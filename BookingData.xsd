@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Booking">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Accounts">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Account">
+                <xs:complexType>
+                  <xs:attribute name="ID" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="Name" type="xs:string" use="required" />
+                  <xs:attribute name="Type" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Assest" />
+                        <xs:enumeration value="Income" />
+                        <xs:enumeration value="Expense" />
+                        <xs:enumeration value="Credit" />
+                        <xs:enumeration value="Debit" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Years">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Year">
+                <xs:complexType>
+                  <xs:attribute name="Name" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="DateStart" type="xs:unsignedInt" use="required" />
+                  <xs:attribute name="DateEnd" type="xs:unsignedInt" use="required" />
+                  <xs:attribute name="Closed" type="xs:string" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element maxOccurs="unbounded" name="Journal">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Entry">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:choice maxOccurs="unbounded">
+                      <xs:element name="Debit">
+                        <xs:complexType>
+                          <xs:attribute name="Value" type="xs:int" use="required" />
+                          <xs:attribute name="Account" type="xs:unsignedShort" use="required" />
+                          <xs:attribute name="Text" type="xs:string" use="required" />
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="Credit">
+                        <xs:complexType>
+                          <xs:attribute name="Value" type="xs:int" use="required" />
+                          <xs:attribute name="Account" type="xs:unsignedShort" use="required" />
+                          <xs:attribute name="Text" type="xs:string" use="required" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:choice>
+                  </xs:sequence>
+                  <xs:attribute name="Date" type="xs:unsignedInt" use="required" />
+                  <xs:attribute name="ID" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="Opening" type="xs:unsignedByte" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Year" type="xs:unsignedShort" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="OpenIssues" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Entry">
+                <xs:complexType>
+                  <xs:attribute name="Year" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="Date" type="xs:unsignedInt" use="required" />
+                  <xs:attribute name="ID" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="Value" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="Account" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="Text" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

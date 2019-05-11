@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xEport papersize="A4" landscape="1" left="13" top="20" bottom="15" right="13">
+  <font size="20" />
+  <text absX="135" align="center">Summen und Salden</text>
+  <move relY="10" />
+  <font size="10" />
+  <text ID="firm" absX="135" align="center">Firm</text>
+  <move relY="5" />
+  <text ID="range" absX="135" align="center">Time Range</text>
+  <move relY="10" />
+  <font size="8" />
+  <table lineheight="4">
+    <columns lineheight="8">
+      <column width="20" rightline="1">Konto</column>
+      <column width="70" rightline="1">Bezeichnung</column>
+      <column width="20" rightline="1">Letzte
+Buchung</column>
+      <column width="20">Eröffnungsbilanz
+Aktiva</column>
+      <column width="20" rightline="1">
+Passiva</column>
+      <column width="20">Summe im Zeitraum
+Soll</column>
+      <column width="20" rightline="1">
+Haben</column>
+      <column width="20">Gesamtsumme am Ende
+Soll</column>
+      <column width="20" rightline="1">
+Haben</column>
+      <column width="20">Saldo am Ende
+Soll</column>
+      <column width="20" >
+Haben</column>
+    </columns>
+    <data />
+  </table>
+  <move relY="10" />
+  <text ID="date" />
+</xEport>
