@@ -1,9 +1,13 @@
+// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace Buchhaltung
+namespace lg2de.SimpleAccounting
 {
     public partial class BookingDialog : Form
     {

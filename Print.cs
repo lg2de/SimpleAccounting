@@ -1,3 +1,7 @@
+// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +10,7 @@ using System.Drawing.Printing;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace Buchhaltung
+namespace lg2de.SimpleAccounting
 {
     class PrintClass
     {

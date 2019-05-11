@@ -1,3 +1,7 @@
+// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,7 +12,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace Buchhaltung
+namespace lg2de.SimpleAccounting
 {
     public partial class MainForm : Form
     {

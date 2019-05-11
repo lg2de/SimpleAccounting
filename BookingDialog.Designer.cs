@@ -1,4 +1,4 @@
-﻿namespace Buchhaltung
+﻿namespace lg2de.SimpleAccounting
 {
     partial class BookingDialog
     {

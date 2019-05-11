@@ -1,3 +1,7 @@
+// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,7 +10,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Buchhaltung
+namespace lg2de.SimpleAccounting
 {
     public partial class SelectBookingYear : Form
     {

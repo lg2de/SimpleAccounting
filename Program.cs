@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
+using System;
 using System.Windows.Forms;
 
-namespace Buchhaltung
+namespace lg2de.SimpleAccounting
 {
     static class Program
     {

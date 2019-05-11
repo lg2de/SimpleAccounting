@@ -1,4 +1,4 @@
-﻿namespace Buchhaltung
+﻿namespace lg2de.SimpleAccounting
 {
     partial class MainForm
     {
@@ -13,11 +13,11 @@
         /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
         protected override void Dispose(bool disposing)
         {
-            if ( disposing && ( components != null ) )
+            if (disposing && (components != null))
             {
                 components.Dispose();
             }
-            base.Dispose( disposing );
+            base.Dispose(disposing);
         }
 
         #region Vom Windows Form-Designer generierter Code
@@ -41,6 +41,7 @@
             this.MenuItemReports = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemReportsJournal = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemReportsSummary = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemReportsBilanz = new System.Windows.Forms.ToolStripMenuItem();
             this.listViewJournal = new System.Windows.Forms.ListView();
             this.columnDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnNumber = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -62,7 +63,6 @@
             this.listViewAccounts = new System.Windows.Forms.ListView();
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.MenuItemReportsBilanz = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerTop)).BeginInit();
             this.splitContainerTop.Panel1.SuspendLayout();
@@ -181,6 +181,13 @@
             this.MenuItemReportsSummary.Text = "Summen und Salden";
             this.MenuItemReportsSummary.Click += new System.EventHandler(this.MenuItemReportsSummary_Click);
             // 
+            // MenuItemReportsBilanz
+            // 
+            this.MenuItemReportsBilanz.Name = "MenuItemReportsBilanz";
+            this.MenuItemReportsBilanz.Size = new System.Drawing.Size(184, 22);
+            this.MenuItemReportsBilanz.Text = "Jahresbilanz";
+            this.MenuItemReportsBilanz.Click += new System.EventHandler(this.MenuItemReportsBilanz_Click);
+            // 
             // listViewJournal
             // 
             this.listViewJournal.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
@@ -193,6 +200,7 @@
             this.listViewJournal.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listViewJournal.FullRowSelect = true;
             this.listViewJournal.GridLines = true;
+            this.listViewJournal.HideSelection = false;
             this.listViewJournal.Location = new System.Drawing.Point(0, 0);
             this.listViewJournal.Name = "listViewJournal";
             this.listViewJournal.Size = new System.Drawing.Size(378, 417);
@@ -288,6 +296,7 @@
             this.listViewAccountJournal.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listViewAccountJournal.FullRowSelect = true;
             this.listViewAccountJournal.GridLines = true;
+            this.listViewAccountJournal.HideSelection = false;
             this.listViewAccountJournal.Location = new System.Drawing.Point(0, 0);
             this.listViewAccountJournal.Name = "listViewAccountJournal";
             this.listViewAccountJournal.Size = new System.Drawing.Size(410, 388);
@@ -349,6 +358,7 @@
             this.listViewAccounts.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listViewAccounts.FullRowSelect = true;
             this.listViewAccounts.GridLines = true;
+            this.listViewAccounts.HideSelection = false;
             this.listViewAccounts.Location = new System.Drawing.Point(0, 0);
             this.listViewAccounts.Name = "listViewAccounts";
             this.listViewAccounts.Size = new System.Drawing.Size(792, 128);
@@ -366,13 +376,6 @@
             // 
             this.columnHeader8.Text = "Bezeichnung";
             this.columnHeader8.Width = 438;
-            // 
-            // MenuItemReportsBilanz
-            // 
-            this.MenuItemReportsBilanz.Name = "MenuItemReportsBilanz";
-            this.MenuItemReportsBilanz.Size = new System.Drawing.Size(184, 22);
-            this.MenuItemReportsBilanz.Text = "Jahresbilanz";
-            this.MenuItemReportsBilanz.Click += new System.EventHandler(this.MenuItemReportsBilanz_Click);
             // 
             // MainForm
             // 

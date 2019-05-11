@@ -1,7 +1,11 @@
-﻿using System.Xml;
+﻿// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
+using System.Xml;
 using System.Xml.Linq;
 
-namespace Buchhaltung
+namespace lg2de.SimpleAccounting
 {
     public static class XmlDocumentExtensions
     {
