@@ -22,5 +22,17 @@ namespace lg2de.SimpleAccounting.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RecentProject {
+            get {
+                return ((string)(this["RecentProject"]));
+            }
+            set {
+                this["RecentProject"] = value;
+            }
+        }
     }
 }

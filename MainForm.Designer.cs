@@ -104,25 +104,26 @@
             // MenuItemArchiveOpen
             // 
             this.MenuItemArchiveOpen.Name = "MenuItemArchiveOpen";
-            this.MenuItemArchiveOpen.Size = new System.Drawing.Size(126, 22);
+            this.MenuItemArchiveOpen.Size = new System.Drawing.Size(180, 22);
             this.MenuItemArchiveOpen.Text = "Öffnen";
+            this.MenuItemArchiveOpen.Click += new System.EventHandler(this.MenuItemArchiveOpen_Click);
             // 
             // MenuItemArchiveSave
             // 
             this.MenuItemArchiveSave.Name = "MenuItemArchiveSave";
-            this.MenuItemArchiveSave.Size = new System.Drawing.Size(126, 22);
+            this.MenuItemArchiveSave.Size = new System.Drawing.Size(180, 22);
             this.MenuItemArchiveSave.Text = "Speichern";
             this.MenuItemArchiveSave.Click += new System.EventHandler(this.MenuItemArchiveSave_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(123, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // MenuItemArchiveExit
             // 
             this.MenuItemArchiveExit.Name = "MenuItemArchiveExit";
-            this.MenuItemArchiveExit.Size = new System.Drawing.Size(126, 22);
+            this.MenuItemArchiveExit.Size = new System.Drawing.Size(180, 22);
             this.MenuItemArchiveExit.Text = "Beenden";
             this.MenuItemArchiveExit.Click += new System.EventHandler(this.MenuItemArchiveExit_Click);
             // 

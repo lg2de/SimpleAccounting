@@ -11,18 +11,20 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using lg2de.SimpleAccounting.Properties;
 
 namespace lg2de.SimpleAccounting
 {
     public partial class MainForm : Form
     {
-        XmlDocument m_Document;
-        bool m_bDocumentChanged = false;
-        string m_strFileName = "";
+        private readonly XmlDocument document;
+        bool isDocumentChanged = false;
+        string fileName = "";
 
-        string m_strBookingYearName = "";
-        DateTime m_dateBookDate;
-        int m_nBookNumber;
+        string bookingYearName = "";
+        DateTime bookDate;
+        int bookNumber;
+
         struct BookEntry { public int Account; public int Value; public string Text; };
         List<BookEntry> DebitEntries = new List<BookEntry>();
         List<BookEntry> CreditEntries = new List<BookEntry>();
@@ -36,26 +38,26 @@ namespace lg2de.SimpleAccounting
 
         public MainForm()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
-            m_Document = new XmlDocument();
-            string strFileName = Application.ExecutablePath;
-            strFileName = strFileName.Substring(0, strFileName.LastIndexOf("\\"));
-            strFileName = strFileName.Substring(0, strFileName.LastIndexOf("\\"));
-            strFileName = strFileName.Substring(0, strFileName.LastIndexOf("\\") + 1);
-            strFileName += "AGJM.bxml";
-            LoadDatabase(strFileName);
+            this.document = new XmlDocument();
+
+            Settings.Default.Upgrade();
+            if (File.Exists(Settings.Default.RecentProject))
+            {
+                this.LoadDatabase(Settings.Default.RecentProject);
+            }
         }
 
         internal XmlNode GetAccountNode(int nAccountIdent)
         {
-            XmlNode accoutNode = m_Document.SelectSingleNode("//Accounts/Account[@ID=" + nAccountIdent + "]");
+            XmlNode accoutNode = this.document.SelectSingleNode("//Accounts/Account[@ID=" + nAccountIdent + "]");
             return accoutNode;
         }
 
         internal IEnumerable<string> GetAccounts()
         {
-            foreach(XmlElement account in m_Document.SelectNodes("//Accounts/Account"))
+            foreach (XmlElement account in this.document.SelectNodes("//Accounts/Account"))
             {
                 yield return $"{account.GetAttribute("Name")} ({account.GetAttribute("ID")})";
             }
@@ -63,13 +65,13 @@ namespace lg2de.SimpleAccounting
 
         internal string GetAccountName(int nAccountIdent)
         {
-            XmlNode accoutNode = GetAccountNode(nAccountIdent);
+            XmlNode accoutNode = this.GetAccountNode(nAccountIdent);
             return accoutNode?.Attributes.GetNamedItem("Name").Value ?? string.Empty;
         }
 
         internal string GetFormatedDate(string strInternalDate)
         {
-            return GetFormatedDate(Convert.ToInt32(strInternalDate));
+            return this.GetFormatedDate(Convert.ToInt32(strInternalDate));
         }
         internal string GetFormatedDate(int nInternalDate)
         {
@@ -78,10 +80,10 @@ namespace lg2de.SimpleAccounting
 
         internal int GetMaxBookIdent()
         {
-            XmlNode journal = m_Document.SelectSingleNode($"//Journal[@Year='{m_strBookingYearName}']");
+            XmlNode journal = this.document.SelectSingleNode($"//Journal[@Year='{this.bookingYearName}']");
             var ids = journal.SelectNodes("Entry/@ID");
             int maxIdent = 0;
-            foreach(XmlNode id in ids)
+            foreach (XmlNode id in ids)
             {
                 var ident = Convert.ToInt32(id.Value);
                 if (maxIdent < ident)
@@ -95,76 +97,100 @@ namespace lg2de.SimpleAccounting
 
         internal void SetBookDate(DateTime date)
         {
-            m_dateBookDate = date;
+            this.bookDate = date;
         }
         internal void SetBookIdent(int number)
         {
-            m_nBookNumber = number;
+            this.bookNumber = number;
         }
         internal void AddDebitEntry(int nAccount, int nValue, string strText)
         {
-            BookEntry entry = new BookEntry();
+            var entry = new BookEntry();
             entry.Account = nAccount;
             entry.Value = nValue;
             entry.Text = strText;
-            DebitEntries.Add(entry);
+            this.DebitEntries.Add(entry);
         }
         internal void AddCreditEntry(int nAccount, int nValue, string strText)
         {
-            BookEntry entry = new BookEntry();
+            var entry = new BookEntry();
             entry.Account = nAccount;
             entry.Value = nValue;
             entry.Text = strText;
-            CreditEntries.Add(entry);
+            this.CreditEntries.Add(entry);
         }
         internal void RegisterBooking()
         {
-            XmlElement newNode = m_Document.CreateElement("Entry");
-            XmlAttribute attrEntry = m_Document.CreateAttribute("Date");
-            attrEntry.Value = m_dateBookDate.ToString("yyyyMMdd");
+            XmlElement newNode = this.document.CreateElement("Entry");
+            XmlAttribute attrEntry = this.document.CreateAttribute("Date");
+            attrEntry.Value = this.bookDate.ToString("yyyyMMdd");
             newNode.Attributes.Append(attrEntry);
-            attrEntry = m_Document.CreateAttribute("ID");
-            attrEntry.Value = m_nBookNumber.ToString();
+            attrEntry = this.document.CreateAttribute("ID");
+            attrEntry.Value = this.bookNumber.ToString();
             newNode.Attributes.Append(attrEntry);
-            foreach (BookEntry entry in DebitEntries)
+            foreach (BookEntry entry in this.DebitEntries)
             {
-                XmlElement newEntry = CreateXmlElement("Debit", entry);
+                XmlElement newEntry = this.CreateXmlElement("Debit", entry);
                 newNode.AppendChild(newEntry);
             }
-            foreach (BookEntry entry in CreditEntries)
+            foreach (BookEntry entry in this.CreditEntries)
             {
-                XmlElement newEntry = CreateXmlElement("Credit", entry);
+                XmlElement newEntry = this.CreateXmlElement("Credit", entry);
                 newNode.AppendChild(newEntry);
             }
 
-            XmlNode JournalNode = m_Document.SelectSingleNode($"//Journal[@Year='{m_strBookingYearName}']");
+            XmlNode JournalNode = this.document.SelectSingleNode($"//Journal[@Year='{this.bookingYearName}']");
             JournalNode.AppendChild(newNode);
-            m_bDocumentChanged = true;
+            this.isDocumentChanged = true;
 
-            DebitEntries.Clear();
-            CreditEntries.Clear();
+            this.DebitEntries.Clear();
+            this.CreditEntries.Clear();
 
             this.RefreshJournal();
         }
 
         void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!m_bDocumentChanged)
+            if (!this.isDocumentChanged)
+            {
                 return;
+            }
 
             DialogResult ret = MessageBox.Show(
                 "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
                 "Programm beenden",
                 MessageBoxButtons.YesNoCancel);
             if (ret == DialogResult.Cancel)
+            {
                 e.Cancel = true;
+            }
             else if (ret == DialogResult.Yes)
-                SaveDatabase();
+            {
+                this.SaveDatabase();
+            }
+        }
+
+        private void MenuItemArchiveOpen_Click(object sender, EventArgs e)
+        {
+            using (var openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Projektdateien (*.bxml)|*.bxml";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                this.LoadDatabase(openFileDialog.FileName);
+                Settings.Default.RecentProject = openFileDialog.FileName;
+                Settings.Default.Save();
+            }
         }
 
         void MenuItemArchiveSave_Click(object sender, EventArgs e)
         {
-            SaveDatabase();
+            this.SaveDatabase();
         }
 
         void MenuItemArchiveExit_Click(object sender, EventArgs e)
@@ -174,33 +200,33 @@ namespace lg2de.SimpleAccounting
 
         void MenuItemActionsBooking_Click(object sender, EventArgs e)
         {
-            BookingDialog dlg = new BookingDialog(this);
+            var dlg = new BookingDialog(this);
             DialogResult ret = dlg.ShowDialog();
         }
 
         void MenuItemActionsSelectYear_Click(object sender, EventArgs e)
         {
-            SelectBookingYear dlg = new SelectBookingYear();
-            XmlNodeList years = m_Document.SelectNodes("//Years/Year");
+            var dlg = new SelectBookingYear();
+            XmlNodeList years = this.document.SelectNodes("//Years/Year");
             foreach (XmlNode year in years)
             {
                 dlg.AddYear(year.Attributes.GetNamedItem("Name").Value);
             }
 
-            dlg.CurrentYear = m_strBookingYearName;
+            dlg.CurrentYear = this.bookingYearName;
             var result = dlg.ShowDialog();
             if (result != DialogResult.OK)
             {
                 return;
             }
 
-            SelectBookingYear(dlg.CurrentYear);
+            this.SelectBookingYear(dlg.CurrentYear);
         }
 
         void MenuItemActionCloseYear_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
-                "Wollen Sie das Jahr " + m_strBookingYearName + " abschließen?",
+                "Wollen Sie das Jahr " + this.bookingYearName + " abschließen?",
                 "Jahresabschluß",
                 MessageBoxButtons.YesNo);
             if (result != DialogResult.Yes)
@@ -208,50 +234,55 @@ namespace lg2de.SimpleAccounting
                 return;
             }
 
-            XmlNode yearNode = m_Document.SelectSingleNode("//Year[@Name=" + m_strBookingYearName + "]");
-            XmlAttribute attr = (XmlAttribute)yearNode.Attributes.GetNamedItem("Closed");
+            XmlNode yearNode = this.document.SelectSingleNode("//Year[@Name=" + this.bookingYearName + "]");
+            var attr = (XmlAttribute)yearNode.Attributes.GetNamedItem("Closed");
             if (attr != null && attr.Value == "True")
+            {
                 return;
-            attr = m_Document.CreateAttribute("Closed");
+            }
+
+            attr = this.document.CreateAttribute("Closed");
             attr.Value = "True";
             yearNode.Attributes.Append(attr);
 
-            string strNewYear = (Convert.ToInt32(m_strBookingYearName) + 1).ToString();
+            string strNewYear = (Convert.ToInt32(this.bookingYearName) + 1).ToString();
 
-            XmlNode newYearNode = m_Document.CreateElement("Year");
-            attr = (XmlAttribute)m_Document.CreateAttribute("Name");
+            XmlNode newYearNode = this.document.CreateElement("Year");
+            attr = (XmlAttribute)this.document.CreateAttribute("Name");
             attr.Value = strNewYear;
             newYearNode.Attributes.Append(attr);
-            attr = (XmlAttribute)m_Document.CreateAttribute("DateStart");
+            attr = (XmlAttribute)this.document.CreateAttribute("DateStart");
             string strDateStart = (Convert.ToInt64(yearNode.Attributes.GetNamedItem("DateStart").Value) + 10000).ToString();
             attr.Value = strDateStart;
             newYearNode.Attributes.Append(attr);
-            attr = (XmlAttribute)m_Document.CreateAttribute("DateEnd");
+            attr = (XmlAttribute)this.document.CreateAttribute("DateEnd");
             attr.Value = (Convert.ToInt64(yearNode.Attributes.GetNamedItem("DateEnd").Value) + 10000).ToString();
             newYearNode.Attributes.Append(attr);
             yearNode.ParentNode.AppendChild(newYearNode);
 
-            XmlNode newYearJournal = m_Document.CreateElement("Journal");
-            attr = (XmlAttribute)m_Document.CreateAttribute("Year");
+            XmlNode newYearJournal = this.document.CreateElement("Journal");
+            attr = (XmlAttribute)this.document.CreateAttribute("Year");
             attr.Value = strNewYear;
             newYearJournal.Attributes.Append(attr);
-            m_Document.DocumentElement.InsertAfter(newYearJournal, m_Document.SelectSingleNode("//Journal[@Year=" + m_strBookingYearName + "]"));
+            this.document.DocumentElement.InsertAfter(newYearJournal, this.document.SelectSingleNode("//Journal[@Year=" + this.bookingYearName + "]"));
 
             int nID = 1;
 
             // Assest Accounts (Bestandskonten), Credit and Debit Accounts
-            XmlNodeList accountNodes = m_Document.SelectNodes("//Accounts/Account[@Type='Assest' or @Type='Credit' or @Type='Debit']");
+            XmlNodeList accountNodes = this.document.SelectNodes("//Accounts/Account[@Type='Assest' or @Type='Credit' or @Type='Debit']");
             foreach (XmlNode accountNode in accountNodes)
             {
                 string strAccount = accountNode.Attributes.GetNamedItem("ID").Value;
-                XPathNavigator nav = m_Document.CreateNavigator();
+                XPathNavigator nav = this.document.CreateNavigator();
                 double nCredit = (double)nav.Evaluate(
-                    "sum(//Journal[@Year=" + m_strBookingYearName + "]/Entry/Credit[@Account=" + strAccount + "]/@Value)");
+                    "sum(//Journal[@Year=" + this.bookingYearName + "]/Entry/Credit[@Account=" + strAccount + "]/@Value)");
                 double nDebit = (double)nav.Evaluate(
-                    "sum(//Journal[@Year=" + m_strBookingYearName + "]/Entry/Debit[@Account=" + strAccount + "]/@Value)");
+                    "sum(//Journal[@Year=" + this.bookingYearName + "]/Entry/Debit[@Account=" + strAccount + "]/@Value)");
 
                 if (nCredit == 0 && nDebit == 0 || nCredit == nDebit)
+                {
                     continue;
+                }
 
                 int nValue = 0;
                 string strName1 = "";
@@ -269,38 +300,38 @@ namespace lg2de.SimpleAccounting
                     strName2 = "Credit";
                 }
 
-                XmlNode entry = m_Document.CreateElement("Entry");
-                attr = m_Document.CreateAttribute("Date");
+                XmlNode entry = this.document.CreateElement("Entry");
+                attr = this.document.CreateAttribute("Date");
                 attr.Value = strDateStart;
                 entry.Attributes.Append(attr);
-                attr = m_Document.CreateAttribute("ID");
+                attr = this.document.CreateAttribute("ID");
                 attr.Value = nID.ToString();
                 entry.Attributes.Append(attr);
-                attr = m_Document.CreateAttribute("Opening");
+                attr = this.document.CreateAttribute("Opening");
                 attr.Value = "1";
                 entry.Attributes.Append(attr);
                 newYearJournal.AppendChild(entry);
 
-                XmlNode value = m_Document.CreateElement(strName1);
-                attr = (XmlAttribute)m_Document.CreateAttribute("Value");
+                XmlNode value = this.document.CreateElement(strName1);
+                attr = (XmlAttribute)this.document.CreateAttribute("Value");
                 attr.Value = nValue.ToString();
                 value.Attributes.Append(attr);
-                attr = (XmlAttribute)m_Document.CreateAttribute("Account");
+                attr = (XmlAttribute)this.document.CreateAttribute("Account");
                 attr.Value = strAccount;
                 value.Attributes.Append(attr);
-                attr = (XmlAttribute)m_Document.CreateAttribute("Text");
+                attr = (XmlAttribute)this.document.CreateAttribute("Text");
                 attr.Value = "EB-Wert " + nID.ToString();
                 value.Attributes.Append(attr);
                 entry.AppendChild(value);
 
-                value = m_Document.CreateElement(strName2);
-                attr = (XmlAttribute)m_Document.CreateAttribute("Value");
+                value = this.document.CreateElement(strName2);
+                attr = (XmlAttribute)this.document.CreateAttribute("Value");
                 attr.Value = nValue.ToString();
                 value.Attributes.Append(attr);
-                attr = (XmlAttribute)m_Document.CreateAttribute("Account");
+                attr = (XmlAttribute)this.document.CreateAttribute("Account");
                 attr.Value = "990";
                 value.Attributes.Append(attr);
-                attr = (XmlAttribute)m_Document.CreateAttribute("Text");
+                attr = (XmlAttribute)this.document.CreateAttribute("Text");
                 attr.Value = "EB-Wert " + nID.ToString();
                 value.Attributes.Append(attr);
                 entry.AppendChild(value);
@@ -308,13 +339,13 @@ namespace lg2de.SimpleAccounting
                 nID++;
             }
 
-            m_bDocumentChanged = true;
-            SelectBookingYear(strNewYear);
+            this.isDocumentChanged = true;
+            this.SelectBookingYear(strNewYear);
         }
 
         void MenuItemReportsJournal_Click(object sender, EventArgs e)
         {
-            PrintClass print = new PrintClass();
+            var print = new PrintClass();
             string fileName = Application.ExecutablePath;
             fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
             fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
@@ -328,24 +359,24 @@ namespace lg2de.SimpleAccounting
             firmNode.InnerText = "AGJM im Bistum Dresden Meißen";
 
             XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            XmlNode yearNode = m_Document.SelectSingleNode("//Year[@Name=" + m_strBookingYearName + "]");
+            XmlNode yearNode = this.document.SelectSingleNode("//Year[@Name=" + this.bookingYearName + "]");
             XmlNode startNode = yearNode.Attributes.GetNamedItem("DateStart");
             XmlNode endNode = yearNode.Attributes.GetNamedItem("DateEnd");
-            rangeNode.InnerText = GetFormatedDate(startNode.Value) + " - " + GetFormatedDate(endNode.Value);
+            rangeNode.InnerText = this.GetFormatedDate(startNode.Value) + " - " + this.GetFormatedDate(endNode.Value);
 
             var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
             dateNode.InnerText = "Dresden, " + DateTime.Now.ToLongDateString();
 
             XmlNode dataNode = doc.SelectSingleNode("//table/data");
 
-            var xdoc = XDocument.Parse(m_Document.OuterXml);
-            var journalEntries = xdoc.XPathSelectElements("//Journal[@Year=" + m_strBookingYearName + "]/Entry");
+            var xdoc = XDocument.Parse(this.document.OuterXml);
+            var journalEntries = xdoc.XPathSelectElements("//Journal[@Year=" + this.bookingYearName + "]/Entry");
             foreach (var entry in journalEntries.OrderBy(x => x.Attribute("Date").Value))
             {
                 XmlNode dataLineNode = doc.CreateElement("tr");
                 XmlNode dataItemNode = doc.CreateElement("td");
-                SetNodeAttribute(dataLineNode, "topline", "1");
-                dataItemNode.InnerText = GetFormatedDate(entry.Attribute("Date").Value);
+                this.SetNodeAttribute(dataLineNode, "topline", "1");
+                dataItemNode.InnerText = this.GetFormatedDate(entry.Attribute("Date").Value);
                 dataLineNode.AppendChild(dataItemNode);
                 dataItemNode = dataItemNode.Clone();
                 dataItemNode.InnerText = entry.Attribute("ID").Value;
@@ -431,11 +462,11 @@ namespace lg2de.SimpleAccounting
                 }
             }
 
-            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Journal " + m_strBookingYearName);
+            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Journal " + this.bookingYearName);
         }
         void MenuItemReportsSummary_Click(object sender, EventArgs e)
         {
-            PrintClass print = new PrintClass();
+            var print = new PrintClass();
             string fileName = Application.ExecutablePath;
             fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
             fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
@@ -449,17 +480,17 @@ namespace lg2de.SimpleAccounting
             firmNode.InnerText = "AGJM im Bistum Dresden Meißen";
 
             XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            XmlNode yearNode = m_Document.SelectSingleNode("//Year[@Name=" + m_strBookingYearName + "]");
+            XmlNode yearNode = this.document.SelectSingleNode("//Year[@Name=" + this.bookingYearName + "]");
             XmlNode startNode = yearNode.Attributes.GetNamedItem("DateStart");
             XmlNode endNode = yearNode.Attributes.GetNamedItem("DateEnd");
-            rangeNode.InnerText = GetFormatedDate(startNode.Value) + " - " + GetFormatedDate(endNode.Value);
+            rangeNode.InnerText = this.GetFormatedDate(startNode.Value) + " - " + this.GetFormatedDate(endNode.Value);
 
             var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
             dateNode.InnerText = "Dresden, " + DateTime.Now.ToLongDateString();
 
             XmlNode dataNode = doc.SelectSingleNode("//table/data");
-            XmlNodeList accountEntries = m_Document.SelectNodes("//Accounts/Account");
-            XmlNode journalNode = m_Document.SelectSingleNode("//Journal[@Year=" + m_strBookingYearName + "]");
+            XmlNodeList accountEntries = this.document.SelectNodes("//Accounts/Account");
+            XmlNode journalNode = this.document.SelectSingleNode("//Journal[@Year=" + this.bookingYearName + "]");
 
             double totalOpeningCredit = 0, totalOpeningDebit = 0;
             double totalSumSectionCredit = 0, totalSumSectionDebit = 0;
@@ -561,7 +592,7 @@ namespace lg2de.SimpleAccounting
 
                 XmlNode dataLineNode = doc.CreateElement("tr");
                 XmlNode dataItemNode = doc.CreateElement("td");
-                SetNodeAttribute(dataLineNode, "topline", "1");
+                this.SetNodeAttribute(dataLineNode, "topline", "1");
 
                 dataItemNode.InnerText = accountNode.Attributes.GetNamedItem("ID").Value;
                 dataLineNode.AppendChild(dataItemNode);
@@ -571,7 +602,7 @@ namespace lg2de.SimpleAccounting
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = GetFormatedDate(lastBookingDate);
+                dataItemNode.InnerText = this.GetFormatedDate(lastBookingDate);
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
@@ -616,7 +647,7 @@ namespace lg2de.SimpleAccounting
 
             XmlNode totalLineNode = doc.CreateElement("tr");
             XmlNode totalItemNode = doc.CreateElement("td");
-            SetNodeAttribute(totalLineNode, "topline", "1");
+            this.SetNodeAttribute(totalLineNode, "topline", "1");
 
             totalItemNode.InnerText = "";
             totalLineNode.AppendChild(totalItemNode);
@@ -659,12 +690,12 @@ namespace lg2de.SimpleAccounting
 
             dataNode.AppendChild(totalLineNode);
 
-            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Summen und Salden " + m_strBookingYearName);
+            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Summen und Salden " + this.bookingYearName);
         }
 
         private void MenuItemReportsBilanz_Click(object sender, EventArgs e)
         {
-            PrintClass print = new PrintClass();
+            var print = new PrintClass();
             string fileName = Application.ExecutablePath;
             fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
             fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
@@ -678,13 +709,13 @@ namespace lg2de.SimpleAccounting
             firmNode.InnerText = "AGJM im Bistum Dresden Meißen";
 
             var rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            rangeNode.InnerText = m_strBookingYearName;
+            rangeNode.InnerText = this.bookingYearName;
 
             var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
             dateNode.InnerText = "Dresden, " + DateTime.Now.ToLongDateString();
 
-            var xdoc = XDocument.Parse(m_Document.OuterXml);
-            var journal = xdoc.XPathSelectElement("//Journal[@Year=" + m_strBookingYearName + "]");
+            var xdoc = XDocument.Parse(this.document.OuterXml);
+            var journal = xdoc.XPathSelectElement("//Journal[@Year=" + this.bookingYearName + "]");
 
             var dataNode = doc.SelectSingleNode("//table/data[@target='income']");
             var accounts = xdoc.XPathSelectElements("//Accounts/Account[@Type='Income']");
@@ -706,7 +737,9 @@ namespace lg2de.SimpleAccounting
 
                 double balance = credits - debits;
                 if (balance == 0)
+                {
                     continue;
+                }
 
                 totalIncome += balance;
 
@@ -754,7 +787,9 @@ namespace lg2de.SimpleAccounting
 
                 double nBalance = credits - debits;
                 if (nBalance == 0)
+                {
                     continue;
+                }
 
                 totalExpense += nBalance;
 
@@ -909,7 +944,9 @@ namespace lg2de.SimpleAccounting
 
                 double balance = debits - credits;
                 if (balance == 0)
+                {
                     continue;
+                }
 
                 totalAccount += balance;
 
@@ -983,26 +1020,26 @@ namespace lg2de.SimpleAccounting
             saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalAccount / 100).ToString("0.00");
 
-            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Jahresbilanz " + m_strBookingYearName);
+            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Jahresbilanz " + this.bookingYearName);
         }
 
         void listViewAccounts_DoubleClick(object sender, EventArgs e)
         {
             ListViewItem item = ((ListView)sender).SelectedItems[0];
             Int32 nAccountNumber = Convert.ToInt32(item.Text);
-            RefreshAccount(nAccountNumber);
+            this.RefreshAccount(nAccountNumber);
         }
 
         XmlElement CreateXmlElement(string Type, BookEntry entry)
         {
-            XmlElement newEntry = m_Document.CreateElement(Type);
-            XmlAttribute attrDebit = m_Document.CreateAttribute("Value");
+            XmlElement newEntry = this.document.CreateElement(Type);
+            XmlAttribute attrDebit = this.document.CreateAttribute("Value");
             attrDebit.Value = entry.Value.ToString();
             newEntry.Attributes.Append(attrDebit);
-            attrDebit = m_Document.CreateAttribute("Account");
+            attrDebit = this.document.CreateAttribute("Account");
             attrDebit.Value = entry.Account.ToString();
             newEntry.Attributes.Append(attrDebit);
-            attrDebit = m_Document.CreateAttribute("Text");
+            attrDebit = this.document.CreateAttribute("Text");
             attrDebit.Value = entry.Text;
             newEntry.Attributes.Append(attrDebit);
             return newEntry;
@@ -1010,68 +1047,77 @@ namespace lg2de.SimpleAccounting
         string BuildAccountDescription(string strAccountNumber)
         {
             int nAccountNumber = Convert.ToInt32(strAccountNumber);
-            string strAccountName = GetAccountName(nAccountNumber);
+            string strAccountName = this.GetAccountName(nAccountNumber);
             return strAccountNumber + " (" + strAccountName + ")";
         }
 
         void SelectLastBookingYear()
         {
-            XmlNodeList years = m_Document.SelectNodes("//Years/Year");
+            XmlNodeList years = this.document.SelectNodes("//Years/Year");
             if (years.Count > 0)
-                SelectBookingYear(years[years.Count - 1].Attributes.GetNamedItem("Name").Value);
+            {
+                this.SelectBookingYear(years[years.Count - 1].Attributes.GetNamedItem("Name").Value);
+            }
         }
 
         void SelectBookingYear(string strYearName)
         {
-            m_strBookingYearName = strYearName;
-            this.Text = "Buchhaltung - " + m_strFileName + " - " + m_strBookingYearName;
-            RefreshJournal();
-            listViewAccountJournal.Items.Clear();
+            this.bookingYearName = strYearName;
+            this.Text = "Buchhaltung - " + this.fileName + " - " + this.bookingYearName;
+            this.RefreshJournal();
+            this.listViewAccountJournal.Items.Clear();
         }
 
         void LoadDatabase(string strFileName)
         {
-            m_strFileName = strFileName;
-            m_Document.Load(m_strFileName);
-            XmlNodeList nodes = m_Document.SelectNodes("//Accounts/Account");
+            this.fileName = strFileName;
+            this.document.Load(this.fileName);
+            XmlNodeList nodes = this.document.SelectNodes("//Accounts/Account");
             foreach (XmlNode entry in nodes)
             {
-                ListViewItem item = new ListViewItem(entry.Attributes.GetNamedItem("ID").Value);
+                var item = new ListViewItem(entry.Attributes.GetNamedItem("ID").Value);
                 item.SubItems.Add(entry.Attributes.GetNamedItem("Name").Value);
-                listViewAccounts.Items.Add(item);
+                this.listViewAccounts.Items.Add(item);
             }
-            SelectLastBookingYear();
+
+            this.SelectLastBookingYear();
         }
+
         void SaveDatabase()
         {
-            DateTime fileDate = File.GetLastWriteTime(m_strFileName);
-            string strNewFileName = m_strFileName + "." + fileDate.ToString("yyyyMMddHHmmss");
+            DateTime fileDate = File.GetLastWriteTime(this.fileName);
+            string strNewFileName = this.fileName + "." + fileDate.ToString("yyyyMMddHHmmss");
             try
             {
-                File.Move(m_strFileName, strNewFileName);
+                File.Move(this.fileName, strNewFileName);
             }
             catch (FileNotFoundException)
             {
             }
-            FileStream file = new FileStream(m_strFileName, FileMode.Create, FileAccess.Write);
-            m_Document.Save(file);
+            var file = new FileStream(this.fileName, FileMode.Create, FileAccess.Write);
+            this.document.Save(file);
             file.Close();
-            m_bDocumentChanged = false;
+            this.isDocumentChanged = false;
         }
 
         void RefreshJournal()
         {
-            listViewJournal.Items.Clear();
-            XmlNode journal = m_Document.SelectSingleNode("//Journal[@Year=" + m_strBookingYearName + "]");
+            this.listViewJournal.Items.Clear();
+            XmlNode journal = this.document.SelectSingleNode("//Journal[@Year=" + this.bookingYearName + "]");
             bool bColorStatus = false;
             foreach (XmlNode entry in journal.ChildNodes)
             {
                 if (entry.Name != "Entry")
+                {
                     continue;
+                }
 
-                ListViewItem item = new ListViewItem(entry.Attributes.GetNamedItem("Date").Value);
+                var item = new ListViewItem(entry.Attributes.GetNamedItem("Date").Value);
                 if (bColorStatus)
+                {
                     item.BackColor = Color.LightGreen;
+                }
+
                 bColorStatus = !bColorStatus;
 
                 item.SubItems.Add(entry.Attributes.GetNamedItem("ID").Value);
@@ -1083,48 +1129,53 @@ namespace lg2de.SimpleAccounting
                     double nValue = Convert.ToDouble(debitAccounts[0].Attributes.GetNamedItem("Value").Value) / 100;
                     item.SubItems.Add(nValue.ToString("0.00"));
                     string strAccountNumber = debitAccounts[0].Attributes.GetNamedItem("Account").Value;
-                    item.SubItems.Add(BuildAccountDescription(strAccountNumber));
+                    item.SubItems.Add(this.BuildAccountDescription(strAccountNumber));
                     strAccountNumber = creditAccounts[0].Attributes.GetNamedItem("Account").Value;
-                    item.SubItems.Add(BuildAccountDescription(strAccountNumber));
-                    listViewJournal.Items.Add(item);
+                    item.SubItems.Add(this.BuildAccountDescription(strAccountNumber));
+                    this.listViewJournal.Items.Add(item);
                     continue;
                 }
                 foreach (XmlNode debitEntry in debitAccounts)
                 {
-                    ListViewItem DebitItem = (ListViewItem)item.Clone();
+                    var DebitItem = (ListViewItem)item.Clone();
                     DebitItem.SubItems.Add(debitEntry.Attributes.GetNamedItem("Text").Value);
                     double nValue = Convert.ToDouble(debitEntry.Attributes.GetNamedItem("Value").Value) / 100;
                     DebitItem.SubItems.Add(nValue.ToString("0.00"));
                     string strAccountNumber = debitEntry.Attributes.GetNamedItem("Account").Value;
-                    DebitItem.SubItems.Add(BuildAccountDescription(strAccountNumber));
-                    listViewJournal.Items.Add(DebitItem);
+                    DebitItem.SubItems.Add(this.BuildAccountDescription(strAccountNumber));
+                    this.listViewJournal.Items.Add(DebitItem);
                 }
                 foreach (XmlNode creditEntry in creditAccounts)
                 {
-                    ListViewItem CreditItem = (ListViewItem)item.Clone();
+                    var CreditItem = (ListViewItem)item.Clone();
                     CreditItem.SubItems.Add(creditEntry.Attributes.GetNamedItem("Text").Value);
                     double nValue = Convert.ToDouble(creditEntry.Attributes.GetNamedItem("Value").Value) / 100;
                     CreditItem.SubItems.Add(nValue.ToString("0.00"));
                     CreditItem.SubItems.Add("");
                     string strAccountNumber = creditEntry.Attributes.GetNamedItem("Account").Value;
-                    CreditItem.SubItems.Add(BuildAccountDescription(strAccountNumber));
-                    listViewJournal.Items.Add(CreditItem);
+                    CreditItem.SubItems.Add(this.BuildAccountDescription(strAccountNumber));
+                    this.listViewJournal.Items.Add(CreditItem);
                 }
             }
         }
 
         void RefreshAccount(Int32 nAccountNumber)
         {
-            RefreshAccount(nAccountNumber, true);
+            this.RefreshAccount(nAccountNumber, true);
         }
         void RefreshAccount(Int32 nAccountNumber, bool bOnlyCurrentBookyear)
         {
             XmlNodeList nodes;
             if (bOnlyCurrentBookyear)
-                nodes = m_Document.SelectNodes("//Journal[@Year=" + m_strBookingYearName + "]/Entry/*[@Account=" + nAccountNumber.ToString() + "]");
+            {
+                nodes = this.document.SelectNodes("//Journal[@Year=" + this.bookingYearName + "]/Entry/*[@Account=" + nAccountNumber.ToString() + "]");
+            }
             else
-                nodes = m_Document.SelectNodes("//Journal/Entry/*[@Account=" + nAccountNumber.ToString() + "]");
-            listViewAccountJournal.Items.Clear();
+            {
+                nodes = this.document.SelectNodes("//Journal/Entry/*[@Account=" + nAccountNumber.ToString() + "]");
+            }
+
+            this.listViewAccountJournal.Items.Clear();
             Double nCreditSum = 0;
             Double nDebitSum = 0;
             bool bColorStatus = false;
@@ -1142,9 +1193,12 @@ namespace lg2de.SimpleAccounting
                 //// any first entry for the account defines an opening value
                 //bOpeningSeen = true;
 
-                ListViewItem item = new ListViewItem(entry.Attributes.GetNamedItem("Date").Value);
+                var item = new ListViewItem(entry.Attributes.GetNamedItem("Date").Value);
                 if (bColorStatus)
+                {
                     item.BackColor = Color.LightGreen;
+                }
+
                 bColorStatus = !bColorStatus;
 
                 item.SubItems.Add(entry.Attributes.GetNamedItem("ID").Value);
@@ -1160,10 +1214,12 @@ namespace lg2de.SimpleAccounting
                     if (CreditAccounts.Count == 1)
                     {
                         string strCreditAccountNumber = CreditAccounts[0].Attributes.GetNamedItem("Account").Value;
-                        item.SubItems.Add(BuildAccountDescription(strCreditAccountNumber));
+                        item.SubItems.Add(this.BuildAccountDescription(strCreditAccountNumber));
                     }
                     else
+                    {
                         item.SubItems.Add("Diverse");
+                    }
                 }
                 else
                 {
@@ -1176,23 +1232,25 @@ namespace lg2de.SimpleAccounting
                     if (DebitAccounts.Count == 1)
                     {
                         string strDebitAccountNumber = DebitAccounts[0].Attributes.GetNamedItem("Account").Value;
-                        item.SubItems.Add(BuildAccountDescription(strDebitAccountNumber));
+                        item.SubItems.Add(this.BuildAccountDescription(strDebitAccountNumber));
                     }
                     else
+                    {
                         item.SubItems.Add("Diverse");
+                    }
                 }
-                listViewAccountJournal.Items.Add(item);
+                this.listViewAccountJournal.Items.Add(item);
             }
 
-            ListViewItem sumItem = new ListViewItem();
+            var sumItem = new ListViewItem();
             sumItem.BackColor = Color.LightGray;
             sumItem.SubItems.Add("");
             sumItem.SubItems.Add("Summe");
             sumItem.SubItems.Add(nDebitSum.ToString("0.00"));
             sumItem.SubItems.Add(nCreditSum.ToString("0.00"));
-            listViewAccountJournal.Items.Add(sumItem);
+            this.listViewAccountJournal.Items.Add(sumItem);
 
-            ListViewItem saldoItem = new ListViewItem();
+            var saldoItem = new ListViewItem();
             saldoItem.BackColor = Color.LightGray;
             saldoItem.SubItems.Add("");
             saldoItem.SubItems.Add("Saldo");
@@ -1206,7 +1264,7 @@ namespace lg2de.SimpleAccounting
                 saldoItem.SubItems.Add("");
                 saldoItem.SubItems.Add((nCreditSum - nDebitSum).ToString("0.00"));
             }
-            listViewAccountJournal.Items.Add(saldoItem);
+            this.listViewAccountJournal.Items.Add(saldoItem);
         }
     }
 }
