@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -43,9 +44,53 @@ namespace lg2de.SimpleAccounting
             this.document = new XmlDocument();
 
             Settings.Default.Upgrade();
+            if (Settings.Default.RecentProjects == null)
+            {
+                Settings.Default.RecentProjects = new StringCollection();
+            }
+
             if (File.Exists(Settings.Default.RecentProject))
             {
                 this.LoadDatabase(Settings.Default.RecentProject);
+            }
+
+            this.MenuItemArchive.DropDownItems.Add(new ToolStripSeparator());
+            foreach (var project in Settings.Default.RecentProjects)
+            {
+                if (!File.Exists(project))
+                {
+                    continue;
+                }
+
+                var item = this.MenuItemArchive.DropDownItems.Add(project);
+                item.Tag = project;
+                item.Click += (s, a) =>
+                {
+                    var menuEntry = (ToolStripItem)s;
+                    string fileName = menuEntry.Tag.ToString();
+                    if (!File.Exists(fileName))
+                    {
+                        return;
+                    }
+
+                    if (this.isDocumentChanged)
+                    {
+                        var result = MessageBox.Show(
+                            "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
+                            "Programm beenden",
+                            MessageBoxButtons.YesNoCancel);
+                        if (result == DialogResult.Cancel)
+                        {
+                            return;
+                        }
+                        else if (result == DialogResult.Yes)
+                        {
+                            this.SaveDatabase();
+                        }
+                    }
+
+                    this.LoadDatabase(fileName);
+                };
             }
         }
 
@@ -183,8 +228,6 @@ namespace lg2de.SimpleAccounting
                 }
 
                 this.LoadDatabase(openFileDialog.FileName);
-                Settings.Default.RecentProject = openFileDialog.FileName;
-                Settings.Default.Save();
             }
         }
 
@@ -248,20 +291,20 @@ namespace lg2de.SimpleAccounting
             string strNewYear = (Convert.ToInt32(this.bookingYearName) + 1).ToString();
 
             XmlNode newYearNode = this.document.CreateElement("Year");
-            attr = (XmlAttribute)this.document.CreateAttribute("Name");
+            attr = this.document.CreateAttribute("Name");
             attr.Value = strNewYear;
             newYearNode.Attributes.Append(attr);
-            attr = (XmlAttribute)this.document.CreateAttribute("DateStart");
+            attr = this.document.CreateAttribute("DateStart");
             string strDateStart = (Convert.ToInt64(yearNode.Attributes.GetNamedItem("DateStart").Value) + 10000).ToString();
             attr.Value = strDateStart;
             newYearNode.Attributes.Append(attr);
-            attr = (XmlAttribute)this.document.CreateAttribute("DateEnd");
+            attr = this.document.CreateAttribute("DateEnd");
             attr.Value = (Convert.ToInt64(yearNode.Attributes.GetNamedItem("DateEnd").Value) + 10000).ToString();
             newYearNode.Attributes.Append(attr);
             yearNode.ParentNode.AppendChild(newYearNode);
 
             XmlNode newYearJournal = this.document.CreateElement("Journal");
-            attr = (XmlAttribute)this.document.CreateAttribute("Year");
+            attr = this.document.CreateAttribute("Year");
             attr.Value = strNewYear;
             newYearJournal.Attributes.Append(attr);
             this.document.DocumentElement.InsertAfter(newYearJournal, this.document.SelectSingleNode("//Journal[@Year=" + this.bookingYearName + "]"));
@@ -313,25 +356,25 @@ namespace lg2de.SimpleAccounting
                 newYearJournal.AppendChild(entry);
 
                 XmlNode value = this.document.CreateElement(strName1);
-                attr = (XmlAttribute)this.document.CreateAttribute("Value");
+                attr = this.document.CreateAttribute("Value");
                 attr.Value = nValue.ToString();
                 value.Attributes.Append(attr);
-                attr = (XmlAttribute)this.document.CreateAttribute("Account");
+                attr = this.document.CreateAttribute("Account");
                 attr.Value = strAccount;
                 value.Attributes.Append(attr);
-                attr = (XmlAttribute)this.document.CreateAttribute("Text");
+                attr = this.document.CreateAttribute("Text");
                 attr.Value = "EB-Wert " + nID.ToString();
                 value.Attributes.Append(attr);
                 entry.AppendChild(value);
 
                 value = this.document.CreateElement(strName2);
-                attr = (XmlAttribute)this.document.CreateAttribute("Value");
+                attr = this.document.CreateAttribute("Value");
                 attr.Value = nValue.ToString();
                 value.Attributes.Append(attr);
-                attr = (XmlAttribute)this.document.CreateAttribute("Account");
+                attr = this.document.CreateAttribute("Account");
                 attr.Value = "990";
                 value.Attributes.Append(attr);
-                attr = (XmlAttribute)this.document.CreateAttribute("Text");
+                attr = this.document.CreateAttribute("Text");
                 attr.Value = "EB-Wert " + nID.ToString();
                 value.Attributes.Append(attr);
                 entry.AppendChild(value);
@@ -1068,9 +1111,9 @@ namespace lg2de.SimpleAccounting
             this.listViewAccountJournal.Items.Clear();
         }
 
-        void LoadDatabase(string strFileName)
+        void LoadDatabase(string fileName)
         {
-            this.fileName = strFileName;
+            this.fileName = fileName;
             this.document.Load(this.fileName);
             XmlNodeList nodes = this.document.SelectNodes("//Accounts/Account");
             foreach (XmlNode entry in nodes)
@@ -1081,6 +1124,16 @@ namespace lg2de.SimpleAccounting
             }
 
             this.SelectLastBookingYear();
+
+            Settings.Default.RecentProject = fileName;
+            Settings.Default.RecentProjects.Remove(fileName);
+            Settings.Default.RecentProjects.Insert(0, fileName);
+            while (Settings.Default.RecentProjects.Count > 10)
+            {
+                Settings.Default.RecentProjects.RemoveAt(10);
+            }
+
+            Settings.Default.Save();
         }
 
         void SaveDatabase()
