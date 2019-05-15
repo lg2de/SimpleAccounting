@@ -1,11 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- 
-  Copyright (c) Lukas Grützmacher. All rights reserved.
--->
+<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="Booking">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="Setup">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Name" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="Accounts">
           <xs:complexType>
             <xs:sequence>
@@ -16,11 +21,12 @@
                   <xs:attribute name="Type" use="required">
                     <xs:simpleType>
                       <xs:restriction base="xs:string">
-                        <xs:enumeration value="Assest" />
+                        <xs:enumeration value="Asset" />
                         <xs:enumeration value="Income" />
                         <xs:enumeration value="Expense" />
                         <xs:enumeration value="Credit" />
                         <xs:enumeration value="Debit" />
+                        <xs:enumeration value="Balance" />
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
@@ -67,7 +73,7 @@
                     </xs:choice>
                   </xs:sequence>
                   <xs:attribute name="Date" type="xs:unsignedInt" use="required" />
-                  <xs:attribute name="ID" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
                   <xs:attribute name="Opening" type="xs:unsignedByte" use="optional" />
                 </xs:complexType>
               </xs:element>

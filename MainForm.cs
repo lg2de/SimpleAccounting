@@ -18,6 +18,7 @@ namespace lg2de.SimpleAccounting
 {
     public partial class MainForm : Form
     {
+        private const string AssetName = nameof(BookingAccountType.Asset);
         private readonly XmlDocument document;
         bool isDocumentChanged = false;
         string fileName = "";
@@ -25,6 +26,7 @@ namespace lg2de.SimpleAccounting
         string bookingYearName = "";
         DateTime bookDate;
         int bookNumber;
+        private string firmName;
 
         struct BookEntry { public int Account; public int Value; public string Text; };
         List<BookEntry> DebitEntries = new List<BookEntry>();
@@ -311,8 +313,8 @@ namespace lg2de.SimpleAccounting
 
             int nID = 1;
 
-            // Assest Accounts (Bestandskonten), Credit and Debit Accounts
-            XmlNodeList accountNodes = this.document.SelectNodes("//Accounts/Account[@Type='Assest' or @Type='Credit' or @Type='Debit']");
+            // Asset Accounts (Bestandskonten), Credit and Debit Accounts
+            XmlNodeList accountNodes = this.document.SelectNodes($"//Accounts/Account[@Type='{AssetName}' or @Type='Credit' or @Type='Debit']");
             foreach (XmlNode accountNode in accountNodes)
             {
                 string strAccount = accountNode.Attributes.GetNamedItem("ID").Value;
@@ -399,7 +401,7 @@ namespace lg2de.SimpleAccounting
             XmlDocument doc = print.Document;
 
             XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = "AGJM im Bistum Dresden Meiﬂen";
+            firmNode.InnerText = this.firmName;
 
             XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
             XmlNode yearNode = this.document.SelectSingleNode("//Year[@Name=" + this.bookingYearName + "]");
@@ -520,7 +522,7 @@ namespace lg2de.SimpleAccounting
             XmlDocument doc = print.Document;
 
             XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = "AGJM im Bistum Dresden Meiﬂen";
+            firmNode.InnerText = this.firmName;
 
             XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
             XmlNode yearNode = this.document.SelectSingleNode("//Year[@Name=" + this.bookingYearName + "]");
@@ -749,7 +751,7 @@ namespace lg2de.SimpleAccounting
             XmlDocument doc = print.Document;
 
             var firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = "AGJM im Bistum Dresden Meiﬂen";
+            firmNode.InnerText = this.firmName;
 
             var rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
             rangeNode.InnerText = this.bookingYearName;
@@ -968,7 +970,7 @@ namespace lg2de.SimpleAccounting
             saldoElement.InnerText = (totalLiability / 100).ToString("0.00");
 
             dataNode = doc.SelectSingleNode("//table/data[@target='account']");
-            accounts = xdoc.XPathSelectElements("//Accounts/Account[@Type='Assest']");
+            accounts = xdoc.XPathSelectElements($"//Accounts/Account[@Type='{AssetName}']");
             double totalAccount = 0;
             foreach (var account in accounts)
             {
@@ -1113,8 +1115,12 @@ namespace lg2de.SimpleAccounting
 
         void LoadDatabase(string fileName)
         {
+            this.listViewAccounts.Items.Clear();
+
             this.fileName = fileName;
             this.document.Load(this.fileName);
+            var booking = Booking.LoadFromFile(this.fileName);
+            this.firmName = booking.Setup.Name;
             XmlNodeList nodes = this.document.SelectNodes("//Accounts/Account");
             foreach (XmlNode entry in nodes)
             {
