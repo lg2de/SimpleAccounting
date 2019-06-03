@@ -16,29 +16,29 @@ namespace lg2de.SimpleAccounting {
     using System.Collections.Generic;
     
     
-    public partial class Booking {
+    public partial class AccountingData {
         
-        private BookingSetup setupField;
+        private AccountingDataSetup setupField;
         
-        private List<BookingAccount> accountsField;
+        private List<AccountingDataAccount> accountsField;
         
-        private List<BookingYear> yearsField;
+        private List<AccountingDataYear> yearsField;
         
-        private List<BookingJournal> journalField;
+        private List<AccountingDataJournal> journalField;
         
-        private BookingOpenIssues openIssuesField;
+        private AccountingDataOpenIssues openIssuesField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
-        public Booking() {
-            this.openIssuesField = new BookingOpenIssues();
-            this.journalField = new List<BookingJournal>();
-            this.yearsField = new List<BookingYear>();
-            this.accountsField = new List<BookingAccount>();
-            this.setupField = new BookingSetup();
+        public AccountingData() {
+            this.openIssuesField = new AccountingDataOpenIssues();
+            this.journalField = new List<AccountingDataJournal>();
+            this.yearsField = new List<AccountingDataYear>();
+            this.accountsField = new List<AccountingDataAccount>();
+            this.setupField = new AccountingDataSetup();
         }
         
-        public BookingSetup Setup {
+        public AccountingDataSetup Setup {
             get {
                 return this.setupField;
             }
@@ -48,7 +48,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         [System.Xml.Serialization.XmlArrayItemAttribute("Account", IsNullable=false)]
-        public List<BookingAccount> Accounts {
+        public List<AccountingDataAccount> Accounts {
             get {
                 return this.accountsField;
             }
@@ -58,7 +58,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         [System.Xml.Serialization.XmlArrayItemAttribute("Year", IsNullable=false)]
-        public List<BookingYear> Years {
+        public List<AccountingDataYear> Years {
             get {
                 return this.yearsField;
             }
@@ -67,7 +67,7 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public List<BookingJournal> Journal {
+        public List<AccountingDataJournal> Journal {
             get {
                 return this.journalField;
             }
@@ -76,7 +76,7 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public BookingOpenIssues OpenIssues {
+        public AccountingDataOpenIssues OpenIssues {
             get {
                 return this.openIssuesField;
             }
@@ -88,7 +88,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(Booking));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingData));
                 }
                 return serializer;
             }
@@ -96,7 +96,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current Booking object into an XML document
+        /// Serializes current AccountingData object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -120,15 +120,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an Booking object
+        /// Deserializes workflow markup into an AccountingData object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output Booking object</param>
+        /// <param name="obj">Output AccountingData object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out Booking obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingData obj, out System.Exception exception) {
             exception = null;
-            obj = default(Booking);
+            obj = default(AccountingData);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -139,16 +139,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out Booking obj) {
+        public static bool Deserialize(string xml, out AccountingData obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static Booking Deserialize(string xml) {
+        public static AccountingData Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((Booking)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingData)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -158,7 +158,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current Booking object into file
+        /// Serializes current AccountingData object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -192,15 +192,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an Booking object
+        /// Deserializes xml markup from file into an AccountingData object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output Booking object</param>
+        /// <param name="obj">Output AccountingData object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out Booking obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingData obj, out System.Exception exception) {
             exception = null;
-            obj = default(Booking);
+            obj = default(AccountingData);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -211,12 +211,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out Booking obj) {
+        public static bool LoadFromFile(string fileName, out AccountingData obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static Booking LoadFromFile(string fileName) {
+        public static AccountingData LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -239,7 +239,7 @@ namespace lg2de.SimpleAccounting {
         #endregion
     }
     
-    public partial class BookingSetup {
+    public partial class AccountingDataSetup {
         
         private string nameField;
         
@@ -257,7 +257,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(BookingSetup));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataSetup));
                 }
                 return serializer;
             }
@@ -265,7 +265,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current BookingSetup object into an XML document
+        /// Serializes current AccountingDataSetup object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -289,15 +289,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an BookingSetup object
+        /// Deserializes workflow markup into an AccountingDataSetup object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output BookingSetup object</param>
+        /// <param name="obj">Output AccountingDataSetup object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out BookingSetup obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataSetup obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingSetup);
+            obj = default(AccountingDataSetup);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -308,16 +308,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out BookingSetup obj) {
+        public static bool Deserialize(string xml, out AccountingDataSetup obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static BookingSetup Deserialize(string xml) {
+        public static AccountingDataSetup Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((BookingSetup)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataSetup)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -327,7 +327,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current BookingSetup object into file
+        /// Serializes current AccountingDataSetup object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -361,15 +361,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an BookingSetup object
+        /// Deserializes xml markup from file into an AccountingDataSetup object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output BookingSetup object</param>
+        /// <param name="obj">Output AccountingDataSetup object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out BookingSetup obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataSetup obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingSetup);
+            obj = default(AccountingDataSetup);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -380,12 +380,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out BookingSetup obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataSetup obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static BookingSetup LoadFromFile(string fileName) {
+        public static AccountingDataSetup LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -408,13 +408,13 @@ namespace lg2de.SimpleAccounting {
         #endregion
     }
     
-    public partial class BookingAccount {
+    public partial class AccountingDataAccount {
         
         private ushort idField;
         
         private string nameField;
         
-        private BookingAccountType typeField;
+        private AccountingDataAccountType typeField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
@@ -436,7 +436,7 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public BookingAccountType Type {
+        public AccountingDataAccountType Type {
             get {
                 return this.typeField;
             }
@@ -448,7 +448,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(BookingAccount));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataAccount));
                 }
                 return serializer;
             }
@@ -456,7 +456,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current BookingAccount object into an XML document
+        /// Serializes current AccountingDataAccount object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -480,15 +480,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an BookingAccount object
+        /// Deserializes workflow markup into an AccountingDataAccount object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output BookingAccount object</param>
+        /// <param name="obj">Output AccountingDataAccount object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out BookingAccount obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataAccount obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingAccount);
+            obj = default(AccountingDataAccount);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -499,16 +499,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out BookingAccount obj) {
+        public static bool Deserialize(string xml, out AccountingDataAccount obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static BookingAccount Deserialize(string xml) {
+        public static AccountingDataAccount Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((BookingAccount)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataAccount)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -518,7 +518,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current BookingAccount object into file
+        /// Serializes current AccountingDataAccount object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -552,15 +552,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an BookingAccount object
+        /// Deserializes xml markup from file into an AccountingDataAccount object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output BookingAccount object</param>
+        /// <param name="obj">Output AccountingDataAccount object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out BookingAccount obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataAccount obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingAccount);
+            obj = default(AccountingDataAccount);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -571,12 +571,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out BookingAccount obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataAccount obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static BookingAccount LoadFromFile(string fileName) {
+        public static AccountingDataAccount LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -599,7 +599,7 @@ namespace lg2de.SimpleAccounting {
         #endregion
     }
     
-    public enum BookingAccountType {
+    public enum AccountingDataAccountType {
         
         /// <remarks/>
         Asset,
@@ -617,10 +617,10 @@ namespace lg2de.SimpleAccounting {
         Debit,
         
         /// <remarks/>
-        Balance,
+        Carryforward,
     }
     
-    public partial class BookingYear {
+    public partial class AccountingDataYear {
         
         private ushort nameField;
         
@@ -671,7 +671,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(BookingYear));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataYear));
                 }
                 return serializer;
             }
@@ -679,7 +679,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current BookingYear object into an XML document
+        /// Serializes current AccountingDataYear object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -703,15 +703,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an BookingYear object
+        /// Deserializes workflow markup into an AccountingDataYear object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output BookingYear object</param>
+        /// <param name="obj">Output AccountingDataYear object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out BookingYear obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataYear obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingYear);
+            obj = default(AccountingDataYear);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -722,16 +722,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out BookingYear obj) {
+        public static bool Deserialize(string xml, out AccountingDataYear obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static BookingYear Deserialize(string xml) {
+        public static AccountingDataYear Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((BookingYear)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataYear)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -741,7 +741,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current BookingYear object into file
+        /// Serializes current AccountingDataYear object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -775,15 +775,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an BookingYear object
+        /// Deserializes xml markup from file into an AccountingDataYear object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output BookingYear object</param>
+        /// <param name="obj">Output AccountingDataYear object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out BookingYear obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataYear obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingYear);
+            obj = default(AccountingDataYear);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -794,12 +794,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out BookingYear obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataYear obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static BookingYear LoadFromFile(string fileName) {
+        public static AccountingDataYear LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -822,24 +822,24 @@ namespace lg2de.SimpleAccounting {
         #endregion
     }
     
-    public partial class BookingJournal {
+    public partial class AccountingDataJournal {
         
-        private List<BookingJournalEntry> entryField;
+        private List<AccountingDataJournalBooking> bookingField;
         
         private ushort yearField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
-        public BookingJournal() {
-            this.entryField = new List<BookingJournalEntry>();
+        public AccountingDataJournal() {
+            this.bookingField = new List<AccountingDataJournalBooking>();
         }
         
-        public List<BookingJournalEntry> Entry {
+        public List<AccountingDataJournalBooking> Booking {
             get {
-                return this.entryField;
+                return this.bookingField;
             }
             set {
-                this.entryField = value;
+                this.bookingField = value;
             }
         }
         
@@ -855,7 +855,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(BookingJournal));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataJournal));
                 }
                 return serializer;
             }
@@ -863,7 +863,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current BookingJournal object into an XML document
+        /// Serializes current AccountingDataJournal object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -887,15 +887,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an BookingJournal object
+        /// Deserializes workflow markup into an AccountingDataJournal object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output BookingJournal object</param>
+        /// <param name="obj">Output AccountingDataJournal object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out BookingJournal obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataJournal obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingJournal);
+            obj = default(AccountingDataJournal);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -906,16 +906,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out BookingJournal obj) {
+        public static bool Deserialize(string xml, out AccountingDataJournal obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static BookingJournal Deserialize(string xml) {
+        public static AccountingDataJournal Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((BookingJournal)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataJournal)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -925,7 +925,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current BookingJournal object into file
+        /// Serializes current AccountingDataJournal object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -959,15 +959,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an BookingJournal object
+        /// Deserializes xml markup from file into an AccountingDataJournal object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output BookingJournal object</param>
+        /// <param name="obj">Output AccountingDataJournal object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out BookingJournal obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataJournal obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingJournal);
+            obj = default(AccountingDataJournal);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -978,12 +978,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out BookingJournal obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataJournal obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static BookingJournal LoadFromFile(string fileName) {
+        public static AccountingDataJournal LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -1006,13 +1006,13 @@ namespace lg2de.SimpleAccounting {
         #endregion
     }
     
-    public partial class BookingJournalEntry {
+    public partial class AccountingDataJournalBooking {
         
         private List<object> itemsField;
         
         private uint dateField;
         
-        private byte idField;
+        private ulong idField;
         
         private byte openingField;
         
@@ -1020,7 +1020,7 @@ namespace lg2de.SimpleAccounting {
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
-        public BookingJournalEntry() {
+        public AccountingDataJournalBooking() {
             this.itemsField = new List<object>();
         }
         
@@ -1042,7 +1042,7 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public byte ID {
+        public ulong ID {
             get {
                 return this.idField;
             }
@@ -1073,7 +1073,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(BookingJournalEntry));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataJournalBooking));
                 }
                 return serializer;
             }
@@ -1081,7 +1081,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current BookingJournalEntry object into an XML document
+        /// Serializes current AccountingDataJournalBooking object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -1105,15 +1105,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an BookingJournalEntry object
+        /// Deserializes workflow markup into an AccountingDataJournalBooking object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output BookingJournalEntry object</param>
+        /// <param name="obj">Output AccountingDataJournalBooking object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out BookingJournalEntry obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataJournalBooking obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingJournalEntry);
+            obj = default(AccountingDataJournalBooking);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -1124,16 +1124,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out BookingJournalEntry obj) {
+        public static bool Deserialize(string xml, out AccountingDataJournalBooking obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static BookingJournalEntry Deserialize(string xml) {
+        public static AccountingDataJournalBooking Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((BookingJournalEntry)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataJournalBooking)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -1143,7 +1143,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current BookingJournalEntry object into file
+        /// Serializes current AccountingDataJournalBooking object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -1177,15 +1177,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an BookingJournalEntry object
+        /// Deserializes xml markup from file into an AccountingDataJournalBooking object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output BookingJournalEntry object</param>
+        /// <param name="obj">Output AccountingDataJournalBooking object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out BookingJournalEntry obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataJournalBooking obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingJournalEntry);
+            obj = default(AccountingDataJournalBooking);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -1196,12 +1196,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out BookingJournalEntry obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataJournalBooking obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static BookingJournalEntry LoadFromFile(string fileName) {
+        public static AccountingDataJournalBooking LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -1224,7 +1224,7 @@ namespace lg2de.SimpleAccounting {
         #endregion
     }
     
-    public partial class BookingJournalEntryCredit {
+    public partial class AccountingDataJournalBookingCredit {
         
         private int valueField;
         
@@ -1264,7 +1264,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(BookingJournalEntryCredit));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataJournalBookingCredit));
                 }
                 return serializer;
             }
@@ -1272,7 +1272,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current BookingJournalEntryCredit object into an XML document
+        /// Serializes current AccountingDataJournalBookingCredit object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -1296,15 +1296,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an BookingJournalEntryCredit object
+        /// Deserializes workflow markup into an AccountingDataJournalBookingCredit object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output BookingJournalEntryCredit object</param>
+        /// <param name="obj">Output AccountingDataJournalBookingCredit object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out BookingJournalEntryCredit obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataJournalBookingCredit obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingJournalEntryCredit);
+            obj = default(AccountingDataJournalBookingCredit);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -1315,16 +1315,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out BookingJournalEntryCredit obj) {
+        public static bool Deserialize(string xml, out AccountingDataJournalBookingCredit obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static BookingJournalEntryCredit Deserialize(string xml) {
+        public static AccountingDataJournalBookingCredit Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((BookingJournalEntryCredit)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataJournalBookingCredit)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -1334,7 +1334,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current BookingJournalEntryCredit object into file
+        /// Serializes current AccountingDataJournalBookingCredit object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -1368,15 +1368,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an BookingJournalEntryCredit object
+        /// Deserializes xml markup from file into an AccountingDataJournalBookingCredit object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output BookingJournalEntryCredit object</param>
+        /// <param name="obj">Output AccountingDataJournalBookingCredit object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out BookingJournalEntryCredit obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataJournalBookingCredit obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingJournalEntryCredit);
+            obj = default(AccountingDataJournalBookingCredit);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -1387,12 +1387,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out BookingJournalEntryCredit obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataJournalBookingCredit obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static BookingJournalEntryCredit LoadFromFile(string fileName) {
+        public static AccountingDataJournalBookingCredit LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -1415,7 +1415,7 @@ namespace lg2de.SimpleAccounting {
         #endregion
     }
     
-    public partial class BookingJournalEntryDebit {
+    public partial class AccountingDataJournalBookingDebit {
         
         private int valueField;
         
@@ -1455,7 +1455,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(BookingJournalEntryDebit));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataJournalBookingDebit));
                 }
                 return serializer;
             }
@@ -1463,7 +1463,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current BookingJournalEntryDebit object into an XML document
+        /// Serializes current AccountingDataJournalBookingDebit object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -1487,15 +1487,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an BookingJournalEntryDebit object
+        /// Deserializes workflow markup into an AccountingDataJournalBookingDebit object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output BookingJournalEntryDebit object</param>
+        /// <param name="obj">Output AccountingDataJournalBookingDebit object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out BookingJournalEntryDebit obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataJournalBookingDebit obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingJournalEntryDebit);
+            obj = default(AccountingDataJournalBookingDebit);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -1506,16 +1506,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out BookingJournalEntryDebit obj) {
+        public static bool Deserialize(string xml, out AccountingDataJournalBookingDebit obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static BookingJournalEntryDebit Deserialize(string xml) {
+        public static AccountingDataJournalBookingDebit Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((BookingJournalEntryDebit)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataJournalBookingDebit)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -1525,7 +1525,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current BookingJournalEntryDebit object into file
+        /// Serializes current AccountingDataJournalBookingDebit object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -1559,15 +1559,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an BookingJournalEntryDebit object
+        /// Deserializes xml markup from file into an AccountingDataJournalBookingDebit object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output BookingJournalEntryDebit object</param>
+        /// <param name="obj">Output AccountingDataJournalBookingDebit object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out BookingJournalEntryDebit obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataJournalBookingDebit obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingJournalEntryDebit);
+            obj = default(AccountingDataJournalBookingDebit);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -1578,12 +1578,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out BookingJournalEntryDebit obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataJournalBookingDebit obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static BookingJournalEntryDebit LoadFromFile(string fileName) {
+        public static AccountingDataJournalBookingDebit LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -1606,17 +1606,17 @@ namespace lg2de.SimpleAccounting {
         #endregion
     }
     
-    public partial class BookingOpenIssues {
+    public partial class AccountingDataOpenIssues {
         
-        private BookingOpenIssuesEntry entryField;
+        private AccountingDataOpenIssuesEntry entryField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
-        public BookingOpenIssues() {
-            this.entryField = new BookingOpenIssuesEntry();
+        public AccountingDataOpenIssues() {
+            this.entryField = new AccountingDataOpenIssuesEntry();
         }
         
-        public BookingOpenIssuesEntry Entry {
+        public AccountingDataOpenIssuesEntry Entry {
             get {
                 return this.entryField;
             }
@@ -1628,7 +1628,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(BookingOpenIssues));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataOpenIssues));
                 }
                 return serializer;
             }
@@ -1636,7 +1636,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current BookingOpenIssues object into an XML document
+        /// Serializes current AccountingDataOpenIssues object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -1660,15 +1660,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an BookingOpenIssues object
+        /// Deserializes workflow markup into an AccountingDataOpenIssues object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output BookingOpenIssues object</param>
+        /// <param name="obj">Output AccountingDataOpenIssues object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out BookingOpenIssues obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataOpenIssues obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingOpenIssues);
+            obj = default(AccountingDataOpenIssues);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -1679,16 +1679,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out BookingOpenIssues obj) {
+        public static bool Deserialize(string xml, out AccountingDataOpenIssues obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static BookingOpenIssues Deserialize(string xml) {
+        public static AccountingDataOpenIssues Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((BookingOpenIssues)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataOpenIssues)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -1698,7 +1698,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current BookingOpenIssues object into file
+        /// Serializes current AccountingDataOpenIssues object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -1732,15 +1732,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an BookingOpenIssues object
+        /// Deserializes xml markup from file into an AccountingDataOpenIssues object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output BookingOpenIssues object</param>
+        /// <param name="obj">Output AccountingDataOpenIssues object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out BookingOpenIssues obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataOpenIssues obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingOpenIssues);
+            obj = default(AccountingDataOpenIssues);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -1751,12 +1751,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out BookingOpenIssues obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataOpenIssues obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static BookingOpenIssues LoadFromFile(string fileName) {
+        public static AccountingDataOpenIssues LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -1779,7 +1779,7 @@ namespace lg2de.SimpleAccounting {
         #endregion
     }
     
-    public partial class BookingOpenIssuesEntry {
+    public partial class AccountingDataOpenIssuesEntry {
         
         private ushort yearField;
         
@@ -1852,7 +1852,7 @@ namespace lg2de.SimpleAccounting {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(BookingOpenIssuesEntry));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataOpenIssuesEntry));
                 }
                 return serializer;
             }
@@ -1860,7 +1860,7 @@ namespace lg2de.SimpleAccounting {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current BookingOpenIssuesEntry object into an XML document
+        /// Serializes current AccountingDataOpenIssuesEntry object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -1884,15 +1884,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an BookingOpenIssuesEntry object
+        /// Deserializes workflow markup into an AccountingDataOpenIssuesEntry object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output BookingOpenIssuesEntry object</param>
+        /// <param name="obj">Output AccountingDataOpenIssuesEntry object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out BookingOpenIssuesEntry obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataOpenIssuesEntry obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingOpenIssuesEntry);
+            obj = default(AccountingDataOpenIssuesEntry);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -1903,16 +1903,16 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool Deserialize(string xml, out BookingOpenIssuesEntry obj) {
+        public static bool Deserialize(string xml, out AccountingDataOpenIssuesEntry obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static BookingOpenIssuesEntry Deserialize(string xml) {
+        public static AccountingDataOpenIssuesEntry Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((BookingOpenIssuesEntry)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataOpenIssuesEntry)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -1922,7 +1922,7 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Serializes current BookingOpenIssuesEntry object into file
+        /// Serializes current AccountingDataOpenIssuesEntry object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -1956,15 +1956,15 @@ namespace lg2de.SimpleAccounting {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an BookingOpenIssuesEntry object
+        /// Deserializes xml markup from file into an AccountingDataOpenIssuesEntry object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output BookingOpenIssuesEntry object</param>
+        /// <param name="obj">Output AccountingDataOpenIssuesEntry object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out BookingOpenIssuesEntry obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataOpenIssuesEntry obj, out System.Exception exception) {
             exception = null;
-            obj = default(BookingOpenIssuesEntry);
+            obj = default(AccountingDataOpenIssuesEntry);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -1975,12 +1975,12 @@ namespace lg2de.SimpleAccounting {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out BookingOpenIssuesEntry obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataOpenIssuesEntry obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static BookingOpenIssuesEntry LoadFromFile(string fileName) {
+        public static AccountingDataOpenIssuesEntry LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {

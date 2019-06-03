@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="Booking">
+  <xs:element name="AccountingData">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="Setup">
@@ -26,7 +26,7 @@
                         <xs:enumeration value="Expense" />
                         <xs:enumeration value="Credit" />
                         <xs:enumeration value="Debit" />
-                        <xs:enumeration value="Balance" />
+                        <xs:enumeration value="Carryforward" />
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
@@ -52,7 +52,7 @@
         <xs:element maxOccurs="unbounded" name="Journal">
           <xs:complexType>
             <xs:sequence>
-              <xs:element maxOccurs="unbounded" name="Entry">
+              <xs:element maxOccurs="unbounded" name="Booking">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:choice maxOccurs="unbounded">

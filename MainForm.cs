@@ -18,7 +18,7 @@ namespace lg2de.SimpleAccounting
 {
     public partial class MainForm : Form
     {
-        private const string AssetName = nameof(BookingAccountType.Asset);
+        private const string AssetName = nameof(AccountingDataAccountType.Asset);
         private readonly XmlDocument document;
         bool isDocumentChanged = false;
         string fileName = "";
@@ -128,7 +128,7 @@ namespace lg2de.SimpleAccounting
         internal int GetMaxBookIdent()
         {
             XmlNode journal = this.document.SelectSingleNode($"//Journal[@Year='{this.bookingYearName}']");
-            var ids = journal.SelectNodes("Entry/@ID");
+            var ids = journal.SelectNodes("Booking/@ID");
             int maxIdent = 0;
             foreach (XmlNode id in ids)
             {
@@ -168,7 +168,7 @@ namespace lg2de.SimpleAccounting
         }
         internal void RegisterBooking()
         {
-            XmlElement newNode = this.document.CreateElement("Entry");
+            XmlElement newNode = this.document.CreateElement("Booking");
             XmlAttribute attrEntry = this.document.CreateAttribute("Date");
             attrEntry.Value = this.bookDate.ToString("yyyyMMdd");
             newNode.Attributes.Append(attrEntry);
@@ -320,9 +320,9 @@ namespace lg2de.SimpleAccounting
                 string strAccount = accountNode.Attributes.GetNamedItem("ID").Value;
                 XPathNavigator nav = this.document.CreateNavigator();
                 double nCredit = (double)nav.Evaluate(
-                    "sum(//Journal[@Year=" + this.bookingYearName + "]/Entry/Credit[@Account=" + strAccount + "]/@Value)");
+                    "sum(//Journal[@Year=" + this.bookingYearName + "]/Booking/Credit[@Account=" + strAccount + "]/@Value)");
                 double nDebit = (double)nav.Evaluate(
-                    "sum(//Journal[@Year=" + this.bookingYearName + "]/Entry/Debit[@Account=" + strAccount + "]/@Value)");
+                    "sum(//Journal[@Year=" + this.bookingYearName + "]/Booking/Debit[@Account=" + strAccount + "]/@Value)");
 
                 if (nCredit == 0 && nDebit == 0 || nCredit == nDebit)
                 {
@@ -345,7 +345,7 @@ namespace lg2de.SimpleAccounting
                     strName2 = "Credit";
                 }
 
-                XmlNode entry = this.document.CreateElement("Entry");
+                XmlNode entry = this.document.CreateElement("Booking");
                 attr = this.document.CreateAttribute("Date");
                 attr.Value = strDateStart;
                 entry.Attributes.Append(attr);
@@ -415,7 +415,7 @@ namespace lg2de.SimpleAccounting
             XmlNode dataNode = doc.SelectSingleNode("//table/data");
 
             var xdoc = XDocument.Parse(this.document.OuterXml);
-            var journalEntries = xdoc.XPathSelectElements("//Journal[@Year=" + this.bookingYearName + "]/Entry");
+            var journalEntries = xdoc.XPathSelectElements("//Journal[@Year=" + this.bookingYearName + "]/Booking");
             foreach (var entry in journalEntries.OrderBy(x => x.Attribute("Date").Value))
             {
                 XmlNode dataLineNode = doc.CreateElement("tr");
@@ -543,7 +543,7 @@ namespace lg2de.SimpleAccounting
             double totalSaldoCredit = 0, totalSaldoDebit = 0;
             foreach (XmlNode accountNode in accountEntries)
             {
-                XmlNodeList journalEntries = journalNode.SelectNodes("Entry/*[@Account=" + accountNode.Attributes.GetNamedItem("ID").Value + "]");
+                XmlNodeList journalEntries = journalNode.SelectNodes("Booking/*[@Account=" + accountNode.Attributes.GetNamedItem("ID").Value + "]");
                 if (journalEntries.Count == 0)
                 {
                     continue;
@@ -767,7 +767,7 @@ namespace lg2de.SimpleAccounting
             double totalIncome = 0;
             foreach (var account in accounts)
             {
-                var journalEntries = journal.XPathSelectElements("Entry/*[@Account=" + account.Attribute("ID").Value + "]");
+                var journalEntries = journal.XPathSelectElements("Booking/*[@Account=" + account.Attribute("ID").Value + "]");
 
                 int credits =
                     (from entry
@@ -817,7 +817,7 @@ namespace lg2de.SimpleAccounting
             double totalExpense = 0;
             foreach (var account in accounts)
             {
-                var journalEntries = journal.XPathSelectElements("Entry/*[@Account=" + account.Attribute("ID").Value + "]");
+                var journalEntries = journal.XPathSelectElements("Booking/*[@Account=" + account.Attribute("ID").Value + "]");
 
                 int credits =
                     (from entry
@@ -872,7 +872,7 @@ namespace lg2de.SimpleAccounting
             foreach (var account in accounts)
             {
                 string accountType = account.Attribute("Type").Value;
-                var journalEntries = journal.XPathSelectElements("Entry/*[@Account=" + account.Attribute("ID").Value + "]");
+                var journalEntries = journal.XPathSelectElements("Booking/*[@Account=" + account.Attribute("ID").Value + "]");
 
                 int credits =
                     (from entry
@@ -924,7 +924,7 @@ namespace lg2de.SimpleAccounting
             foreach (var account in accounts)
             {
                 string accountType = account.Attribute("Type").Value;
-                var journalEntries = journal.XPathSelectElements("Entry/*[@Account=" + account.Attribute("ID").Value + "]");
+                var journalEntries = journal.XPathSelectElements("Booking/*[@Account=" + account.Attribute("ID").Value + "]");
 
                 int credits =
                     (from entry
@@ -974,7 +974,7 @@ namespace lg2de.SimpleAccounting
             double totalAccount = 0;
             foreach (var account in accounts)
             {
-                var journalEntries = journal.XPathSelectElements("Entry/*[@Account=" + account.Attribute("ID").Value + "]");
+                var journalEntries = journal.XPathSelectElements("Booking/*[@Account=" + account.Attribute("ID").Value + "]");
 
                 int credits =
                     (from entry
@@ -1119,7 +1119,7 @@ namespace lg2de.SimpleAccounting
 
             this.fileName = fileName;
             this.document.Load(this.fileName);
-            var booking = Booking.LoadFromFile(this.fileName);
+            var booking = AccountingData.LoadFromFile(this.fileName);
             this.firmName = booking.Setup.Name;
             XmlNodeList nodes = this.document.SelectNodes("//Accounts/Account");
             foreach (XmlNode entry in nodes)
@@ -1166,7 +1166,7 @@ namespace lg2de.SimpleAccounting
             bool bColorStatus = false;
             foreach (XmlNode entry in journal.ChildNodes)
             {
-                if (entry.Name != "Entry")
+                if (entry.Name != "Booking")
                 {
                     continue;
                 }
@@ -1227,11 +1227,11 @@ namespace lg2de.SimpleAccounting
             XmlNodeList nodes;
             if (bOnlyCurrentBookyear)
             {
-                nodes = this.document.SelectNodes("//Journal[@Year=" + this.bookingYearName + "]/Entry/*[@Account=" + nAccountNumber.ToString() + "]");
+                nodes = this.document.SelectNodes("//Journal[@Year=" + this.bookingYearName + "]/Booking/*[@Account=" + nAccountNumber.ToString() + "]");
             }
             else
             {
-                nodes = this.document.SelectNodes("//Journal/Entry/*[@Account=" + nAccountNumber.ToString() + "]");
+                nodes = this.document.SelectNodes("//Journal/Booking/*[@Account=" + nAccountNumber.ToString() + "]");
             }
 
             this.listViewAccountJournal.Items.Clear();
