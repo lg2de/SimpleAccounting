@@ -16,7 +16,7 @@
             <xs:sequence>
               <xs:element maxOccurs="unbounded" name="Account">
                 <xs:complexType>
-                  <xs:attribute name="ID" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
                   <xs:attribute name="Name" type="xs:string" use="required" />
                   <xs:attribute name="Type" use="required">
                     <xs:simpleType>
@@ -43,7 +43,7 @@
                   <xs:attribute name="Name" type="xs:unsignedShort" use="required" />
                   <xs:attribute name="DateStart" type="xs:unsignedInt" use="required" />
                   <xs:attribute name="DateEnd" type="xs:unsignedInt" use="required" />
-                  <xs:attribute name="Closed" type="xs:string" use="optional" />
+                  <xs:attribute name="Closed" type="xs:boolean" use="optional" default="false" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
@@ -55,36 +55,22 @@
               <xs:element maxOccurs="unbounded" name="Booking">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:choice maxOccurs="unbounded">
-                      <xs:element name="Debit">
-                        <xs:complexType>
-                          <xs:attribute name="Value" type="xs:int" use="required" />
-                          <xs:attribute name="Account" type="xs:unsignedShort" use="required" />
-                          <xs:attribute name="Text" type="xs:string" use="required" />
-                        </xs:complexType>
-                      </xs:element>
-                      <xs:element name="Credit">
-                        <xs:complexType>
-                          <xs:attribute name="Value" type="xs:int" use="required" />
-                          <xs:attribute name="Account" type="xs:unsignedShort" use="required" />
-                          <xs:attribute name="Text" type="xs:string" use="required" />
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:choice>
+                    <xs:element name="Debit" type="BookingValue" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element name="Credit" type="BookingValue" minOccurs="1" maxOccurs="unbounded" />
                   </xs:sequence>
                   <xs:attribute name="Date" type="xs:unsignedInt" use="required" />
                   <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
-                  <xs:attribute name="Opening" type="xs:unsignedByte" use="optional" />
+                  <xs:attribute name="Opening" type="xs:boolean" use="optional" default="false" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
             <xs:attribute name="Year" type="xs:unsignedShort" use="required" />
           </xs:complexType>
         </xs:element>
-        <xs:element name="OpenIssues" minOccurs="0">
+        <xs:element name="OpenIssues" minOccurs="0" maxOccurs="1">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Entry">
+              <xs:element name="Entry" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:attribute name="Year" type="xs:unsignedShort" use="required" />
                   <xs:attribute name="Date" type="xs:unsignedInt" use="required" />
@@ -100,4 +86,9 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:complexType name="BookingValue">
+    <xs:attribute name="Value" type="xs:int" use="required" />
+    <xs:attribute name="Account" type="xs:unsignedLong" use="required" />
+    <xs:attribute name="Text" type="xs:string" use="required" />
+  </xs:complexType>
 </xs:schema>

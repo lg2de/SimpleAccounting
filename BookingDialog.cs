@@ -41,19 +41,19 @@ namespace lg2de.SimpleAccounting
                 return;
             }
 
-            theMainForm.SetBookIdent(Convert.ToInt32(textBoxBookIdent.Text));
+            theMainForm.SetBookIdent(Convert.ToUInt64(textBoxBookIdent.Text));
             if (textBoxDebitAccount.Text.Length == 0)
             {
                 return;
             }
 
-            theMainForm.AddDebitEntry(Convert.ToInt32(textBoxDebitAccount.Text), Convert.ToInt32(textValue.Text), comboBookText.Text);
+            theMainForm.AddDebitEntry(Convert.ToUInt64(textBoxDebitAccount.Text), Convert.ToInt32(textValue.Text), comboBookText.Text);
             if (textBoxCreditAccount.Text.Length == 0)
             {
                 return;
             }
 
-            theMainForm.AddCreditEntry(Convert.ToInt32(textBoxCreditAccount.Text), Convert.ToInt32(textValue.Text), comboBookText.Text);
+            theMainForm.AddCreditEntry(Convert.ToUInt64(textBoxCreditAccount.Text), Convert.ToInt32(textValue.Text), comboBookText.Text);
             theMainForm.RegisterBooking();
 
             this.SetNextBookIdent();
@@ -97,7 +97,7 @@ namespace lg2de.SimpleAccounting
         {
             this.textBoxDebitAccount.Text = accountExpression.Match(this.comboBoxDebitAccount.SelectedItem.ToString()).Value;
         }
-        
+
         private void comboBoxCreditAccount_SelectionChangeCommitted(object sender, EventArgs e)
         {
             this.textBoxCreditAccount.Text = accountExpression.Match(this.comboBoxCreditAccount.SelectedItem.ToString()).Value;
