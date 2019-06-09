@@ -4,7 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -15,7 +15,7 @@ using lg2de.SimpleAccounting.Properties;
 
 namespace lg2de.SimpleAccounting
 {
-    public class ShellViewModel : Conductor<IScreen>
+    public class ShellViewModel : Conductor<IScreen>, IProjectLoader
     {
         private readonly List<BookingValue> debitEntries = new List<BookingValue>();
         private readonly List<BookingValue> creditEntries = new List<BookingValue>();
@@ -39,19 +39,26 @@ namespace lg2de.SimpleAccounting
         public ShellViewModel()
         {
             this.DisplayName = "SimpleAccounting";
+        }
 
-            Settings.Default.Upgrade();
-            if (Settings.Default.RecentProjects == null)
-            {
-                Settings.Default.RecentProjects = new StringCollection();
-            }
+        public ObservableCollection<MenuViewModel> RecentProjects { get; }
+            = new ObservableCollection<MenuViewModel>();
+
+        public ObservableCollection<AccountViewModel> Accounts { get; }
+            = new ObservableCollection<AccountViewModel>();
+
+        public ObservableCollection<JournalViewModel> Journal { get; }
+            = new ObservableCollection<JournalViewModel>();
+
+        protected override void OnActivate()
+        {
+            base.OnActivate();
 
             if (File.Exists(Settings.Default.RecentProject))
             {
-                this.LoadDatabase(Settings.Default.RecentProject);
+                this.LoadProject(Settings.Default.RecentProject);
             }
 
-            /*this.MenuItemArchive.DropDownItems.Add(new ToolStripSeparator());
             foreach (var project in Settings.Default.RecentProjects)
             {
                 if (!File.Exists(project))
@@ -59,38 +66,10 @@ namespace lg2de.SimpleAccounting
                     continue;
                 }
 
-                var item = this.MenuItemArchive.DropDownItems.Add(project);
-                item.Tag = project;
-                item.Click += (s, a) =>
-                {
-                    var menuEntry = (ToolStripItem)s;
-                    string fileName = menuEntry.Tag.ToString();
-                    if (!File.Exists(fileName))
-                    {
-                        return;
-                    }
+                this.RecentProjects.Add(new MenuViewModel(this, project));
+            }
 
-                    if (this.isDocumentChanged)
-                    {
-                        var result = MessageBox.Show(
-                            "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
-                            "Programm beenden",
-                            MessageBoxButtons.YesNoCancel);
-                        if (result == DialogResult.Cancel)
-                        {
-                            return;
-                        }
-                        else if (result == DialogResult.Yes)
-                        {
-                            this.SaveDatabase();
-                        }
-                    }
-
-                    this.LoadDatabase(fileName);
-                };
-            }*/
         }
-
         internal IEnumerable<string> GetAccounts()
         {
             return this.accountingData.Accounts.Select(a => $"{a.Name} ({a.ID})");
@@ -196,7 +175,7 @@ namespace lg2de.SimpleAccounting
                     return;
                 }
 
-                this.LoadDatabase(openFileDialog.FileName);
+                this.LoadProject(openFileDialog.FileName);
             }
         }
 
@@ -952,18 +931,33 @@ namespace lg2de.SimpleAccounting
             //this.listViewAccountJournal.Items.Clear();
         }
 
-        void LoadDatabase(string fileName)
+        public void LoadProject(string fileName)
         {
-            //this.listViewAccounts.Items.Clear();
+            if (this.isDocumentChanged)
+            {
+                var result = MessageBox.Show(
+                    "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
+                    "Programm beenden",
+                    MessageBoxButtons.YesNoCancel);
+                if (result == DialogResult.Cancel)
+                {
+                    return;
+                }
+                else if (result == DialogResult.Yes)
+                {
+                    this.SaveDatabase();
+                }
+            }
+
+            this.Accounts.Clear();
 
             this.fileName = fileName;
             this.accountingData = AccountingData.LoadFromFile(this.fileName);
             this.firmName = this.accountingData.Setup.Name;
             foreach (var account in this.accountingData.Accounts)
             {
-                var item = new ListViewItem(account.ID.ToString());
-                item.SubItems.Add(account.Name);
-                //this.listViewAccounts.Items.Add(item);
+                var acountModel = new AccountViewModel { Identifier = account.ID, Name = account.Name };
+                this.Accounts.Add(acountModel);
             }
 
             this.SelectLastBookingYear();
@@ -997,56 +991,53 @@ namespace lg2de.SimpleAccounting
 
         void RefreshJournal()
         {
-            //this.listViewJournal.Items.Clear();
+            this.Journal.Clear();
             bool bColorStatus = false;
             foreach (var booking in this.currentJournal.Booking.OrderBy(b => b.Date))
             {
-                var item = new ListViewItem(booking.Date.ToString());
-                if (bColorStatus)
-                {
-                    item.BackColor = Color.LightGreen;
-                }
+                var item = new JournalViewModel();
+                item.SetDate(booking.Date);
+                //if (bColorStatus)
+                //{
+                //    item.BackColor = Color.LightGreen;
+                //}
 
                 bColorStatus = !bColorStatus;
 
-                item.SubItems.Add(booking.ID.ToString());
+                item.Identifier = booking.ID;
                 var debitAccounts = booking.Debit;
                 var creditAccounts = booking.Credit;
                 if (debitAccounts.Count == 1 && creditAccounts.Count == 1)
                 {
                     var debit = debitAccounts[0];
-                    item.SubItems.Add(debit.Text);
-                    double nValue = Convert.ToDouble(debit.Value) / 100;
-                    item.SubItems.Add(nValue.ToString("0.00"));
+                    item.Text = debit.Text;
+                    item.Value = Convert.ToDouble(debit.Value) / 100;
                     string accountNumber = debit.Account.ToString();
-                    item.SubItems.Add(this.BuildAccountDescription(accountNumber));
+                    item.DebitAccount = this.BuildAccountDescription(accountNumber);
                     accountNumber = creditAccounts[0].Account.ToString();
-                    item.SubItems.Add(this.BuildAccountDescription(accountNumber));
-                    //this.listViewJournal.Items.Add(item);
+                    item.CreditAccount = this.BuildAccountDescription(accountNumber);
+                    this.Journal.Add(item);
                     continue;
                 }
 
                 foreach (var debitEntry in debitAccounts)
                 {
-                    var DebitItem = (ListViewItem)item.Clone();
-                    DebitItem.SubItems.Add(debitEntry.Text);
-                    double nValue = Convert.ToDouble(debitEntry.Value) / 100;
-                    DebitItem.SubItems.Add(nValue.ToString("0.00"));
+                    var debitItem = item.Clone();
+                    debitItem.Text = debitEntry.Text;
+                    debitItem.Value = Convert.ToDouble(debitEntry.Value) / 100;
                     string strAccountNumber = debitEntry.Account.ToString();
-                    DebitItem.SubItems.Add(this.BuildAccountDescription(strAccountNumber));
-                    //this.listViewJournal.Items.Add(DebitItem);
+                    debitItem.DebitAccount = this.BuildAccountDescription(strAccountNumber);
+                    this.Journal.Add(debitItem);
                 }
 
                 foreach (var creditEntry in creditAccounts)
                 {
-                    var CreditItem = (ListViewItem)item.Clone();
-                    CreditItem.SubItems.Add(creditEntry.Text);
-                    double nValue = Convert.ToDouble(creditEntry.Value) / 100;
-                    CreditItem.SubItems.Add(nValue.ToString("0.00"));
-                    CreditItem.SubItems.Add("");
+                    var creditItem = item.Clone();
+                    creditItem.Text = creditEntry.Text;
+                    creditItem.Value = Convert.ToDouble(creditEntry.Value) / 100;
                     string strAccountNumber = creditEntry.Account.ToString();
-                    CreditItem.SubItems.Add(this.BuildAccountDescription(strAccountNumber));
-                    //this.listViewJournal.Items.Add(CreditItem);
+                    creditItem.CreditAccount = this.BuildAccountDescription(strAccountNumber);
+                    this.Journal.Add(creditItem);
                 }
             }
         }

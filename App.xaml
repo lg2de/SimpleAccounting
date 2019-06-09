@@ -2,7 +2,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:lg2de.SimpleAccounting"
-    x:Class="Caliburn.Micro.Hello.App">
+    x:Class="lg2de.SimpleAccounting.App"
+    Startup="ApplicationStartup">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

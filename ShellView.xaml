@@ -7,12 +7,23 @@
     xmlns:local="clr-namespace:lg2de.SimpleAccounting"
     mc:Ignorable="d"
     MinWidth="400" MinHeight="400"
-    d:DesignWidth="800" d:DesignHeight="450">
+    d:DesignWidth="800" d:DesignHeight="450"
+    d:DataContext="{d:DesignInstance Type=local:ShellDesignViewModel, IsDesignTimeCreatable=True}">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="Archiv">
+            <MenuItem Header="Projekt">
                 <MenuItem Header="Öffnen" />
                 <MenuItem Header="Speichern" />
+                <Separator />
+                <MenuItem
+                    Header="Letzte Projekte" ItemsSource="{Binding RecentProjects}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Header" Value="{Binding Header}"/>
+                            <Setter Property="Command" Value="{Binding Command}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
                 <Separator />
                 <MenuItem Header="Beenden" />
             </MenuItem>
@@ -38,14 +49,19 @@
                 <RowDefinition Height="5" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <DataGrid Grid.Column="0">
+            <DataGrid
+                Grid.Column="0"
+                ItemsSource="{Binding Journal}"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Datum" />
-                    <DataGridTextColumn Header="Belegnr." />
-                    <DataGridTextColumn Header="Buchungstext" />
-                    <DataGridTextColumn Header="Betrag" />
-                    <DataGridTextColumn Header="Sollkonto" />
-                    <DataGridTextColumn Header="Habenkonto" />
+                    <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" />
+                    <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" />
+                    <DataGridTextColumn Header="Buchungstext" Binding="{Binding Text}" />
+                    <DataGridTextColumn Header="Betrag" Binding="{Binding Value, StringFormat=\{0:0.00\}}" />
+                    <DataGridTextColumn Header="Sollkonto" Binding="{Binding CreditAccount}" />
+                    <DataGridTextColumn Header="Habenkonto" Binding="{Binding DebitAccount}" />
                 </DataGrid.Columns>
             </DataGrid>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
@@ -60,10 +76,15 @@
                 </DataGrid.Columns>
             </DataGrid>
             <GridSplitter Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-            <DataGrid Grid.ColumnSpan="3" Grid.Row="2">
+            <DataGrid
+                Grid.ColumnSpan="3" Grid.Row="2"
+                ItemsSource="{Binding Accounts}"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Nummer" />
-                    <DataGridTextColumn Header="Bezeichnung" />
+                    <DataGridTextColumn Header="Nummer" Binding="{Binding Identifier}" />
+                    <DataGridTextColumn Header="Bezeichnung" Binding="{Binding Name}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

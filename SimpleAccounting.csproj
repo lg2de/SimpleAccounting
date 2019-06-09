@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountingData.designer.cs" />
+    <Compile Include="AccountViewModel.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -98,6 +99,11 @@
     <Compile Include="BookingDialog.Designer.cs">
       <DependentUpon>BookingDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="IProjectLoader.cs" />
+    <Compile Include="JournalViewModel.cs" />
+    <Compile Include="MenuViewModel.cs" />
+    <Compile Include="RelayCommand.cs" />
+    <Compile Include="ShellDesignViewModel.cs" />
     <Compile Include="ShellViewModel.cs" />
     <Compile Include="Print.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
