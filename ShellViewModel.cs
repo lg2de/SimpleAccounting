@@ -10,11 +10,12 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
+using Caliburn.Micro;
 using lg2de.SimpleAccounting.Properties;
 
 namespace lg2de.SimpleAccounting
 {
-    public partial class MainForm : Form
+    public class ShellViewModel : Conductor<IScreen>
     {
         private readonly List<BookingValue> debitEntries = new List<BookingValue>();
         private readonly List<BookingValue> creditEntries = new List<BookingValue>();
@@ -35,9 +36,9 @@ namespace lg2de.SimpleAccounting
             node.Attributes.SetNamedItem(attr);
         }
 
-        public MainForm()
+        public ShellViewModel()
         {
-            this.InitializeComponent();
+            this.DisplayName = "SimpleAccounting";
 
             Settings.Default.Upgrade();
             if (Settings.Default.RecentProjects == null)
@@ -50,7 +51,7 @@ namespace lg2de.SimpleAccounting
                 this.LoadDatabase(Settings.Default.RecentProject);
             }
 
-            this.MenuItemArchive.DropDownItems.Add(new ToolStripSeparator());
+            /*this.MenuItemArchive.DropDownItems.Add(new ToolStripSeparator());
             foreach (var project in Settings.Default.RecentProjects)
             {
                 if (!File.Exists(project))
@@ -87,7 +88,7 @@ namespace lg2de.SimpleAccounting
 
                     this.LoadDatabase(fileName);
                 };
-            }
+            }*/
         }
 
         internal IEnumerable<string> GetAccounts()
@@ -206,7 +207,7 @@ namespace lg2de.SimpleAccounting
 
         void MenuItemArchiveExit_Click(object sender, EventArgs e)
         {
-            this.Close();
+            //this.Close();
         }
 
         void MenuItemActionsBooking_Click(object sender, EventArgs e)
@@ -946,14 +947,14 @@ namespace lg2de.SimpleAccounting
         {
             this.bookingYearName = newYear.ToString();
             this.currentJournal = this.accountingData.Journal.Single(y => y.Year == newYear);
-            this.Text = "Buchhaltung - " + this.fileName + " - " + this.bookingYearName;
+            //this.Text = "Buchhaltung - " + this.fileName + " - " + this.bookingYearName;
             this.RefreshJournal();
-            this.listViewAccountJournal.Items.Clear();
+            //this.listViewAccountJournal.Items.Clear();
         }
 
         void LoadDatabase(string fileName)
         {
-            this.listViewAccounts.Items.Clear();
+            //this.listViewAccounts.Items.Clear();
 
             this.fileName = fileName;
             this.accountingData = AccountingData.LoadFromFile(this.fileName);
@@ -962,7 +963,7 @@ namespace lg2de.SimpleAccounting
             {
                 var item = new ListViewItem(account.ID.ToString());
                 item.SubItems.Add(account.Name);
-                this.listViewAccounts.Items.Add(item);
+                //this.listViewAccounts.Items.Add(item);
             }
 
             this.SelectLastBookingYear();
@@ -996,7 +997,7 @@ namespace lg2de.SimpleAccounting
 
         void RefreshJournal()
         {
-            this.listViewJournal.Items.Clear();
+            //this.listViewJournal.Items.Clear();
             bool bColorStatus = false;
             foreach (var booking in this.currentJournal.Booking.OrderBy(b => b.Date))
             {
@@ -1021,7 +1022,7 @@ namespace lg2de.SimpleAccounting
                     item.SubItems.Add(this.BuildAccountDescription(accountNumber));
                     accountNumber = creditAccounts[0].Account.ToString();
                     item.SubItems.Add(this.BuildAccountDescription(accountNumber));
-                    this.listViewJournal.Items.Add(item);
+                    //this.listViewJournal.Items.Add(item);
                     continue;
                 }
 
@@ -1033,7 +1034,7 @@ namespace lg2de.SimpleAccounting
                     DebitItem.SubItems.Add(nValue.ToString("0.00"));
                     string strAccountNumber = debitEntry.Account.ToString();
                     DebitItem.SubItems.Add(this.BuildAccountDescription(strAccountNumber));
-                    this.listViewJournal.Items.Add(DebitItem);
+                    //this.listViewJournal.Items.Add(DebitItem);
                 }
 
                 foreach (var creditEntry in creditAccounts)
@@ -1045,14 +1046,14 @@ namespace lg2de.SimpleAccounting
                     CreditItem.SubItems.Add("");
                     string strAccountNumber = creditEntry.Account.ToString();
                     CreditItem.SubItems.Add(this.BuildAccountDescription(strAccountNumber));
-                    this.listViewJournal.Items.Add(CreditItem);
+                    //this.listViewJournal.Items.Add(CreditItem);
                 }
             }
         }
 
         void RefreshAccount(ulong accountNumber)
         {
-            this.listViewAccountJournal.Items.Clear();
+            //this.listViewAccountJournal.Items.Clear();
             double nCreditSum = 0;
             double nDebitSum = 0;
             bool bColorStatus = false;
@@ -1106,7 +1107,7 @@ namespace lg2de.SimpleAccounting
                         item.SubItems.Add("Diverse");
                     }
                 }
-                this.listViewAccountJournal.Items.Add(item);
+                //this.listViewAccountJournal.Items.Add(item);
             }
 
             var sumItem = new ListViewItem();
@@ -1115,7 +1116,7 @@ namespace lg2de.SimpleAccounting
             sumItem.SubItems.Add("Summe");
             sumItem.SubItems.Add(nDebitSum.ToString("0.00"));
             sumItem.SubItems.Add(nCreditSum.ToString("0.00"));
-            this.listViewAccountJournal.Items.Add(sumItem);
+            //this.listViewAccountJournal.Items.Add(sumItem);
 
             var saldoItem = new ListViewItem();
             saldoItem.BackColor = Color.LightGray;
@@ -1131,7 +1132,7 @@ namespace lg2de.SimpleAccounting
                 saldoItem.SubItems.Add("");
                 saldoItem.SubItems.Add((nCreditSum - nDebitSum).ToString("0.00"));
             }
-            this.listViewAccountJournal.Items.Add(saldoItem);
+            //this.listViewAccountJournal.Items.Add(saldoItem);
         }
     }
 }

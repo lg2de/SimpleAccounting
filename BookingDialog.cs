@@ -12,9 +12,9 @@ namespace lg2de.SimpleAccounting
     public partial class BookingDialog : Form
     {
         private readonly Regex accountExpression = new Regex("\\d+");
-        private MainForm theMainForm;
+        private ShellViewModel theMainForm;
 
-        public BookingDialog(MainForm form)
+        public BookingDialog(ShellViewModel form)
         {
             InitializeComponent();
 
