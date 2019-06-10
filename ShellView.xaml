@@ -25,7 +25,7 @@
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="Beenden" />
+                <MenuItem Header="Beenden" Command="{Binding CloseCommand}" />
             </MenuItem>
             <MenuItem Header="Aktionen">
                 <MenuItem Header="Buchen" />
@@ -63,6 +63,11 @@
                     <DataGridTextColumn Header="Sollkonto" Binding="{Binding DebitAccount}" />
                     <DataGridTextColumn Header="Habenkonto" Binding="{Binding CreditAccount}" />
                 </DataGrid.Columns>
+                <DataGrid.RowStyle>
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Setter Property="FontSize" Value="11" />
+                    </Style>
+                </DataGrid.RowStyle>
             </DataGrid>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
             <DataGrid
@@ -79,6 +84,11 @@
                     <DataGridTextColumn Header="Habenwert" Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}" />
                     <DataGridTextColumn Header="Gegenkonto" Binding="{Binding RemoteAccount}" />
                 </DataGrid.Columns>
+                <DataGrid.RowStyle>
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Setter Property="FontSize" Value="11" />
+                    </Style>
+                </DataGrid.RowStyle>
             </DataGrid>
             <GridSplitter Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
             <DataGrid

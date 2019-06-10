@@ -54,11 +54,38 @@ namespace lg2de.SimpleAccounting
         public ObservableCollection<AccountJournalViewModel> AccountJournal { get; }
             = new ObservableCollection<AccountJournalViewModel>();
 
+        public ICommand CloseCommand => new RelayCommand(_ => this.TryClose(null));
+
         public ICommand AccountSelectionCommand => new RelayCommand(o =>
         {
             var account = o as AccountViewModel;
-            this.RefreshAccount(account.Identifier);
+            this.BuildAccountJournal(account.Identifier);
         });
+
+        public override void CanClose(Action<bool> callback)
+        {
+            if (!this.isDocumentChanged)
+            {
+                base.CanClose(callback);
+                return;
+            }
+
+            DialogResult ret = MessageBox.Show(
+                "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
+                "Programm beenden",
+                MessageBoxButtons.YesNoCancel);
+            if (ret == DialogResult.Cancel)
+            {
+                callback(false);
+                return;
+            }
+            else if (ret == DialogResult.Yes)
+            {
+                this.SaveDatabase();
+            }
+
+            base.CanClose(callback);
+        }
 
         protected override void OnActivate()
         {
@@ -78,8 +105,8 @@ namespace lg2de.SimpleAccounting
 
                 this.RecentProjects.Add(new MenuViewModel(this, project));
             }
-
         }
+
         internal IEnumerable<string> GetAccounts()
         {
             return this.accountingData.Accounts.Select(a => $"{a.Name} ({a.ID})");
@@ -90,10 +117,6 @@ namespace lg2de.SimpleAccounting
             return this.accountingData.Accounts.Single(a => a.ID == accountId).Name;
         }
 
-        internal string GetFormatedDate(string strInternalDate)
-        {
-            return this.GetFormatedDate(Convert.ToUInt32(strInternalDate));
-        }
         internal string GetFormatedDate(uint nInternalDate)
         {
             return (nInternalDate % 100).ToString("D2") + "." + ((nInternalDate % 10000) / 100).ToString("D2") + "." + (nInternalDate / 10000).ToString("D2");
@@ -152,27 +175,6 @@ namespace lg2de.SimpleAccounting
             this.RefreshJournal();
         }
 
-        void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (!this.isDocumentChanged)
-            {
-                return;
-            }
-
-            DialogResult ret = MessageBox.Show(
-                "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
-                "Programm beenden",
-                MessageBoxButtons.YesNoCancel);
-            if (ret == DialogResult.Cancel)
-            {
-                e.Cancel = true;
-            }
-            else if (ret == DialogResult.Yes)
-            {
-                this.SaveDatabase();
-            }
-        }
-
         private void MenuItemArchiveOpen_Click(object sender, EventArgs e)
         {
             using (var openFileDialog = new OpenFileDialog())
@@ -192,11 +194,6 @@ namespace lg2de.SimpleAccounting
         void MenuItemArchiveSave_Click(object sender, EventArgs e)
         {
             this.SaveDatabase();
-        }
-
-        void MenuItemArchiveExit_Click(object sender, EventArgs e)
-        {
-            //this.Close();
         }
 
         void MenuItemActionsBooking_Click(object sender, EventArgs e)
@@ -909,13 +906,6 @@ namespace lg2de.SimpleAccounting
             print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Jahresbilanz " + this.bookingYearName);
         }
 
-        void listViewAccounts_DoubleClick(object sender, EventArgs e)
-        {
-            ListViewItem item = ((ListView)sender).SelectedItems[0];
-            var acountNumber = Convert.ToUInt64(item.Text);
-            this.RefreshAccount(acountNumber);
-        }
-
         string BuildAccountDescription(string strAccountNumber)
         {
             var nAccountNumber = Convert.ToUInt32(strAccountNumber);
@@ -936,9 +926,9 @@ namespace lg2de.SimpleAccounting
         {
             this.bookingYearName = newYear.ToString();
             this.currentJournal = this.accountingData.Journal.Single(y => y.Year == newYear);
-            //this.Text = "Buchhaltung - " + this.fileName + " - " + this.bookingYearName;
+            this.DisplayName = $"SimpleAccounting - {this.fileName} - {this.bookingYearName}";
+            this.AccountJournal.Clear();
             this.RefreshJournal();
-            //this.listViewAccountJournal.Items.Clear();
         }
 
         public void LoadProject(string fileName)
@@ -1052,7 +1042,7 @@ namespace lg2de.SimpleAccounting
             }
         }
 
-        void RefreshAccount(ulong accountNumber)
+        void BuildAccountJournal(ulong accountNumber)
         {
             this.AccountJournal.Clear();
             double nCreditSum = 0;
