@@ -22,6 +22,16 @@ namespace lg2de.SimpleAccounting
                 DebitAccount = "400"
             };
             this.Journal.Add(journalItem);
+
+            var accountJournalItem = new AccountJournalViewModel
+            {
+                Identifier = 42,
+                Date = DateTime.Now,
+                Text = "Booking",
+                CreditValue = 123.4,
+                RemoteAccount = "Div."
+            };
+            this.AccountJournal.Add(accountJournalItem);
         }
     }
 }

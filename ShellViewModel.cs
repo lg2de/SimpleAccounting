@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Windows.Input;
 using System.Xml;
 using Caliburn.Micro;
 using lg2de.SimpleAccounting.Properties;
@@ -49,6 +50,15 @@ namespace lg2de.SimpleAccounting
 
         public ObservableCollection<JournalViewModel> Journal { get; }
             = new ObservableCollection<JournalViewModel>();
+
+        public ObservableCollection<AccountJournalViewModel> AccountJournal { get; }
+            = new ObservableCollection<AccountJournalViewModel>();
+
+        public ICommand AccountSelectionCommand => new RelayCommand(o =>
+        {
+            var account = o as AccountViewModel;
+            this.RefreshAccount(account.Identifier);
+        });
 
         protected override void OnActivate()
         {
@@ -1044,7 +1054,7 @@ namespace lg2de.SimpleAccounting
 
         void RefreshAccount(ulong accountNumber)
         {
-            //this.listViewAccountJournal.Items.Clear();
+            this.AccountJournal.Clear();
             double nCreditSum = 0;
             double nDebitSum = 0;
             bool bColorStatus = false;
@@ -1053,77 +1063,72 @@ namespace lg2de.SimpleAccounting
                 .Concat(this.currentJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)));
             foreach (var entry in entries.OrderBy(x => x.Date))
             {
-                var item = new ListViewItem(entry.Date.ToString());
-                if (bColorStatus)
-                {
-                    item.BackColor = Color.LightGreen;
-                }
+                var item = new AccountJournalViewModel();
+                this.AccountJournal.Add(item);
+                item.SetDate(entry.Date);
+                //if (bColorStatus)
+                //{
+                //    item.BackColor = Color.LightGreen;
+                //}
 
                 bColorStatus = !bColorStatus;
 
-                item.SubItems.Add(entry.ID.ToString());
+                item.Identifier = entry.ID;
                 var debitEntry = entry.Debit.FirstOrDefault(x => x.Account == accountNumber);
                 if (debitEntry != null)
                 {
-                    item.SubItems.Add(debitEntry.Text);
-                    double value = Convert.ToDouble(debitEntry.Value) / 100;
-                    nDebitSum += value;
-                    item.SubItems.Add(value.ToString("0.00"));
-                    item.SubItems.Add("");
+                    item.Text = debitEntry.Text;
+                    item.DebitValue = Convert.ToDouble(debitEntry.Value) / 100;
+                    nDebitSum += item.DebitValue;
                     if (entry.Credit.Count == 1)
                     {
                         string creditAccount = entry.Credit[0].Account.ToString();
-                        item.SubItems.Add(this.BuildAccountDescription(creditAccount));
+                        item.RemoteAccount = this.BuildAccountDescription(creditAccount);
                     }
                     else
                     {
-                        item.SubItems.Add("Diverse");
+                        item.RemoteAccount = "Diverse";
                     }
                 }
                 else
                 {
                     var creditEntry = entry.Credit.FirstOrDefault(x => x.Account == accountNumber);
-                    item.SubItems.Add(creditEntry.Text);
-                    item.SubItems.Add("");
-                    double value = Convert.ToDouble(creditEntry.Value) / 100;
-                    nCreditSum += value;
-                    item.SubItems.Add(value.ToString("0.00"));
+                    item.Text = creditEntry.Text;
+                    item.CreditValue = Convert.ToDouble(creditEntry.Value) / 100;
+                    nCreditSum += item.CreditValue;
                     if (entry.Debit.Count == 1)
                     {
                         string debitAccount = entry.Debit[0].Account.ToString();
-                        item.SubItems.Add(this.BuildAccountDescription(debitAccount));
+                        item.RemoteAccount = this.BuildAccountDescription(debitAccount);
                     }
                     else
                     {
-                        item.SubItems.Add("Diverse");
+                        item.RemoteAccount = "Diverse";
                     }
                 }
-                //this.listViewAccountJournal.Items.Add(item);
             }
 
-            var sumItem = new ListViewItem();
-            sumItem.BackColor = Color.LightGray;
-            sumItem.SubItems.Add("");
-            sumItem.SubItems.Add("Summe");
-            sumItem.SubItems.Add(nDebitSum.ToString("0.00"));
-            sumItem.SubItems.Add(nCreditSum.ToString("0.00"));
-            //this.listViewAccountJournal.Items.Add(sumItem);
+            var sumItem = new AccountJournalViewModel();
+            this.AccountJournal.Add(sumItem);
+            //sumItem.BackColor = Color.LightGray;
+            //sumItem.SubItems.Add("");
+            sumItem.Text = "Summe";
+            sumItem.DebitValue = nDebitSum;
+            sumItem.CreditValue = nCreditSum;
 
-            var saldoItem = new ListViewItem();
-            saldoItem.BackColor = Color.LightGray;
-            saldoItem.SubItems.Add("");
-            saldoItem.SubItems.Add("Saldo");
+            var saldoItem = new AccountJournalViewModel();
+            this.AccountJournal.Add(saldoItem);
+            //saldoItem.BackColor = Color.LightGray;
+            //saldoItem.SubItems.Add("");
+            saldoItem.Text = "Saldo";
             if (nDebitSum > nCreditSum)
             {
-                saldoItem.SubItems.Add((nDebitSum - nCreditSum).ToString("0.00"));
-                saldoItem.SubItems.Add("");
+                saldoItem.DebitValue = nDebitSum - nCreditSum;
             }
             else
             {
-                saldoItem.SubItems.Add("");
-                saldoItem.SubItems.Add((nCreditSum - nDebitSum).ToString("0.00"));
+                saldoItem.CreditValue = nCreditSum - nDebitSum;
             }
-            //this.listViewAccountJournal.Items.Add(saldoItem);
         }
     }
 }

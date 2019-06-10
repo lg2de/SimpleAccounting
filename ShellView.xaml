@@ -60,19 +60,24 @@
                     <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" />
                     <DataGridTextColumn Header="Buchungstext" Binding="{Binding Text}" />
                     <DataGridTextColumn Header="Betrag" Binding="{Binding Value, StringFormat=\{0:0.00\}}" />
-                    <DataGridTextColumn Header="Sollkonto" Binding="{Binding CreditAccount}" />
-                    <DataGridTextColumn Header="Habenkonto" Binding="{Binding DebitAccount}" />
+                    <DataGridTextColumn Header="Sollkonto" Binding="{Binding DebitAccount}" />
+                    <DataGridTextColumn Header="Habenkonto" Binding="{Binding CreditAccount}" />
                 </DataGrid.Columns>
             </DataGrid>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
-            <DataGrid Grid.Column="2">
+            <DataGrid
+                Grid.Column="2"
+                ItemsSource="{Binding AccountJournal}"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Datum" />
-                    <DataGridTextColumn Header="Belegnr." />
-                    <DataGridTextColumn Header="Buchungstext" />
-                    <DataGridTextColumn Header="Sollwert" />
-                    <DataGridTextColumn Header="Habenwert" />
-                    <DataGridTextColumn Header="Gegenkonto" />
+                    <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" />
+                    <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" />
+                    <DataGridTextColumn Header="Buchungstext" Binding="{Binding Text}" />
+                    <DataGridTextColumn Header="Sollwert" Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}" />
+                    <DataGridTextColumn Header="Habenwert" Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}" />
+                    <DataGridTextColumn Header="Gegenkonto" Binding="{Binding RemoteAccount}" />
                 </DataGrid.Columns>
             </DataGrid>
             <GridSplitter Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
@@ -81,11 +86,18 @@
                 ItemsSource="{Binding Accounts}"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
-                IsReadOnly="True">
+                IsReadOnly="True"
+                IsSynchronizedWithCurrentItem="True">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Nummer" Binding="{Binding Identifier}" />
                     <DataGridTextColumn Header="Bezeichnung" Binding="{Binding Name}" />
                 </DataGrid.Columns>
+                <DataGrid.InputBindings>
+                    <MouseBinding
+                        MouseAction="LeftDoubleClick"
+                        Command="{Binding AccountSelectionCommand}"
+                        CommandParameter="{Binding Accounts/}"/>
+                </DataGrid.InputBindings>
             </DataGrid>
         </Grid>
     </DockPanel>
