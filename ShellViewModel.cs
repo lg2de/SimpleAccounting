@@ -21,7 +21,6 @@ namespace lg2de.SimpleAccounting
         private readonly List<BookingValue> debitEntries = new List<BookingValue>();
         private readonly List<BookingValue> creditEntries = new List<BookingValue>();
         private AccountingData accountingData;
-        bool isDocumentChanged = false;
         string fileName = "";
 
         string bookingYearName = "";
@@ -54,7 +53,34 @@ namespace lg2de.SimpleAccounting
         public ObservableCollection<AccountJournalViewModel> AccountJournal { get; }
             = new ObservableCollection<AccountJournalViewModel>();
 
-        public ICommand CloseCommand => new RelayCommand(_ => this.TryClose(null));
+        public ICommand OpenProjectCommand => new RelayCommand(_ =>
+        {
+            using (var openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Projektdateien (*.bxml)|*.bxml";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                this.LoadProject(openFileDialog.FileName);
+            }
+        });
+
+        public ICommand SaveProjectCommand => new RelayCommand(
+            _ => this.SaveDatabase(),
+            _ => this.IsDocumentChanged);
+
+        public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose(null));
+
+        public ICommand JournalReportCommand => new RelayCommand(_ =>
+        {
+            var report = new JournalReport(this.currentJournal, this.firmName);
+            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+            report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateStart.ToDateTime());
+        });
 
         public ICommand AccountSelectionCommand => new RelayCommand(o =>
         {
@@ -62,9 +88,11 @@ namespace lg2de.SimpleAccounting
             this.BuildAccountJournal(account.Identifier);
         });
 
+        private bool IsDocumentChanged { get; set; }
+
         public override void CanClose(Action<bool> callback)
         {
-            if (!this.isDocumentChanged)
+            if (!this.IsDocumentChanged)
             {
                 base.CanClose(callback);
                 return;
@@ -167,33 +195,12 @@ namespace lg2de.SimpleAccounting
             this.debitEntries.ForEach(newBooking.Debit.Add);
             this.creditEntries.ForEach(newBooking.Credit.Add);
 
-            this.isDocumentChanged = true;
+            this.IsDocumentChanged = true;
 
             this.debitEntries.Clear();
             this.creditEntries.Clear();
 
             this.RefreshJournal();
-        }
-
-        private void MenuItemArchiveOpen_Click(object sender, EventArgs e)
-        {
-            using (var openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Filter = "Projektdateien (*.bxml)|*.bxml";
-                openFileDialog.RestoreDirectory = true;
-
-                if (openFileDialog.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-
-                this.LoadProject(openFileDialog.FileName);
-            }
-        }
-
-        void MenuItemArchiveSave_Click(object sender, EventArgs e)
-        {
-            this.SaveDatabase();
         }
 
         void MenuItemActionsBooking_Click(object sender, EventArgs e)
@@ -303,128 +310,10 @@ namespace lg2de.SimpleAccounting
                 bookingId++;
             }
 
-            this.isDocumentChanged = true;
+            this.IsDocumentChanged = true;
             this.SelectBookingYear(newYear);
         }
 
-        void MenuItemReportsJournal_Click(object sender, EventArgs e)
-        {
-            var print = new PrintClass();
-            string fileName = Application.ExecutablePath;
-            fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
-            fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
-            fileName = fileName.Substring(0, fileName.LastIndexOf("\\") + 1);
-            fileName += "Journal.xml";
-            print.LoadDocument(fileName);
-
-            XmlDocument doc = print.Document;
-
-            XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = this.firmName;
-
-            XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
-            rangeNode.InnerText = this.GetFormatedDate(yearNode.DateStart) + " - " + this.GetFormatedDate(yearNode.DateEnd);
-
-            var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = "Dresden, " + DateTime.Now.ToLongDateString();
-
-            XmlNode dataNode = doc.SelectSingleNode("//table/data");
-
-            var journalEntries = this.currentJournal.Booking.OrderBy(b => b.Date);
-            foreach (var entry in journalEntries)
-            {
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
-                this.SetNodeAttribute(dataLineNode, "topline", "1");
-                dataItemNode.InnerText = this.GetFormatedDate(entry.Date);
-                dataLineNode.AppendChild(dataItemNode);
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = entry.ID.ToString();
-                dataLineNode.AppendChild(dataItemNode);
-
-                if (entry.Debit.Count == 1
-                    && entry.Credit.Count == 1
-                    && entry.Debit.First().Text == entry.Credit.First().Text)
-                {
-                    var credit = entry.Credit.Single();
-                    var debit = entry.Debit.Single();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = debit.Text;
-                    dataLineNode.AppendChild(dataItemNode);
-                    string strAccountNumber = debit.Account.ToString();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = strAccountNumber;
-                    dataLineNode.AppendChild(dataItemNode);
-                    double nValue = Convert.ToDouble(debit.Value) / 100;
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00");
-                    dataLineNode.AppendChild(dataItemNode);
-                    strAccountNumber = credit.Account.ToString();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = strAccountNumber;
-                    dataLineNode.AppendChild(dataItemNode);
-                    nValue = Convert.ToDouble(credit.Value) / 100;
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00");
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataNode.AppendChild(dataLineNode);
-                    continue;
-                }
-
-                foreach (var debitEntry in entry.Debit)
-                {
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = debitEntry.Text;
-                    dataLineNode.AppendChild(dataItemNode);
-                    string strAccountNumber = debitEntry.Account.ToString();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = strAccountNumber;
-                    dataLineNode.AppendChild(dataItemNode);
-                    double nValue = Convert.ToDouble(debitEntry.Value) / 100;
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00");
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = "";
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataLineNode.AppendChild(dataItemNode.Clone());
-                    dataNode.AppendChild(dataLineNode);
-
-                    dataLineNode = doc.CreateElement("tr");
-                    dataItemNode = doc.CreateElement("td");
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataLineNode.AppendChild(dataItemNode.Clone());
-                }
-
-                foreach (var creditEntry in entry.Credit)
-                {
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = creditEntry.Text;
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = "";
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataLineNode.AppendChild(dataItemNode.Clone());
-                    string strAccountNumber = creditEntry.Account.ToString();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = strAccountNumber;
-                    dataLineNode.AppendChild(dataItemNode);
-                    double nValue = Convert.ToDouble(creditEntry.Value) / 100;
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00");
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataNode.AppendChild(dataLineNode);
-
-                    dataLineNode = doc.CreateElement("tr");
-                    dataItemNode = doc.CreateElement("td");
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataLineNode.AppendChild(dataItemNode.Clone());
-                }
-            }
-
-            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Journal " + this.bookingYearName);
-        }
         void MenuItemReportsSummary_Click(object sender, EventArgs e)
         {
             var print = new PrintClass();
@@ -933,7 +822,7 @@ namespace lg2de.SimpleAccounting
 
         public void LoadProject(string fileName)
         {
-            if (this.isDocumentChanged)
+            if (this.IsDocumentChanged)
             {
                 var result = MessageBox.Show(
                     "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
@@ -986,7 +875,7 @@ namespace lg2de.SimpleAccounting
             }
 
             this.accountingData.SaveToFile(this.fileName);
-            this.isDocumentChanged = false;
+            this.IsDocumentChanged = false;
         }
 
         void RefreshJournal()
@@ -995,8 +884,7 @@ namespace lg2de.SimpleAccounting
             bool bColorStatus = false;
             foreach (var booking in this.currentJournal.Booking.OrderBy(b => b.Date))
             {
-                var item = new JournalViewModel();
-                item.SetDate(booking.Date);
+                var item = new JournalViewModel { Date = booking.Date.ToDateTime() };
                 //if (bColorStatus)
                 //{
                 //    item.BackColor = Color.LightGreen;
@@ -1053,9 +941,8 @@ namespace lg2de.SimpleAccounting
                 .Concat(this.currentJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)));
             foreach (var entry in entries.OrderBy(x => x.Date))
             {
-                var item = new AccountJournalViewModel();
+                var item = new AccountJournalViewModel { Date = entry.Date.ToDateTime() };
                 this.AccountJournal.Add(item);
-                item.SetDate(entry.Date);
                 //if (bColorStatus)
                 //{
                 //    item.BackColor = Color.LightGreen;
@@ -1100,16 +987,14 @@ namespace lg2de.SimpleAccounting
 
             var sumItem = new AccountJournalViewModel();
             this.AccountJournal.Add(sumItem);
-            //sumItem.BackColor = Color.LightGray;
-            //sumItem.SubItems.Add("");
+            sumItem.IsSummary = true;
             sumItem.Text = "Summe";
             sumItem.DebitValue = nDebitSum;
             sumItem.CreditValue = nCreditSum;
 
             var saldoItem = new AccountJournalViewModel();
             this.AccountJournal.Add(saldoItem);
-            //saldoItem.BackColor = Color.LightGray;
-            //saldoItem.SubItems.Add("");
+            saldoItem.IsSummary = true;
             saldoItem.Text = "Saldo";
             if (nDebitSum > nCreditSum)
             {

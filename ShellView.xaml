@@ -12,8 +12,8 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Projekt">
-                <MenuItem Header="Öffnen" />
-                <MenuItem Header="Speichern" />
+                <MenuItem Header="Öffnen" Command="{Binding OpenProjectCommand}" />
+                <MenuItem Header="Speichern" Command="{Binding SaveProjectCommand}" />
                 <Separator />
                 <MenuItem
                     Header="Letzte Projekte" ItemsSource="{Binding RecentProjects}">
@@ -25,7 +25,7 @@
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="Beenden" Command="{Binding CloseCommand}" />
+                <MenuItem Header="Beenden" Command="{Binding CloseApplicationCommand}" />
             </MenuItem>
             <MenuItem Header="Aktionen">
                 <MenuItem Header="Buchen" />
@@ -33,7 +33,7 @@
                 <MenuItem Header="Buchungsjahr abschließen" />
             </MenuItem>
             <MenuItem Header="Berichte">
-                <MenuItem Header="Journal" />
+                <MenuItem Header="Journal" Command="{Binding JournalReportCommand}" />
                 <MenuItem Header="Summen und Salden" />
                 <MenuItem Header="Jahresbilanz" />
             </MenuItem>
@@ -49,6 +49,19 @@
                 <RowDefinition Height="5" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <Grid.Resources>
+                <Style x:Key="SummaryGridStyle" TargetType="DataGridCell">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSummary}" Value="True">
+                            <Setter Property="Foreground" Value="LightGray" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+                <Style x:Key="ValueGridStyle" TargetType="{x:Type TextBlock}">
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                    <Setter Property="Margin" Value="2 0 2 0" />
+                </Style>
+            </Grid.Resources>
             <DataGrid
                 Grid.Column="0"
                 ItemsSource="{Binding Journal}"
@@ -59,7 +72,7 @@
                     <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" />
                     <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" />
                     <DataGridTextColumn Header="Buchungstext" Binding="{Binding Text}" />
-                    <DataGridTextColumn Header="Betrag" Binding="{Binding Value, StringFormat=\{0:0.00\}}" />
+                    <DataGridTextColumn Header="Betrag" Binding="{Binding Value, StringFormat=\{0:0.00\}}" ElementStyle="{StaticResource ValueGridStyle}" />
                     <DataGridTextColumn Header="Sollkonto" Binding="{Binding DebitAccount}" />
                     <DataGridTextColumn Header="Habenkonto" Binding="{Binding CreditAccount}" />
                 </DataGrid.Columns>
@@ -77,16 +90,21 @@
                 CanUserAddRows="False"
                 IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" />
-                    <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" />
+                    <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" CellStyle="{StaticResource SummaryGridStyle}" />
+                    <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" CellStyle="{StaticResource SummaryGridStyle}" />
                     <DataGridTextColumn Header="Buchungstext" Binding="{Binding Text}" />
-                    <DataGridTextColumn Header="Sollwert" Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}" />
-                    <DataGridTextColumn Header="Habenwert" Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}" />
+                    <DataGridTextColumn Header="Sollwert" Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}" ElementStyle="{StaticResource ValueGridStyle}" />
+                    <DataGridTextColumn Header="Habenwert" Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}" ElementStyle="{StaticResource ValueGridStyle}" />
                     <DataGridTextColumn Header="Gegenkonto" Binding="{Binding RemoteAccount}" />
                 </DataGrid.Columns>
                 <DataGrid.RowStyle>
                     <Style TargetType="{x:Type DataGridRow}">
                         <Setter Property="FontSize" Value="11" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSummary}" Value="True">
+                                <Setter Property="Background" Value="LightGray" />
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
             </DataGrid>

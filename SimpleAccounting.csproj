@@ -100,11 +100,14 @@
     <Compile Include="BookingDialog.Designer.cs">
       <DependentUpon>BookingDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="IProjectLoader.cs" />
     <Compile Include="JournalBaseViewModel.cs" />
+    <Compile Include="JournalReport.cs" />
     <Compile Include="JournalViewModel.cs" />
     <Compile Include="MenuViewModel.cs" />
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="ReportBase.cs" />
     <Compile Include="ShellDesignViewModel.cs" />
     <Compile Include="ShellViewModel.cs" />
     <Compile Include="Print.cs" />
