@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
+using System;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;

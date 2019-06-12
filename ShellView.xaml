@@ -1,4 +1,5 @@
-﻿<UserControl
+﻿<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
+<UserControl
     x:Class="lg2de.SimpleAccounting.ShellView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -29,7 +30,7 @@
                 <MenuItem Header="Beenden" Command="{Binding CloseApplicationCommand}" />
             </MenuItem>
             <MenuItem Header="Aktionen">
-                <MenuItem Header="Buchen" />
+                <MenuItem Header="Buchen" Command="{Binding AddBookingsCommand}" />
                 <MenuItem Header="Buchungsjahr abschließen" Command="{Binding CloseYearCommand}" />
                 <MenuItem
                     Header="Buchungsjahr wählen"

@@ -1,10 +1,15 @@
-﻿using System;
+﻿// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
+using System;
 
 namespace lg2de.SimpleAccounting
 {
     public class ShellDesignViewModel : ShellViewModel
     {
         public ShellDesignViewModel()
+            : base(null)
         {
             var menuItem = new MenuViewModel("c:\\Test.bxml", null);
             this.RecentProjects.Add(menuItem);

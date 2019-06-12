@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -16,19 +15,18 @@ namespace lg2de.SimpleAccounting
 {
     public class ShellViewModel : Conductor<IScreen>
     {
-        private readonly List<BookingValue> debitEntries = new List<BookingValue>();
-        private readonly List<BookingValue> creditEntries = new List<BookingValue>();
+        private readonly IWindowManager windowManager;
         private AccountingData accountingData;
         string fileName = "";
 
         string bookingYearName = "";
         private AccountingDataJournal currentJournal;
-        DateTime bookDate;
-        ulong bookNumber;
         private string firmName;
 
-        public ShellViewModel()
+        public ShellViewModel(IWindowManager windowManager)
         {
+            this.windowManager = windowManager;
+
             this.DisplayName = "SimpleAccounting";
         }
 
@@ -68,6 +66,17 @@ namespace lg2de.SimpleAccounting
             _ => this.IsDocumentChanged);
 
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose(null));
+
+        public ICommand AddBookingsCommand => new RelayCommand(_ =>
+        {
+            var bookingModel = new AddBookingViewModel(this)
+            {
+                BookingNumber = this.GetMaxBookIdent() + 1
+            };
+            bookingModel.Accounts.AddRange(this.accountingData.Accounts);
+            bookingModel.BindingTemplates.Add(new BookingTemplate { Text = "Geld abheben", Credit = 110, Debit = 100 });
+            this.windowManager.ShowDialog(bookingModel);
+        });
 
         public ICommand CloseYearCommand => new RelayCommand(_ => this.CloseYear());
 
@@ -147,17 +156,15 @@ namespace lg2de.SimpleAccounting
             }
         }
 
-        internal IEnumerable<string> GetAccounts()
+        internal void AddBooking(AccountingDataJournalBooking booking)
         {
-            return this.accountingData.Accounts.Select(a => $"{a.Name} ({a.ID})");
+            this.currentJournal.Booking.Add(booking);
+            this.IsDocumentChanged = true;
+
+            this.RefreshJournal();
         }
 
-        internal string GetAccountName(uint accountId)
-        {
-            return this.accountingData.Accounts.Single(a => a.ID == accountId).Name;
-        }
-
-        internal ulong GetMaxBookIdent()
+        private ulong GetMaxBookIdent()
         {
             if (!this.currentJournal.Booking.Any())
             {
@@ -165,55 +172,6 @@ namespace lg2de.SimpleAccounting
             }
 
             return this.currentJournal.Booking.Max(b => b.ID);
-        }
-
-        internal void SetBookDate(DateTime date)
-        {
-            this.bookDate = date;
-        }
-        internal void SetBookIdent(ulong number)
-        {
-            this.bookNumber = number;
-        }
-        internal void AddDebitEntry(ulong nAccount, int nValue, string strText)
-        {
-            var entry = new BookingValue();
-            entry.Account = nAccount;
-            entry.Value = nValue;
-            entry.Text = strText;
-            this.debitEntries.Add(entry);
-        }
-        internal void AddCreditEntry(ulong nAccount, int nValue, string strText)
-        {
-            var entry = new BookingValue();
-            entry.Account = nAccount;
-            entry.Value = nValue;
-            entry.Text = strText;
-            this.creditEntries.Add(entry);
-        }
-        internal void RegisterBooking()
-        {
-            var newBooking = new AccountingDataJournalBooking
-            {
-                Date = Convert.ToUInt32(this.bookDate.ToString("yyyyMMdd")),
-                ID = this.bookNumber
-            };
-            this.currentJournal.Booking.Add(newBooking);
-            this.debitEntries.ForEach(newBooking.Debit.Add);
-            this.creditEntries.ForEach(newBooking.Credit.Add);
-
-            this.IsDocumentChanged = true;
-
-            this.debitEntries.Clear();
-            this.creditEntries.Clear();
-
-            this.RefreshJournal();
-        }
-
-        void MenuItemActionsBooking_Click(object sender, EventArgs e)
-        {
-            var dlg = new BookingDialog(this);
-            DialogResult ret = dlg.ShowDialog();
         }
 
         void CloseYear()
@@ -309,7 +267,7 @@ namespace lg2de.SimpleAccounting
         string BuildAccountDescription(string strAccountNumber)
         {
             var nAccountNumber = Convert.ToUInt32(strAccountNumber);
-            string strAccountName = this.GetAccountName(nAccountNumber);
+            string strAccountName = this.accountingData.Accounts.Single(a => a.ID == nAccountNumber).Name;
             return strAccountNumber + " (" + strAccountName + ")";
         }
 

@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
+using System.Windows;
 
 namespace lg2de.SimpleAccounting
 {
