@@ -30,7 +30,7 @@
             </MenuItem>
             <MenuItem Header="Aktionen">
                 <MenuItem Header="Buchen" />
-                <MenuItem Header="Buchungsjahr abschließen" />
+                <MenuItem Header="Buchungsjahr abschließen" Command="{Binding CloseYearCommand}" />
                 <MenuItem
                     Header="Buchungsjahr wählen"
                     ItemsSource="{Binding BookingYears}"

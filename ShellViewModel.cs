@@ -64,10 +64,12 @@ namespace lg2de.SimpleAccounting
         });
 
         public ICommand SaveProjectCommand => new RelayCommand(
-            _ => this.SaveDatabase(),
+            _ => this.SaveProject(),
             _ => this.IsDocumentChanged);
 
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose(null));
+
+        public ICommand CloseYearCommand => new RelayCommand(_ => this.CloseYear());
 
         public ICommand JournalReportCommand => new RelayCommand(_ =>
         {
@@ -116,7 +118,7 @@ namespace lg2de.SimpleAccounting
             }
             else if (ret == DialogResult.Yes)
             {
-                this.SaveDatabase();
+                this.SaveProject();
             }
 
             base.CanClose(callback);
@@ -214,7 +216,7 @@ namespace lg2de.SimpleAccounting
             DialogResult ret = dlg.ShowDialog();
         }
 
-        void MenuItemActionCloseYear_Click(object sender, EventArgs e)
+        void CloseYear()
         {
             var accountingYear = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
             if (accountingYear.Closed)
@@ -265,10 +267,9 @@ namespace lg2de.SimpleAccounting
                     continue;
                 }
 
-                var dateStart = newYearEntry.DateStart + 10000;
                 var newBooking = new AccountingDataJournalBooking
                 {
-                    Date = dateStart,
+                    Date = newYearEntry.DateStart,
                     ID = bookingId,
                     Opening = true
                 };
@@ -278,11 +279,13 @@ namespace lg2de.SimpleAccounting
                     Value = Math.Abs(creditAmount - debitAmount),
                     Text = "EB-Wert " + bookingId.ToString()
                 };
+                newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue
                 {
                     Value = newDebit.Value,
                     Text = newDebit.Text
                 };
+                newBooking.Credit.Add(newCredit);
                 if (creditAmount > debitAmount)
                 {
                     newCredit.Account = account.ID;
@@ -299,6 +302,8 @@ namespace lg2de.SimpleAccounting
 
             this.IsDocumentChanged = true;
             this.SelectBookingYear(newYear);
+
+            this.UpdateBookingYears();
         }
 
         string BuildAccountDescription(string strAccountNumber)
@@ -331,28 +336,22 @@ namespace lg2de.SimpleAccounting
                 }
                 else if (result == DialogResult.Yes)
                 {
-                    this.SaveDatabase();
+                    this.SaveProject();
                 }
             }
 
+            this.IsDocumentChanged = false;
             this.Accounts.Clear();
-            this.BookingYears.Clear();
 
             this.fileName = fileName;
             this.accountingData = AccountingData.LoadFromFile(this.fileName);
             this.firmName = this.accountingData.Setup.Name;
+            this.UpdateBookingYears();
+
             foreach (var account in this.accountingData.Accounts)
             {
                 var acountModel = new AccountViewModel { Identifier = account.ID, Name = account.Name };
                 this.Accounts.Add(acountModel);
-            }
-
-            foreach (var year in this.accountingData.Years)
-            {
-                var bookingYear = new MenuViewModel(
-                    year.Name.ToString(),
-                    new RelayCommand(_ => this.SelectBookingYear(year.Name)));
-                this.BookingYears.Add(bookingYear);
             }
 
             // select last booking year after loading
@@ -369,13 +368,25 @@ namespace lg2de.SimpleAccounting
             Settings.Default.Save();
         }
 
-        void SaveDatabase()
+        private void UpdateBookingYears()
+        {
+            this.BookingYears.Clear();
+            foreach (var year in this.accountingData.Years)
+            {
+                var bookingYear = new MenuViewModel(
+                    year.Name.ToString(),
+                    new RelayCommand(_ => this.SelectBookingYear(year.Name)));
+                this.BookingYears.Add(bookingYear);
+            }
+        }
+
+        void SaveProject()
         {
             DateTime fileDate = File.GetLastWriteTime(this.fileName);
-            string strNewFileName = this.fileName + "." + fileDate.ToString("yyyyMMddHHmmss");
+            string backupFileName = this.fileName + "." + fileDate.ToString("yyyyMMddHHmmss");
             try
             {
-                File.Move(this.fileName, strNewFileName);
+                File.Move(this.fileName, backupFileName);
             }
             catch (FileNotFoundException)
             {
