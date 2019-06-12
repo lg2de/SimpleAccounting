@@ -6,7 +6,7 @@ namespace lg2de.SimpleAccounting
     {
         public ShellDesignViewModel()
         {
-            var menuItem = new MenuViewModel(this, "c:\\Test.bxml");
+            var menuItem = new MenuViewModel("c:\\Test.bxml", null);
             this.RecentProjects.Add(menuItem);
 
             var accountItem = new AccountViewModel { Identifier = 100, Name = "Kasse" };

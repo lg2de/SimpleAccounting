@@ -4,16 +4,14 @@ namespace lg2de.SimpleAccounting
 {
     public class MenuViewModel
     {
-        private readonly IProjectLoader projectLoader;
-
-        public MenuViewModel(IProjectLoader projectLoader, string fileName)
+        public MenuViewModel(string header, ICommand command)
         {
-            this.projectLoader = projectLoader;
-            this.Header = fileName;
+            this.Header = header;
+            this.Command = command;
         }
 
         public string Header { get; }
 
-        public ICommand Command => new RelayCommand(_ => this.projectLoader.LoadProject(this.Header));
+        public ICommand Command { get; }
     }
 }

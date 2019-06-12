@@ -5,18 +5,16 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
-using System.Xml;
 using Caliburn.Micro;
 using lg2de.SimpleAccounting.Properties;
 
 namespace lg2de.SimpleAccounting
 {
-    public class ShellViewModel : Conductor<IScreen>, IProjectLoader
+    public class ShellViewModel : Conductor<IScreen>
     {
         private readonly List<BookingValue> debitEntries = new List<BookingValue>();
         private readonly List<BookingValue> creditEntries = new List<BookingValue>();
@@ -35,6 +33,9 @@ namespace lg2de.SimpleAccounting
         }
 
         public ObservableCollection<MenuViewModel> RecentProjects { get; }
+            = new ObservableCollection<MenuViewModel>();
+
+        public ObservableCollection<MenuViewModel> BookingYears { get; }
             = new ObservableCollection<MenuViewModel>();
 
         public ObservableCollection<AccountViewModel> Accounts { get; }
@@ -137,7 +138,10 @@ namespace lg2de.SimpleAccounting
                     continue;
                 }
 
-                this.RecentProjects.Add(new MenuViewModel(this, project));
+                var item = new MenuViewModel(
+                    project,
+                    new RelayCommand(_ => this.LoadProject(project)));
+                this.RecentProjects.Add(item);
             }
         }
 
@@ -208,24 +212,6 @@ namespace lg2de.SimpleAccounting
         {
             var dlg = new BookingDialog(this);
             DialogResult ret = dlg.ShowDialog();
-        }
-
-        void MenuItemActionsSelectYear_Click(object sender, EventArgs e)
-        {
-            var dlg = new SelectBookingYear();
-            foreach (var year in this.accountingData.Years)
-            {
-                dlg.AddYear(year.Name.ToString());
-            }
-
-            dlg.CurrentYear = this.bookingYearName;
-            var result = dlg.ShowDialog();
-            if (result != DialogResult.OK)
-            {
-                return;
-            }
-
-            this.SelectBookingYear(Convert.ToUInt16(dlg.CurrentYear));
         }
 
         void MenuItemActionCloseYear_Click(object sender, EventArgs e)
@@ -322,15 +308,6 @@ namespace lg2de.SimpleAccounting
             return strAccountNumber + " (" + strAccountName + ")";
         }
 
-        void SelectLastBookingYear()
-        {
-            var lastYear = this.accountingData.Years.LastOrDefault();
-            if (lastYear != null)
-            {
-                this.SelectBookingYear(lastYear.Name);
-            }
-        }
-
         void SelectBookingYear(ushort newYear)
         {
             this.bookingYearName = newYear.ToString();
@@ -359,6 +336,7 @@ namespace lg2de.SimpleAccounting
             }
 
             this.Accounts.Clear();
+            this.BookingYears.Clear();
 
             this.fileName = fileName;
             this.accountingData = AccountingData.LoadFromFile(this.fileName);
@@ -369,7 +347,16 @@ namespace lg2de.SimpleAccounting
                 this.Accounts.Add(acountModel);
             }
 
-            this.SelectLastBookingYear();
+            foreach (var year in this.accountingData.Years)
+            {
+                var bookingYear = new MenuViewModel(
+                    year.Name.ToString(),
+                    new RelayCommand(_ => this.SelectBookingYear(year.Name)));
+                this.BookingYears.Add(bookingYear);
+            }
+
+            // select last booking year after loading
+            this.BookingYears.LastOrDefault()?.Command.Execute(null);
 
             Settings.Default.RecentProject = fileName;
             Settings.Default.RecentProjects.Remove(fileName);

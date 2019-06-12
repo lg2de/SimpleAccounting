@@ -11,26 +11,30 @@
     d:DataContext="{d:DesignInstance Type=local:ShellDesignViewModel, IsDesignTimeCreatable=True}">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
+            <Menu.Resources>
+                <Style x:Key="CommandMenuStyle" TargetType="{x:Type MenuItem}">
+                    <Setter Property="Header" Value="{Binding Header}"/>
+                    <Setter Property="Command" Value="{Binding Command}"/>
+                </Style>
+            </Menu.Resources>
             <MenuItem Header="Projekt">
                 <MenuItem Header="Öffnen" Command="{Binding OpenProjectCommand}" />
                 <MenuItem Header="Speichern" Command="{Binding SaveProjectCommand}" />
                 <Separator />
                 <MenuItem
-                    Header="Letzte Projekte" ItemsSource="{Binding RecentProjects}">
-                    <MenuItem.ItemContainerStyle>
-                        <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="Header" Value="{Binding Header}"/>
-                            <Setter Property="Command" Value="{Binding Command}"/>
-                        </Style>
-                    </MenuItem.ItemContainerStyle>
-                </MenuItem>
+                    Header="Letzte Projekte"
+                    ItemsSource="{Binding RecentProjects}"
+                    ItemContainerStyle="{StaticResource CommandMenuStyle}" />
                 <Separator />
                 <MenuItem Header="Beenden" Command="{Binding CloseApplicationCommand}" />
             </MenuItem>
             <MenuItem Header="Aktionen">
                 <MenuItem Header="Buchen" />
-                <MenuItem Header="Buchungsjahr wählen" />
                 <MenuItem Header="Buchungsjahr abschließen" />
+                <MenuItem
+                    Header="Buchungsjahr wählen"
+                    ItemsSource="{Binding BookingYears}"
+                    ItemContainerStyle="{StaticResource CommandMenuStyle}" />
             </MenuItem>
             <MenuItem Header="Berichte">
                 <MenuItem Header="Journal" Command="{Binding JournalReportCommand}" />
