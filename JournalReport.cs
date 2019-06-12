@@ -5,15 +5,17 @@ using System.Xml;
 
 namespace lg2de.SimpleAccounting
 {
-    internal class JournalReport : ReportBase
+    internal class JournalReport
     {
         private readonly AccountingDataJournal journal;
         private readonly string firmName;
+        private readonly string bookingYearName;
 
-        public JournalReport(AccountingDataJournal journal, string firmName)
+        public JournalReport(AccountingDataJournal journal, string firmName, string bookingYearName)
         {
             this.journal = journal;
             this.firmName = firmName;
+            this.bookingYearName = bookingYearName;
         }
 
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
@@ -32,7 +34,7 @@ namespace lg2de.SimpleAccounting
             firmNode.InnerText = this.firmName;
 
             XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            rangeNode.InnerText = dateStart.ToString("s") + " - " + dateEnd.ToString("s");
+            rangeNode.InnerText = dateStart.ToString("d") + " - " + dateEnd.ToString("d");
 
             var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
             dateNode.InnerText = "Dresden, " + DateTime.Now.ToLongDateString();
@@ -44,8 +46,8 @@ namespace lg2de.SimpleAccounting
             {
                 XmlNode dataLineNode = doc.CreateElement("tr");
                 XmlNode dataItemNode = doc.CreateElement("td");
-                this.SetNodeAttribute(dataLineNode, "topline", "1");
-                dataItemNode.InnerText = entry.Date.ToDateTime().ToString("s");
+                dataLineNode.SetAttribute("topline", "1");
+                dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d");
                 dataLineNode.AppendChild(dataItemNode);
                 dataItemNode = dataItemNode.Clone();
                 dataItemNode.InnerText = entry.ID.ToString();
@@ -131,7 +133,7 @@ namespace lg2de.SimpleAccounting
                 }
             }
 
-            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Journal");
+            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Journal " + this.bookingYearName);
         }
     }
 }

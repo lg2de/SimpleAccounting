@@ -34,8 +34,8 @@
             </MenuItem>
             <MenuItem Header="Berichte">
                 <MenuItem Header="Journal" Command="{Binding JournalReportCommand}" />
-                <MenuItem Header="Summen und Salden" />
-                <MenuItem Header="Jahresbilanz" />
+                <MenuItem Header="Summen und Salden"  Command="{Binding TotalsBalancesReportCommand}" />
+                <MenuItem Header="Jahresbilanz"  Command="{Binding AnnualBalanceReportCommand}" />
             </MenuItem>
         </Menu>
         <Grid>
