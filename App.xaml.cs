@@ -1,4 +1,8 @@
-﻿using System.Collections.Specialized;
+﻿// <copyright>
+//     Copyright (c) Lukas Grützmacher. All rights reserved.
+// </copyright>
+
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Markup;

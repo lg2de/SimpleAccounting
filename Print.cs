@@ -27,26 +27,26 @@ namespace lg2de.SimpleAccounting
 
         public PrintClass()
         {
-            m_Document = new XmlDocument();
-            m_PenStack = new Stack<Pen>();
-            m_SolidBrushStack = new Stack<SolidBrush>();
-            m_FontStack = new Stack<Font>();
+            this.m_Document = new XmlDocument();
+            this.m_PenStack = new Stack<Pen>();
+            this.m_SolidBrushStack = new Stack<SolidBrush>();
+            this.m_FontStack = new Stack<Font>();
         }
         public XmlDocument Document
         {
-            get { return m_Document; }
+            get { return this.m_Document; }
         }
         public void SetDocument(string strXML)
         {
-            m_Document.LoadXml(strXML);
+            this.m_Document.LoadXml(strXML);
         }
         public void SetDocument(XmlDocument doc)
         {
-            m_Document = (XmlDocument)doc.Clone();
+            this.m_Document = (XmlDocument)doc.Clone();
         }
         public void LoadDocument(string strFileName)
         {
-            m_Document.Load(strFileName);
+            this.m_Document.Load(strFileName);
         }
         public void PrintDocument(string documentName)
         {
@@ -58,8 +58,8 @@ namespace lg2de.SimpleAccounting
             doc.DocumentName = documentName;
 
             // init
-            m_nResFactor = (float)( 100 / 25.4 );
-            XmlNode node = m_Document.DocumentElement.Attributes.GetNamedItem("papersize");
+            this.m_nResFactor = (float)( 100 / 25.4 );
+            XmlNode node = this.m_Document.DocumentElement.Attributes.GetNamedItem("papersize");
             string strPaperSize = "A4";
             if ( node != null )
                 strPaperSize = node.Value;
@@ -69,35 +69,35 @@ namespace lg2de.SimpleAccounting
                 if ( !item.PaperName.StartsWith(strPaperSize, StringComparison.CurrentCultureIgnoreCase) )
                     continue;
                 doc.DefaultPageSettings.PaperSize = item;
-                m_nDocumentWidth = Convert.ToInt32(item.Width / m_nResFactor);
-                m_nDocumentHeight = Convert.ToInt32(item.Height / m_nResFactor);
-                m_nDocumentScale = 1;
+                this.m_nDocumentWidth = Convert.ToInt32(item.Width / this.m_nResFactor);
+                this.m_nDocumentHeight = Convert.ToInt32(item.Height / this.m_nResFactor);
+                this.m_nDocumentScale = 1;
                 bFound = true;
                 break;
             }
             if ( !bFound )
             {
-                node = m_Document.DocumentElement.Attributes.GetNamedItem("width");
+                node = this.m_Document.DocumentElement.Attributes.GetNamedItem("width");
                 if ( node != null )
-                    m_nDocumentWidth = Convert.ToInt32(node.Value);
+                    this.m_nDocumentWidth = Convert.ToInt32(node.Value);
                 else
-                    m_nDocumentWidth = 210;
-                node = m_Document.DocumentElement.Attributes.GetNamedItem("height");
+                    this.m_nDocumentWidth = 210;
+                node = this.m_Document.DocumentElement.Attributes.GetNamedItem("height");
                 if ( node != null )
-                    m_nDocumentHeight = Convert.ToInt32(node.Value);
+                    this.m_nDocumentHeight = Convert.ToInt32(node.Value);
                 else
-                    m_nDocumentHeight = 297;
-                node = m_Document.DocumentElement.Attributes.GetNamedItem("scale");
+                    this.m_nDocumentHeight = 297;
+                node = this.m_Document.DocumentElement.Attributes.GetNamedItem("scale");
                 if ( node != null )
-                    m_nDocumentScale = Convert.ToSingle(node.Value);
+                    this.m_nDocumentScale = Convert.ToSingle(node.Value);
                 else
-                    m_nDocumentScale = 1;
-                m_nResFactor *= m_nDocumentScale;
-                doc.DefaultPageSettings.PaperSize = new PaperSize(strPaperSize, Convert.ToInt32(m_nDocumentWidth * m_nResFactor), Convert.ToInt32(m_nDocumentHeight * m_nResFactor));
+                    this.m_nDocumentScale = 1;
+                this.m_nResFactor *= this.m_nDocumentScale;
+                doc.DefaultPageSettings.PaperSize = new PaperSize(strPaperSize, Convert.ToInt32(this.m_nDocumentWidth * this.m_nResFactor), Convert.ToInt32(this.m_nDocumentHeight * this.m_nResFactor));
             }
 
             doc.DefaultPageSettings.Landscape = false;
-            node = m_Document.DocumentElement.Attributes.GetNamedItem("landscape");
+            node = this.m_Document.DocumentElement.Attributes.GetNamedItem("landscape");
             if ( node != null )
             {
                 if ( node.Value == "1" )
@@ -105,37 +105,37 @@ namespace lg2de.SimpleAccounting
             }
             if ( doc.DefaultPageSettings.Landscape )
             {
-                int nDummy = m_nDocumentWidth;
-                m_nDocumentWidth = m_nDocumentHeight;
-                m_nDocumentHeight = nDummy;
+                int nDummy = this.m_nDocumentWidth;
+                this.m_nDocumentWidth = this.m_nDocumentHeight;
+                this.m_nDocumentHeight = nDummy;
             }
 
-            m_CurrentNode = m_Document.DocumentElement.FirstChild;
-            node = m_Document.DocumentElement.Attributes.GetNamedItem("left");
+            this.m_CurrentNode = this.m_Document.DocumentElement.FirstChild;
+            node = this.m_Document.DocumentElement.Attributes.GetNamedItem("left");
             if ( node != null )
-                m_nDocumentLeftMargin = Convert.ToInt32(node.Value);
+                this.m_nDocumentLeftMargin = Convert.ToInt32(node.Value);
             else
-                m_nDocumentLeftMargin = 0;
-            node = m_Document.DocumentElement.Attributes.GetNamedItem("right");
+                this.m_nDocumentLeftMargin = 0;
+            node = this.m_Document.DocumentElement.Attributes.GetNamedItem("right");
             if ( node != null )
-                m_nDocumentRightMargin = Convert.ToInt32(node.Value);
+                this.m_nDocumentRightMargin = Convert.ToInt32(node.Value);
             else
-                m_nDocumentRightMargin = 0;
-            node = m_Document.DocumentElement.Attributes.GetNamedItem("top");
+                this.m_nDocumentRightMargin = 0;
+            node = this.m_Document.DocumentElement.Attributes.GetNamedItem("top");
             if ( node != null )
-                m_nDocumentTopMargin = Convert.ToInt32(node.Value);
+                this.m_nDocumentTopMargin = Convert.ToInt32(node.Value);
             else
-                m_nDocumentTopMargin = 0;
-            node = m_Document.DocumentElement.Attributes.GetNamedItem("bottom");
+                this.m_nDocumentTopMargin = 0;
+            node = this.m_Document.DocumentElement.Attributes.GetNamedItem("bottom");
             if ( node != null )
-                m_nDocumentBottomMargin = Convert.ToInt32(node.Value);
+                this.m_nDocumentBottomMargin = Convert.ToInt32(node.Value);
             else
-                m_nDocumentBottomMargin = 0;
-            m_nCursorX = m_nDocumentLeftMargin;
-            m_nCursorY = m_nDocumentTopMargin;
+                this.m_nDocumentBottomMargin = 0;
+            this.m_nCursorX = this.m_nDocumentLeftMargin;
+            this.m_nCursorY = this.m_nDocumentTopMargin;
 
             // transform
-            TransformDocument();
+            this.TransformDocument();
             // show
             pdlg.WindowState = FormWindowState.Maximized;
             pdlg.ShowDialog();
@@ -150,8 +150,8 @@ namespace lg2de.SimpleAccounting
 
         void TransformDocument()
         {
-            TransformNodes(m_Document.DocumentElement.FirstChild);
-            string strText = m_Document.InnerXml;
+            this.TransformNodes(this.m_Document.DocumentElement.FirstChild);
+            string strText = this.m_Document.InnerXml;
         }
         void TransformNodes(XmlNode firstNode)
         {
@@ -165,31 +165,31 @@ namespace lg2de.SimpleAccounting
                 {
                     XmlNode attr = currentNode.Attributes.GetNamedItem("absX");
                     if ( attr != null )
-                        m_nCursorX = m_nDocumentLeftMargin + Convert.ToInt32(attr.Value);
+                        this.m_nCursorX = this.m_nDocumentLeftMargin + Convert.ToInt32(attr.Value);
                     attr = currentNode.Attributes.GetNamedItem("absY");
                     if ( attr != null )
-                        m_nCursorY = m_nDocumentTopMargin + Convert.ToInt32(attr.Value);
+                        this.m_nCursorY = this.m_nDocumentTopMargin + Convert.ToInt32(attr.Value);
                     attr = currentNode.Attributes.GetNamedItem("relX");
                     if ( attr != null )
-                        m_nCursorX += Convert.ToInt32(attr.Value);
+                        this.m_nCursorX += Convert.ToInt32(attr.Value);
                     attr = currentNode.Attributes.GetNamedItem("relY");
                     if ( attr != null )
-                        m_nCursorY += Convert.ToInt32(attr.Value);
+                        this.m_nCursorY += Convert.ToInt32(attr.Value);
                 }
                 else if ( currentNode.Name == "rectangle" )
-                    TransformRectangle(currentNode);
+                    this.TransformRectangle(currentNode);
                 else if ( currentNode.Name == "table" )
-                    TransformTable(currentNode);
+                    this.TransformTable(currentNode);
                 else if ( currentNode.Name == "newpage" )
-                    m_nCursorY = m_nDocumentTopMargin;
+                    this.m_nCursorY = this.m_nDocumentTopMargin;
 
-                TransformNodes(currentNode.FirstChild);
+                this.TransformNodes(currentNode.FirstChild);
 
-                if ( m_nCursorY >= ( m_nDocumentHeight - m_nDocumentBottomMargin ) )
+                if (this.m_nCursorY >= (this.m_nDocumentHeight - this.m_nDocumentBottomMargin ) )
                 {
-                    XmlNode newPage = m_Document.CreateElement("newpage");
+                    XmlNode newPage = this.m_Document.CreateElement("newpage");
                     currentNode.ParentNode.InsertBefore(newPage, currentNode);
-                    m_nCursorY = m_nDocumentTopMargin;
+                    this.m_nCursorY = this.m_nDocumentTopMargin;
                 }
             }
         }
@@ -200,32 +200,32 @@ namespace lg2de.SimpleAccounting
             float nX2 = Convert.ToSingle(rectNode.Attributes.GetNamedItem("relToX").Value);
             float nY2 = Convert.ToSingle(rectNode.Attributes.GetNamedItem("relToY").Value);
 
-            XmlNode lineNode = m_Document.CreateElement("line");
-            SetNodeAttribute(lineNode, "relFromX", nX1.ToString());
-            SetNodeAttribute(lineNode, "relFromY", nY1.ToString());
-            SetNodeAttribute(lineNode, "relToX", nX2.ToString());
-            SetNodeAttribute(lineNode, "relToY", nY1.ToString());
+            XmlNode lineNode = this.m_Document.CreateElement("line");
+            this.SetNodeAttribute(lineNode, "relFromX", nX1.ToString());
+            this.SetNodeAttribute(lineNode, "relFromY", nY1.ToString());
+            this.SetNodeAttribute(lineNode, "relToX", nX2.ToString());
+            this.SetNodeAttribute(lineNode, "relToY", nY1.ToString());
             rectNode.ParentNode.InsertBefore(lineNode, rectNode);
 
-            lineNode = m_Document.CreateElement("line");
-            SetNodeAttribute(lineNode, "relFromX", nX2.ToString());
-            SetNodeAttribute(lineNode, "relFromY", nY1.ToString());
-            SetNodeAttribute(lineNode, "relToX", nX2.ToString());
-            SetNodeAttribute(lineNode, "relToY", nY2.ToString());
+            lineNode = this.m_Document.CreateElement("line");
+            this.SetNodeAttribute(lineNode, "relFromX", nX2.ToString());
+            this.SetNodeAttribute(lineNode, "relFromY", nY1.ToString());
+            this.SetNodeAttribute(lineNode, "relToX", nX2.ToString());
+            this.SetNodeAttribute(lineNode, "relToY", nY2.ToString());
             rectNode.ParentNode.InsertBefore(lineNode, rectNode);
 
-            lineNode = m_Document.CreateElement("line");
-            SetNodeAttribute(lineNode, "relFromX", nX2.ToString());
-            SetNodeAttribute(lineNode, "relFromY", nY2.ToString());
-            SetNodeAttribute(lineNode, "relToX", nX1.ToString());
-            SetNodeAttribute(lineNode, "relToY", nY2.ToString());
+            lineNode = this.m_Document.CreateElement("line");
+            this.SetNodeAttribute(lineNode, "relFromX", nX2.ToString());
+            this.SetNodeAttribute(lineNode, "relFromY", nY2.ToString());
+            this.SetNodeAttribute(lineNode, "relToX", nX1.ToString());
+            this.SetNodeAttribute(lineNode, "relToY", nY2.ToString());
             rectNode.ParentNode.InsertBefore(lineNode, rectNode);
 
-            lineNode = m_Document.CreateElement("line");
-            SetNodeAttribute(lineNode, "relFromX", nX1.ToString());
-            SetNodeAttribute(lineNode, "relFromY", nY2.ToString());
-            SetNodeAttribute(lineNode, "relToX", nX1.ToString());
-            SetNodeAttribute(lineNode, "relToY", nY1.ToString());
+            lineNode = this.m_Document.CreateElement("line");
+            this.SetNodeAttribute(lineNode, "relFromX", nX1.ToString());
+            this.SetNodeAttribute(lineNode, "relFromY", nY2.ToString());
+            this.SetNodeAttribute(lineNode, "relToX", nX1.ToString());
+            this.SetNodeAttribute(lineNode, "relToY", nY1.ToString());
             rectNode.ParentNode.InsertBefore(lineNode, rectNode);
 
             rectNode.ParentNode.RemoveChild(rectNode);
@@ -248,22 +248,22 @@ namespace lg2de.SimpleAccounting
             {
                 XmlNode width = columnNode.Attributes.GetNamedItem("width");
 
-                XmlNode textNode = m_Document.CreateElement("text");
+                XmlNode textNode = this.m_Document.CreateElement("text");
                 textNode.InnerText = columnNode.InnerText;
 
-                SetNodeAttribute(textNode, "relX", nTableWidth.ToString());
+                this.SetNodeAttribute(textNode, "relX", nTableWidth.ToString());
 
                 tableNode.ParentNode.InsertBefore(textNode, tableNode);
 
-                CreateFrame(columnNode, tableNode, nTableWidth, 0, nTableWidth + Convert.ToInt32(width.Value), nHeaderLineHeight);
+                this.CreateFrame(columnNode, tableNode, nTableWidth, 0, nTableWidth + Convert.ToInt32(width.Value), nHeaderLineHeight);
                 nTableWidth += Convert.ToInt32(width.Value);
             }
-            CreateFrame(columnsRoot, tableNode, 0, 0, nTableWidth, nHeaderLineHeight);
+            this.CreateFrame(columnsRoot, tableNode, 0, 0, nTableWidth, nHeaderLineHeight);
 
-            XmlNode moveNode = m_Document.CreateElement("move");
-            SetNodeAttribute(moveNode, "relY", nHeaderLineHeight.ToString());
+            XmlNode moveNode = this.m_Document.CreateElement("move");
+            this.SetNodeAttribute(moveNode, "relY", nHeaderLineHeight.ToString());
             tableNode.ParentNode.InsertBefore(moveNode, tableNode);
-            m_nCursorY += nHeaderLineHeight;
+            this.m_nCursorY += nHeaderLineHeight;
         }
         void TransformTable(XmlNode tableNode)
         {
@@ -275,23 +275,23 @@ namespace lg2de.SimpleAccounting
             XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
 
             // if table can not be started on page - create new one
-            if ( ( m_nCursorY + nTableLineHeight * 2 ) > ( m_nDocumentHeight - m_nDocumentBottomMargin ) )
+            if ( (this.m_nCursorY + nTableLineHeight * 2 ) > (this.m_nDocumentHeight - this.m_nDocumentBottomMargin ) )
             {
-                XmlNode newPage = m_Document.CreateElement("newpage");
+                XmlNode newPage = this.m_Document.CreateElement("newpage");
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                m_nCursorY = m_nDocumentTopMargin;
+                this.m_nCursorY = this.m_nDocumentTopMargin;
             }
 
-            TransformTableHeader(tableNode);
+            this.TransformTableHeader(tableNode);
 
             foreach ( XmlNode dataNode in dataNodes )
             {
-                if ( ( m_nCursorY + nTableLineHeight ) > ( m_nDocumentHeight - m_nDocumentBottomMargin ) )
+                if ( (this.m_nCursorY + nTableLineHeight ) > (this.m_nDocumentHeight - this.m_nDocumentBottomMargin ) )
                 {
-                    XmlNode newPage = m_Document.CreateElement("newpage");
+                    XmlNode newPage = this.m_Document.CreateElement("newpage");
                     tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                    m_nCursorY = m_nDocumentTopMargin;
-                    TransformTableHeader(tableNode);
+                    this.m_nCursorY = this.m_nDocumentTopMargin;
+                    this.TransformTableHeader(tableNode);
                 }
 
                 XmlNode textStyleNode = dataNode.Attributes.GetNamedItem("textStyle");
@@ -304,7 +304,7 @@ namespace lg2de.SimpleAccounting
                 for ( int i = 0; i < rowNodes.Count; i++ )
                 {
                     XmlNode rowNode = rowNodes[i];
-                    XmlNode textNode = m_Document.CreateElement("text");
+                    XmlNode textNode = this.m_Document.CreateElement("text");
                     string strText = rowNode.InnerText;
                     nInnerLineCount += strText.Length / 40;
                 }
@@ -318,7 +318,7 @@ namespace lg2de.SimpleAccounting
                 for ( int i = 0; i < rowNodes.Count; i++ )
                 {
                     XmlNode rowNode = rowNodes[i];
-                    XmlNode textNode = m_Document.CreateElement("text");
+                    XmlNode textNode = this.m_Document.CreateElement("text");
                     string strText = rowNode.InnerText;
 
                     // line break
@@ -329,18 +329,18 @@ namespace lg2de.SimpleAccounting
 
                     textNode.InnerText = strText;
                     XmlNode width = columnNodes[i].Attributes.GetNamedItem("width");
-                    SetNodeAttribute(textNode, "relX", nTableWidth.ToString());
+                    this.SetNodeAttribute(textNode, "relX", nTableWidth.ToString());
                     tableNode.ParentNode.InsertBefore(textNode, tableNode);
                     int nWidth = Convert.ToInt32(width.Value);
-                    CreateFrame(columnNodes[i], textNode, nTableWidth, 0, nTableWidth + nWidth, nLineHeight);
+                    this.CreateFrame(columnNodes[i], textNode, nTableWidth, 0, nTableWidth + nWidth, nLineHeight);
                     nTableWidth += nWidth;
                 }
-                CreateFrame(dataNode, tableNode, 0, 0, nTableWidth, nLineHeight);
+                this.CreateFrame(dataNode, tableNode, 0, 0, nTableWidth, nLineHeight);
 
-                XmlNode moveNode = m_Document.CreateElement("move");
-                SetNodeAttribute(moveNode, "relY", nLineHeight.ToString());
+                XmlNode moveNode = this.m_Document.CreateElement("move");
+                this.SetNodeAttribute(moveNode, "relY", nLineHeight.ToString());
                 tableNode.ParentNode.InsertBefore(moveNode, tableNode);
-                m_nCursorY += nLineHeight;
+                this.m_nCursorY += nLineHeight;
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);
@@ -348,28 +348,28 @@ namespace lg2de.SimpleAccounting
 
         void BeginPrint(object sender, PrintEventArgs e)
         {
-            m_CurrentNode = m_Document.DocumentElement.FirstChild;
-            m_nCursorX = m_nDocumentLeftMargin;
-            m_nCursorY = m_nDocumentTopMargin;
-            m_PenStack.Clear();
-            m_PenStack.Push(new Pen(Color.Black));
-            m_SolidBrushStack.Clear();
-            m_SolidBrushStack.Push(new SolidBrush(Color.Black));
-            m_FontStack.Clear();
-            m_FontStack.Push(new Font("Arial", 10));
+            this.m_CurrentNode = this.m_Document.DocumentElement.FirstChild;
+            this.m_nCursorX = this.m_nDocumentLeftMargin;
+            this.m_nCursorY = this.m_nDocumentTopMargin;
+            this.m_PenStack.Clear();
+            this.m_PenStack.Push(new Pen(Color.Black));
+            this.m_SolidBrushStack.Clear();
+            this.m_SolidBrushStack.Push(new SolidBrush(Color.Black));
+            this.m_FontStack.Clear();
+            this.m_FontStack.Push(new Font("Arial", 10));
         }
         void PrintPage(object sender, PrintPageEventArgs e)
         {
-            m_nCursorY = m_nDocumentTopMargin;
-            PrintNodes(sender, e);
+            this.m_nCursorY = this.m_nDocumentTopMargin;
+            this.PrintNodes(sender, e);
         }
         XmlNode CreateLineNode(int nX1, int nY1, int nX2, int nY2)
         {
-            XmlNode newNode = m_Document.CreateElement("line");
-            SetNodeAttribute(newNode, "relFromX", nX1.ToString());
-            SetNodeAttribute(newNode, "relFromY", nY1.ToString());
-            SetNodeAttribute(newNode, "relToX", nX2.ToString());
-            SetNodeAttribute(newNode, "relToY", nY2.ToString());
+            XmlNode newNode = this.m_Document.CreateElement("line");
+            this.SetNodeAttribute(newNode, "relFromX", nX1.ToString());
+            this.SetNodeAttribute(newNode, "relFromY", nY1.ToString());
+            this.SetNodeAttribute(newNode, "relToX", nX2.ToString());
+            this.SetNodeAttribute(newNode, "relToY", nY2.ToString());
             return newNode;
         }
         void CreateFrame(XmlNode referenceNode, XmlNode positionNode, int nX1, int nY1, int nX2, int nY2)
@@ -377,41 +377,41 @@ namespace lg2de.SimpleAccounting
             XmlNode attr = referenceNode.Attributes.GetNamedItem("leftline");
             if ( attr != null && attr.Value == "1" )
             {
-                XmlNode leftline = CreateLineNode(nX1, nY1, nX1, nY2);
+                XmlNode leftline = this.CreateLineNode(nX1, nY1, nX1, nY2);
                 positionNode.ParentNode.InsertBefore(leftline, positionNode);
             }
             attr = referenceNode.Attributes.GetNamedItem("rightline");
             if ( attr != null && attr.Value == "1" )
             {
-                XmlNode rightline = CreateLineNode(nX2, nY1, nX2, nY2);
+                XmlNode rightline = this.CreateLineNode(nX2, nY1, nX2, nY2);
                 positionNode.ParentNode.InsertBefore(rightline, positionNode);
             }
             attr = referenceNode.Attributes.GetNamedItem("topline");
             if ( attr != null && attr.Value == "1" )
             {
-                XmlNode topline = CreateLineNode(nX1, nY1, nX2, nY1);
+                XmlNode topline = this.CreateLineNode(nX1, nY1, nX2, nY1);
                 positionNode.ParentNode.InsertBefore(topline, positionNode);
             }
             attr = referenceNode.Attributes.GetNamedItem("bottomline");
             if ( attr != null && attr.Value == "1" )
             {
-                XmlNode bottomline = CreateLineNode(nX1, nY2, nX2, nY2);
+                XmlNode bottomline = this.CreateLineNode(nX1, nY2, nX2, nY2);
                 positionNode.ParentNode.InsertBefore(bottomline, positionNode);
             }
         }
         void PrintNodes(object sender, PrintPageEventArgs e)
         {
-            while ( m_CurrentNode != null )
+            while (this.m_CurrentNode != null )
             {
                 if ( e.HasMorePages )
                     return;
 
-                Pen drawPen = m_PenStack.Peek();
-                SolidBrush drawBrush = m_SolidBrushStack.Peek();
-                Font drawFont = m_FontStack.Peek();
+                Pen drawPen = this.m_PenStack.Peek();
+                SolidBrush drawBrush = this.m_SolidBrushStack.Peek();
+                Font drawFont = this.m_FontStack.Peek();
 
-                XmlNode drawNode = m_CurrentNode;
-                m_CurrentNode = m_CurrentNode.NextSibling;
+                XmlNode drawNode = this.m_CurrentNode;
+                this.m_CurrentNode = this.m_CurrentNode.NextSibling;
 
                 if ( drawNode.Name == "move" )
                 {
@@ -420,13 +420,13 @@ namespace lg2de.SimpleAccounting
                     XmlNode nodeRelX = drawNode.Attributes.GetNamedItem("relX");
                     XmlNode nodeRelY = drawNode.Attributes.GetNamedItem("relY");
                     if ( nodeAbsX != null )
-                        m_nCursorX = m_nDocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
+                        this.m_nCursorX = this.m_nDocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
                     if ( nodeAbsY != null )
-                        m_nCursorY = m_nDocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
+                        this.m_nCursorY = this.m_nDocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
                     if ( nodeRelX != null )
-                        m_nCursorX += Convert.ToInt32(nodeRelX.Value);
+                        this.m_nCursorX += Convert.ToInt32(nodeRelX.Value);
                     if ( nodeRelY != null )
-                        m_nCursorY += Convert.ToInt32(nodeRelY.Value);
+                        this.m_nCursorY += Convert.ToInt32(nodeRelY.Value);
                 }
                 else if ( drawNode.Name == "text" )
                 {
@@ -435,12 +435,12 @@ namespace lg2de.SimpleAccounting
                     XmlNode nodeRelX = drawNode.Attributes.GetNamedItem("relX");
                     XmlNode nodeRelY = drawNode.Attributes.GetNamedItem("relY");
                     XmlNode nodeAlign = drawNode.Attributes.GetNamedItem("align");
-                    int nX = m_nCursorX;
-                    int nY = m_nCursorY;
+                    int nX = this.m_nCursorX;
+                    int nY = this.m_nCursorY;
                     if ( nodeAbsX != null )
-                        nX = m_nDocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
+                        nX = this.m_nDocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
                     if ( nodeAbsY != null )
-                        nY = m_nDocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
+                        nY = this.m_nDocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
                     if ( nodeRelX != null )
                         nX += Convert.ToInt32(nodeRelX.Value);
                     if ( nodeRelY != null )
@@ -454,7 +454,7 @@ namespace lg2de.SimpleAccounting
                         if ( nodeAlign.Value == "center" )
                             format.Alignment = StringAlignment.Center;
                     }
-                    e.Graphics.DrawString(strText, drawFont, drawBrush, nX * m_nResFactor, nY * m_nResFactor, format);
+                    e.Graphics.DrawString(strText, drawFont, drawBrush, nX * this.m_nResFactor, nY * this.m_nResFactor, format);
                 }
                 else if ( drawNode.Name == "line" )
                 {
@@ -466,28 +466,28 @@ namespace lg2de.SimpleAccounting
                     XmlNode nodeAbsToY = drawNode.Attributes.GetNamedItem("absToY");
                     XmlNode nodeRelToX = drawNode.Attributes.GetNamedItem("relToX");
                     XmlNode nodeRelToY = drawNode.Attributes.GetNamedItem("relToY");
-                    float nX1 = m_nCursorX;
-                    float nY1 = m_nCursorY;
-                    float nX2 = m_nCursorX;
-                    float nY2 = m_nCursorY;
+                    float nX1 = this.m_nCursorX;
+                    float nY1 = this.m_nCursorY;
+                    float nX2 = this.m_nCursorX;
+                    float nY2 = this.m_nCursorY;
                     if ( nodeAbsFromX != null )
-                        nX1 = m_nDocumentLeftMargin + Convert.ToSingle(nodeAbsFromX.Value);
+                        nX1 = this.m_nDocumentLeftMargin + Convert.ToSingle(nodeAbsFromX.Value);
                     if ( nodeAbsFromY != null )
-                        nY1 = m_nDocumentTopMargin + Convert.ToSingle(nodeAbsFromY.Value);
+                        nY1 = this.m_nDocumentTopMargin + Convert.ToSingle(nodeAbsFromY.Value);
                     if ( nodeRelFromX != null )
                         nX1 += Convert.ToSingle(nodeRelFromX.Value);
                     if ( nodeRelFromY != null )
                         nY1 += Convert.ToSingle(nodeRelFromY.Value);
                     if ( nodeAbsToX != null )
-                        nX2 = m_nDocumentLeftMargin + Convert.ToSingle(nodeAbsToX.Value);
+                        nX2 = this.m_nDocumentLeftMargin + Convert.ToSingle(nodeAbsToX.Value);
                     if ( nodeAbsToY != null )
-                        nY2 = m_nDocumentTopMargin + Convert.ToSingle(nodeAbsToY.Value);
+                        nY2 = this.m_nDocumentTopMargin + Convert.ToSingle(nodeAbsToY.Value);
                     if ( nodeRelToX != null )
                         nX2 += Convert.ToSingle(nodeRelToX.Value);
                     if ( nodeRelToY != null )
                         nY2 += Convert.ToSingle(nodeRelToY.Value);
 
-                    e.Graphics.DrawLine(drawPen, nX1 * m_nResFactor, nY1 * m_nResFactor, nX2 * m_nResFactor, nY2 * m_nResFactor);
+                    e.Graphics.DrawLine(drawPen, nX1 * this.m_nResFactor, nY1 * this.m_nResFactor, nX2 * this.m_nResFactor, nY2 * this.m_nResFactor);
                 }
                 else if ( drawNode.Name == "circle" )
                 {
@@ -497,12 +497,12 @@ namespace lg2de.SimpleAccounting
                     XmlNode nodeRelY = drawNode.Attributes.GetNamedItem("relY");
                     XmlNode nodeRadX = drawNode.Attributes.GetNamedItem("radX");
                     XmlNode nodeRadY = drawNode.Attributes.GetNamedItem("radY");
-                    float nX = m_nCursorX;
-                    float nY = m_nCursorY;
+                    float nX = this.m_nCursorX;
+                    float nY = this.m_nCursorY;
                     if ( nodeAbsX != null )
-                        nX = m_nDocumentLeftMargin + Convert.ToSingle(nodeAbsX.Value);
+                        nX = this.m_nDocumentLeftMargin + Convert.ToSingle(nodeAbsX.Value);
                     if ( nodeAbsY != null )
-                        nY = m_nDocumentTopMargin + Convert.ToSingle(nodeAbsY.Value);
+                        nY = this.m_nDocumentTopMargin + Convert.ToSingle(nodeAbsY.Value);
                     if ( nodeRelX != null )
                         nX += Convert.ToSingle(nodeRelX.Value);
                     if ( nodeRelY != null )
@@ -514,7 +514,7 @@ namespace lg2de.SimpleAccounting
                     nRadX *= 2;
                     nRadY *= 2;
                     string strText = drawNode.InnerText;
-                    e.Graphics.DrawEllipse(drawPen, nX * m_nResFactor, nY * m_nResFactor, nRadX * m_nResFactor, nRadY * m_nResFactor);
+                    e.Graphics.DrawEllipse(drawPen, nX * this.m_nResFactor, nY * this.m_nResFactor, nRadX * this.m_nResFactor, nRadY * this.m_nResFactor);
                 }
                 else if ( drawNode.Name == "font" )
                 {
@@ -538,15 +538,15 @@ namespace lg2de.SimpleAccounting
                     Font newFont = new Font(strFontName, nFontSize, nFontStyle);
                     if ( drawNode.ChildNodes.Count > 0 )
                     {
-                        m_FontStack.Push(newFont);
-                        m_CurrentNode = drawNode.FirstChild;
-                        PrintNodes(sender, e);
-                        m_FontStack.Pop();
+                        this.m_FontStack.Push(newFont);
+                        this.m_CurrentNode = drawNode.FirstChild;
+                        this.PrintNodes(sender, e);
+                        this.m_FontStack.Pop();
                     }
                     else
                     {
-                        m_FontStack.Pop();
-                        m_FontStack.Push(newFont);
+                        this.m_FontStack.Pop();
+                        this.m_FontStack.Push(newFont);
                     }
                 }
                 else if ( drawNode.Name == "color" )
@@ -562,19 +562,19 @@ namespace lg2de.SimpleAccounting
                     }
                     if ( drawNode.ChildNodes.Count > 0 )
                     {
-                        m_PenStack.Push(newPen);
-                        m_SolidBrushStack.Push(newBrush);
-                        m_CurrentNode = drawNode.FirstChild;
-                        PrintNodes(sender, e);
-                        m_PenStack.Pop();
-                        m_SolidBrushStack.Pop();
+                        this.m_PenStack.Push(newPen);
+                        this.m_SolidBrushStack.Push(newBrush);
+                        this.m_CurrentNode = drawNode.FirstChild;
+                        this.PrintNodes(sender, e);
+                        this.m_PenStack.Pop();
+                        this.m_SolidBrushStack.Pop();
                     }
                     else
                     {
-                        m_PenStack.Pop();
-                        m_PenStack.Push(newPen);
-                        m_SolidBrushStack.Pop();
-                        m_SolidBrushStack.Push(newBrush);
+                        this.m_PenStack.Pop();
+                        this.m_PenStack.Push(newPen);
+                        this.m_SolidBrushStack.Pop();
+                        this.m_SolidBrushStack.Push(newBrush);
                     }
                 }
                 else if ( drawNode.Name == "newpage" )
@@ -583,10 +583,10 @@ namespace lg2de.SimpleAccounting
                     return;
                 }
 
-                if ( m_CurrentNode == null )
+                if (this.m_CurrentNode == null )
                 {
                     if ( drawNode.ParentNode != null && drawNode.ParentNode.Name != "xEport" )
-                        m_CurrentNode = drawNode.ParentNode.NextSibling;
+                        this.m_CurrentNode = drawNode.ParentNode.NextSibling;
                     return;
                 }
             }
