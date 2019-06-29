@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Presentation
 {
     internal class BookingTemplate
     {

@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Caliburn.Micro;
+using lg2de.SimpleAccounting.Model;
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Presentation
 {
     internal class AddBookingViewModel : Screen
     {

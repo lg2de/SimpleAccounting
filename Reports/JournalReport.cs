@@ -4,10 +4,11 @@
 
 using System;
 using System.Linq;
-using System.Windows.Forms;
 using System.Xml;
+using lg2de.SimpleAccounting.Extensions;
+using lg2de.SimpleAccounting.Model;
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Reports
 {
     internal class JournalReport
     {
@@ -25,12 +26,7 @@ namespace lg2de.SimpleAccounting
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
             var print = new PrintClass();
-            string fileName = Application.ExecutablePath;
-            fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
-            fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
-            fileName = fileName.Substring(0, fileName.LastIndexOf("\\") + 1);
-            fileName += "Journal.xml";
-            print.LoadDocument(fileName);
+            print.LoadDocument("Journal.xml");
 
             XmlDocument doc = print.Document;
 

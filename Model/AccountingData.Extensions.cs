@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Model
 {
     public partial class BookingValue
     {

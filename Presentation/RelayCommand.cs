@@ -5,7 +5,7 @@
 using System;
 using System.Windows.Input;
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Presentation
 {
     public class RelayCommand : ICommand
     {

@@ -1,12 +1,12 @@
 ﻿<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
 <UserControl
-    x:Class="lg2de.SimpleAccounting.AddBookingView"
+    x:Class="lg2de.SimpleAccounting.Presentation.AddBookingView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:s="clr-namespace:System;assembly=mscorlib"
-    xmlns:local="clr-namespace:lg2de.SimpleAccounting"
+    xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:currencytextboxcontrol="clr-namespace:CurrencyTextBoxControl;assembly=CurrencyTextBoxControl"
     mc:Ignorable="d"

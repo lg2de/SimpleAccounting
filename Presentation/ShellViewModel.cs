@@ -9,9 +9,12 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Caliburn.Micro;
+using lg2de.SimpleAccounting.Extensions;
+using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
+using lg2de.SimpleAccounting.Reports;
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Presentation
 {
     public class ShellViewModel : Conductor<IScreen>
     {

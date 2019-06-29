@@ -5,10 +5,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using System.Xml;
+using lg2de.SimpleAccounting.Model;
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Reports
 {
     internal class AnnualBalanceReport
     {
@@ -32,12 +32,7 @@ namespace lg2de.SimpleAccounting
         public void CreateReport()
         {
             var print = new PrintClass();
-            string fileName = Application.ExecutablePath;
-            fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
-            fileName = fileName.Substring(0, fileName.LastIndexOf("\\"));
-            fileName = fileName.Substring(0, fileName.LastIndexOf("\\") + 1);
-            fileName += "Bilanz.xml";
-            print.LoadDocument(fileName);
+            print.LoadDocument("AnnualBalance.xml");
 
             XmlDocument doc = print.Document;
 

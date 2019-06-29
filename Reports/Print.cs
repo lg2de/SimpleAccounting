@@ -4,13 +4,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Reports
 {
     class PrintClass
     {
@@ -44,10 +46,19 @@ namespace lg2de.SimpleAccounting
         {
             this.m_Document = (XmlDocument)doc.Clone();
         }
-        public void LoadDocument(string strFileName)
+
+        public void LoadDocument(string resourceName)
         {
-            this.m_Document.Load(strFileName);
+            var assembly = Assembly.GetExecutingAssembly();
+            string fullResourceName = assembly.GetManifestResourceNames()
+                .Single(str => str.EndsWith(resourceName, StringComparison.InvariantCultureIgnoreCase));
+
+            using (Stream stream = assembly.GetManifestResourceStream(fullResourceName))
+            {
+                this.m_Document.Load(stream);
+            }
         }
+
         public void PrintDocument(string documentName)
         {
             PrintDocument doc = new PrintDocument();

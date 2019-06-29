@@ -5,7 +5,7 @@
 using System.Xml;
 using System.Xml.Linq;
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Extensions
 {
     public static class XmlDocumentExtensions
     {

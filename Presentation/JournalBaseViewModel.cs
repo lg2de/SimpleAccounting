@@ -4,7 +4,7 @@
 
 using System;
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Presentation
 {
     public class JournalBaseViewModel
     {

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using Caliburn.Micro;
+using lg2de.SimpleAccounting.Presentation;
 
 namespace lg2de.SimpleAccounting
 {

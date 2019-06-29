@@ -4,7 +4,7 @@
 
 using System.Windows.Controls;
 
-namespace lg2de.SimpleAccounting
+namespace lg2de.SimpleAccounting.Presentation
 {
     /// <summary>
     ///     Implements the view to create new booking entry.
