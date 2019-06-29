@@ -52,7 +52,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             using (var openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Projektdateien (*.bxml)|*.bxml";
+                openFileDialog.Filter = "Acconting project files (*.bxml)|*.bxml";
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() != DialogResult.OK)
@@ -79,6 +79,23 @@ namespace lg2de.SimpleAccounting.Presentation
             bookingModel.Accounts.AddRange(this.accountingData.Accounts);
             bookingModel.BindingTemplates.Add(new BookingTemplate { Text = "Geld abheben", Credit = 110, Debit = 100 });
             this.windowManager.ShowDialog(bookingModel);
+        });
+
+        public ICommand ImportBookingsCommand => new RelayCommand(_ =>
+        {
+            using (var openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Booking data files (*.csv)|*.csv";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                var importData = File.ReadAllText(openFileDialog.FileName);
+                this.ImportBookings(importData);
+            }
         });
 
         public ICommand CloseYearCommand => new RelayCommand(_ => this.CloseYear());
@@ -283,7 +300,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.RefreshJournal();
         }
 
-        public void LoadProject(string fileName)
+        internal void LoadProject(string fileName)
         {
             if (this.IsDocumentChanged)
             {
@@ -327,6 +344,11 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             Settings.Default.Save();
+        }
+
+        internal void ImportBookings(string importData)
+        {
+            var importer = new CsvImporter();
         }
 
         private void UpdateBookingYears()

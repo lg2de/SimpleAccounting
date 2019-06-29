@@ -31,6 +31,7 @@
             </MenuItem>
             <MenuItem Header="Aktionen">
                 <MenuItem Header="Buchen" Command="{Binding AddBookingsCommand}" />
+                <MenuItem Header="Buchungen importieren" Command="{Binding ImportBookingsCommand}" />
                 <MenuItem Header="Buchungsjahr abschließen" Command="{Binding CloseYearCommand}" />
                 <MenuItem
                     Header="Buchungsjahr wählen"
