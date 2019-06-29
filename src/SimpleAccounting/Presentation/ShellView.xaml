@@ -63,10 +63,6 @@
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-                <Style x:Key="ValueGridStyle" TargetType="{x:Type TextBlock}">
-                    <Setter Property="HorizontalAlignment" Value="Right" />
-                    <Setter Property="Margin" Value="2 0 2 0" />
-                </Style>
             </Grid.Resources>
             <DataGrid
                 Grid.Column="0"

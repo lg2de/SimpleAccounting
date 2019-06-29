@@ -10,6 +10,24 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
                     <local:AppBootstrapper x:Key="bootstrapper" />
+                    <DataTemplate x:Key="AccountSelectionTemplate">
+                        <Grid VerticalAlignment="Stretch" Margin="5">
+                            <TextBlock VerticalAlignment="Center">
+                            <Run Text="{Binding Name}" />
+                            <Run Text="{Binding ID, StringFormat=({0})}" />
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                    <Style TargetType="Button">
+                        <Setter Property="Width" Value="80" />
+                        <Setter Property="Height" Value="30" />
+                        <Setter Property="Margin" Value="5" />
+                        <Setter Property="VerticalAlignment" Value="Bottom" />
+                    </Style>
+                    <Style x:Key="ValueGridStyle" TargetType="{x:Type TextBlock}">
+                        <Setter Property="HorizontalAlignment" Value="Right" />
+                        <Setter Property="Margin" Value="2 0 2 0" />
+                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

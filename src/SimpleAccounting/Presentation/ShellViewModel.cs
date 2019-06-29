@@ -83,19 +83,22 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand ImportBookingsCommand => new RelayCommand(_ =>
         {
-            using (var openFileDialog = new OpenFileDialog())
+            var min = this.accountingData
+                .Years.Single(x => x.Name.ToString() == this.bookingYearName)
+                .DateStart.ToDateTime();
+            var max = this.accountingData
+                .Years.Single(x => x.Name.ToString() == this.bookingYearName)
+                .DateEnd.ToDateTime();
+
+            var importModel = new ImportBookingsViewModel(this)
             {
-                openFileDialog.Filter = "Booking data files (*.csv)|*.csv";
-                openFileDialog.RestoreDirectory = true;
-
-                if (openFileDialog.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-
-                var importData = File.ReadAllText(openFileDialog.FileName);
-                this.ImportBookings(importData);
-            }
+                BookingNumber = this.GetMaxBookIdent() + 1,
+                RangeMin = min,
+                RangMax = max,
+                Journal = this.currentJournal
+            };
+            importModel.Accounts.AddRange(this.accountingData.Accounts);
+            this.windowManager.ShowDialog(importModel);
         });
 
         public ICommand CloseYearCommand => new RelayCommand(_ => this.CloseYear());
@@ -344,11 +347,6 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             Settings.Default.Save();
-        }
-
-        internal void ImportBookings(string importData)
-        {
-            var importer = new CsvImporter();
         }
 
         private void UpdateBookingYears()

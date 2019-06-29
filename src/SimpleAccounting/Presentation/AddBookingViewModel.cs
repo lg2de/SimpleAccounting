@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Caliburn.Micro;
+using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 
 namespace lg2de.SimpleAccounting.Presentation
@@ -83,7 +84,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand BookCommand => new RelayCommand(_ =>
         {
             var newBooking = new AccountingDataJournalBooking();
-            newBooking.Date = (uint)(this.Date.Year * 10000 + this.Date.Month * 100 + this.Date.Day);
+            newBooking.Date = this.Date.ToAccountingDate();
             newBooking.ID = this.BookingNumber;
             var creditValue = new BookingValue
             {

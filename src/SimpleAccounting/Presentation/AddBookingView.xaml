@@ -42,25 +42,10 @@
             <Style TargetType="DatePicker">
                 <Setter Property="Margin" Value="5" />
             </Style>
-            <Style TargetType="Button">
-                <Setter Property="Width" Value="80" />
-                <Setter Property="Height" Value="30" />
-                <Setter Property="Margin" Value="5" />
-                <Setter Property="VerticalAlignment" Value="Bottom" />
-            </Style>
             <Style TargetType="DatePickerTextBox">
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Padding" Value="2" />
             </Style>
-            <DataTemplate x:Key="AccountSelectionTemplate">
-                <Grid VerticalAlignment="Stretch" Margin="5">
-                    <TextBlock VerticalAlignment="Center">
-                            <Run Text="{Binding Name}" />
-                            <Run Text="{Binding ID, StringFormat=({0})}" />
-                    </TextBlock>
-                </Grid>
-            </DataTemplate>
-
         </Grid.Resources>
         <DatePicker
             Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0"
