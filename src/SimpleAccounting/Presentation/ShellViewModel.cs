@@ -129,11 +129,45 @@ namespace lg2de.SimpleAccounting.Presentation
             this.BuildAccountJournal(account.Identifier);
         });
 
-        public ICommand AccountEditCommand => new RelayCommand(o =>
+        public ICommand NewAccountCommand => new RelayCommand(_ =>
+        {
+            var accountVm = new AccountViewModel
+            {
+                DisplayName = "Account erstellen",
+                IsAvalidIdentifierFunc = id => this.Accounts.All(a => a.Identifier != id)
+            };
+            var result = this.windowManager.ShowDialog(accountVm);
+            if (result != true)
+            {
+                return;
+            }
+
+            // update database
+            var newAccount = new AccountingDataAccount
+            {
+                ID = accountVm.Identifier,
+                Name = accountVm.Name,
+                Type = AccountingDataAccountType.Asset
+            };
+            this.accountingData.Accounts.Add(newAccount);
+            this.accountingData.Accounts = this.accountingData.Accounts.OrderBy(x => x.ID).ToList();
+
+            // update view
+            this.Accounts.Add(accountVm);
+            var sorted = this.Accounts.OrderBy(x => x.Identifier).ToList();
+            this.Accounts.Clear();
+            sorted.ForEach(this.Accounts.Add);
+
+            this.IsDocumentChanged = true;
+        });
+
+        public ICommand EditAccountCommand => new RelayCommand(o =>
         {
             var account = o as AccountViewModel;
             var vm = account.Clone();
             vm.DisplayName = "Account bearbeiten";
+            var invalidIds = this.Accounts.Select(x => x.Identifier).Where(x => x != account.Identifier).ToList();
+            vm.IsAvalidIdentifierFunc = id => !invalidIds.Contains(id);
             var result = this.windowManager.ShowDialog(vm);
             if (result != true)
             {

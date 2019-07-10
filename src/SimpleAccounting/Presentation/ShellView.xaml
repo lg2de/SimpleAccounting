@@ -37,6 +37,8 @@
                     Header="Buchungsjahr wählen"
                     ItemsSource="{Binding BookingYears}"
                     ItemContainerStyle="{StaticResource CommandMenuStyle}" />
+                <Separator />
+                <MenuItem Header="Neues Konto" Command="{Binding NewAccountCommand}" />
             </MenuItem>
             <MenuItem Header="Berichte">
                 <MenuItem Header="Journal" Command="{Binding JournalReportCommand}" />
@@ -136,8 +138,12 @@
                             CommandParameter="{Binding Accounts/}" />
                         <MenuItem
                             Header="Konto bearbeiten"
-                            Command="{Binding AccountEditCommand}"
+                            Command="{Binding EditAccountCommand}"
                             CommandParameter="{Binding Accounts/}" />
+                        <Separator />
+                        <MenuItem
+                            Header="Konto erstellen"
+                            Command="{Binding NewAccountCommand}" />
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>
