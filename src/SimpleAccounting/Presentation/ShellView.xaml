@@ -123,6 +123,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Nummer" Binding="{Binding Identifier}" />
                     <DataGridTextColumn Header="Bezeichnung" Binding="{Binding Name}" />
+                    <DataGridTextColumn Header="Typ" Binding="{Binding Type}" />
                 </DataGrid.Columns>
                 <DataGrid.InputBindings>
                     <MouseBinding

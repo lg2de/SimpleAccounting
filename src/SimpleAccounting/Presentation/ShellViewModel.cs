@@ -147,7 +147,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 ID = accountVm.Identifier,
                 Name = accountVm.Name,
-                Type = AccountingDataAccountType.Asset
+                Type = accountVm.Type
             };
             this.accountingData.Accounts.Add(newAccount);
             this.accountingData.Accounts = this.accountingData.Accounts.OrderBy(x => x.ID).ToList();
@@ -177,6 +177,7 @@ namespace lg2de.SimpleAccounting.Presentation
             // update database
             var accountData = this.accountingData.Accounts.Single(x => x.ID == account.Identifier);
             accountData.Name = vm.Name;
+            accountData.Type = vm.Type;
             if (account.Identifier != vm.Identifier)
             {
                 accountData.ID = vm.Identifier;
@@ -191,6 +192,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             // update view
             account.Name = vm.Name;
+            account.Type = vm.Type;
             if (account.Identifier != vm.Identifier)
             {
                 account.Identifier = vm.Identifier;
@@ -415,7 +417,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
             foreach (var account in this.accountingData.Accounts)
             {
-                var acountModel = new AccountViewModel { Identifier = account.ID, Name = account.Name };
+                var acountModel = new AccountViewModel
+                {
+                    Identifier = account.ID,
+                    Name = account.Name,
+                    Type = account.Type
+                };
                 this.Accounts.Add(acountModel);
             }
 
