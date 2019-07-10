@@ -129,6 +129,56 @@ namespace lg2de.SimpleAccounting.Presentation
             this.BuildAccountJournal(account.Identifier);
         });
 
+        public ICommand AccountEditCommand => new RelayCommand(o =>
+        {
+            var account = o as AccountViewModel;
+            var vm = account.Clone();
+            vm.DisplayName = "Account bearbeiten";
+            var result = this.windowManager.ShowDialog(vm);
+            if (result != true)
+            {
+                return;
+            }
+
+            // update database
+            var accountData = this.accountingData.Accounts.Single(x => x.ID == account.Identifier);
+            accountData.Name = vm.Name;
+            if (account.Identifier != vm.Identifier)
+            {
+                accountData.ID = vm.Identifier;
+                this.accountingData.Accounts = this.accountingData.Accounts.OrderBy(x => x.ID).ToList();
+
+                this.accountingData.Journal.ForEach(j => j.Booking.ForEach(b =>
+                {
+                    b.Credit.ForEach(c => UpdateAccount(c, account.Identifier, vm.Identifier));
+                    b.Debit.ForEach(d => UpdateAccount(d, account.Identifier, vm.Identifier));
+                }));
+            }
+
+            // update view
+            account.Name = vm.Name;
+            if (account.Identifier != vm.Identifier)
+            {
+                account.Identifier = vm.Identifier;
+                var sorted = this.Accounts.OrderBy(x => x.Identifier).ToList();
+                this.Accounts.Clear();
+                sorted.ForEach(this.Accounts.Add);
+            }
+
+            account.Refresh();
+            this.RefreshJournal();
+
+            this.IsDocumentChanged = true;
+
+            void UpdateAccount(BookingValue entry, ulong oldIdeentifier, ulong newIdeentifier)
+            {
+                if (entry.Account == oldIdeentifier)
+                {
+                    entry.Account = newIdeentifier;
+                }
+            }
+        });
+
         private bool IsDocumentChanged { get; set; }
 
         public override void CanClose(Action<bool> callback)

@@ -1,0 +1,63 @@
+﻿<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
+<UserControl
+    x:Class="lg2de.SimpleAccounting.Presentation.AccountView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=local:AccountDesignViewModel, IsDesignTimeCreatable=True}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" MinWidth="200" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Margin" Value="5" />
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="xctk:ValueRangeTextBox">
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+        </Grid.Resources>
+        <TextBlock
+            Grid.Column="0" Grid.Row="0"
+            Text="Kontonummer" />
+        <xctk:ValueRangeTextBox
+            Grid.Column="1" Grid.Row="0"
+            Width="100" HorizontalContentAlignment="Right"
+            AutoSelectBehavior="OnFocus"
+            ValueDataType="{x:Type s:UInt64}"
+            Value="{Binding Identifier}" />
+
+        <TextBlock
+            Grid.Column="0" Grid.Row="1"
+            Text="Kontoname" />
+        <TextBox
+            Grid.Column="1" Grid.Row="1"
+            Text="{Binding Name}" />
+
+        <StackPanel
+            Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2"
+            Margin="0 30 0 0"
+            Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="OK" Command="{Binding SaveCommand}" IsDefault="True" />
+            <Button Content="Abbrechen" IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -126,8 +126,20 @@
                     <MouseBinding
                         MouseAction="LeftDoubleClick"
                         Command="{Binding AccountSelectionCommand}"
-                        CommandParameter="{Binding Accounts/}"/>
+                        CommandParameter="{Binding Accounts/}" />
                 </DataGrid.InputBindings>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            Header="Kontenblatt aktualisieren"
+                            Command="{Binding AccountSelectionCommand}"
+                            CommandParameter="{Binding Accounts/}" />
+                        <MenuItem
+                            Header="Konto bearbeiten"
+                            Command="{Binding AccountEditCommand}"
+                            CommandParameter="{Binding Accounts/}" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
             </DataGrid>
         </Grid>
     </DockPanel>
