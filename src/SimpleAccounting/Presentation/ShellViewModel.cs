@@ -295,7 +295,9 @@ namespace lg2de.SimpleAccounting.Presentation
             var result = MessageBox.Show(
                 "Wollen Sie das Jahr " + this.bookingYearName + " abschlieﬂen?",
                 "Jahresabschluﬂ",
-                MessageBoxButtons.YesNo);
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button2);
             if (result != DialogResult.Yes)
             {
                 return;

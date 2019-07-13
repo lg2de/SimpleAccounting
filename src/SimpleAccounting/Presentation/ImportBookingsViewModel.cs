@@ -60,6 +60,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ObservableCollection<ImportEntryViewModel> ImportData { get; }
             = new ObservableCollection<ImportEntryViewModel>();
+
         public ICommand LoadDataCommand => new RelayCommand(_ =>
         {
             using (var openFileDialog = new System.Windows.Forms.OpenFileDialog())
@@ -72,7 +73,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                using (var reader = new StreamReader(openFileDialog.FileName))
+                using (var reader = new StreamReader(openFileDialog.FileName, Encoding.GetEncoding(1252)))
                 {
                     this.ImportBookings(reader);
                 }
@@ -125,17 +126,33 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
             }
 
-            var configuration = new Configuration { Encoding = Encoding.GetEncoding(850) };
-            using (var csv = new CsvReader(reader, configuration))
+            using (var csv = new CsvReader(reader))
             {
                 csv.Read();
                 var header = csv.ReadHeader();
                 while (csv.Read())
                 {
-                    var date = csv.GetField<DateTime>("Buchungsdatum");
+                    if (!csv.TryGetField<DateTime>("Buchungsdatum", out var date))
+                    {
+                        csv.TryGetField("Datum", out date);
+                    }
+
                     if (date < this.RangeMin || date > this.RangMax)
                     {
                         continue;
+                    }
+
+                    if (!csv.TryGetField<string>("Name 1", out var name))
+                    {
+                        csv.TryGetField("Zahlungspflichtiger/-empfänger", out name);
+                    }
+
+                    if (!csv.TryGetField<string>("Verwendungszweck", out var text))
+                    {
+                    }
+
+                    if (!csv.TryGetField<double>("Betrag", out var value))
+                    {
                     }
 
                     var item = new ImportEntryViewModel
@@ -143,10 +160,22 @@ namespace lg2de.SimpleAccounting.Presentation
                         Date = date,
                         Accounts = this.Accounts,
                         Identifier = this.BookingNumber++,
-                        Name = csv.GetField("Name 1"),
-                        Text = csv.GetField("Verwendungszweck"),
-                        Value = csv.GetField<double>("Betrag")
+                        Name = name,
+                        Text = text,
+                        Value = value
                     };
+
+                    text = text.ToLower();
+                    if (text.Contains("jahresbeitrag") || text.Contains("mitgliedsbeitrag") || text.Contains("vereinsbeitrag"))
+                    {
+                        item.RemoteAccount = item.Accounts.SingleOrDefault(x => x.ID == 410);
+                    }
+
+                    if (text.Contains("beitrag") && value.Equals(20.0))
+                    {
+                        item.RemoteAccount = item.Accounts.SingleOrDefault(x => x.ID == 410);
+                    }
+
                     this.ImportData.Add(item);
                 }
             }
