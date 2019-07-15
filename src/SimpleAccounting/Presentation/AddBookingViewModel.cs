@@ -48,8 +48,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public double BookingValue { get; set; }
 
-        public List<AccountingDataAccount> Accounts { get; }
-            = new List<AccountingDataAccount>();
+        public List<AccountDefinition> Accounts { get; }
+            = new List<AccountDefinition>();
 
         public ulong CreditAccount
         {

@@ -14,18 +14,18 @@ namespace lg2de.SimpleAccounting.Reports
     internal class TotalsBalancesReport
     {
         private readonly AccountingDataJournal journal;
-        private readonly List<AccountingDataAccount> accounts;
+        private readonly List<AccountDefinition> accounts;
         private readonly string firmName;
         private readonly string bookingYearName;
 
         public TotalsBalancesReport(
             AccountingDataJournal journal,
-            List<AccountingDataAccount> accounts,
+            IEnumerable<AccountDefinition> accounts,
             string firmName,
             string bookingYearName)
         {
             this.journal = journal;
-            this.accounts = accounts;
+            this.accounts = accounts.ToList();
             this.firmName = firmName;
             this.bookingYearName = bookingYearName;
         }

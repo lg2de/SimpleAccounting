@@ -14,19 +14,21 @@ namespace lg2de.SimpleAccounting.Presentation
     {
         static AccountViewModel()
         {
-            foreach (var type in Enum.GetValues(typeof(AccountingDataAccountType)))
+            foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)))
             {
-                Types.Add((AccountingDataAccountType)type);
+                Types.Add((AccountDefinitionType)type);
             }
         }
 
-        public static List<AccountingDataAccountType> Types { get; } = new List<AccountingDataAccountType>();
+        public static List<AccountDefinitionType> Types { get; } = new List<AccountDefinitionType>();
 
         public ulong Identifier { get; set; }
 
         public string Name { get; set; }
 
-        public AccountingDataAccountType Type { get; set; }
+        public AccountingDataAccountGroup Group { get; set; }
+
+        public AccountDefinitionType Type { get; set; }
 
         internal Func<ulong, bool> IsAvalidIdentifierFunc { get; set; }
 

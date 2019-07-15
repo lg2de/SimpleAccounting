@@ -13,18 +13,18 @@ namespace lg2de.SimpleAccounting.Reports
     internal class AnnualBalanceReport
     {
         private readonly AccountingDataJournal journal;
-        private readonly List<AccountingDataAccount> accounts;
+        private readonly List<AccountDefinition> accounts;
         private readonly string firmName;
         private readonly string bookingYearName;
 
         public AnnualBalanceReport(
             AccountingDataJournal journal,
-            List<AccountingDataAccount> accounts,
+            IEnumerable<AccountDefinition> accounts,
             string firmName,
             string bookingYearName)
         {
             this.journal = journal;
-            this.accounts = accounts;
+            this.accounts = accounts.ToList();
             this.firmName = firmName;
             this.bookingYearName = bookingYearName;
         }
@@ -47,7 +47,7 @@ namespace lg2de.SimpleAccounting.Reports
 
             var dataNode = doc.SelectSingleNode("//table/data[@target='income']");
             double totalIncome = 0;
-            var accounts = this.accounts.Where(a => a.Type == AccountingDataAccountType.Income);
+            var accounts = this.accounts.Where(a => a.Type == AccountDefinitionType.Income);
             foreach (var account in accounts)
             {
                 double saldoCredit = this.journal.Booking
@@ -91,7 +91,7 @@ namespace lg2de.SimpleAccounting.Reports
 
             dataNode = doc.SelectSingleNode("//table/data[@target='expense']");
             double totalExpense = 0;
-            accounts = this.accounts.Where(a => a.Type == AccountingDataAccountType.Expense);
+            accounts = this.accounts.Where(a => a.Type == AccountDefinitionType.Expense);
             foreach (var account in accounts)
             {
                 double saldoCredit = this.journal.Booking
@@ -139,7 +139,7 @@ namespace lg2de.SimpleAccounting.Reports
             // receivables / Forderungen
             dataNode = doc.SelectSingleNode("//table/data[@target='receivable']");
             double totalReceivable = 0;
-            accounts = this.accounts.Where(a => a.Type == AccountingDataAccountType.Debit || a.Type == AccountingDataAccountType.Credit);
+            accounts = this.accounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
                 double saldoCredit = this.journal.Booking
@@ -184,7 +184,7 @@ namespace lg2de.SimpleAccounting.Reports
             // liabilities / Verbindlichkeiten
             dataNode = doc.SelectSingleNode("//table/data[@target='liability']");
             double totalLiability = 0;
-            accounts = this.accounts.Where(a => a.Type == AccountingDataAccountType.Debit || a.Type == AccountingDataAccountType.Credit);
+            accounts = this.accounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
                 double saldoCredit = this.journal.Booking
@@ -228,7 +228,7 @@ namespace lg2de.SimpleAccounting.Reports
 
             dataNode = doc.SelectSingleNode("//table/data[@target='account']");
             double totalAccount = 0;
-            accounts = this.accounts.Where(a => a.Type == AccountingDataAccountType.Asset);
+            accounts = this.accounts.Where(a => a.Type == AccountDefinitionType.Asset);
             foreach (var account in accounts)
             {
                 double saldoCredit = this.journal.Booking

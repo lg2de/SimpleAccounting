@@ -11,7 +11,6 @@ using System.Text;
 using System.Windows.Input;
 using Caliburn.Micro;
 using CsvHelper;
-using CsvHelper.Configuration;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 
@@ -30,8 +29,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.DisplayName = "Import von Kontodaten";
         }
 
-        public List<AccountingDataAccount> Accounts { get; }
-            = new List<AccountingDataAccount>();
+        public List<AccountDefinition> Accounts { get; }
+            = new List<AccountDefinition>();
 
         public DateTime RangeMin { get; internal set; }
 
@@ -56,7 +55,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        public AccountingDataAccount SelectedAccount { get; set; }
+        public AccountDefinition SelectedAccount { get; set; }
 
         public ObservableCollection<ImportEntryViewModel> ImportData { get; }
             = new ObservableCollection<ImportEntryViewModel>();

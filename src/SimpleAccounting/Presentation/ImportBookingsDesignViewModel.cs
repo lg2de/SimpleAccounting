@@ -13,8 +13,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public ImportBookingsDesignViewModel()
             : base(null)
         {
-            this.Accounts.Add(new AccountingDataAccount { ID = 100, Name = "Cash" });
-            this.Accounts.Add(new AccountingDataAccount { ID = 600, Name = "Shopping" });
+            this.Accounts.Add(new AccountDefinition { ID = 100, Name = "Cash" });
+            this.Accounts.Add(new AccountDefinition { ID = 600, Name = "Shopping" });
 
             this.ImportAccount = 100;
 

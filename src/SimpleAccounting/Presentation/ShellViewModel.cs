@@ -76,7 +76,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 BookingNumber = this.GetMaxBookIdent() + 1
             };
-            bookingModel.Accounts.AddRange(this.accountingData.Accounts);
+            bookingModel.Accounts.AddRange(this.accountingData.AllAccounts);
             bookingModel.BindingTemplates.Add(new BookingTemplate { Text = "Geld abheben", Credit = 110, Debit = 100 });
             this.windowManager.ShowDialog(bookingModel);
         });
@@ -97,7 +97,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 RangMax = max,
                 Journal = this.currentJournal
             };
-            importModel.Accounts.AddRange(this.accountingData.Accounts);
+            importModel.Accounts.AddRange(this.accountingData.AllAccounts);
             this.windowManager.ShowDialog(importModel);
         });
 
@@ -112,14 +112,14 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand TotalsBalancesReportCommand => new RelayCommand(_ =>
         {
-            var report = new TotalsBalancesReport(this.currentJournal, this.accountingData.Accounts, this.firmName, this.bookingYearName);
+            var report = new TotalsBalancesReport(this.currentJournal, this.accountingData.AllAccounts, this.firmName, this.bookingYearName);
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateStart.ToDateTime());
         });
 
         public ICommand AnnualBalanceReportCommand => new RelayCommand(_ =>
         {
-            var report = new AnnualBalanceReport(this.currentJournal, this.accountingData.Accounts, this.firmName, this.bookingYearName);
+            var report = new AnnualBalanceReport(this.currentJournal, this.accountingData.AllAccounts, this.firmName, this.bookingYearName);
             report.CreateReport();
         });
 
@@ -134,6 +134,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var accountVm = new AccountViewModel
             {
                 DisplayName = "Account erstellen",
+                Group = this.accountingData.Accounts[0], // TODO make selectable
                 IsAvalidIdentifierFunc = id => this.Accounts.All(a => a.Identifier != id)
             };
             var result = this.windowManager.ShowDialog(accountVm);
@@ -143,14 +144,14 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             // update database
-            var newAccount = new AccountingDataAccount
+            var newAccount = new AccountDefinition
             {
                 ID = accountVm.Identifier,
                 Name = accountVm.Name,
                 Type = accountVm.Type
             };
-            this.accountingData.Accounts.Add(newAccount);
-            this.accountingData.Accounts = this.accountingData.Accounts.OrderBy(x => x.ID).ToList();
+            accountVm.Group.Account.Add(newAccount);
+            accountVm.Group.Account = accountVm.Group.Account.OrderBy(x => x.ID).ToList();
 
             // update view
             this.Accounts.Add(accountVm);
@@ -175,13 +176,13 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             // update database
-            var accountData = this.accountingData.Accounts.Single(x => x.ID == account.Identifier);
+            var accountData = this.accountingData.AllAccounts.Single(x => x.ID == account.Identifier);
             accountData.Name = vm.Name;
             accountData.Type = vm.Type;
             if (account.Identifier != vm.Identifier)
             {
                 accountData.ID = vm.Identifier;
-                this.accountingData.Accounts = this.accountingData.Accounts.OrderBy(x => x.ID).ToList();
+                account.Group.Account = account.Group.Account.OrderBy(x => x.ID).ToList();
 
                 this.accountingData.Journal.ForEach(j => j.Booking.ForEach(b =>
                 {
@@ -320,7 +321,7 @@ namespace lg2de.SimpleAccounting.Presentation
             ulong bookingId = 1;
 
             // Asset Accounts (Bestandskonten), Credit and Debit Accounts
-            var accounts = this.accountingData.Accounts.Where(a => a.Type == AccountingDataAccountType.Asset || a.Type == AccountingDataAccountType.Credit || a.Type == AccountingDataAccountType.Debit);
+            var accounts = this.accountingData.AllAccounts.Where(a => a.Type == AccountDefinitionType.Asset || a.Type == AccountDefinitionType.Credit || a.Type == AccountDefinitionType.Debit);
             foreach (var account in accounts)
             {
                 var creditAmount = this.currentJournal.Booking
@@ -378,7 +379,7 @@ namespace lg2de.SimpleAccounting.Presentation
         string BuildAccountDescription(string strAccountNumber)
         {
             var nAccountNumber = Convert.ToUInt32(strAccountNumber);
-            string strAccountName = this.accountingData.Accounts.Single(a => a.ID == nAccountNumber).Name;
+            string strAccountName = this.accountingData.AllAccounts.Single(a => a.ID == nAccountNumber).Name;
             return strAccountNumber + " (" + strAccountName + ")";
         }
 
@@ -417,15 +418,19 @@ namespace lg2de.SimpleAccounting.Presentation
             this.firmName = this.accountingData.Setup.Name;
             this.UpdateBookingYears();
 
-            foreach (var account in this.accountingData.Accounts)
+            foreach (var accountGroup in this.accountingData.Accounts)
             {
-                var acountModel = new AccountViewModel
+                foreach (var account in accountGroup.Account)
                 {
-                    Identifier = account.ID,
-                    Name = account.Name,
-                    Type = account.Type
-                };
-                this.Accounts.Add(acountModel);
+                    var acountModel = new AccountViewModel
+                    {
+                        Identifier = account.ID,
+                        Name = account.Name,
+                        Group = accountGroup,
+                        Type = account.Type
+                    };
+                    this.Accounts.Add(acountModel);
+                }
             }
 
             // select last booking year after loading

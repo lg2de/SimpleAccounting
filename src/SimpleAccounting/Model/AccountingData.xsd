@@ -14,22 +14,12 @@
         <xs:element name="Accounts">
           <xs:complexType>
             <xs:sequence>
-              <xs:element maxOccurs="unbounded" name="Account">
+              <xs:element maxOccurs="unbounded" name="AccountGroup">
                 <xs:complexType>
-                  <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="Account" type="AccountDefinition" />
+                  </xs:sequence>
                   <xs:attribute name="Name" type="xs:string" use="required" />
-                  <xs:attribute name="Type" use="required">
-                    <xs:simpleType>
-                      <xs:restriction base="xs:string">
-                        <xs:enumeration value="Asset" />
-                        <xs:enumeration value="Income" />
-                        <xs:enumeration value="Expense" />
-                        <xs:enumeration value="Credit" />
-                        <xs:enumeration value="Debit" />
-                        <xs:enumeration value="Carryforward" />
-                      </xs:restriction>
-                    </xs:simpleType>
-                  </xs:attribute>
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
@@ -86,6 +76,22 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:complexType name="AccountDefinition">
+    <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="Type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Asset" />
+          <xs:enumeration value="Income" />
+          <xs:enumeration value="Expense" />
+          <xs:enumeration value="Credit" />
+          <xs:enumeration value="Debit" />
+          <xs:enumeration value="Carryforward" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
   <xs:complexType name="BookingValue">
     <xs:attribute name="Value" type="xs:int" use="required" />
     <xs:attribute name="Account" type="xs:unsignedLong" use="required" />

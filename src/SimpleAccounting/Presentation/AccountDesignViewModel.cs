@@ -10,7 +10,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.Identifier = 42;
             this.Name = "Bla";
-            this.Type = Model.AccountingDataAccountType.Asset;
+            this.Type = Model.AccountDefinitionType.Asset;
         }
     }
 }

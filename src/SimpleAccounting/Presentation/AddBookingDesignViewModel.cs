@@ -15,8 +15,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.BookingText = "shoes";
             this.BookingValue = 169.95;
 
-            this.Accounts.Add(new AccountingDataAccount { ID = 100, Name = "Cash" });
-            this.Accounts.Add(new AccountingDataAccount { ID = 600, Name = "Shopping" });
+            this.Accounts.Add(new AccountDefinition { ID = 100, Name = "Cash" });
+            this.Accounts.Add(new AccountDefinition { ID = 600, Name = "Shopping" });
 
             this.DebitAccount = 100;
             this.CreditAccount = 600;

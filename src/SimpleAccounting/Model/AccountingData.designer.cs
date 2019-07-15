@@ -25,7 +25,7 @@ namespace lg2de.SimpleAccounting.Model {
         
         private AccountingDataSetup setupField;
         
-        private List<AccountingDataAccount> accountsField;
+        private List<AccountingDataAccountGroup> accountsField;
         
         private List<AccountingDataYear> yearsField;
         
@@ -39,7 +39,7 @@ namespace lg2de.SimpleAccounting.Model {
             this.openIssuesField = new List<AccountingDataEntry>();
             this.journalField = new List<AccountingDataJournal>();
             this.yearsField = new List<AccountingDataYear>();
-            this.accountsField = new List<AccountingDataAccount>();
+            this.accountsField = new List<AccountingDataAccountGroup>();
             this.setupField = new AccountingDataSetup();
         }
         
@@ -52,8 +52,8 @@ namespace lg2de.SimpleAccounting.Model {
             }
         }
         
-        [System.Xml.Serialization.XmlArrayItemAttribute("Account", IsNullable=false)]
-        public List<AccountingDataAccount> Accounts {
+        [System.Xml.Serialization.XmlArrayItemAttribute("AccountGroup", IsNullable=false)]
+        public List<AccountingDataAccountGroup> Accounts {
             get {
                 return this.accountsField;
             }
@@ -620,14 +620,14 @@ namespace lg2de.SimpleAccounting.Model {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3761.0")]
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
-    public partial class AccountingDataAccount {
+    [System.Xml.Serialization.XmlRootAttribute(Namespace="", IsNullable=true)]
+    public partial class AccountDefinition {
         
         private ulong idField;
         
         private string nameField;
         
-        private AccountingDataAccountType typeField;
+        private AccountDefinitionType typeField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
@@ -652,7 +652,7 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public AccountingDataAccountType Type {
+        public AccountDefinitionType Type {
             get {
                 return this.typeField;
             }
@@ -664,7 +664,7 @@ namespace lg2de.SimpleAccounting.Model {
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataAccount));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountDefinition));
                 }
                 return serializer;
             }
@@ -672,7 +672,7 @@ namespace lg2de.SimpleAccounting.Model {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current AccountingDataAccount object into an XML document
+        /// Serializes current AccountDefinition object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -696,15 +696,15 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an AccountingDataAccount object
+        /// Deserializes workflow markup into an AccountDefinition object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output AccountingDataAccount object</param>
+        /// <param name="obj">Output AccountDefinition object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out AccountingDataAccount obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountDefinition obj, out System.Exception exception) {
             exception = null;
-            obj = default(AccountingDataAccount);
+            obj = default(AccountDefinition);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -715,16 +715,16 @@ namespace lg2de.SimpleAccounting.Model {
             }
         }
         
-        public static bool Deserialize(string xml, out AccountingDataAccount obj) {
+        public static bool Deserialize(string xml, out AccountDefinition obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static AccountingDataAccount Deserialize(string xml) {
+        public static AccountDefinition Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((AccountingDataAccount)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountDefinition)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -734,7 +734,7 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         /// <summary>
-        /// Serializes current AccountingDataAccount object into file
+        /// Serializes current AccountDefinition object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -768,15 +768,15 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an AccountingDataAccount object
+        /// Deserializes xml markup from file into an AccountDefinition object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output AccountingDataAccount object</param>
+        /// <param name="obj">Output AccountDefinition object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out AccountingDataAccount obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountDefinition obj, out System.Exception exception) {
             exception = null;
-            obj = default(AccountingDataAccount);
+            obj = default(AccountDefinition);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -787,12 +787,12 @@ namespace lg2de.SimpleAccounting.Model {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out AccountingDataAccount obj) {
+        public static bool LoadFromFile(string fileName, out AccountDefinition obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static AccountingDataAccount LoadFromFile(string fileName) {
+        public static AccountDefinition LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -818,7 +818,7 @@ namespace lg2de.SimpleAccounting.Model {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3761.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
-    public enum AccountingDataAccountType {
+    public enum AccountDefinitionType {
         
         /// <remarks/>
         Asset,
@@ -837,6 +837,196 @@ namespace lg2de.SimpleAccounting.Model {
         
         /// <remarks/>
         Carryforward,
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3761.0")]
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
+    public partial class AccountingDataAccountGroup {
+        
+        private List<AccountDefinition> accountField;
+        
+        private string nameField;
+        
+        private static System.Xml.Serialization.XmlSerializer serializer;
+        
+        public AccountingDataAccountGroup() {
+            this.accountField = new List<AccountDefinition>();
+        }
+        
+        [System.Xml.Serialization.XmlElementAttribute("Account")]
+        public List<AccountDefinition> Account {
+            get {
+                return this.accountField;
+            }
+            set {
+                this.accountField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+            }
+        }
+        
+        private static System.Xml.Serialization.XmlSerializer Serializer {
+            get {
+                if ((serializer == null)) {
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataAccountGroup));
+                }
+                return serializer;
+            }
+        }
+        
+        #region Serialize/Deserialize
+        /// <summary>
+        /// Serializes current AccountingDataAccountGroup object into an XML document
+        /// </summary>
+        /// <returns>string XML value</returns>
+        public virtual string Serialize() {
+            System.IO.StreamReader streamReader = null;
+            System.IO.MemoryStream memoryStream = null;
+            try {
+                memoryStream = new System.IO.MemoryStream();
+                Serializer.Serialize(memoryStream, this);
+                memoryStream.Seek(0, System.IO.SeekOrigin.Begin);
+                streamReader = new System.IO.StreamReader(memoryStream);
+                return streamReader.ReadToEnd();
+            }
+            finally {
+                if ((streamReader != null)) {
+                    streamReader.Dispose();
+                }
+                if ((memoryStream != null)) {
+                    memoryStream.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes workflow markup into an AccountingDataAccountGroup object
+        /// </summary>
+        /// <param name="xml">string workflow markup to deserialize</param>
+        /// <param name="obj">Output AccountingDataAccountGroup object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool Deserialize(string xml, out AccountingDataAccountGroup obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountingDataAccountGroup);
+            try {
+                obj = Deserialize(xml);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool Deserialize(string xml, out AccountingDataAccountGroup obj) {
+            System.Exception exception = null;
+            return Deserialize(xml, out obj, out exception);
+        }
+        
+        public static AccountingDataAccountGroup Deserialize(string xml) {
+            System.IO.StringReader stringReader = null;
+            try {
+                stringReader = new System.IO.StringReader(xml);
+                return ((AccountingDataAccountGroup)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+            }
+            finally {
+                if ((stringReader != null)) {
+                    stringReader.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Serializes current AccountingDataAccountGroup object into file
+        /// </summary>
+        /// <param name="fileName">full path of outupt xml file</param>
+        /// <param name="exception">output Exception value if failed</param>
+        /// <returns>true if can serialize and save into file; otherwise, false</returns>
+        public virtual bool SaveToFile(string fileName, out System.Exception exception) {
+            exception = null;
+            try {
+                SaveToFile(fileName);
+                return true;
+            }
+            catch (System.Exception e) {
+                exception = e;
+                return false;
+            }
+        }
+        
+        public virtual void SaveToFile(string fileName) {
+            System.IO.StreamWriter streamWriter = null;
+            try {
+                string xmlString = Serialize();
+                System.IO.FileInfo xmlFile = new System.IO.FileInfo(fileName);
+                streamWriter = xmlFile.CreateText();
+                streamWriter.WriteLine(xmlString);
+                streamWriter.Close();
+            }
+            finally {
+                if ((streamWriter != null)) {
+                    streamWriter.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes xml markup from file into an AccountingDataAccountGroup object
+        /// </summary>
+        /// <param name="fileName">string xml file to load and deserialize</param>
+        /// <param name="obj">Output AccountingDataAccountGroup object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool LoadFromFile(string fileName, out AccountingDataAccountGroup obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountingDataAccountGroup);
+            try {
+                obj = LoadFromFile(fileName);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool LoadFromFile(string fileName, out AccountingDataAccountGroup obj) {
+            System.Exception exception = null;
+            return LoadFromFile(fileName, out obj, out exception);
+        }
+        
+        public static AccountingDataAccountGroup LoadFromFile(string fileName) {
+            System.IO.FileStream file = null;
+            System.IO.StreamReader sr = null;
+            try {
+                file = new System.IO.FileStream(fileName, FileMode.Open, FileAccess.Read);
+                sr = new System.IO.StreamReader(file);
+                string xmlString = sr.ReadToEnd();
+                sr.Close();
+                file.Close();
+                return Deserialize(xmlString);
+            }
+            finally {
+                if ((file != null)) {
+                    file.Dispose();
+                }
+                if ((sr != null)) {
+                    sr.Dispose();
+                }
+            }
+        }
+        #endregion
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3761.0")]
