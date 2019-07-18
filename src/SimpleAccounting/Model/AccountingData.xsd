@@ -91,6 +91,7 @@
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
+    <xs:attribute name="Active" type="xs:boolean" default="true" />
   </xs:complexType>
   <xs:complexType name="BookingValue">
     <xs:attribute name="Value" type="xs:int" use="required" />

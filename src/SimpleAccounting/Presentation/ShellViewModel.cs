@@ -306,6 +306,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
             accountingYear.Closed = true;
 
+            var carryForwardAccount =
+                this.accountingData.AllAccounts.Single(a => a.Type == AccountDefinitionType.Carryforward && a.Active);
+
             var newYear = (ushort)(Convert.ToUInt16(this.bookingYearName) + 1);
 
             var newYearEntry = new AccountingDataYear
@@ -347,7 +350,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var newDebit = new BookingValue
                 {
                     Value = Math.Abs(creditAmount - debitAmount),
-                    Text = "EB-Wert " + bookingId.ToString()
+                    Text = $"Eröffnungsbetrag {bookingId}"
                 };
                 newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue
@@ -359,12 +362,12 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (creditAmount > debitAmount)
                 {
                     newCredit.Account = account.ID;
-                    newDebit.Account = 990;
+                    newDebit.Account = carryForwardAccount.ID;
                 }
                 else
                 {
                     newDebit.Account = account.ID;
-                    newCredit.Account = 990;
+                    newCredit.Account = carryForwardAccount.ID;
                 }
 
                 bookingId++;

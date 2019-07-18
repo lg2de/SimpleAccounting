@@ -167,12 +167,12 @@ namespace lg2de.SimpleAccounting.Presentation
                     text = text.ToLower();
                     if (text.Contains("jahresbeitrag") || text.Contains("mitgliedsbeitrag") || text.Contains("vereinsbeitrag"))
                     {
-                        item.RemoteAccount = item.Accounts.SingleOrDefault(x => x.ID == 410);
+                        item.RemoteAccount = item.Accounts.SingleOrDefault(x => x.ID == 4100);
                     }
 
                     if (text.Contains("beitrag") && value.Equals(20.0))
                     {
-                        item.RemoteAccount = item.Accounts.SingleOrDefault(x => x.ID == 410);
+                        item.RemoteAccount = item.Accounts.SingleOrDefault(x => x.ID == 4100);
                     }
 
                     this.ImportData.Add(item);

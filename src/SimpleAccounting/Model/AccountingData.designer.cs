@@ -660,6 +660,9 @@ namespace lg2de.SimpleAccounting.Model {
                 this.typeField = value;
             }
         }
+
+        [XmlAttribute]
+        public bool Active { get; set; } = true;
         
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
