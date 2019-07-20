@@ -90,7 +90,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 .Years.Single(x => x.Name.ToString() == this.bookingYearName)
                 .DateEnd.ToDateTime();
 
-            var importModel = new ImportBookingsViewModel(this)
+            var importModel = new ImportBookingsViewModel(this, this.accountingData.ImportMappings)
             {
                 BookingNumber = this.GetMaxBookIdent() + 1,
                 RangeMin = min,

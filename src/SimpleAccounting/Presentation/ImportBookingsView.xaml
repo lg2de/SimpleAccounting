@@ -9,7 +9,7 @@
     xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     mc:Ignorable="d"
-    Width="800" Height="600"
+    MinWidth="800" MinHeight="600"
     d:DataContext="{d:DesignInstance Type=local:ImportBookingsDesignViewModel, IsDesignTimeCreatable=True}">
     <DockPanel>
         <DockPanel.Resources>
@@ -24,6 +24,11 @@
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
         </DockPanel.Resources>
+        <TextBlock DockPanel.Dock="Top">
+            Hinweise:<LineBreak/>
+            Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.<LineBreak/>
+            Die importierten Empfängernamen und Buchungstexte können korrigiert werden.
+        </TextBlock>
         <StackPanel
             DockPanel.Dock="Top"
             Orientation="Horizontal">
@@ -45,13 +50,19 @@
                 Command="{Binding LoadDataCommand}" />
             <Button
                 Width="100"
+                Content="Teilweise Buchen"
+                ToolTip="Alle Einträge buchen, die schon einem Gegenkonto zugeordnet sind."
+                Command="{Binding BookMappedCommand}" />
+            <Button
+                Width="100"
                 Content="Alles Buchen"
-                Command="{Binding BookCommand}" />
+                Command="{Binding BookAllCommand}" />
         </StackPanel>
         <DataGrid
             ItemsSource="{Binding ImportData}"
-                AutoGenerateColumns="False"
-                CanUserAddRows="False" CanUserDeleteRows="False">
+            AutoGenerateColumns="False"
+            CanUserResizeColumns="True"
+            CanUserAddRows="False" CanUserDeleteRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" />
                 <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" />
@@ -70,6 +81,17 @@
                                 ItemsSource="{Binding Accounts}"
                                 SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button
+                                Width="30" Height="30" Padding="0" Margin="0"
+                                Content="X"
+                                ToolTip="Zuordnung zurücksetzen"
+                                Command="{Binding ResetRemoteAccountCommand}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

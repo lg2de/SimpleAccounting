@@ -124,6 +124,7 @@
       <DependentUpon>AddBookingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Presentation\AddBookingViewModel.cs" />
+    <Compile Include="Presentation\DataGridExtensions.cs" />
     <Compile Include="Presentation\ImportBookingsDesignViewModel.cs" />
     <Compile Include="Presentation\ImportBookingsView.xaml.cs">
       <DependentUpon>ImportBookingsView.xaml</DependentUpon>

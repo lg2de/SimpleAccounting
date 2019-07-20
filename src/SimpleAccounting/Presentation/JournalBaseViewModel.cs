@@ -3,10 +3,11 @@
 // </copyright>
 
 using System;
+using Caliburn.Micro;
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    public class JournalBaseViewModel
+    public class JournalBaseViewModel : PropertyChangedBase
     {
         protected JournalBaseViewModel()
         {

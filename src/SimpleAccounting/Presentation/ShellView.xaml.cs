@@ -14,6 +14,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public ShellView()
         {
             this.InitializeComponent();
+
+            this.Loaded += (s, a) => this.ResetDataGridColumnSizes();
         }
     }
 }

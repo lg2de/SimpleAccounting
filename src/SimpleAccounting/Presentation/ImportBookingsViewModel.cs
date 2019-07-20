@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Caliburn.Micro;
 using CsvHelper;
@@ -19,12 +20,13 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class ImportBookingsViewModel : Screen
     {
         private readonly ShellViewModel parent;
-
+        private readonly List<AccountingDataMapping> importMappings;
         private ulong importAccount;
 
-        public ImportBookingsViewModel(ShellViewModel parent)
+        public ImportBookingsViewModel(ShellViewModel parent, List<AccountingDataMapping> importMappings)
         {
             this.parent = parent;
+            this.importMappings = importMappings ?? new List<AccountingDataMapping>();
 
             this.DisplayName = "Import von Kontodaten";
         }
@@ -80,10 +82,102 @@ namespace lg2de.SimpleAccounting.Presentation
 
         }, _ => this.SelectedAccount != null);
 
-        public ICommand BookCommand => new RelayCommand(_ =>
+        public ICommand BookAllCommand => new RelayCommand(
+            _ => this.ProcessData(),
+            _ => this.ImportData.All(x => x.RemoteAccount != null));
+
+        public ICommand BookMappedCommand => new RelayCommand(
+            _ => this.ProcessData(),
+            _ => this.ImportData.Any(x => x.RemoteAccount != null));
+
+        internal void ImportBookings(TextReader reader)
+        {
+            this.ImportData.Clear();
+
+            var lastEntry = this.Journal.Booking
+                .Where(x => x.Credit.Any(c => c.Account == this.ImportAccount) || x.Debit.Any(c => c.Account == this.ImportAccount))
+                .OrderBy(x => x.Date)
+                .LastOrDefault();
+            if (lastEntry != null)
+            {
+                this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
+            }
+
+            using (var csv = new CsvReader(reader))
+            {
+                csv.Read();
+                var header = csv.ReadHeader();
+                while (csv.Read())
+                {
+                    var dateField = this.SelectedAccount.ImportMapping
+                        .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Date)?.Source;
+                    csv.TryGetField(dateField, out DateTime date);
+                    if (date < this.RangeMin || date > this.RangMax)
+                    {
+                        continue;
+                    }
+
+                    var nameField = this.SelectedAccount.ImportMapping
+                        .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Name);
+                    var textField = this.SelectedAccount.ImportMapping
+                        .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Text);
+                    var valueField = this.SelectedAccount.ImportMapping
+                        .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Value)?.Source;
+
+                    csv.TryGetField<string>(nameField?.Source, out var name);
+                    csv.TryGetField<string>(textField?.Source, out var text);
+                    csv.TryGetField<double>(valueField, out var value);
+
+                    if (!string.IsNullOrEmpty(textField?.IgnorePattern))
+                    {
+                        text = Regex.Replace(text, textField?.IgnorePattern, string.Empty);
+                    }
+
+                    var item = new ImportEntryViewModel
+                    {
+                        Date = date,
+                        Accounts = this.Accounts,
+                        Identifier = this.BookingNumber++,
+                        Name = name,
+                        Text = text,
+                        Value = value
+                    };
+
+                    var longValue = (long)(value * 100);
+                    foreach (var importMapping in this.importMappings)
+                    {
+                        if (!Regex.IsMatch(text, importMapping.TextPattern))
+                        {
+                            // mapping does not match
+                            continue;
+                        }
+
+                        if (importMapping.ValueSpecified && longValue != importMapping.Value)
+                        {
+                            // mapping does not match
+                            continue;
+                        }
+
+                        // use first match
+                        item.RemoteAccount = this.Accounts.SingleOrDefault(a => a.ID == importMapping.AccountID);
+                        break;
+                    }
+
+                    this.ImportData.Add(item);
+                }
+            }
+        }
+
+        internal void ProcessData()
         {
             foreach (var item in this.ImportData)
             {
+                if (item.RemoteAccount == null)
+                {
+                    // mapping missing - abort
+                    break;
+                }
+
                 var newBooking = new AccountingDataJournalBooking
                 {
                     Date = item.Date.ToAccountingDate(),
@@ -91,7 +185,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 };
                 var creditValue = new BookingValue
                 {
-                    Text = item.Text,
+                    Text = $"{item.Name} - {item.Text}",
                     Value = (int)Math.Abs(Math.Round(item.Value * 100))
                 };
                 var debitValue = creditValue.Clone();
@@ -112,72 +206,6 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.TryClose(null);
-        }, _ => this.ImportData.All(x => x.RemoteAccount != null));
-
-        internal void ImportBookings(TextReader reader)
-        {
-            var lastEntry = this.Journal.Booking
-                .Where(x => x.Credit.Any(c => c.Account == this.ImportAccount) || x.Debit.Any(c => c.Account == this.ImportAccount))
-                .OrderBy(x => x.Date)
-                .LastOrDefault();
-            if (lastEntry != null)
-            {
-                this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
-            }
-
-            using (var csv = new CsvReader(reader))
-            {
-                csv.Read();
-                var header = csv.ReadHeader();
-                while (csv.Read())
-                {
-                    if (!csv.TryGetField<DateTime>("Buchungsdatum", out var date))
-                    {
-                        csv.TryGetField("Datum", out date);
-                    }
-
-                    if (date < this.RangeMin || date > this.RangMax)
-                    {
-                        continue;
-                    }
-
-                    if (!csv.TryGetField<string>("Name 1", out var name))
-                    {
-                        csv.TryGetField("Zahlungspflichtiger/-empfänger", out name);
-                    }
-
-                    if (!csv.TryGetField<string>("Verwendungszweck", out var text))
-                    {
-                    }
-
-                    if (!csv.TryGetField<double>("Betrag", out var value))
-                    {
-                    }
-
-                    var item = new ImportEntryViewModel
-                    {
-                        Date = date,
-                        Accounts = this.Accounts,
-                        Identifier = this.BookingNumber++,
-                        Name = name,
-                        Text = text,
-                        Value = value
-                    };
-
-                    text = text.ToLower();
-                    if (text.Contains("jahresbeitrag") || text.Contains("mitgliedsbeitrag") || text.Contains("vereinsbeitrag"))
-                    {
-                        item.RemoteAccount = item.Accounts.SingleOrDefault(x => x.ID == 4100);
-                    }
-
-                    if (text.Contains("beitrag") && value.Equals(20.0))
-                    {
-                        item.RemoteAccount = item.Accounts.SingleOrDefault(x => x.ID == 4100);
-                    }
-
-                    this.ImportData.Add(item);
-                }
-            }
         }
     }
 }
