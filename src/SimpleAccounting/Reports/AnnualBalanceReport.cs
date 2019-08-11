@@ -31,7 +31,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         public void CreateReport()
         {
-            var print = new PrintClass();
+            var print = new XmlPrinter();
             print.LoadDocument("AnnualBalance.xml");
 
             XmlDocument doc = print.Document;

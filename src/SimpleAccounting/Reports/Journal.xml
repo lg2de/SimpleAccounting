@@ -15,13 +15,13 @@
       <column width="20" rightline="1">Datum</column>
       <column width="10" rightline="1">Nr. </column>
       <column width="80" rightline="1">Buchungstext</column>
-      <column width="15" rightline="1">Soll-
+      <column width="15" rightline="1" align="right">Soll-
 konto</column>
-      <column width="15" rightline="1">Soll-
+      <column width="15" rightline="1" align="right">Soll-
 betrag</column>
-      <column width="15" rightline="1">Haben-
+      <column width="15" rightline="1" align="right">Haben-
 konto</column>
-      <column width="15">Haben-
+      <column width="15" align="right">Haben-
 betrag</column>
     </columns>
     <data />

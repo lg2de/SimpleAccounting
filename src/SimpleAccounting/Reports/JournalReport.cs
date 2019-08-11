@@ -25,7 +25,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
-            var print = new PrintClass();
+            var print = new XmlPrinter();
             print.LoadDocument("Journal.xml");
 
             XmlDocument doc = print.Document;

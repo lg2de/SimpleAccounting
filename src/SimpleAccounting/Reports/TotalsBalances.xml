@@ -13,24 +13,20 @@
   <table lineheight="4">
     <columns lineheight="8">
       <column width="20" rightline="1">Konto</column>
-      <column width="70" rightline="1">Bezeichnung</column>
+      <column width="80" rightline="1">Bezeichnung</column>
       <column width="20" rightline="1">Letzte
 Buchung</column>
-      <column width="20">Eröffnungsbilanz
+      <column width="25" align="right">
 Aktiva</column>
-      <column width="20" rightline="1">
+      <column width="25" rightline="1" align="right">Eröffnungsbilanz
 Passiva</column>
-      <column width="20">Summe im Zeitraum
+      <column width="25" align="right">
 Soll</column>
-      <column width="20" rightline="1">
+      <column width="25" rightline="1" align="right">Summe im Zeitraum
 Haben</column>
-      <column width="20">Gesamtsumme am Ende
+      <column width="25" align="right">
 Soll</column>
-      <column width="20" rightline="1">
-Haben</column>
-      <column width="20">Saldo am Ende
-Soll</column>
-      <column width="20" >
+      <column width="25" align="right">Saldo am Ende
 Haben</column>
     </columns>
     <data />

@@ -30,12 +30,13 @@ namespace lg2de.SimpleAccounting.Reports
             this.bookingYearName = bookingYearName;
         }
 
+        public IXmlPrinter Printer { get; internal set; } = new XmlPrinter();
+
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
-            var print = new PrintClass();
-            print.LoadDocument("TotalsBalances.xml");
+            this.Printer.LoadDocument("TotalsBalances.xml");
 
-            XmlDocument doc = print.Document;
+            XmlDocument doc = this.Printer.Document;
 
             XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
             firmNode.InnerText = this.firmName;
@@ -49,8 +50,7 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNode dataNode = doc.SelectSingleNode("//table/data");
 
             double totalOpeningCredit = 0, totalOpeningDebit = 0;
-            double totalSumSectionCredit = 0, totalSumSectionDebit = 0;
-            double totalSumEndCredit = 0, totalSumEndDebit = 0;
+            double totalSumCredit = 0, totalSumDebit = 0;
             double totalSaldoCredit = 0, totalSaldoDebit = 0;
             foreach (var account in this.accounts)
             {
@@ -76,16 +76,14 @@ namespace lg2de.SimpleAccounting.Reports
                     .Where(b => b.Opening)
                     .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double sumSectionCredit = this.journal.Booking
+                double sumCredit = this.journal.Booking
                     .Where(b => !b.Opening)
                     .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double sumSectionDebit = this.journal.Booking
+                double sumDebit = this.journal.Booking
                     .Where(b => !b.Opening)
                     .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                // currently identical
-                double sumEndCredit = sumSectionCredit, sumEndDebit = sumSectionDebit;
 
                 if (openingCredit > openingDebit)
                 {
@@ -125,41 +123,32 @@ namespace lg2de.SimpleAccounting.Reports
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = openingDebit > 0 ? (openingDebit / 100).ToString("0.00") : "";
+                dataItemNode.InnerText = openingDebit > 0 ? (openingDebit / 100).ToString("0.00") : string.Empty;
                 dataLineNode.AppendChild(dataItemNode);
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = openingCredit > 0 ? (openingCredit / 100).ToString("0.00") : "";
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = sumSectionDebit > 0 ? (sumSectionDebit / 100).ToString("0.00") : "";
-                dataLineNode.AppendChild(dataItemNode);
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = sumSectionCredit > 0 ? (sumSectionCredit / 100).ToString("0.00") : "";
+                dataItemNode.InnerText = openingCredit > 0 ? (openingCredit / 100).ToString("0.00") : string.Empty;
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = sumEndDebit > 0 ? (sumEndDebit / 100).ToString("0.00") : "";
+                dataItemNode.InnerText = sumDebit > 0 ? (sumDebit / 100).ToString("0.00") : string.Empty;
                 dataLineNode.AppendChild(dataItemNode);
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = sumEndCredit > 0 ? (sumEndCredit / 100).ToString("0.00") : "";
+                dataItemNode.InnerText = sumCredit > 0 ? (sumCredit / 100).ToString("0.00") : string.Empty;
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = saldoDebit > 0 ? (saldoDebit / 100).ToString("0.00") : "";
+                dataItemNode.InnerText = saldoDebit > 0 ? (saldoDebit / 100).ToString("0.00") : string.Empty;
                 dataLineNode.AppendChild(dataItemNode);
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = saldoCredit > 0 ? (saldoCredit / 100).ToString("0.00") : "";
+                dataItemNode.InnerText = saldoCredit > 0 ? (saldoCredit / 100).ToString("0.00") : string.Empty;
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataNode.AppendChild(dataLineNode);
 
                 totalOpeningCredit += openingCredit;
                 totalOpeningDebit += openingDebit;
-                totalSumSectionCredit += sumSectionCredit;
-                totalSumSectionDebit += sumSectionDebit;
-                totalSumEndCredit += sumEndCredit;
-                totalSumEndDebit += sumEndDebit;
+                totalSumCredit += sumCredit;
+                totalSumDebit += sumDebit;
                 totalSaldoCredit += saldoCredit;
                 totalSaldoDebit += saldoDebit;
             }
@@ -168,7 +157,7 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNode totalItemNode = doc.CreateElement("td");
             totalLineNode.SetAttribute("topline", "1");
 
-            totalItemNode.InnerText = "";
+            totalItemNode.InnerText = string.Empty;
             totalLineNode.AppendChild(totalItemNode);
 
             totalItemNode = totalItemNode.Clone();
@@ -176,40 +165,33 @@ namespace lg2de.SimpleAccounting.Reports
             totalLineNode.AppendChild(totalItemNode);
 
             totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = "";
+            totalItemNode.InnerText = string.Empty;
             totalLineNode.AppendChild(totalItemNode);
 
             totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = totalOpeningDebit > 0 ? (totalOpeningDebit / 100).ToString("0.00") : "";
+            totalItemNode.InnerText = totalOpeningDebit > 0 ? (totalOpeningDebit / 100).ToString("0.00") : string.Empty;
             totalLineNode.AppendChild(totalItemNode);
             totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = totalOpeningCredit > 0 ? (totalOpeningCredit / 100).ToString("0.00") : "";
-            totalLineNode.AppendChild(totalItemNode);
-
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = totalSumSectionDebit > 0 ? (totalSumSectionDebit / 100).ToString("0.00") : "";
-            totalLineNode.AppendChild(totalItemNode);
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = totalSumSectionCredit > 0 ? (totalSumSectionCredit / 100).ToString("0.00") : "";
+            totalItemNode.InnerText = totalOpeningCredit > 0 ? (totalOpeningCredit / 100).ToString("0.00") : string.Empty;
             totalLineNode.AppendChild(totalItemNode);
 
             totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = totalSumEndDebit > 0 ? (totalSumEndDebit / 100).ToString("0.00") : "";
+            totalItemNode.InnerText = totalSumDebit > 0 ? (totalSumDebit / 100).ToString("0.00") : string.Empty;
             totalLineNode.AppendChild(totalItemNode);
             totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = totalSumEndCredit > 0 ? (totalSumEndCredit / 100).ToString("0.00") : "";
+            totalItemNode.InnerText = totalSumCredit > 0 ? (totalSumCredit / 100).ToString("0.00") : string.Empty;
             totalLineNode.AppendChild(totalItemNode);
 
             totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = totalSaldoDebit > 0 ? (totalSaldoDebit / 100).ToString("0.00") : "";
+            totalItemNode.InnerText = totalSaldoDebit > 0 ? (totalSaldoDebit / 100).ToString("0.00") : string.Empty;
             totalLineNode.AppendChild(totalItemNode);
             totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = totalSaldoCredit > 0 ? (totalSaldoCredit / 100).ToString("0.00") : "";
+            totalItemNode.InnerText = totalSaldoCredit > 0 ? (totalSaldoCredit / 100).ToString("0.00") : string.Empty;
             totalLineNode.AppendChild(totalItemNode);
 
             dataNode.AppendChild(totalLineNode);
 
-            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Summen und Salden " + this.bookingYearName);
+            this.Printer.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Summen und Salden " + this.bookingYearName);
         }
     }
 }

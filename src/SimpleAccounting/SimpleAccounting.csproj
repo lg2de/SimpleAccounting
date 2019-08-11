@@ -140,6 +140,7 @@
     <Compile Include="Model\AccountingData.Extensions.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Presentation\JournalBaseViewModel.cs" />
+    <Compile Include="Reports\IXmlPrinter.cs" />
     <Compile Include="Reports\JournalReport.cs" />
     <Compile Include="Presentation\JournalViewModel.cs" />
     <Compile Include="Presentation\MenuViewModel.cs" />
@@ -148,7 +149,7 @@
     <Compile Include="Extensions\XmlExtensions.cs" />
     <Compile Include="Presentation\ShellDesignViewModel.cs" />
     <Compile Include="Presentation\ShellViewModel.cs" />
-    <Compile Include="Reports\Print.cs" />
+    <Compile Include="Reports\XmlPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Presentation\ShellView.xaml.cs">
       <DependentUpon>ShellView.xaml</DependentUpon>
