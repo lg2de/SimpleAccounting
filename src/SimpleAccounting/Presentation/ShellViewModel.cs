@@ -107,14 +107,14 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var report = new JournalReport(this.currentJournal, this.firmName, this.bookingYearName);
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
-            report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateStart.ToDateTime());
+            report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
 
         public ICommand TotalsBalancesReportCommand => new RelayCommand(_ =>
         {
-            var report = new TotalsBalancesReport(this.currentJournal, this.accountingData.AllAccounts, this.firmName, this.bookingYearName);
+            var report = new TotalsBalancesReport(this.currentJournal, this.accountingData.Accounts, this.firmName, this.bookingYearName);
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
-            report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateStart.ToDateTime());
+            report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
 
         public ICommand AnnualBalanceReportCommand => new RelayCommand(_ =>

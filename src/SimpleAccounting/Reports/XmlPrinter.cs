@@ -373,13 +373,6 @@ namespace lg2de.SimpleAccounting.Reports
                     this.TransformTableHeader(tableNode);
                 }
 
-                XmlNode textStyleNode = dataNode.Attributes.GetNamedItem("textStyle");
-                string strRowTextStyle = "";
-                if (textStyleNode != null)
-                {
-                    strRowTextStyle = textStyleNode.Value = "bold";
-                }
-
                 XmlNodeList rowNodes = dataNode.SelectNodes("td");
                 int nInnerLineCount = 1;
                 for (int i = 0; i < rowNodes.Count; i++)
@@ -415,7 +408,8 @@ namespace lg2de.SimpleAccounting.Reports
                     XmlNode widthNode = columnNode.Attributes.GetNamedItem("width");
                     int colmnWidth = Convert.ToInt32(widthNode.Value);
                     int xAdoption = 0;
-                    var align = columnNode.Attributes.GetNamedItem("align");
+                    var align = rowNode.Attributes.GetNamedItem("align")
+                        ?? columnNode.Attributes.GetNamedItem("align");
                     if (align != null)
                     {
                         textNode.SetAttribute("align", align.Value);
