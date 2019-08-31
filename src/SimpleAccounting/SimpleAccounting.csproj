@@ -145,7 +145,7 @@
     <Compile Include="Presentation\JournalViewModel.cs" />
     <Compile Include="Presentation\MenuViewModel.cs" />
     <Compile Include="Presentation\RelayCommand.cs" />
-    <Compile Include="Reports\TotalsBalancesReport.cs" />
+    <Compile Include="Reports\TotalsAndBalancesReport.cs" />
     <Compile Include="Extensions\XmlExtensions.cs" />
     <Compile Include="Presentation\ShellDesignViewModel.cs" />
     <Compile Include="Presentation\ShellViewModel.cs" />
@@ -183,7 +183,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Reports\AnnualBalance.xml" />
     <EmbeddedResource Include="Reports\Journal.xml" />
-    <EmbeddedResource Include="Reports\TotalsBalances.xml" />
+    <EmbeddedResource Include="Reports\TotalsAndBalances.xml" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -239,7 +239,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

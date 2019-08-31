@@ -11,32 +11,33 @@ using lg2de.SimpleAccounting.Model;
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    internal class TotalsBalancesReport
+    internal class TotalsAndBalancesReport
     {
         private readonly AccountingDataJournal journal;
         private readonly List<AccountingDataAccountGroup> accountGroups;
         private readonly string firmName;
         private readonly string bookingYearName;
+        private readonly IXmlPrinter printer = new XmlPrinter();
 
-        public TotalsBalancesReport(
+        public TotalsAndBalancesReport(
             AccountingDataJournal journal,
-            IEnumerable<AccountingDataAccountGroup> accountGroups,
+            List<AccountingDataAccountGroup> accountGroups,
             string firmName,
             string bookingYearName)
         {
             this.journal = journal;
-            this.accountGroups = accountGroups.ToList();
+            this.accountGroups = accountGroups;
             this.firmName = firmName;
             this.bookingYearName = bookingYearName;
         }
 
-        public IXmlPrinter Printer { get; internal set; } = new XmlPrinter();
+        public List<string> Signatures { get; } = new List<string>();
 
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
-            this.Printer.LoadDocument("TotalsBalances.xml");
+            this.printer.LoadDocument("TotalsAndBalances.xml");
 
-            XmlDocument doc = this.Printer.Document;
+            XmlDocument doc = this.printer.Document;
 
             XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
             firmNode.InnerText = this.firmName;
@@ -250,7 +251,25 @@ namespace lg2de.SimpleAccounting.Reports
             totalLineNode.ChildNodes[1].SetAttribute("align", "right");
             dataNode.AppendChild(totalLineNode);
 
-            this.Printer.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Summen und Salden " + this.bookingYearName);
+            var signatures = doc.SelectSingleNode("//signatures");
+            foreach (var signature in this.Signatures)
+            {
+                var move = doc.CreateElement("move");
+                move.SetAttribute("relY", "20");
+                signatures.ParentNode.InsertBefore(move, signatures);
+
+                var line = doc.CreateElement("line");
+                line.SetAttribute("relToX", "100");
+                signatures.ParentNode.InsertBefore(line, signatures);
+
+                var text = doc.CreateElement("text");
+                text.InnerText = signature;
+                signatures.ParentNode.InsertBefore(text, signatures);
+            }
+
+            signatures.ParentNode.RemoveChild(signatures);
+
+            this.printer.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Summen und Salden " + this.bookingYearName);
         }
 
         private static string FormatValue(double value)

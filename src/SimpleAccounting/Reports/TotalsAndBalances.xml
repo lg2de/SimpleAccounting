@@ -31,6 +31,7 @@ Haben</column>
     </columns>
     <data />
   </table>
+  <signatures />
   <move relY="10" />
   <text ID="date" />
 </xEport>

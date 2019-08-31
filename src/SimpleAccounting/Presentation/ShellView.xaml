@@ -42,7 +42,8 @@
             </MenuItem>
             <MenuItem Header="Berichte">
                 <MenuItem Header="Journal" Command="{Binding JournalReportCommand}" />
-                <MenuItem Header="Summen und Salden"  Command="{Binding TotalsBalancesReportCommand}" />
+                <MenuItem Header="Summen und Salden"  Command="{Binding TotalsAndBalancesReportCommand}" />
+                <MenuItem Header="Bestandskontosalden"  Command="{Binding AssetBalancesReportCommand}" />
                 <MenuItem Header="Jahresbilanz"  Command="{Binding AnnualBalanceReportCommand}" />
             </MenuItem>
         </Menu>

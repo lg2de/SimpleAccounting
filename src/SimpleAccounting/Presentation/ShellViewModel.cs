@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -110,9 +111,45 @@ namespace lg2de.SimpleAccounting.Presentation
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
 
-        public ICommand TotalsBalancesReportCommand => new RelayCommand(_ =>
+        public ICommand TotalsAndBalancesReportCommand => new RelayCommand(_ =>
         {
-            var report = new TotalsBalancesReport(this.currentJournal, this.accountingData.Accounts, this.firmName, this.bookingYearName);
+            var report = new TotalsAndBalancesReport(
+                this.currentJournal,
+                this.accountingData.Accounts,
+                this.firmName,
+                this.bookingYearName);
+            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+            report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
+        });
+
+        public ICommand AssetBalancesReportCommand => new RelayCommand(_ =>
+        {
+            var accountGroups = new List<AccountingDataAccountGroup>();
+            foreach (var group in this.accountingData.Accounts)
+            {
+                var assertAccounts = group.Account
+                    .Where(a => a.Type == AccountDefinitionType.Asset).ToList();
+                if (assertAccounts.Count <= 0)
+                {
+                    // ignore group
+                    continue;
+                }
+
+                accountGroups.Add(new AccountingDataAccountGroup
+                {
+                    Name = group.Name,
+                    Account = assertAccounts
+                });
+            }
+
+            var report = new TotalsAndBalancesReport(
+                this.currentJournal,
+                accountGroups,
+                this.firmName,
+                this.bookingYearName);
+            report.Signatures.Add("1. Prüfer");
+            report.Signatures.Add("2. Prüfer");
+            report.Signatures.Add("Kassenwart");
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
