@@ -10,13 +10,13 @@ using lg2de.SimpleAccounting.Model;
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    internal class JournalReport
+    internal class TotalJournalReport
     {
         private readonly AccountingDataJournal journal;
         private readonly string firmName;
         private readonly string bookingYearName;
 
-        public JournalReport(AccountingDataJournal journal, string firmName, string bookingYearName)
+        public TotalJournalReport(AccountingDataJournal journal, string firmName, string bookingYearName)
         {
             this.journal = journal;
             this.firmName = firmName;
@@ -26,7 +26,7 @@ namespace lg2de.SimpleAccounting.Reports
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
             var print = new XmlPrinter();
-            print.LoadDocument("Journal.xml");
+            print.LoadDocument("TotalJournal.xml");
 
             XmlDocument doc = print.Document;
 

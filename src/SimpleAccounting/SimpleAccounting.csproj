@@ -141,7 +141,8 @@
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Presentation\JournalBaseViewModel.cs" />
     <Compile Include="Reports\IXmlPrinter.cs" />
-    <Compile Include="Reports\JournalReport.cs" />
+    <Compile Include="Reports\AccountJournalReport.cs" />
+    <Compile Include="Reports\TotalJournalReport.cs" />
     <Compile Include="Presentation\JournalViewModel.cs" />
     <Compile Include="Presentation\MenuViewModel.cs" />
     <Compile Include="Presentation\RelayCommand.cs" />
@@ -182,7 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Reports\AnnualBalance.xml" />
-    <EmbeddedResource Include="Reports\Journal.xml" />
+    <EmbeddedResource Include="Reports\TotalJournal.xml" />
     <EmbeddedResource Include="Reports\TotalsAndBalances.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +239,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Reports\AccountJournal.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

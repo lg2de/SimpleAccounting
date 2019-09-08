@@ -20,6 +20,14 @@ namespace lg2de.SimpleAccounting.Model
         internal IEnumerable<AccountDefinition> AllAccounts => this.Accounts.SelectMany(g => g.Account);
     }
 
+    public partial class AccountDefinition
+    {
+        internal string FormatName()
+        {
+            return $"{this.ID} ({this.Name})";
+        }
+    }
+
     public partial class BookingValue
     {
         internal BookingValue Clone()

@@ -104,9 +104,20 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand CloseYearCommand => new RelayCommand(_ => this.CloseYear());
 
-        public ICommand JournalReportCommand => new RelayCommand(_ =>
+        public ICommand TotalJournalReportCommand => new RelayCommand(_ =>
         {
-            var report = new JournalReport(this.currentJournal, this.firmName, this.bookingYearName);
+            var report = new TotalJournalReport(this.currentJournal, this.firmName, this.bookingYearName);
+            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+            report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
+        });
+
+        public ICommand AccountJournalReportCommand => new RelayCommand(_ =>
+        {
+            var report = new AccountJournalReport(
+                this.accountingData.Accounts.SelectMany(a => a.Account),
+                this.currentJournal,
+                this.firmName,
+                this.bookingYearName);
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
@@ -417,8 +428,8 @@ namespace lg2de.SimpleAccounting.Presentation
         string BuildAccountDescription(string strAccountNumber)
         {
             var nAccountNumber = Convert.ToUInt32(strAccountNumber);
-            string strAccountName = this.accountingData.AllAccounts.Single(a => a.ID == nAccountNumber).Name;
-            return strAccountNumber + " (" + strAccountName + ")";
+            var account = this.accountingData.AllAccounts.Single(a => a.ID == nAccountNumber);
+            return account.FormatName();
         }
 
         void SelectBookingYear(ushort newYear)
