@@ -15,18 +15,18 @@ namespace lg2de.SimpleAccounting.Reports
     {
         private readonly IEnumerable<AccountDefinition> accounts;
         private readonly AccountingDataJournal journal;
-        private readonly string firmName;
+        private readonly AccountingDataSetup setup;
         private readonly string bookingYearName;
 
         public AccountJournalReport(
             IEnumerable<AccountDefinition> accounts,
             AccountingDataJournal journal,
-            string firmName,
+            AccountingDataSetup setup,
             string bookingYearName)
         {
             this.accounts = accounts.OrderBy(a => a.ID);
             this.journal = journal;
-            this.firmName = firmName;
+            this.setup = setup;
             this.bookingYearName = bookingYearName;
         }
 
@@ -38,13 +38,13 @@ namespace lg2de.SimpleAccounting.Reports
             XmlDocument doc = print.Document;
 
             XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = this.firmName;
+            firmNode.InnerText = this.setup.Name;
 
             XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
             rangeNode.InnerText = dateStart.ToString("d") + " - " + dateEnd.ToString("d");
 
             var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = "Dresden, " + DateTime.Now.ToLongDateString();
+            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToLongDateString();
 
             XmlNode tableNode = doc.SelectSingleNode("//table");
 

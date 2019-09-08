@@ -25,7 +25,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
         string bookingYearName = "";
         private AccountingDataJournal currentJournal;
-        private string firmName;
 
         public ShellViewModel(IWindowManager windowManager)
         {
@@ -106,7 +105,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand TotalJournalReportCommand => new RelayCommand(_ =>
         {
-            var report = new TotalJournalReport(this.currentJournal, this.firmName, this.bookingYearName);
+            var report = new TotalJournalReport(
+                this.currentJournal,
+                this.accountingData.Setup,
+                this.bookingYearName);
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
@@ -116,7 +118,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = new AccountJournalReport(
                 this.accountingData.Accounts.SelectMany(a => a.Account),
                 this.currentJournal,
-                this.firmName,
+                this.accountingData.Setup,
                 this.bookingYearName);
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
@@ -127,7 +129,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = new TotalsAndBalancesReport(
                 this.currentJournal,
                 this.accountingData.Accounts,
-                this.firmName,
+                this.accountingData.Setup,
                 this.bookingYearName);
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
@@ -156,7 +158,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = new TotalsAndBalancesReport(
                 this.currentJournal,
                 accountGroups,
-                this.firmName,
+                this.accountingData.Setup,
                 this.bookingYearName);
             report.Signatures.AddRange(this.accountingData.Setup.Reports.TotalsAndBalancesReport);
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
@@ -165,7 +167,11 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand AnnualBalanceReportCommand => new RelayCommand(_ =>
         {
-            var report = new AnnualBalanceReport(this.currentJournal, this.accountingData.AllAccounts, this.firmName, this.bookingYearName);
+            var report = new AnnualBalanceReport(
+                this.currentJournal,
+                this.accountingData.AllAccounts,
+                this.accountingData.Setup,
+                this.bookingYearName);
             report.CreateReport();
         });
 
@@ -464,7 +470,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.fileName = fileName;
             this.accountingData = AccountingData.LoadFromFile(this.fileName);
-            this.firmName = this.accountingData.Setup.Name;
             this.UpdateBookingYears();
 
             foreach (var accountGroup in this.accountingData.Accounts)

@@ -14,18 +14,18 @@ namespace lg2de.SimpleAccounting.Reports
     {
         private readonly AccountingDataJournal journal;
         private readonly List<AccountDefinition> accounts;
-        private readonly string firmName;
+        private readonly AccountingDataSetup setup;
         private readonly string bookingYearName;
 
         public AnnualBalanceReport(
             AccountingDataJournal journal,
             IEnumerable<AccountDefinition> accounts,
-            string firmName,
+            AccountingDataSetup setup,
             string bookingYearName)
         {
             this.journal = journal;
             this.accounts = accounts.ToList();
-            this.firmName = firmName;
+            this.setup = setup;
             this.bookingYearName = bookingYearName;
         }
 
@@ -37,13 +37,13 @@ namespace lg2de.SimpleAccounting.Reports
             XmlDocument doc = print.Document;
 
             var firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = this.firmName;
+            firmNode.InnerText = this.setup.Name;
 
             var rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
             rangeNode.InnerText = this.bookingYearName;
 
             var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = "Dresden, " + DateTime.Now.ToLongDateString();
+            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToLongDateString();
 
             var dataNode = doc.SelectSingleNode("//table/data[@target='income']");
             double totalIncome = 0;

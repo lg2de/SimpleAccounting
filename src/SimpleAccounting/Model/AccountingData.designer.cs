@@ -267,6 +267,8 @@ namespace lg2de.SimpleAccounting.Model {
         
         private string nameField;
         
+        private string locationField;
+        
         private AccountingDataSetupReports reportsField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
@@ -281,6 +283,15 @@ namespace lg2de.SimpleAccounting.Model {
             }
             set {
                 this.nameField = value;
+            }
+        }
+        
+        public string Location {
+            get {
+                return this.locationField;
+            }
+            set {
+                this.locationField = value;
             }
         }
         
