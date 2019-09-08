@@ -147,9 +147,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 accountGroups,
                 this.firmName,
                 this.bookingYearName);
-            report.Signatures.Add("1. Prüfer");
-            report.Signatures.Add("2. Prüfer");
-            report.Signatures.Add("Kassenwart");
+            report.Signatures.AddRange(this.accountingData.Setup.Reports.TotalsAndBalancesReport);
             var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });

@@ -8,6 +8,19 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Name" type="xs:string" />
+              <xs:element name="Reports" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="TotalsAndBalancesReport" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Signature" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -39,7 +52,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element maxOccurs="unbounded" name="Journal">
+        <xs:element name="Journal" maxOccurs="unbounded">
           <xs:complexType>
             <xs:sequence>
               <xs:element maxOccurs="unbounded" name="Booking">
