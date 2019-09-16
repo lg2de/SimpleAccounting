@@ -12,7 +12,7 @@ namespace lg2de.SimpleAccounting
 {
     public class AppBootstrapper : BootstrapperBase
     {
-        private SimpleContainer container = new SimpleContainer();
+        private readonly SimpleContainer container = new SimpleContainer();
 
         public AppBootstrapper()
         {
@@ -22,14 +22,14 @@ namespace lg2de.SimpleAccounting
             this.container.PerRequest<ShellViewModel>();
         }
 
-        protected override object GetInstance(Type serviceType, string key)
+        protected override object GetInstance(Type service, string key)
         {
-            return this.container.GetInstance(serviceType, key);
+            return this.container.GetInstance(service, key);
         }
 
-        protected override IEnumerable<object> GetAllInstances(Type serviceType)
+        protected override IEnumerable<object> GetAllInstances(Type service)
         {
-            return this.container.GetAllInstances(serviceType);
+            return this.container.GetAllInstances(service);
         }
 
         protected override void BuildUp(object instance)

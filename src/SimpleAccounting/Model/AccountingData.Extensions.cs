@@ -14,7 +14,10 @@ namespace lg2de.SimpleAccounting.Model
         public string xsiSchemaLocation
         {
             get => "https://lg2.de/SimpleAccounting/AccountingSchema https://lg2de.github.io/SimpleAccounting/AccountingData.xsd";
-            set { }
+            set
+            {
+                // ignored
+            }
         }
 
         internal IEnumerable<AccountDefinition> AllAccounts => this.Accounts.SelectMany(g => g.Account);

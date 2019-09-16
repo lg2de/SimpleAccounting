@@ -523,6 +523,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
             catch (FileNotFoundException)
             {
+                // ignored
             }
 
             this.accountingData.SaveToFile(this.fileName);
@@ -532,17 +533,9 @@ namespace lg2de.SimpleAccounting.Presentation
         void RefreshJournal()
         {
             this.Journal.Clear();
-            bool bColorStatus = false;
             foreach (var booking in this.currentJournal.Booking.OrderBy(b => b.Date))
             {
                 var item = new JournalViewModel { Date = booking.Date.ToDateTime() };
-                //if (bColorStatus)
-                //{
-                //    item.BackColor = Color.LightGreen;
-                //}
-
-                bColorStatus = !bColorStatus;
-
                 item.Identifier = booking.ID;
                 var debitAccounts = booking.Debit;
                 var creditAccounts = booking.Credit;
@@ -586,7 +579,6 @@ namespace lg2de.SimpleAccounting.Presentation
             this.AccountJournal.Clear();
             double nCreditSum = 0;
             double nDebitSum = 0;
-            bool bColorStatus = false;
             var entries =
                 this.currentJournal.Booking.Where(b => b.Credit.Any(x => x.Account == accountNumber))
                 .Concat(this.currentJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)));
@@ -594,13 +586,6 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 var item = new AccountJournalViewModel { Date = entry.Date.ToDateTime() };
                 this.AccountJournal.Add(item);
-                //if (bColorStatus)
-                //{
-                //    item.BackColor = Color.LightGreen;
-                //}
-
-                bColorStatus = !bColorStatus;
-
                 item.Identifier = entry.ID;
                 var debitEntry = entry.Debit.FirstOrDefault(x => x.Account == accountNumber);
                 if (debitEntry != null)
