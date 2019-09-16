@@ -13,7 +13,7 @@ namespace lg2de.SimpleAccounting.Model
         [XmlAttribute("schemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
         public string xsiSchemaLocation
         {
-            get => "http://lg2.de/schema1 https://mariaehimmelfahrt-dresden.de/documents/AccountingData.xsd";
+            get => "https://lg2.de/SimpleAccounting/AccountingSchema https://lg2de.github.io/SimpleAccounting/AccountingData.xsd";
             set { }
         }
 

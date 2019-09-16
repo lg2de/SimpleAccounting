@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="AccountingData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Setup">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Name" type="xs:string" />
+              <xs:element name="Location" type="xs:string" />
+              <xs:element name="Reports" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="TotalsAndBalancesReport" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Signature" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Accounts">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="AccountGroup">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="Account" type="AccountDefinition" />
+                  </xs:sequence>
+                  <xs:attribute name="Name" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Years">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Year">
+                <xs:complexType>
+                  <xs:attribute name="Name" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="DateStart" type="xs:unsignedInt" use="required" />
+                  <xs:attribute name="DateEnd" type="xs:unsignedInt" use="required" />
+                  <xs:attribute name="Closed" type="xs:boolean" use="optional" default="false" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Journal" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Booking">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Debit" type="BookingValue" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element name="Credit" type="BookingValue" minOccurs="1" maxOccurs="unbounded" />
+                  </xs:sequence>
+                  <xs:attribute name="Date" type="xs:unsignedInt" use="required" />
+                  <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
+                  <xs:attribute name="Opening" type="xs:boolean" use="optional" default="false" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Year" type="xs:unsignedShort" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="OpenIssues" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Entry" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="Year" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="Date" type="xs:unsignedInt" use="required" />
+                  <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
+                  <xs:attribute name="Value" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="Account" type="xs:unsignedShort" use="required" />
+                  <xs:attribute name="Text" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ImportMappings" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Mapping" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="TextPattern" type="xs:string" use="required" />
+                  <xs:attribute name="Value" type="xs:int" use="optional" />
+                  <xs:attribute name="AccountID" type="xs:unsignedLong" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="AccountDefinition">
+    <xs:sequence>
+      <xs:element name="ImportMapping" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="Target" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="Date" />
+                <xs:enumeration value="Name" />
+                <xs:enumeration value="Text" />
+                <xs:enumeration value="Value" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="Source" use="required" type="xs:string" />
+          <xs:attribute name="IgnorePattern" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="Type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Asset" />
+          <xs:enumeration value="Income" />
+          <xs:enumeration value="Expense" />
+          <xs:enumeration value="Credit" />
+          <xs:enumeration value="Debit" />
+          <xs:enumeration value="Carryforward" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Active" type="xs:boolean" default="true" />
+  </xs:complexType>
+  <xs:complexType name="BookingValue">
+    <xs:attribute name="Value" type="xs:int" use="required" />
+    <xs:attribute name="Account" type="xs:unsignedLong" use="required" />
+    <xs:attribute name="Text" type="xs:string" use="required" />
+  </xs:complexType>
+</xs:schema>
