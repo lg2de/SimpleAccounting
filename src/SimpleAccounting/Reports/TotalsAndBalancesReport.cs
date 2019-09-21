@@ -13,6 +13,8 @@ namespace lg2de.SimpleAccounting.Reports
 {
     internal class TotalsAndBalancesReport
     {
+        public const string ResourceName = "TotalsAndBalances.xml";
+
         private readonly AccountingDataJournal journal;
         private readonly List<AccountingDataAccountGroup> accountGroups;
         private readonly AccountingDataSetup setup;
@@ -35,7 +37,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
-            this.printer.LoadDocument("TotalsAndBalances.xml");
+            this.printer.LoadDocument(ResourceName);
 
             XmlDocument doc = this.printer.Document;
 

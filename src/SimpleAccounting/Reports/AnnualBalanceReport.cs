@@ -12,6 +12,8 @@ namespace lg2de.SimpleAccounting.Reports
 {
     internal class AnnualBalanceReport
     {
+        public const string ResourceName = "AnnualBalance.xml";
+
         private readonly AccountingDataJournal journal;
         private readonly List<AccountDefinition> allAccounts;
         private readonly AccountingDataSetup setup;
@@ -32,7 +34,7 @@ namespace lg2de.SimpleAccounting.Reports
         public void CreateReport()
         {
             var print = new XmlPrinter();
-            print.LoadDocument("AnnualBalance.xml");
+            print.LoadDocument(ResourceName);
 
             XmlDocument doc = print.Document;
 

@@ -25,5 +25,22 @@ namespace lg2de.SimpleAccounting.Extensions
             attr.Value = value;
             node.Attributes.SetNamedItem(attr);
         }
+
+        public static T GetAttribute<T>(this XmlNode node, string name, T defaultValue = default)
+        {
+            var attribute = node.Attributes.GetNamedItem(name);
+            if (attribute == null)
+            {
+                return defaultValue;
+            }
+
+            Type returnType = typeof(T);
+            if (returnType == typeof(int))
+            {
+                return (T)(object)Convert.ToInt32(attribute.Value);
+            }
+
+            throw new ArgumentException($"The type {returnType.Name} is not supported.");
+        }
     }
 }

@@ -39,5 +39,32 @@ namespace SimpleAccounting.UnitTests.Extensions
 
             doc.DocumentElement.FirstChild.OuterXml.Should().Be("<element name=\"value\" />");
         }
+
+        [Fact]
+        public void GetAttribute_IntNotExisting_ReturnsZero()
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml("<root />");
+
+            doc.DocumentElement.GetAttribute<int>("X").Should().Be(0);
+        }
+
+        [Fact]
+        public void GetAttribute_IntOnNumber_ReturnsNumber()
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml("<root attr=\"42\"/>");
+
+            doc.DocumentElement.GetAttribute<int>("attr").Should().Be(42);
+        }
+
+        [Fact]
+        public void GetAttribute_IntOnString_Throws()
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml("<root attr=\"X\"/>");
+
+            doc.DocumentElement.Invoking(x => x.GetAttribute<int>("attr")).Should().Throw<FormatException>();
+        }
     }
 }

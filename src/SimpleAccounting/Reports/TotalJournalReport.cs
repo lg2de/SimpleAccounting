@@ -12,6 +12,8 @@ namespace lg2de.SimpleAccounting.Reports
 {
     internal class TotalJournalReport
     {
+        public const string ResourceName = "TotalJournal.xml";
+
         private readonly AccountingDataJournal journal;
         private readonly AccountingDataSetup setup;
         private readonly string bookingYearName;
@@ -29,7 +31,7 @@ namespace lg2de.SimpleAccounting.Reports
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
             var print = new XmlPrinter();
-            print.LoadDocument("TotalJournal.xml");
+            print.LoadDocument(ResourceName);
 
             XmlDocument doc = print.Document;
 

@@ -17,12 +17,14 @@ namespace lg2de.SimpleAccounting.Reports
 {
     internal class XmlPrinter : IXmlPrinter
     {
+        public const int DefaultLineHeight = 4;
+
         private readonly Stack<Pen> penStack;
         private readonly Stack<SolidBrush> solidBrushStack;
         private readonly Stack<Font> fontStack;
 
         private XmlNode currentNode;
-        private int documentLeftMargin, documentRightMargin, documentTopMargin, documentBottomMargin, documentWidth, documentHeight;
+        private int documentLeftMargin, documentRightMargin, documentTopMargin, documentBottomMargin, documentWidth;
         private float documentScale;
         private int cursorX, cursorY;
         private float printFactor;
@@ -35,13 +37,20 @@ namespace lg2de.SimpleAccounting.Reports
             this.fontStack = new Stack<Font>();
         }
 
-        public XmlDocument Document { get; private set; }
+        public XmlDocument Document { get; }
+
+        internal int DocumentHeight { get; set; }
 
         public void LoadDocument(string resourceName)
         {
             var assembly = Assembly.GetExecutingAssembly();
             string fullResourceName = assembly.GetManifestResourceNames()
-                .Single(str => str.EndsWith(resourceName, StringComparison.InvariantCultureIgnoreCase));
+                .SingleOrDefault(str => str.EndsWith(resourceName, StringComparison.InvariantCultureIgnoreCase));
+
+            if (fullResourceName == null)
+            {
+                throw new ArgumentException($"The report {resourceName} is invalid.");
+            }
 
             using (Stream stream = assembly.GetManifestResourceStream(fullResourceName))
             {
@@ -76,7 +85,7 @@ namespace lg2de.SimpleAccounting.Reports
 
                 doc.DefaultPageSettings.PaperSize = item;
                 this.documentWidth = Convert.ToInt32(item.Width / this.printFactor);
-                this.documentHeight = Convert.ToInt32(item.Height / this.printFactor);
+                this.DocumentHeight = Convert.ToInt32(item.Height / this.printFactor);
                 this.documentScale = 1;
                 bFound = true;
                 break;
@@ -97,11 +106,11 @@ namespace lg2de.SimpleAccounting.Reports
                 node = this.Document.DocumentElement.Attributes.GetNamedItem("height");
                 if (node != null)
                 {
-                    this.documentHeight = Convert.ToInt32(node.Value);
+                    this.DocumentHeight = Convert.ToInt32(node.Value);
                 }
                 else
                 {
-                    this.documentHeight = 297;
+                    this.DocumentHeight = 297;
                 }
 
                 node = this.Document.DocumentElement.Attributes.GetNamedItem("scale");
@@ -115,7 +124,7 @@ namespace lg2de.SimpleAccounting.Reports
                 }
 
                 this.printFactor *= this.documentScale;
-                doc.DefaultPageSettings.PaperSize = new PaperSize(strPaperSize, Convert.ToInt32(this.documentWidth * this.printFactor), Convert.ToInt32(this.documentHeight * this.printFactor));
+                doc.DefaultPageSettings.PaperSize = new PaperSize(strPaperSize, Convert.ToInt32(this.documentWidth * this.printFactor), Convert.ToInt32(this.DocumentHeight * this.printFactor));
             }
 
             doc.DefaultPageSettings.Landscape = false;
@@ -128,8 +137,8 @@ namespace lg2de.SimpleAccounting.Reports
             if (doc.DefaultPageSettings.Landscape)
             {
                 int nDummy = this.documentWidth;
-                this.documentWidth = this.documentHeight;
-                this.documentHeight = nDummy;
+                this.documentWidth = this.DocumentHeight;
+                this.DocumentHeight = nDummy;
             }
 
             this.currentNode = this.Document.DocumentElement.FirstChild;
@@ -183,12 +192,17 @@ namespace lg2de.SimpleAccounting.Reports
             dialog.ShowDialog();
         }
 
-        private void TransformDocument()
+        internal void LoadXml(string xml)
+        {
+            this.Document.LoadXml(xml);
+        }
+
+        internal void TransformDocument()
         {
             this.TransformNodes(this.Document.DocumentElement.FirstChild);
         }
 
-        private void TransformNodes(XmlNode firstNode)
+        internal void TransformNodes(XmlNode firstNode)
         {
             XmlNode nextNode = firstNode;
             while (nextNode != null)
@@ -237,10 +251,11 @@ namespace lg2de.SimpleAccounting.Reports
 
                 this.TransformNodes(transformingNode.FirstChild);
 
-                if (this.cursorY >= (this.documentHeight - this.documentBottomMargin))
+                if (nextNode != null
+                    && this.cursorY >= (this.DocumentHeight - this.documentBottomMargin))
                 {
                     XmlNode newPage = this.Document.CreateElement("newpage");
-                    transformingNode.ParentNode.InsertBefore(newPage, transformingNode);
+                    nextNode.ParentNode.InsertBefore(newPage, nextNode);
                     this.cursorY = this.documentTopMargin;
                 }
             }
@@ -289,9 +304,9 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNode columnsRoot = tableNode.SelectSingleNode("columns");
             XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
 
-            int nTableLineHeight = Convert.ToInt32(tableNode.Attributes.GetNamedItem("lineheight").Value);
+            int tableLineHeight = tableNode.GetAttribute<int>("lineheight", DefaultLineHeight);
 
-            int nHeaderLineHeight = nTableLineHeight;
+            int nHeaderLineHeight = tableLineHeight;
             XmlNode headerLineHeightNode = columnsRoot.Attributes.GetNamedItem("lineheight");
             if (headerLineHeightNode != null)
             {
@@ -341,7 +356,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void TransformTable(XmlNode tableNode)
         {
-            int nTableLineHeight = Convert.ToInt32(tableNode.Attributes.GetNamedItem("lineheight").Value);
+            int tableLineHeight = tableNode.GetAttribute<int>("lineheight", DefaultLineHeight);
 
             XmlNode columnsRoot = tableNode.SelectSingleNode("columns");
             XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
@@ -349,7 +364,7 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
 
             // if table can not be started on page - create new one
-            if ((this.cursorY + nTableLineHeight * 2) > (this.documentHeight - this.documentBottomMargin))
+            if ((this.cursorY + tableLineHeight * 2) > (this.DocumentHeight - this.documentBottomMargin))
             {
                 XmlNode newPage = this.Document.CreateElement("newpage");
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
@@ -360,7 +375,7 @@ namespace lg2de.SimpleAccounting.Reports
 
             foreach (XmlNode dataNode in dataNodes)
             {
-                if ((this.cursorY + nTableLineHeight) > (this.documentHeight - this.documentBottomMargin))
+                if ((this.cursorY + tableLineHeight) > (this.DocumentHeight - this.documentBottomMargin))
                 {
                     XmlNode newPage = this.Document.CreateElement("newpage");
                     tableNode.ParentNode.InsertBefore(newPage, tableNode);
@@ -377,7 +392,7 @@ namespace lg2de.SimpleAccounting.Reports
                     nInnerLineCount += strText.Length / 40;
                 }
 
-                int nLineHeight = nTableLineHeight * nInnerLineCount;
+                int nLineHeight = tableLineHeight * nInnerLineCount;
                 XmlNode lineHeightNode = dataNode.Attributes.GetNamedItem("lineheight");
                 if (lineHeightNode != null)
                 {

@@ -13,6 +13,8 @@ namespace lg2de.SimpleAccounting.Reports
 {
     internal class AccountJournalReport
     {
+        public const string ResourceName = "AccountJournal.xml";
+
         private readonly IEnumerable<AccountDefinition> accounts;
         private readonly AccountingDataJournal journal;
         private readonly AccountingDataSetup setup;
@@ -33,7 +35,7 @@ namespace lg2de.SimpleAccounting.Reports
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
             var print = new XmlPrinter();
-            print.LoadDocument("AccountJournal.xml");
+            print.LoadDocument(ResourceName);
 
             XmlDocument doc = print.Document;
 
