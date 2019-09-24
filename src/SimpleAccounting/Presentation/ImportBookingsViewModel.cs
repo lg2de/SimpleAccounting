@@ -2,21 +2,21 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Windows.Input;
-using Caliburn.Micro;
-using CsvHelper;
-using lg2de.SimpleAccounting.Extensions;
-using lg2de.SimpleAccounting.Model;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Windows.Input;
+    using Caliburn.Micro;
+    using CsvHelper;
+    using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Model;
+
     internal class ImportBookingsViewModel : Screen
     {
         private readonly ShellViewModel parent;

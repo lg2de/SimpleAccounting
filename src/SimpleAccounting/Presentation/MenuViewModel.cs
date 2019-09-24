@@ -2,10 +2,10 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System.Windows.Input;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System.Windows.Input;
+
     public class MenuViewModel
     {
         public MenuViewModel(string header, ICommand command)

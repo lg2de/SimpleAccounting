@@ -2,14 +2,14 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Windows.Input;
-using Caliburn.Micro;
-using lg2de.SimpleAccounting.Model;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Windows.Input;
+    using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Model;
+
     public class AccountViewModel : Screen
     {
         static AccountViewModel()

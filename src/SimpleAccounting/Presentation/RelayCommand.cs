@@ -2,11 +2,11 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Windows.Input;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System;
+    using System.Windows.Input;
+
     public class RelayCommand : ICommand
     {
         private readonly Action<object> execute;

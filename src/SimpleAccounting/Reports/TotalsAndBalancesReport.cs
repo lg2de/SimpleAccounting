@@ -2,15 +2,15 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-using lg2de.SimpleAccounting.Extensions;
-using lg2de.SimpleAccounting.Model;
-
 namespace lg2de.SimpleAccounting.Reports
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Xml;
+    using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Model;
+
     internal class TotalsAndBalancesReport
     {
         public const string ResourceName = "TotalsAndBalances.xml";

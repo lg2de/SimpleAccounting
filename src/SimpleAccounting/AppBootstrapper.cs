@@ -2,14 +2,14 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Windows;
-using Caliburn.Micro;
-using lg2de.SimpleAccounting.Presentation;
-
 namespace lg2de.SimpleAccounting
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Windows;
+    using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Presentation;
+
     public class AppBootstrapper : BootstrapperBase
     {
         private readonly SimpleContainer container = new SimpleContainer();
@@ -39,9 +39,11 @@ namespace lg2de.SimpleAccounting
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
-            var settings = new Dictionary<string, object>();
-            settings.Add("SizeToContent", SizeToContent.Manual);
-            settings.Add("WindowState", WindowState.Maximized);
+            var settings = new Dictionary<string, object>
+            {
+                { "SizeToContent", SizeToContent.Manual },
+                { "WindowState", WindowState.Maximized }
+            };
             this.DisplayRootViewFor<ShellViewModel>(settings);
         }
     }

@@ -2,12 +2,12 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Windows.Input;
-using lg2de.SimpleAccounting.Model;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System.Collections.Generic;
+    using System.Windows.Input;
+    using lg2de.SimpleAccounting.Model;
+
     public class ImportEntryViewModel : JournalBaseViewModel
     {
         private AccountDefinition remoteAccount;

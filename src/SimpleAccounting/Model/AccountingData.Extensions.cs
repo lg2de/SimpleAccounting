@@ -2,12 +2,12 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
-
 namespace lg2de.SimpleAccounting.Model
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Xml.Serialization;
+
     public partial class AccountingData
     {
         [XmlAttribute("schemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]

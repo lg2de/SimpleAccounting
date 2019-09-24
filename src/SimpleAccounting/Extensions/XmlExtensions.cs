@@ -2,11 +2,11 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Xml;
-
 namespace lg2de.SimpleAccounting.Extensions
 {
+    using System;
+    using System.Xml;
+
     internal static class XmlExtensions
     {
         public static void SetAttribute(this XmlNode node, string name, string value)

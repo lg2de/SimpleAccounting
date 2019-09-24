@@ -2,16 +2,16 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
-using Caliburn.Micro;
-using lg2de.SimpleAccounting.Extensions;
-using lg2de.SimpleAccounting.Model;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Windows.Input;
+    using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Model;
+
     internal class AddBookingViewModel : Screen
     {
         private readonly ShellViewModel parent;
@@ -83,9 +83,11 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand BookCommand => new RelayCommand(_ =>
         {
-            var newBooking = new AccountingDataJournalBooking();
-            newBooking.Date = this.Date.ToAccountingDate();
-            newBooking.ID = this.BookingNumber;
+            var newBooking = new AccountingDataJournalBooking
+            {
+                Date = this.Date.ToAccountingDate(),
+                ID = this.BookingNumber
+            };
             var creditValue = new BookingValue
             {
                 Account = this.CreditAccount,

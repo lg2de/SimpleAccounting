@@ -2,14 +2,14 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-using lg2de.SimpleAccounting.Model;
-
 namespace lg2de.SimpleAccounting.Reports
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Xml;
+    using lg2de.SimpleAccounting.Model;
+
     internal class AnnualBalanceReport
     {
         public const string ResourceName = "AnnualBalance.xml";

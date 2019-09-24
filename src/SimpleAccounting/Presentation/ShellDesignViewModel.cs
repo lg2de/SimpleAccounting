@@ -2,10 +2,10 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System;
+
     public class ShellDesignViewModel : ShellViewModel
     {
         public ShellDesignViewModel()

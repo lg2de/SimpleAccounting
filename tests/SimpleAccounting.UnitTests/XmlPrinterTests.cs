@@ -2,14 +2,14 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Xml.Linq;
-using FluentAssertions;
-using lg2de.SimpleAccounting.Reports;
-using Xunit;
-
 namespace SimpleAccounting.UnitTests
 {
+    using System;
+    using System.Xml.Linq;
+    using FluentAssertions;
+    using lg2de.SimpleAccounting.Reports;
+    using Xunit;
+
     public class XmlPrinterTests
     {
         [Fact]

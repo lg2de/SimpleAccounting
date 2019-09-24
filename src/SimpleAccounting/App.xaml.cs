@@ -2,14 +2,14 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System.Collections.Specialized;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Markup;
-using lg2de.SimpleAccounting.Properties;
-
 namespace lg2de.SimpleAccounting
 {
+    using System.Collections.Specialized;
+    using System.Globalization;
+    using System.Windows;
+    using System.Windows.Markup;
+    using lg2de.SimpleAccounting.Properties;
+
     public partial class App : Application
     {
         public App()

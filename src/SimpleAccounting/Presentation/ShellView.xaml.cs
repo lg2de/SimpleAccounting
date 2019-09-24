@@ -2,10 +2,10 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System.Windows.Controls;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System.Windows.Controls;
+
     /// <summary>
     ///     Implements the main view of the application.
     /// </summary>

@@ -2,10 +2,10 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using lg2de.SimpleAccounting.Model;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using lg2de.SimpleAccounting.Model;
+
     internal class AddBookingDesignViewModel : AddBookingViewModel
     {
         public AddBookingDesignViewModel()

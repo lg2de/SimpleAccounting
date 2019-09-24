@@ -2,19 +2,19 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Forms;
-using System.Xml;
-using lg2de.SimpleAccounting.Extensions;
-
 namespace lg2de.SimpleAccounting.Reports
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Drawing;
+    using System.Drawing.Printing;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Windows.Forms;
+    using System.Xml;
+    using lg2de.SimpleAccounting.Extensions;
+
     internal class XmlPrinter : IXmlPrinter
     {
         public const int DefaultLineHeight = 4;

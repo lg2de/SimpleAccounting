@@ -2,10 +2,10 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-
 namespace lg2de.SimpleAccounting.Extensions
 {
+    using System;
+
     internal static class DateTimeExtensions
     {
         public static DateTime ToDateTime(this uint date)

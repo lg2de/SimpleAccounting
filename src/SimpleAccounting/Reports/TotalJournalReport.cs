@@ -2,14 +2,14 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Linq;
-using System.Xml;
-using lg2de.SimpleAccounting.Extensions;
-using lg2de.SimpleAccounting.Model;
-
 namespace lg2de.SimpleAccounting.Reports
 {
+    using System;
+    using System.Linq;
+    using System.Xml;
+    using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Model;
+
     internal class TotalJournalReport
     {
         public const string ResourceName = "TotalJournal.xml";
