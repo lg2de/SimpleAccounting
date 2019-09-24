@@ -249,7 +249,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)Model\AccountingData.xsd" "$(SolutionDir)docs\AccountingData.xsd" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)Model\AccountingData.xsd" "$(SolutionDir)docs"\ /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
