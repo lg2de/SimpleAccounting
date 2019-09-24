@@ -2,28 +2,29 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using System.Windows.Input;
-using Caliburn.Micro;
-using lg2de.SimpleAccounting.Extensions;
-using lg2de.SimpleAccounting.Model;
-using lg2de.SimpleAccounting.Properties;
-using lg2de.SimpleAccounting.Reports;
-
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Linq;
+    using System.Windows.Forms;
+    using System.Windows.Input;
+    using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
+    using lg2de.SimpleAccounting.Reports;
+
+    [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
     public class ShellViewModel : Conductor<IScreen>
     {
         private readonly IWindowManager windowManager;
         private AccountingData accountingData;
-        string fileName = "";
-
-        string bookingYearName = "";
+        private string fileName = "";
+        private string bookingYearName = "";
         private AccountingDataJournal currentJournal;
 
         public ShellViewModel(IWindowManager windowManager)
@@ -318,12 +319,54 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        internal void AddBooking(AccountingDataJournalBooking booking)
+        internal void Initialize()
+        {
+            this.accountingData = new AccountingData
+            {
+                Accounts = new List<AccountingDataAccountGroup>
+            {
+                new AccountingDataAccountGroup
+                {
+                    Name = "Default",
+                    Account = new List<AccountDefinition>
+                    {
+                        new AccountDefinition
+                        {
+                            ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset
+                        },
+                        new AccountDefinition
+                        {
+                            ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
+                        }
+                    }
+                }
+            }
+            };
+            uint year = (uint)DateTime.Now.Year * 10000;
+            this.accountingData.Years = new List<AccountingDataYear>
+            {
+                new AccountingDataYear
+                {
+                    Name = (ushort)DateTime.Now.Year,
+                    DateStart = year + 101, DateEnd = year + 1231
+                }
+            };
+            this.accountingData.Journal = new List<AccountingDataJournal>
+            {
+                new AccountingDataJournal{ Year = this.accountingData.Years.Single().Name }
+            };
+            this.currentJournal = this.accountingData.Journal.Single();
+        }
+
+        internal void AddBooking(AccountingDataJournalBooking booking, bool refreshJournal = true)
         {
             this.currentJournal.Booking.Add(booking);
             this.IsDocumentChanged = true;
 
-            this.RefreshJournal();
+            if (refreshJournal)
+            {
+                this.RefreshJournal();
+            }
         }
 
         private ulong GetMaxBookIdent()
@@ -336,7 +379,7 @@ namespace lg2de.SimpleAccounting.Presentation
             return this.currentJournal.Booking.Max(b => b.ID);
         }
 
-        void CloseYear()
+        private void CloseYear()
         {
             var accountingYear = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
             if (accountingYear.Closed)
@@ -431,14 +474,14 @@ namespace lg2de.SimpleAccounting.Presentation
             this.UpdateBookingYears();
         }
 
-        string BuildAccountDescription(string strAccountNumber)
+        private string BuildAccountDescription(string strAccountNumber)
         {
             var nAccountNumber = Convert.ToUInt32(strAccountNumber);
             var account = this.accountingData.AllAccounts.Single(a => a.ID == nAccountNumber);
             return account.FormatName();
         }
 
-        void SelectBookingYear(ushort newYear)
+        private void SelectBookingYear(ushort newYear)
         {
             this.bookingYearName = newYear.ToString();
             this.currentJournal = this.accountingData.Journal.Single(y => y.Year == newYear);
@@ -513,7 +556,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        void SaveProject()
+        private void SaveProject()
         {
             DateTime fileDate = File.GetLastWriteTime(this.fileName);
             string backupFileName = this.fileName + "." + fileDate.ToString("yyyyMMddHHmmss");
@@ -530,7 +573,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.IsDocumentChanged = false;
         }
 
-        void RefreshJournal()
+        private void RefreshJournal()
         {
             this.Journal.Clear();
             foreach (var booking in this.currentJournal.Booking.OrderBy(b => b.Date))
@@ -574,7 +617,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        void BuildAccountJournal(ulong accountNumber)
+        private void BuildAccountJournal(ulong accountNumber)
         {
             this.AccountJournal.Clear();
             double nCreditSum = 0;
