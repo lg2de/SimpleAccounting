@@ -38,6 +38,20 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void AddBookingsCommand_BookingNumberInitialized()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            AddBookingViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
+            var sut = new ShellViewModel(windowManager);
+            sut.Initialize();
+
+            sut.AddBookingsCommand.Execute(null);
+
+            vm.BookingNumber.Should().Be(1);
+        }
+
+        [Fact]
         public void AddBooking_FirstBooking_JournalUpdated()
         {
             var windowManager = Substitute.For<IWindowManager>();
