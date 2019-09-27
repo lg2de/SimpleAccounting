@@ -8,6 +8,7 @@ namespace SimpleAccounting.UnitTests.Presentation
     using System.Collections.Generic;
     using Caliburn.Micro;
     using FluentAssertions;
+    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
     using NSubstitute;
@@ -49,6 +50,25 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.AddBookingsCommand.Execute(null);
 
             vm.BookingNumber.Should().Be(1);
+        }
+
+        [Fact]
+        public void ImportBookingsCommand_BookingNumberInitialized()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            ImportBookingsViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as ImportBookingsViewModel));
+            var sut = new ShellViewModel(windowManager);
+            sut.Initialize();
+
+            sut.ImportBookingsCommand.Execute(null);
+
+            vm.Should().BeEquivalentTo(new
+            {
+                BookingNumber = 1,
+                RangeMin = new DateTime(DateTime.Now.Year, 1, 1),
+                RangMax = new DateTime(DateTime.Now.Year, 12, 31)
+            });
         }
 
         [Fact]

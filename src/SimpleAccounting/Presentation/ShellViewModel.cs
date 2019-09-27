@@ -343,6 +343,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
             };
             uint year = (uint)DateTime.Now.Year * 10000;
+            this.bookingYearName = DateTime.Now.Year.ToString();
             this.accountingData.Years = new List<AccountingDataYear>
             {
                 new AccountingDataYear
