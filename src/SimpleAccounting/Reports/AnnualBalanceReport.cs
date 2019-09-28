@@ -47,8 +47,31 @@ namespace lg2de.SimpleAccounting.Reports
             var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
             dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToLongDateString();
 
+            // income / Einnahmen
+            this.ProcessIncome(doc, out var totalIncome);
+
+            // expense / Ausgaben
+            this.ProcessExpenses(doc, out var totalExpense);
+
+            var saldoNode = doc.SelectSingleNode("//text[@ID=\"saldo\"]");
+            saldoNode.InnerText = ((totalIncome + totalExpense) / 100).ToString("0.00");
+
+            // receivables / Forderungen
+            this.ProcessReceivables(doc, out double totalReceivable);
+
+            // liabilities / Verbindlichkeiten
+            this.ProcessLiabilities(doc, out double totalLiability);
+
+            // asset / Vermögen
+            this.ProcessAssets(doc, totalReceivable, totalLiability);
+
+            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Jahresbilanz " + this.bookingYearName);
+        }
+
+        private void ProcessIncome(XmlDocument doc, out double totalIncome)
+        {
             var dataNode = doc.SelectSingleNode("//table/data[@target='income']");
-            double totalIncome = 0;
+            totalIncome = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Income);
             foreach (var account in accounts)
             {
@@ -90,10 +113,13 @@ namespace lg2de.SimpleAccounting.Reports
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalIncome / 100).ToString("0.00");
+        }
 
-            dataNode = doc.SelectSingleNode("//table/data[@target='expense']");
-            double totalExpense = 0;
-            accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Expense);
+        private void ProcessExpenses(XmlDocument doc, out double totalExpense)
+        {
+            var dataNode = doc.SelectSingleNode("//table/data[@target='expense']");
+            totalExpense = 0;
+            var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Expense);
             foreach (var account in accounts)
             {
                 double saldoCredit = this.journal.Booking
@@ -132,16 +158,15 @@ namespace lg2de.SimpleAccounting.Reports
                 dataNode.AppendChild(dataLineNode);
             }
 
-            saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
+            var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalExpense / 100).ToString("0.00");
+        }
 
-            var saldoNode = doc.SelectSingleNode("//text[@ID=\"saldo\"]");
-            saldoNode.InnerText = ((totalIncome + totalExpense) / 100).ToString("0.00");
-
-            // receivables / Forderungen
-            dataNode = doc.SelectSingleNode("//table/data[@target='receivable']");
-            double totalReceivable = 0;
-            accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
+        private void ProcessReceivables(XmlDocument doc, out double totalReceivable)
+        {
+            var dataNode = doc.SelectSingleNode("//table/data[@target='receivable']");
+            totalReceivable = 0;
+            var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
                 double saldoCredit = this.journal.Booking
@@ -180,13 +205,15 @@ namespace lg2de.SimpleAccounting.Reports
                 dataNode.AppendChild(dataLineNode);
             }
 
-            saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
+            var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalReceivable / 100).ToString("0.00");
+        }
 
-            // liabilities / Verbindlichkeiten
-            dataNode = doc.SelectSingleNode("//table/data[@target='liability']");
-            double totalLiability = 0;
-            accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
+        private void ProcessLiabilities(XmlDocument doc, out double totalLiability)
+        {
+            var dataNode = doc.SelectSingleNode("//table/data[@target='liability']");
+            totalLiability = 0;
+            var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
                 double saldoCredit = this.journal.Booking
@@ -225,12 +252,15 @@ namespace lg2de.SimpleAccounting.Reports
                 dataNode.AppendChild(dataLineNode);
             }
 
-            saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
+            var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalLiability / 100).ToString("0.00");
+        }
 
-            dataNode = doc.SelectSingleNode("//table/data[@target='account']");
+        private void ProcessAssets(XmlDocument doc, double totalReceivable, double totalLiability)
+        {
+            var dataNode = doc.SelectSingleNode("//table/data[@target='asset']");
             double totalAccount = 0;
-            accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Asset);
+            var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Asset);
             foreach (var account in accounts)
             {
                 double saldoCredit = this.journal.Booking
@@ -315,10 +345,8 @@ namespace lg2de.SimpleAccounting.Reports
                 totalAccount += totalLiability;
             }
 
-            saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
+            var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalAccount / 100).ToString("0.00");
-
-            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Jahresbilanz " + this.bookingYearName);
         }
     }
 }

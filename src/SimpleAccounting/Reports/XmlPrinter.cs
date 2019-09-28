@@ -358,9 +358,7 @@ namespace lg2de.SimpleAccounting.Reports
         {
             int tableLineHeight = tableNode.GetAttribute<int>("lineheight", DefaultLineHeight);
 
-            XmlNode columnsRoot = tableNode.SelectSingleNode("columns");
             XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
-            XmlNode dataRoot = tableNode.SelectSingleNode("data");
             XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
 
             // if table can not be started on page - create new one
@@ -465,7 +463,7 @@ namespace lg2de.SimpleAccounting.Reports
         private void PrintPage(object sender, PrintPageEventArgs e)
         {
             this.cursorY = this.documentTopMargin;
-            this.PrintNodes(sender, e);
+            this.PrintNodes(e);
         }
 
         private XmlNode CreateLineNode(int nX1, int nY1, int nX2, int nY2)
@@ -509,275 +507,320 @@ namespace lg2de.SimpleAccounting.Reports
             }
         }
 
-        private void PrintNodes(object sender, PrintPageEventArgs e)
+        private void PrintNodes(PrintPageEventArgs printArgs)
         {
             while (this.currentNode != null)
             {
-                if (e.HasMorePages)
+                if (printArgs.HasMorePages)
                 {
                     return;
                 }
 
-                Pen drawPen = this.penStack.Peek();
-                SolidBrush drawBrush = this.solidBrushStack.Peek();
-                Font drawFont = this.fontStack.Peek();
-
-                XmlNode drawNode = this.currentNode;
-                this.currentNode = this.currentNode.NextSibling;
-
-                if (drawNode.Name == "move")
+                if (this.currentNode.Name == "move")
                 {
-                    XmlNode nodeAbsX = drawNode.Attributes.GetNamedItem("absX");
-                    XmlNode nodeAbsY = drawNode.Attributes.GetNamedItem("absY");
-                    XmlNode nodeRelX = drawNode.Attributes.GetNamedItem("relX");
-                    XmlNode nodeRelY = drawNode.Attributes.GetNamedItem("relY");
-                    if (nodeAbsX != null)
-                    {
-                        this.cursorX = this.documentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
-                    }
-
-                    if (nodeAbsY != null)
-                    {
-                        this.cursorY = this.documentTopMargin + Convert.ToInt32(nodeAbsY.Value);
-                    }
-
-                    if (nodeRelX != null)
-                    {
-                        this.cursorX += Convert.ToInt32(nodeRelX.Value);
-                    }
-
-                    if (nodeRelY != null)
-                    {
-                        this.cursorY += Convert.ToInt32(nodeRelY.Value);
-                    }
+                    this.ProcessMoveNode();
                 }
-                else if (drawNode.Name == "text")
+                else if (this.currentNode.Name == "text")
                 {
-                    XmlNode nodeAbsX = drawNode.Attributes.GetNamedItem("absX");
-                    XmlNode nodeAbsY = drawNode.Attributes.GetNamedItem("absY");
-                    XmlNode nodeRelX = drawNode.Attributes.GetNamedItem("relX");
-                    XmlNode nodeRelY = drawNode.Attributes.GetNamedItem("relY");
-                    XmlNode nodeAlign = drawNode.Attributes.GetNamedItem("align");
-                    int nX = this.cursorX;
-                    int nY = this.cursorY;
-                    if (nodeAbsX != null)
-                    {
-                        nX = this.documentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
-                    }
-
-                    if (nodeAbsY != null)
-                    {
-                        nY = this.documentTopMargin + Convert.ToInt32(nodeAbsY.Value);
-                    }
-
-                    if (nodeRelX != null)
-                    {
-                        nX += Convert.ToInt32(nodeRelX.Value);
-                    }
-
-                    if (nodeRelY != null)
-                    {
-                        nY += Convert.ToInt32(nodeRelY.Value);
-                    }
-
-                    string strText = drawNode.InnerText;
-                    var format = new StringFormat();
-                    switch (nodeAlign?.Value)
-                    {
-                    case "center":
-                        format.Alignment = StringAlignment.Center;
-                        break;
-                    case "right":
-                        format.Alignment = StringAlignment.Far;
-                        break;
-                    default:
-                        format.Alignment = StringAlignment.Near;
-                        break;
-                    }
-
-                    e.Graphics.DrawString(strText, drawFont, drawBrush, nX * this.printFactor, nY * this.printFactor, format);
+                    this.PrintTextNode(printArgs);
                 }
-                else if (drawNode.Name == "line")
+                else if (this.currentNode.Name == "line")
                 {
-                    XmlNode nodeAbsFromX = drawNode.Attributes.GetNamedItem("absFromX");
-                    XmlNode nodeAbsFromY = drawNode.Attributes.GetNamedItem("absFromY");
-                    XmlNode nodeRelFromX = drawNode.Attributes.GetNamedItem("relFromX");
-                    XmlNode nodeRelFromY = drawNode.Attributes.GetNamedItem("relFromY");
-                    XmlNode nodeAbsToX = drawNode.Attributes.GetNamedItem("absToX");
-                    XmlNode nodeAbsToY = drawNode.Attributes.GetNamedItem("absToY");
-                    XmlNode nodeRelToX = drawNode.Attributes.GetNamedItem("relToX");
-                    XmlNode nodeRelToY = drawNode.Attributes.GetNamedItem("relToY");
-                    float nX1 = this.cursorX;
-                    float nY1 = this.cursorY;
-                    float nX2 = this.cursorX;
-                    float nY2 = this.cursorY;
-                    if (nodeAbsFromX != null)
-                    {
-                        nX1 = this.documentLeftMargin + Convert.ToSingle(nodeAbsFromX.Value);
-                    }
-
-                    if (nodeAbsFromY != null)
-                    {
-                        nY1 = this.documentTopMargin + Convert.ToSingle(nodeAbsFromY.Value);
-                    }
-
-                    if (nodeRelFromX != null)
-                    {
-                        nX1 += Convert.ToSingle(nodeRelFromX.Value);
-                    }
-
-                    if (nodeRelFromY != null)
-                    {
-                        nY1 += Convert.ToSingle(nodeRelFromY.Value);
-                    }
-
-                    if (nodeAbsToX != null)
-                    {
-                        nX2 = this.documentLeftMargin + Convert.ToSingle(nodeAbsToX.Value);
-                    }
-
-                    if (nodeAbsToY != null)
-                    {
-                        nY2 = this.documentTopMargin + Convert.ToSingle(nodeAbsToY.Value);
-                    }
-
-                    if (nodeRelToX != null)
-                    {
-                        nX2 += Convert.ToSingle(nodeRelToX.Value);
-                    }
-
-                    if (nodeRelToY != null)
-                    {
-                        nY2 += Convert.ToSingle(nodeRelToY.Value);
-                    }
-
-                    e.Graphics.DrawLine(drawPen, nX1 * this.printFactor, nY1 * this.printFactor, nX2 * this.printFactor, nY2 * this.printFactor);
+                    this.PrintLineNode(printArgs);
                 }
-                else if (drawNode.Name == "circle")
+                else if (this.currentNode.Name == "circle")
                 {
-                    XmlNode nodeAbsX = drawNode.Attributes.GetNamedItem("absX");
-                    XmlNode nodeAbsY = drawNode.Attributes.GetNamedItem("absY");
-                    XmlNode nodeRelX = drawNode.Attributes.GetNamedItem("relX");
-                    XmlNode nodeRelY = drawNode.Attributes.GetNamedItem("relY");
-                    XmlNode nodeRadX = drawNode.Attributes.GetNamedItem("radX");
-                    XmlNode nodeRadY = drawNode.Attributes.GetNamedItem("radY");
-                    float nX = this.cursorX;
-                    float nY = this.cursorY;
-                    if (nodeAbsX != null)
-                    {
-                        nX = this.documentLeftMargin + Convert.ToSingle(nodeAbsX.Value);
-                    }
-
-                    if (nodeAbsY != null)
-                    {
-                        nY = this.documentTopMargin + Convert.ToSingle(nodeAbsY.Value);
-                    }
-
-                    if (nodeRelX != null)
-                    {
-                        nX += Convert.ToSingle(nodeRelX.Value);
-                    }
-
-                    if (nodeRelY != null)
-                    {
-                        nY += Convert.ToSingle(nodeRelY.Value);
-                    }
-
-                    float nRadX = Convert.ToSingle(nodeRadX.Value);
-                    float nRadY = Convert.ToSingle(nodeRadY.Value);
-                    nX -= nRadX;
-                    nY -= nRadY;
-                    nRadX *= 2;
-                    nRadY *= 2;
-                    e.Graphics.DrawEllipse(drawPen, nX * this.printFactor, nY * this.printFactor, nRadX * this.printFactor, nRadY * this.printFactor);
+                    this.PrintCircleNode(printArgs);
                 }
-                else if (drawNode.Name == "font")
+                else if (this.currentNode.Name == "font")
                 {
-                    XmlNode nodeName = drawNode.Attributes.GetNamedItem("name");
-                    XmlNode nodeSize = drawNode.Attributes.GetNamedItem("size");
-                    XmlNode nodeBold = drawNode.Attributes.GetNamedItem("bold");
-                    string strFontName = drawFont.Name;
-                    float nFontSize = drawFont.SizeInPoints;
-                    FontStyle nFontStyle = drawFont.Style;
-                    if (nodeName != null)
-                    {
-                        strFontName = nodeName.Value;
-                    }
-
-                    if (nodeSize != null)
-                    {
-                        nFontSize = Convert.ToSingle(nodeSize.Value);
-                    }
-
-                    if (nodeBold != null)
-                    {
-                        if (nodeBold.Value == "1")
-                        {
-                            nFontStyle |= FontStyle.Bold;
-                        }
-                        else
-                        {
-                            nFontStyle &= ~FontStyle.Bold;
-                        }
-                    }
-
-                    var newFont = new Font(strFontName, nFontSize, nFontStyle);
-                    if (drawNode.ChildNodes.Count > 0)
-                    {
-                        this.fontStack.Push(newFont);
-                        this.currentNode = drawNode.FirstChild;
-                        this.PrintNodes(sender, e);
-                        this.fontStack.Pop();
-                    }
-                    else
-                    {
-                        this.fontStack.Pop();
-                        this.fontStack.Push(newFont);
-                    }
+                    this.PrintFontNode(printArgs);
                 }
-                else if (drawNode.Name == "color")
+                else if (this.currentNode.Name == "color")
                 {
-                    XmlNode nodeRGB = drawNode.Attributes.GetNamedItem("rgb");
-                    XmlNode nodeName = drawNode.Attributes.GetNamedItem("name");
-                    var newPen = (Pen)drawPen.Clone();
-                    var newBrush = (SolidBrush)drawBrush.Clone();
-                    if (nodeName != null)
-                    {
-                        newPen.Color = Color.FromName(nodeName.Value);
-                        newBrush.Color = Color.FromName(nodeName.Value);
-                    }
-                    if (drawNode.ChildNodes.Count > 0)
-                    {
-                        this.penStack.Push(newPen);
-                        this.solidBrushStack.Push(newBrush);
-                        this.currentNode = drawNode.FirstChild;
-                        this.PrintNodes(sender, e);
-                        this.penStack.Pop();
-                        this.solidBrushStack.Pop();
-                    }
-                    else
-                    {
-                        this.penStack.Pop();
-                        this.penStack.Push(newPen);
-                        this.solidBrushStack.Pop();
-                        this.solidBrushStack.Push(newBrush);
-                    }
+                    this.PrintColorNode(printArgs);
                 }
-                else if (drawNode.Name == "newpage")
+                else if (this.currentNode.Name == "newpage")
                 {
-                    e.HasMorePages = true;
+                    printArgs.HasMorePages = true;
+                    this.currentNode = this.currentNode.NextSibling;
                     return;
                 }
 
-                if (this.currentNode == null)
+                if (this.currentNode.NextSibling != null)
                 {
-                    if (drawNode.ParentNode != null && drawNode.ParentNode.Name != "xEport")
-                    {
-                        this.currentNode = drawNode.ParentNode.NextSibling;
-                    }
-
-                    return;
+                    this.currentNode = this.currentNode.NextSibling;
+                    continue;
                 }
+
+                if (this.currentNode.ParentNode != null
+                    && this.currentNode.ParentNode.Name != "xEport")
+                {
+                    this.currentNode = this.currentNode.ParentNode.NextSibling;
+                }
+
+                // step back in stack
+                return;
+            }
+        }
+
+        private void ProcessMoveNode()
+        {
+            XmlNode nodeAbsX = this.currentNode.Attributes.GetNamedItem("absX");
+            XmlNode nodeAbsY = this.currentNode.Attributes.GetNamedItem("absY");
+            XmlNode nodeRelX = this.currentNode.Attributes.GetNamedItem("relX");
+            XmlNode nodeRelY = this.currentNode.Attributes.GetNamedItem("relY");
+            if (nodeAbsX != null)
+            {
+                this.cursorX = this.documentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
+            }
+
+            if (nodeAbsY != null)
+            {
+                this.cursorY = this.documentTopMargin + Convert.ToInt32(nodeAbsY.Value);
+            }
+
+            if (nodeRelX != null)
+            {
+                this.cursorX += Convert.ToInt32(nodeRelX.Value);
+            }
+
+            if (nodeRelY != null)
+            {
+                this.cursorY += Convert.ToInt32(nodeRelY.Value);
+            }
+        }
+
+        private void PrintTextNode(PrintPageEventArgs printArgs)
+        {
+            SolidBrush drawBrush = this.solidBrushStack.Peek();
+            Font drawFont = this.fontStack.Peek();
+
+            XmlNode nodeAbsX = this.currentNode.Attributes.GetNamedItem("absX");
+            XmlNode nodeAbsY = this.currentNode.Attributes.GetNamedItem("absY");
+            XmlNode nodeRelX = this.currentNode.Attributes.GetNamedItem("relX");
+            XmlNode nodeRelY = this.currentNode.Attributes.GetNamedItem("relY");
+            XmlNode nodeAlign = this.currentNode.Attributes.GetNamedItem("align");
+            int nX = this.cursorX;
+            int nY = this.cursorY;
+            if (nodeAbsX != null)
+            {
+                nX = this.documentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
+            }
+
+            if (nodeAbsY != null)
+            {
+                nY = this.documentTopMargin + Convert.ToInt32(nodeAbsY.Value);
+            }
+
+            if (nodeRelX != null)
+            {
+                nX += Convert.ToInt32(nodeRelX.Value);
+            }
+
+            if (nodeRelY != null)
+            {
+                nY += Convert.ToInt32(nodeRelY.Value);
+            }
+
+            string strText = this.currentNode.InnerText;
+            var format = new StringFormat();
+            switch (nodeAlign?.Value)
+            {
+            case "center":
+                format.Alignment = StringAlignment.Center;
+                break;
+            case "right":
+                format.Alignment = StringAlignment.Far;
+                break;
+            default:
+                format.Alignment = StringAlignment.Near;
+                break;
+            }
+
+            printArgs.Graphics.DrawString(strText, drawFont, drawBrush, nX * this.printFactor, nY * this.printFactor, format);
+        }
+
+        private void PrintLineNode(PrintPageEventArgs printArgs)
+        {
+            Pen drawPen = this.penStack.Peek();
+
+            XmlNode nodeAbsFromX = this.currentNode.Attributes.GetNamedItem("absFromX");
+            XmlNode nodeAbsFromY = this.currentNode.Attributes.GetNamedItem("absFromY");
+            XmlNode nodeRelFromX = this.currentNode.Attributes.GetNamedItem("relFromX");
+            XmlNode nodeRelFromY = this.currentNode.Attributes.GetNamedItem("relFromY");
+            XmlNode nodeAbsToX = this.currentNode.Attributes.GetNamedItem("absToX");
+            XmlNode nodeAbsToY = this.currentNode.Attributes.GetNamedItem("absToY");
+            XmlNode nodeRelToX = this.currentNode.Attributes.GetNamedItem("relToX");
+            XmlNode nodeRelToY = this.currentNode.Attributes.GetNamedItem("relToY");
+            float nX1 = this.cursorX;
+            float nY1 = this.cursorY;
+            float nX2 = this.cursorX;
+            float nY2 = this.cursorY;
+            if (nodeAbsFromX != null)
+            {
+                nX1 = this.documentLeftMargin + Convert.ToSingle(nodeAbsFromX.Value);
+            }
+
+            if (nodeAbsFromY != null)
+            {
+                nY1 = this.documentTopMargin + Convert.ToSingle(nodeAbsFromY.Value);
+            }
+
+            if (nodeRelFromX != null)
+            {
+                nX1 += Convert.ToSingle(nodeRelFromX.Value);
+            }
+
+            if (nodeRelFromY != null)
+            {
+                nY1 += Convert.ToSingle(nodeRelFromY.Value);
+            }
+
+            if (nodeAbsToX != null)
+            {
+                nX2 = this.documentLeftMargin + Convert.ToSingle(nodeAbsToX.Value);
+            }
+
+            if (nodeAbsToY != null)
+            {
+                nY2 = this.documentTopMargin + Convert.ToSingle(nodeAbsToY.Value);
+            }
+
+            if (nodeRelToX != null)
+            {
+                nX2 += Convert.ToSingle(nodeRelToX.Value);
+            }
+
+            if (nodeRelToY != null)
+            {
+                nY2 += Convert.ToSingle(nodeRelToY.Value);
+            }
+
+            printArgs.Graphics.DrawLine(drawPen, nX1 * this.printFactor, nY1 * this.printFactor, nX2 * this.printFactor, nY2 * this.printFactor);
+        }
+
+        private void PrintCircleNode(PrintPageEventArgs printArgs)
+        {
+            Pen drawPen = this.penStack.Peek();
+
+            XmlNode nodeAbsX = this.currentNode.Attributes.GetNamedItem("absX");
+            XmlNode nodeAbsY = this.currentNode.Attributes.GetNamedItem("absY");
+            XmlNode nodeRelX = this.currentNode.Attributes.GetNamedItem("relX");
+            XmlNode nodeRelY = this.currentNode.Attributes.GetNamedItem("relY");
+            XmlNode nodeRadX = this.currentNode.Attributes.GetNamedItem("radX");
+            XmlNode nodeRadY = this.currentNode.Attributes.GetNamedItem("radY");
+            float nX = this.cursorX;
+            float nY = this.cursorY;
+            if (nodeAbsX != null)
+            {
+                nX = this.documentLeftMargin + Convert.ToSingle(nodeAbsX.Value);
+            }
+
+            if (nodeAbsY != null)
+            {
+                nY = this.documentTopMargin + Convert.ToSingle(nodeAbsY.Value);
+            }
+
+            if (nodeRelX != null)
+            {
+                nX += Convert.ToSingle(nodeRelX.Value);
+            }
+
+            if (nodeRelY != null)
+            {
+                nY += Convert.ToSingle(nodeRelY.Value);
+            }
+
+            float nRadX = Convert.ToSingle(nodeRadX.Value);
+            float nRadY = Convert.ToSingle(nodeRadY.Value);
+            nX -= nRadX;
+            nY -= nRadY;
+            nRadX *= 2;
+            nRadY *= 2;
+            printArgs.Graphics.DrawEllipse(drawPen, nX * this.printFactor, nY * this.printFactor, nRadX * this.printFactor, nRadY * this.printFactor);
+        }
+
+        private void PrintFontNode(PrintPageEventArgs printArgs)
+        {
+            Font drawFont = this.fontStack.Peek();
+
+            XmlNode nodeName = this.currentNode.Attributes.GetNamedItem("name");
+            XmlNode nodeSize = this.currentNode.Attributes.GetNamedItem("size");
+            XmlNode nodeBold = this.currentNode.Attributes.GetNamedItem("bold");
+            string strFontName = drawFont.Name;
+            float nFontSize = drawFont.SizeInPoints;
+            FontStyle nFontStyle = drawFont.Style;
+            if (nodeName != null)
+            {
+                strFontName = nodeName.Value;
+            }
+
+            if (nodeSize != null)
+            {
+                nFontSize = Convert.ToSingle(nodeSize.Value);
+            }
+
+            if (nodeBold != null)
+            {
+                if (nodeBold.Value == "1")
+                {
+                    nFontStyle |= FontStyle.Bold;
+                }
+                else
+                {
+                    nFontStyle &= ~FontStyle.Bold;
+                }
+            }
+
+            var newFont = new Font(strFontName, nFontSize, nFontStyle);
+            if (this.currentNode.ChildNodes.Count > 0)
+            {
+                this.fontStack.Push(newFont);
+                var stackNode = this.currentNode;
+                this.currentNode = this.currentNode.FirstChild;
+                this.PrintNodes(printArgs);
+                this.currentNode = stackNode;
+                this.fontStack.Pop();
+            }
+            else
+            {
+                this.fontStack.Pop();
+                this.fontStack.Push(newFont);
+            }
+        }
+
+        private void PrintColorNode(PrintPageEventArgs printArgs)
+        {
+            Pen drawPen = this.penStack.Peek();
+            SolidBrush drawBrush = this.solidBrushStack.Peek();
+
+            XmlNode nodeRGB = this.currentNode.Attributes.GetNamedItem("rgb");
+            XmlNode nodeName = this.currentNode.Attributes.GetNamedItem("name");
+            var newPen = (Pen)drawPen.Clone();
+            var newBrush = (SolidBrush)drawBrush.Clone();
+            if (nodeName != null)
+            {
+                newPen.Color = Color.FromName(nodeName.Value);
+                newBrush.Color = Color.FromName(nodeName.Value);
+            }
+            if (this.currentNode.ChildNodes.Count > 0)
+            {
+                this.penStack.Push(newPen);
+                this.solidBrushStack.Push(newBrush);
+                var stackNode = this.currentNode;
+                this.currentNode = this.currentNode.FirstChild;
+                this.PrintNodes(printArgs);
+                this.currentNode = stackNode;
+                this.penStack.Pop();
+                this.solidBrushStack.Pop();
+            }
+            else
+            {
+                this.penStack.Pop();
+                this.penStack.Push(newPen);
+                this.solidBrushStack.Pop();
+                this.solidBrushStack.Push(newBrush);
             }
         }
     }
