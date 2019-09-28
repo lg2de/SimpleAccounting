@@ -49,6 +49,17 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<AccountJournalViewModel> AccountJournal { get; }
             = new ObservableCollection<AccountJournalViewModel>();
 
+        public ICommand NewProjectCommand => new RelayCommand(_ =>
+        {
+            if (!this.CheckSaveProject())
+            {
+                return;
+            }
+
+            this.fileName = "<new>";
+            this.LoadProjectData(this.GetTemplateProject());
+        });
+
         public ICommand OpenProjectCommand => new RelayCommand(_ =>
         {
             using (var openFileDialog = new OpenFileDialog())
@@ -271,24 +282,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public override void CanClose(Action<bool> callback)
         {
-            if (!this.IsDocumentChanged)
-            {
-                base.CanClose(callback);
-                return;
-            }
-
-            DialogResult ret = MessageBox.Show(
-                "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
-                "Programm beenden",
-                MessageBoxButtons.YesNoCancel);
-            if (ret == DialogResult.Cancel)
+            if (!this.CheckSaveProject())
             {
                 callback(false);
                 return;
-            }
-            else if (ret == DialogResult.Yes)
-            {
-                this.SaveProject();
             }
 
             base.CanClose(callback);
@@ -451,20 +448,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal void LoadProjectFromFile(string fileName)
         {
-            if (this.IsDocumentChanged)
+            if (!this.CheckSaveProject())
             {
-                var result = MessageBox.Show(
-                    "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
-                    "Programm beenden",
-                    MessageBoxButtons.YesNoCancel);
-                if (result == DialogResult.Cancel)
-                {
-                    return;
-                }
-                else if (result == DialogResult.Yes)
-                {
-                    this.SaveProject();
-                }
+                return;
             }
 
             this.IsDocumentChanged = false;
@@ -506,7 +492,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             // select last booking year after loading
-            this.BookingYears.LastOrDefault()?.Command.Execute(null);
+            this.BookingYears.Last().Command.Execute(null);
         }
 
         private void UpdateBookingYears()
@@ -519,6 +505,69 @@ namespace lg2de.SimpleAccounting.Presentation
                     new RelayCommand(_ => this.SelectBookingYear(year.Name)));
                 this.BookingYears.Add(bookingYear);
             }
+        }
+
+        private AccountingData GetTemplateProject()
+        {
+            var year = (ushort)DateTime.Now.Year;
+            var defaultAccounts = new List<AccountDefinition>
+            {
+                new AccountDefinition
+                {
+                    ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset
+                },
+                new AccountDefinition
+                {
+                    ID = 400, Name = "Salary", Type = AccountDefinitionType.Income
+                },
+                new AccountDefinition
+                {
+                    ID = 600, Name = "Food", Type = AccountDefinitionType.Expense
+                },
+                new AccountDefinition
+                {
+                    ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
+                }
+            };
+            var accountYear = new AccountingDataYear { Name = year, DateStart = (uint)year * 10000 + 101, DateEnd = (uint)year * 10000 + 1231 };
+            var accountJournal = new AccountingDataJournal { Year = year, Booking = new List<AccountingDataJournalBooking>() };
+            return new AccountingData
+            {
+                Accounts = new List<AccountingDataAccountGroup>
+                {
+                    new AccountingDataAccountGroup
+                    {
+                        Name = "Default",
+                        Account = defaultAccounts
+                    }
+                },
+                Years = new List<AccountingDataYear> { accountYear },
+                Journal = new List<AccountingDataJournal> { accountJournal }
+            };
+        }
+
+        private bool CheckSaveProject()
+        {
+            if (!this.IsDocumentChanged)
+            {
+                // no need to save the project
+                return true;
+            }
+
+            var result = MessageBox.Show(
+                "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
+                "Programm beenden",
+                MessageBoxButtons.YesNoCancel);
+            if (result == DialogResult.Cancel)
+            {
+                return false;
+            }
+            else if (result == DialogResult.Yes)
+            {
+                this.SaveProject();
+            }
+
+            return true;
         }
 
         private void SaveProject()

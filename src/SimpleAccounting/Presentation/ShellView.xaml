@@ -19,6 +19,7 @@
                 </Style>
             </Menu.Resources>
             <MenuItem Header="Projekt">
+                <MenuItem Header="Neu" Command="{Binding NewProjectCommand}" />
                 <MenuItem Header="Öffnen" Command="{Binding OpenProjectCommand}" />
                 <MenuItem Header="Speichern" Command="{Binding SaveProjectCommand}" />
                 <Separator />

@@ -48,6 +48,19 @@ namespace SimpleAccounting.UnitTests.Presentation
         };
 
         [Fact]
+        public void NewProjectCommand_ProjectInitialized()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var sut = new ShellViewModel(windowManager);
+
+            sut.NewProjectCommand.Execute(null);
+
+            sut.Accounts.Should().NotBeEmpty();
+            sut.Journal.Should().BeEmpty();
+            sut.AccountJournal.Should().BeEmpty();
+        }
+
+        [Fact]
         public void SaveProjectCommand_Initialized_CannotExecute()
         {
             var windowManager = Substitute.For<IWindowManager>();
