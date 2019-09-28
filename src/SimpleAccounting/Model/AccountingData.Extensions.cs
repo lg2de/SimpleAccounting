@@ -21,6 +21,12 @@ namespace lg2de.SimpleAccounting.Model
         }
 
         internal IEnumerable<AccountDefinition> AllAccounts => this.Accounts.SelectMany(g => g.Account);
+
+        internal AccountingData Clone()
+        {
+            var xml = this.Serialize();
+            return AccountingData.Deserialize(xml);
+        }
     }
 
     public partial class AccountDefinition

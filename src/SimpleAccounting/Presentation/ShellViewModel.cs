@@ -61,7 +61,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                this.LoadProject(openFileDialog.FileName);
+                this.LoadProjectFromFile(openFileDialog.FileName);
             }
         });
 
@@ -84,12 +84,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand ImportBookingsCommand => new RelayCommand(_ =>
         {
-            var min = this.accountingData
-                .Years.Single(x => x.Name.ToString() == this.bookingYearName)
-                .DateStart.ToDateTime();
-            var max = this.accountingData
-                .Years.Single(x => x.Name.ToString() == this.bookingYearName)
-                .DateEnd.ToDateTime();
+            AccountingDataYear year = this.accountingData
+                .Years.Single(x => x.Name.ToString() == this.bookingYearName);
+            var min = year.DateStart.ToDateTime();
+            var max = year.DateEnd.ToDateTime();
 
             var importModel = new ImportBookingsViewModel(this, this.accountingData.ImportMappings)
             {
@@ -302,7 +300,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             if (File.Exists(Settings.Default.RecentProject))
             {
-                this.LoadProject(Settings.Default.RecentProject);
+                this.LoadProjectFromFile(Settings.Default.RecentProject);
             }
 
             foreach (var project in Settings.Default.RecentProjects)
@@ -314,49 +312,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var item = new MenuViewModel(
                     project,
-                    new RelayCommand(_ => this.LoadProject(project)));
+                    new RelayCommand(_ => this.LoadProjectFromFile(project)));
                 this.RecentProjects.Add(item);
             }
-        }
-
-        internal void Initialize()
-        {
-            this.accountingData = new AccountingData
-            {
-                Accounts = new List<AccountingDataAccountGroup>
-            {
-                new AccountingDataAccountGroup
-                {
-                    Name = "Default",
-                    Account = new List<AccountDefinition>
-                    {
-                        new AccountDefinition
-                        {
-                            ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset
-                        },
-                        new AccountDefinition
-                        {
-                            ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
-                        }
-                    }
-                }
-            }
-            };
-            uint year = (uint)DateTime.Now.Year * 10000;
-            this.bookingYearName = DateTime.Now.Year.ToString();
-            this.accountingData.Years = new List<AccountingDataYear>
-            {
-                new AccountingDataYear
-                {
-                    Name = (ushort)DateTime.Now.Year,
-                    DateStart = year + 101, DateEnd = year + 1231
-                }
-            };
-            this.accountingData.Journal = new List<AccountingDataJournal>
-            {
-                new AccountingDataJournal{ Year = this.accountingData.Years.Single().Name }
-            };
-            this.currentJournal = this.accountingData.Journal.Single();
         }
 
         internal void AddBooking(AccountingDataJournalBooking booking, bool refreshJournal = true)
@@ -491,7 +449,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.RefreshJournal();
         }
 
-        internal void LoadProject(string fileName)
+        internal void LoadProjectFromFile(string fileName)
         {
             if (this.IsDocumentChanged)
             {
@@ -510,12 +468,28 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.IsDocumentChanged = false;
-            this.Accounts.Clear();
-
             this.fileName = fileName;
-            this.accountingData = AccountingData.LoadFromFile(this.fileName);
+
+            var projectData = AccountingData.LoadFromFile(this.fileName);
+            this.LoadProjectData(projectData);
+
+            Settings.Default.RecentProject = fileName;
+            Settings.Default.RecentProjects.Remove(fileName);
+            Settings.Default.RecentProjects.Insert(0, fileName);
+            while (Settings.Default.RecentProjects.Count > 10)
+            {
+                Settings.Default.RecentProjects.RemoveAt(10);
+            }
+
+            Settings.Default.Save();
+        }
+
+        internal void LoadProjectData(AccountingData projectData)
+        {
+            this.accountingData = projectData;
             this.UpdateBookingYears();
 
+            this.Accounts.Clear();
             foreach (var accountGroup in this.accountingData.Accounts)
             {
                 foreach (var account in accountGroup.Account)
@@ -533,16 +507,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
             // select last booking year after loading
             this.BookingYears.LastOrDefault()?.Command.Execute(null);
-
-            Settings.Default.RecentProject = fileName;
-            Settings.Default.RecentProjects.Remove(fileName);
-            Settings.Default.RecentProjects.Insert(0, fileName);
-            while (Settings.Default.RecentProjects.Count > 10)
-            {
-                Settings.Default.RecentProjects.RemoveAt(10);
-            }
-
-            Settings.Default.Save();
         }
 
         private void UpdateBookingYears()

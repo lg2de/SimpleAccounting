@@ -6,9 +6,10 @@ namespace SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Caliburn.Micro;
     using FluentAssertions;
-    using lg2de.SimpleAccounting.Extensions;
+    using FluentAssertions.Execution;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
     using NSubstitute;
@@ -16,6 +17,36 @@ namespace SimpleAccounting.UnitTests.Presentation
 
     public class ShellViewModelTests
     {
+        private static AccountingData SampleProject => new AccountingData
+        {
+            Accounts = new List<AccountingDataAccountGroup>
+            {
+                new AccountingDataAccountGroup
+                {
+                    Name = "Default",
+                    Account = new List<AccountDefinition>
+                    {
+                        new AccountDefinition
+                        {
+                            ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset
+                        },
+                        new AccountDefinition
+                        {
+                            ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
+                        }
+                    }
+                }
+            },
+            Years = new List<AccountingDataYear>
+            {
+                new AccountingDataYear { Name = 2019, DateStart = 20190101, DateEnd = 20191231}
+            },
+            Journal = new List<AccountingDataJournal>
+            {
+                new AccountingDataJournal { Year = 2019, Booking = new List<AccountingDataJournalBooking>()}
+            }
+        };
+
         [Fact]
         public void SaveProjectCommand_Initialized_CannotExecute()
         {
@@ -31,7 +62,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var sut = new ShellViewModel(windowManager);
-            sut.Initialize();
+            sut.LoadProjectData(SampleProject);
 
             sut.AddBooking(new AccountingDataJournalBooking(), refreshJournal: false);
 
@@ -45,7 +76,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             AddBookingViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
             var sut = new ShellViewModel(windowManager);
-            sut.Initialize();
+            sut.LoadProjectData(SampleProject);
 
             sut.AddBookingsCommand.Execute(null);
 
@@ -59,16 +90,80 @@ namespace SimpleAccounting.UnitTests.Presentation
             ImportBookingsViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as ImportBookingsViewModel));
             var sut = new ShellViewModel(windowManager);
-            sut.Initialize();
+            sut.LoadProjectData(SampleProject);
 
             sut.ImportBookingsCommand.Execute(null);
 
-            vm.Should().BeEquivalentTo(new
+            using (new AssertionScope())
             {
-                BookingNumber = 1,
-                RangeMin = new DateTime(DateTime.Now.Year, 1, 1),
-                RangMax = new DateTime(DateTime.Now.Year, 12, 31)
-            });
+                vm.Should().BeEquivalentTo(new
+                {
+                    BookingNumber = 1,
+                    RangeMin = new DateTime(DateTime.Now.Year, 1, 1),
+                    RangMax = new DateTime(DateTime.Now.Year, 12, 31)
+                });
+                vm.Accounts.Should().NotBeEmpty();
+            }
+        }
+
+        [Fact]
+        public void NewAccountCommand_AccountCreatedAndSorted()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            windowManager.ShowDialog(Arg.Do<object>(model =>
+            {
+                var vm = model as AccountViewModel;
+                vm.Name = "New Account";
+                vm.Identifier = 500;
+                return;
+            })).Returns(true);
+            var sut = new ShellViewModel(windowManager);
+            sut.LoadProjectData(SampleProject);
+
+            sut.NewAccountCommand.Execute(null);
+
+            sut.Accounts.Select(x => x.Name).Should()
+                .Equal("Bank account", "New Account", "Carryforward");
+        }
+
+        [Fact]
+        public void EditAccountCommand_AllDataUpdated()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            windowManager.ShowDialog(Arg.Do<object>(model =>
+            {
+                var vm = model as AccountViewModel;
+                vm.Identifier += 1000;
+                return;
+            })).Returns(true);
+            var sut = new ShellViewModel(windowManager);
+            sut.LoadProjectData(SampleProject);
+            var booking = new AccountingDataJournalBooking
+            {
+                Date = 20190201,
+                ID = 1,
+                Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
+                Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
+            };
+            sut.AddBooking(booking);
+            booking = new AccountingDataJournalBooking
+            {
+                Date = 20190301,
+                ID = 2,
+                Credit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Back", Value = 5 } },
+                Debit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Back", Value = 5 } }
+            };
+            sut.AddBooking(booking);
+
+            sut.EditAccountCommand.Execute(sut.Accounts.First());
+
+            using (new AssertionScope())
+            {
+                sut.Accounts.Select(x => x.Name).Should().Equal("Carryforward", "Bank account");
+                sut.Journal.Should().BeEquivalentTo(
+                    new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
+                    new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });
+            }
         }
 
         [Fact]
@@ -76,7 +171,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var sut = new ShellViewModel(windowManager);
-            sut.Initialize();
+            sut.LoadProjectData(SampleProject);
 
             var booking = new AccountingDataJournalBooking
             {
