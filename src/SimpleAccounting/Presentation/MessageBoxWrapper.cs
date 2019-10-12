@@ -14,10 +14,10 @@ namespace lg2de.SimpleAccounting.Presentation
         public MessageBoxResult Show(
             string messageBoxText,
             string caption,
-            MessageBoxButton button,
-            MessageBoxImage icon,
-            MessageBoxResult defaultResult,
-            MessageBoxOptions options)
+            MessageBoxButton button = MessageBoxButton.OK,
+            MessageBoxImage icon = MessageBoxImage.None,
+            MessageBoxResult defaultResult = MessageBoxResult.None,
+            MessageBoxOptions options = MessageBoxOptions.None)
         {
             return MessageBox.Show(messageBoxText, caption, button, icon, defaultResult, options);
         }

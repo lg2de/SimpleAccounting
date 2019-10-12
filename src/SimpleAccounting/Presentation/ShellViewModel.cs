@@ -125,7 +125,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return false;
                 }
 
-                return accountingYear.Closed == false;
+                return !accountingYear.Closed;
             });
 
         public ICommand TotalJournalReportCommand => new RelayCommand(_ =>
@@ -304,6 +304,11 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public override void CanClose(Action<bool> callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+
             if (!this.CheckSaveProject())
             {
                 callback(false);
