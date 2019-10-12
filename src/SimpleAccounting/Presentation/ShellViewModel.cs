@@ -10,6 +10,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
+    using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Input;
     using Caliburn.Micro;
@@ -17,21 +18,23 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
+    using MessageBox = System.Windows.Forms.MessageBox;
 
     [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
     public class ShellViewModel : Conductor<IScreen>
     {
         private readonly IWindowManager windowManager;
+        private readonly IMessageBox messageBox;
+
         private AccountingData accountingData;
         private string fileName = "";
         private string bookingYearName = "";
         private AccountingDataJournal currentJournal;
 
-        public ShellViewModel(IWindowManager windowManager)
+        public ShellViewModel(IWindowManager windowManager, IMessageBox messageBox)
         {
             this.windowManager = windowManager;
-
-            this.DisplayName = "SimpleAccounting";
+            this.messageBox = messageBox;
         }
 
         public ObservableCollection<MenuViewModel> RecentProjects { get; }
@@ -111,7 +114,19 @@ namespace lg2de.SimpleAccounting.Presentation
             this.windowManager.ShowDialog(importModel);
         });
 
-        public ICommand CloseYearCommand => new RelayCommand(_ => this.CloseYear());
+        public ICommand CloseYearCommand => new RelayCommand(
+            _ => this.CloseYear(),
+            _ =>
+            {
+                var accountingYear =
+                    this.accountingData?.Years.SingleOrDefault(y => y.Name.ToString() == this.bookingYearName);
+                if (accountingYear == null)
+                {
+                    return false;
+                }
+
+                return accountingYear.Closed == false;
+            });
 
         public ICommand TotalJournalReportCommand => new RelayCommand(_ =>
         {
@@ -187,8 +202,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand AccountSelectionCommand => new RelayCommand(o =>
         {
-            var account = o as AccountViewModel;
-            this.BuildAccountJournal(account.Identifier);
+            if (o is AccountViewModel account)
+            {
+                this.BuildAccountJournal(account.Identifier);
+            }
         });
 
         public ICommand NewAccountCommand => new RelayCommand(_ =>
@@ -227,6 +244,11 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand EditAccountCommand => new RelayCommand(o =>
         {
             var account = o as AccountViewModel;
+            if (account == null)
+            {
+                return;
+            }
+
             var vm = account.Clone();
             vm.DisplayName = "Account bearbeiten";
             var invalidIds = this.Accounts.Select(x => x.Identifier).Where(x => x != account.Identifier).ToList();
@@ -269,11 +291,11 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.IsDocumentChanged = true;
 
-            void UpdateAccount(BookingValue entry, ulong oldIdeentifier, ulong newIdeentifier)
+            void UpdateAccount(BookingValue entry, ulong oldIdentifier, ulong newIdentifier)
             {
-                if (entry.Account == oldIdeentifier)
+                if (entry.Account == oldIdentifier)
                 {
-                    entry.Account = newIdeentifier;
+                    entry.Account = newIdentifier;
                 }
             }
         });
@@ -289,6 +311,13 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             base.CanClose(callback);
+        }
+
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+
+            this.DisplayName = "SimpleAccounting";
         }
 
         protected override void OnActivate()
@@ -337,24 +366,18 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void CloseYear()
         {
+            var result = this.messageBox.Show(
+                $"Wollen Sie das Jahr {this.bookingYearName} abschließen?",
+                "Jahresabschluss",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No);
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
             var accountingYear = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
-            if (accountingYear.Closed)
-            {
-                // nothing to do
-                return;
-            }
-
-            var result = MessageBox.Show(
-                "Wollen Sie das Jahr " + this.bookingYearName + " abschließen?",
-                "Jahresabschluß",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question,
-                MessageBoxDefaultButton.Button2);
-            if (result != DialogResult.Yes)
-            {
-                return;
-            }
-
             accountingYear.Closed = true;
 
             var carryForwardAccount =
@@ -446,7 +469,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.RefreshJournal();
         }
 
-        internal void LoadProjectFromFile(string fileName)
+        internal void LoadProjectFromFile(string projectFileName)
         {
             if (!this.CheckSaveProject())
             {
@@ -454,14 +477,14 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.IsDocumentChanged = false;
-            this.fileName = fileName;
+            this.fileName = projectFileName;
 
             var projectData = AccountingData.LoadFromFile(this.fileName);
             this.LoadProjectData(projectData);
 
-            Settings.Default.RecentProject = fileName;
-            Settings.Default.RecentProjects.Remove(fileName);
-            Settings.Default.RecentProjects.Insert(0, fileName);
+            Settings.Default.RecentProject = this.fileName;
+            Settings.Default.RecentProjects.Remove(this.fileName);
+            Settings.Default.RecentProjects.Insert(0, this.fileName);
             while (Settings.Default.RecentProjects.Count > 10)
             {
                 Settings.Default.RecentProjects.RemoveAt(10);
@@ -480,14 +503,14 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 foreach (var account in accountGroup.Account)
                 {
-                    var acountModel = new AccountViewModel
+                    var accountModel = new AccountViewModel
                     {
                         Identifier = account.ID,
                         Name = account.Name,
                         Group = accountGroup,
                         Type = account.Type
                     };
-                    this.Accounts.Add(acountModel);
+                    this.Accounts.Add(accountModel);
                 }
             }
 
@@ -592,8 +615,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.Journal.Clear();
             foreach (var booking in this.currentJournal.Booking.OrderBy(b => b.Date))
             {
-                var item = new JournalViewModel { Date = booking.Date.ToDateTime() };
-                item.Identifier = booking.ID;
+                var item = new JournalViewModel { Date = booking.Date.ToDateTime(), Identifier = booking.ID };
                 var debitAccounts = booking.Debit;
                 var creditAccounts = booking.Credit;
                 if (debitAccounts.Count == 1 && creditAccounts.Count == 1)

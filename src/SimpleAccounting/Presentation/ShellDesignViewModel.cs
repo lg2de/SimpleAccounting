@@ -9,7 +9,7 @@ namespace lg2de.SimpleAccounting.Presentation
     public class ShellDesignViewModel : ShellViewModel
     {
         public ShellDesignViewModel()
-            : base(null)
+            : base(null, null)
         {
             var menuItem = new MenuViewModel("c:\\Test.bxml", null);
             this.RecentProjects.Add(menuItem);

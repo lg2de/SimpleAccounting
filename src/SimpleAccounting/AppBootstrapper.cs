@@ -19,6 +19,7 @@ namespace lg2de.SimpleAccounting
             this.Initialize();
 
             this.container.Singleton<IWindowManager, WindowManager>();
+            this.container.Singleton<IMessageBox, MessageBoxWrapper>();
             this.container.PerRequest<ShellViewModel>();
         }
 
