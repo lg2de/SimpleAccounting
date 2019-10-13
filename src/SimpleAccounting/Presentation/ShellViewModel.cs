@@ -18,7 +18,6 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
-    using MessageBox = System.Windows.Forms.MessageBox;
 
     [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
     public class ShellViewModel : Conductor<IScreen>
@@ -582,15 +581,15 @@ namespace lg2de.SimpleAccounting.Presentation
                 return true;
             }
 
-            var result = MessageBox.Show(
+            var result = this.messageBox.Show(
                 "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
                 "Programm beenden",
-                MessageBoxButtons.YesNoCancel);
-            if (result == DialogResult.Cancel)
+                MessageBoxButton.YesNoCancel);
+            if (result == MessageBoxResult.Cancel)
             {
                 return false;
             }
-            else if (result == DialogResult.Yes)
+            else if (result == MessageBoxResult.Yes)
             {
                 this.SaveProject();
             }
