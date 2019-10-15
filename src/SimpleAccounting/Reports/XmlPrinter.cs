@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Reports
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.Drawing.Printing;
     using System.IO;
@@ -63,7 +64,6 @@ namespace lg2de.SimpleAccounting.Reports
             var doc = new PrintDocument();
             doc.BeginPrint += new PrintEventHandler(this.BeginPrint);
             doc.PrintPage += new PrintPageEventHandler(this.PrintPage);
-            var dialog = new PrintPreviewDialog { Document = doc };
             doc.DocumentName = documentName;
 
             // init
@@ -187,9 +187,13 @@ namespace lg2de.SimpleAccounting.Reports
 
             // transform
             this.TransformDocument();
+
             // show
-            dialog.WindowState = FormWindowState.Maximized;
-            dialog.ShowDialog();
+            using (var dialog = new PrintPreviewDialog { Document = doc })
+            {
+                dialog.WindowState = FormWindowState.Maximized;
+                dialog.ShowDialog();
+            }
         }
 
         internal void LoadXml(string xml)
@@ -447,16 +451,17 @@ namespace lg2de.SimpleAccounting.Reports
             tableNode.ParentNode.RemoveChild(tableNode);
         }
 
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Stack items will be disposed explicitely.")]
         private void BeginPrint(object sender, PrintEventArgs e)
         {
             this.currentNode = this.Document.DocumentElement.FirstChild;
             this.cursorX = this.documentLeftMargin;
             this.cursorY = this.documentTopMargin;
-            this.penStack.Clear();
+            this.penStack.ClearAndDispose();
             this.penStack.Push(new Pen(Color.Black));
-            this.solidBrushStack.Clear();
+            this.solidBrushStack.ClearAndDispose();
             this.solidBrushStack.Push(new SolidBrush(Color.Black));
-            this.fontStack.Clear();
+            this.fontStack.ClearAndDispose();
             this.fontStack.Push(new Font("Arial", 10));
         }
 
@@ -624,21 +629,23 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             string strText = this.currentNode.InnerText;
-            var format = new StringFormat();
-            switch (nodeAlign?.Value)
+            using (var format = new StringFormat())
             {
-            case "center":
-                format.Alignment = StringAlignment.Center;
-                break;
-            case "right":
-                format.Alignment = StringAlignment.Far;
-                break;
-            default:
-                format.Alignment = StringAlignment.Near;
-                break;
-            }
+                switch (nodeAlign?.Value)
+                {
+                case "center":
+                    format.Alignment = StringAlignment.Center;
+                    break;
+                case "right":
+                    format.Alignment = StringAlignment.Far;
+                    break;
+                default:
+                    format.Alignment = StringAlignment.Near;
+                    break;
+                }
 
-            printArgs.Graphics.DrawString(strText, drawFont, drawBrush, nX * this.printFactor, nY * this.printFactor, format);
+                printArgs.Graphics.DrawString(strText, drawFont, drawBrush, nX * this.printFactor, nY * this.printFactor, format);
+            }
         }
 
         private void PrintLineNode(PrintPageEventArgs printArgs)
@@ -776,16 +783,19 @@ namespace lg2de.SimpleAccounting.Reports
             var newFont = new Font(strFontName, nFontSize, nFontStyle);
             if (this.currentNode.ChildNodes.Count > 0)
             {
+                // change font temporary for subnodes
                 this.fontStack.Push(newFont);
                 var stackNode = this.currentNode;
                 this.currentNode = this.currentNode.FirstChild;
                 this.PrintNodes(printArgs);
                 this.currentNode = stackNode;
                 this.fontStack.Pop();
+                newFont.Dispose();
             }
             else
             {
-                this.fontStack.Pop();
+                // change current font
+                this.fontStack.Pop().Dispose();
                 this.fontStack.Push(newFont);
             }
         }
@@ -795,7 +805,6 @@ namespace lg2de.SimpleAccounting.Reports
             Pen drawPen = this.penStack.Peek();
             SolidBrush drawBrush = this.solidBrushStack.Peek();
 
-            XmlNode nodeRGB = this.currentNode.Attributes.GetNamedItem("rgb");
             XmlNode nodeName = this.currentNode.Attributes.GetNamedItem("name");
             var newPen = (Pen)drawPen.Clone();
             var newBrush = (SolidBrush)drawBrush.Clone();
@@ -804,6 +813,7 @@ namespace lg2de.SimpleAccounting.Reports
                 newPen.Color = Color.FromName(nodeName.Value);
                 newBrush.Color = Color.FromName(nodeName.Value);
             }
+
             if (this.currentNode.ChildNodes.Count > 0)
             {
                 this.penStack.Push(newPen);
@@ -814,12 +824,14 @@ namespace lg2de.SimpleAccounting.Reports
                 this.currentNode = stackNode;
                 this.penStack.Pop();
                 this.solidBrushStack.Pop();
+                newPen.Dispose();
+                newBrush.Dispose();
             }
             else
             {
-                this.penStack.Pop();
+                this.penStack.Pop().Dispose();
                 this.penStack.Push(newPen);
-                this.solidBrushStack.Pop();
+                this.solidBrushStack.Pop().Dispose();
                 this.solidBrushStack.Push(newBrush);
             }
         }
