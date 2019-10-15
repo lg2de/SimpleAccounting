@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace SimpleAccounting.UnitTests
+namespace SimpleAccounting.UnitTests.Reports
 {
     using System;
     using System.Xml.Linq;

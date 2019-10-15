@@ -40,6 +40,11 @@ namespace lg2de.SimpleAccounting.Extensions
                 return (T)(object)Convert.ToInt32(attribute.Value);
             }
 
+            if (returnType == typeof(bool))
+            {
+                return (T)(object)bool.Parse(attribute.Value);
+            }
+
             throw new ArgumentException($"The type {returnType.Name} is not supported.");
         }
     }

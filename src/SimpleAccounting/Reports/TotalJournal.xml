@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
-<xEport papersize="A4" landscape="0" left="20" top="15" bottom="15" right="20">
+<xEport papersize="A4" left="20" top="15" bottom="15" right="20">
   <font size="20" />
   <text absX="85" align="center">Journal</text>
   <move relY="10" />

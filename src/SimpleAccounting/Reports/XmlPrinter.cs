@@ -25,9 +25,11 @@ namespace lg2de.SimpleAccounting.Reports
         private readonly Stack<Font> fontStack;
 
         private XmlNode currentNode;
-        private int documentLeftMargin, documentRightMargin, documentTopMargin, documentBottomMargin, documentWidth;
-        private float documentScale;
         private int cursorX, cursorY;
+
+        /// <summary>
+        ///     Defines factor to translate logical position to physical position.
+        /// </summary>
         private float printFactor;
 
         public XmlPrinter()
@@ -40,7 +42,12 @@ namespace lg2de.SimpleAccounting.Reports
 
         public XmlDocument Document { get; }
 
+        internal int DocumentWidth { get; set; }
         internal int DocumentHeight { get; set; }
+
+        internal int DocumentLeftMargin { get; set; }
+        internal int DocumentTopMargin { get; set; }
+        internal int DocumentBottomMargin { get; set; }
 
         public void LoadDocument(string resourceName)
         {
@@ -61,139 +68,21 @@ namespace lg2de.SimpleAccounting.Reports
 
         public void PrintDocument(string documentName)
         {
-            var doc = new PrintDocument();
-            doc.BeginPrint += new PrintEventHandler(this.BeginPrint);
-            doc.PrintPage += new PrintPageEventHandler(this.PrintPage);
-            doc.DocumentName = documentName;
+            var printDocument = new PrintDocument();
+            printDocument.DocumentName = documentName;
 
-            // init
-            this.printFactor = (float)(100 / 25.4);
-            XmlNode node = this.Document.DocumentElement.Attributes.GetNamedItem("papersize");
-            string strPaperSize = "A4";
-            if (node != null)
-            {
-                strPaperSize = node.Value;
-            }
+            var paperSizes = printDocument.PrinterSettings.PaperSizes;
 
-            bool bFound = false;
-            foreach (PaperSize item in doc.PrinterSettings.PaperSizes)
-            {
-                if (!item.PaperName.StartsWith(strPaperSize, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    continue;
-                }
-
-                doc.DefaultPageSettings.PaperSize = item;
-                this.documentWidth = Convert.ToInt32(item.Width / this.printFactor);
-                this.DocumentHeight = Convert.ToInt32(item.Height / this.printFactor);
-                this.documentScale = 1;
-                bFound = true;
-                break;
-            }
-
-            if (!bFound)
-            {
-                node = this.Document.DocumentElement.Attributes.GetNamedItem("width");
-                if (node != null)
-                {
-                    this.documentWidth = Convert.ToInt32(node.Value);
-                }
-                else
-                {
-                    this.documentWidth = 210;
-                }
-
-                node = this.Document.DocumentElement.Attributes.GetNamedItem("height");
-                if (node != null)
-                {
-                    this.DocumentHeight = Convert.ToInt32(node.Value);
-                }
-                else
-                {
-                    this.DocumentHeight = 297;
-                }
-
-                node = this.Document.DocumentElement.Attributes.GetNamedItem("scale");
-                if (node != null)
-                {
-                    this.documentScale = Convert.ToSingle(node.Value);
-                }
-                else
-                {
-                    this.documentScale = 1;
-                }
-
-                this.printFactor *= this.documentScale;
-                doc.DefaultPageSettings.PaperSize = new PaperSize(strPaperSize, Convert.ToInt32(this.documentWidth * this.printFactor), Convert.ToInt32(this.DocumentHeight * this.printFactor));
-            }
-
-            doc.DefaultPageSettings.Landscape = false;
-            node = this.Document.DocumentElement.Attributes.GetNamedItem("landscape");
-            if (node?.Value == "1")
-            {
-                doc.DefaultPageSettings.Landscape = true;
-            }
-
-            if (doc.DefaultPageSettings.Landscape)
-            {
-                int nDummy = this.documentWidth;
-                this.documentWidth = this.DocumentHeight;
-                this.DocumentHeight = nDummy;
-            }
-
-            this.currentNode = this.Document.DocumentElement.FirstChild;
-            node = this.Document.DocumentElement.Attributes.GetNamedItem("left");
-            if (node != null)
-            {
-                this.documentLeftMargin = Convert.ToInt32(node.Value);
-            }
-            else
-            {
-                this.documentLeftMargin = 0;
-            }
-
-            node = this.Document.DocumentElement.Attributes.GetNamedItem("right");
-            if (node != null)
-            {
-                this.documentRightMargin = Convert.ToInt32(node.Value);
-            }
-            else
-            {
-                this.documentRightMargin = 0;
-            }
-
-            node = this.Document.DocumentElement.Attributes.GetNamedItem("top");
-            if (node != null)
-            {
-                this.documentTopMargin = Convert.ToInt32(node.Value);
-            }
-            else
-            {
-                this.documentTopMargin = 0;
-            }
-
-            node = this.Document.DocumentElement.Attributes.GetNamedItem("bottom");
-            if (node != null)
-            {
-                this.documentBottomMargin = Convert.ToInt32(node.Value);
-            }
-            else
-            {
-                this.documentBottomMargin = 0;
-            }
-
-            this.cursorX = this.documentLeftMargin;
-            this.cursorY = this.documentTopMargin;
-
-            // transform
+            this.SetupDocument(printDocument, paperSizes);
             this.TransformDocument();
-
-            // show
-            using (var dialog = new PrintPreviewDialog { Document = doc })
+            this.SetupGraphics();
+            using (var dialog = new PrintPreviewDialog { Document = printDocument })
             {
                 dialog.WindowState = FormWindowState.Maximized;
                 dialog.ShowDialog();
             }
+
+            this.CleanupGraphics();
         }
 
         internal void LoadXml(string xml)
@@ -201,8 +90,80 @@ namespace lg2de.SimpleAccounting.Reports
             this.Document.LoadXml(xml);
         }
 
+        internal void SetupDocument(PrintDocument printDocument, PrinterSettings.PaperSizeCollection paperSizes)
+        {
+            printDocument.PrintPage += (_, printArgs) =>
+            {
+                this.cursorY = this.DocumentTopMargin;
+                this.PrintNodes(printArgs);
+            };
+
+            this.printFactor = (float)(100 / 25.4);
+            XmlNode node = this.Document.DocumentElement.Attributes.GetNamedItem("papersize");
+            string documentPaperSize = "A4";
+            if (node != null)
+            {
+                documentPaperSize = node.Value;
+            }
+
+            var paperSize = paperSizes.OfType<PaperSize>().FirstOrDefault(
+                s => s.PaperName.StartsWith(documentPaperSize, StringComparison.CurrentCultureIgnoreCase));
+            if (paperSize != null)
+            {
+                printDocument.DefaultPageSettings.PaperSize = paperSize;
+                this.DocumentWidth = this.ToLogical(paperSize.Width);
+                this.DocumentHeight = this.ToLogical(paperSize.Height);
+            }
+            else
+            {
+                this.DocumentWidth = this.Document.DocumentElement.GetAttribute("width", 210);
+                this.DocumentHeight = this.Document.DocumentElement.GetAttribute("height", 297);
+                var documentScale = this.Document.DocumentElement.GetAttribute("scale", 1);
+                this.printFactor *= documentScale;
+                int width = this.ToPhysical(this.DocumentWidth);
+                int height = this.ToPhysical(this.DocumentHeight);
+                printDocument.DefaultPageSettings.PaperSize = new PaperSize(documentPaperSize, width, height);
+            }
+
+            printDocument.DefaultPageSettings.Landscape =
+                this.Document.DocumentElement.GetAttribute("landscape", false);
+            if (printDocument.DefaultPageSettings.Landscape)
+            {
+                // "rotate" paper
+                int newHeight = this.DocumentWidth;
+                this.DocumentWidth = this.DocumentHeight;
+                this.DocumentHeight = newHeight;
+            }
+
+            this.DocumentLeftMargin = this.Document.DocumentElement.GetAttribute("left", 0);
+            this.DocumentTopMargin = this.Document.DocumentElement.GetAttribute("top", 0);
+            this.DocumentBottomMargin = this.Document.DocumentElement.GetAttribute("bottom", 0);
+
+            this.cursorX = this.DocumentLeftMargin;
+            this.cursorY = this.DocumentTopMargin;
+        }
+
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Stack items will be disposed explicitely.")]
+        internal void SetupGraphics()
+        {
+            var defaultPen = new Pen(Color.Black);
+            var defaultBrush = new SolidBrush(Color.Black);
+            var defaultFont = new Font("Arial", 10);
+            this.penStack.Push(defaultPen);
+            this.solidBrushStack.Push(defaultBrush);
+            this.fontStack.Push(defaultFont);
+        }
+
+        internal void CleanupGraphics()
+        {
+            this.penStack.Pop().Dispose();
+            this.solidBrushStack.Pop().Dispose();
+            this.fontStack.Pop().Dispose();
+        }
+
         internal void TransformDocument()
         {
+            this.currentNode = this.Document.DocumentElement.FirstChild;
             this.TransformNodes(this.Document.DocumentElement.FirstChild);
         }
 
@@ -219,13 +180,13 @@ namespace lg2de.SimpleAccounting.Reports
                     XmlNode attr = transformingNode.Attributes.GetNamedItem("absX");
                     if (attr != null)
                     {
-                        this.cursorX = this.documentLeftMargin + Convert.ToInt32(attr.Value);
+                        this.cursorX = this.DocumentLeftMargin + Convert.ToInt32(attr.Value);
                     }
 
                     attr = transformingNode.Attributes.GetNamedItem("absY");
                     if (attr != null)
                     {
-                        this.cursorY = this.documentTopMargin + Convert.ToInt32(attr.Value);
+                        this.cursorY = this.DocumentTopMargin + Convert.ToInt32(attr.Value);
                     }
 
                     attr = transformingNode.Attributes.GetNamedItem("relX");
@@ -250,17 +211,17 @@ namespace lg2de.SimpleAccounting.Reports
                 }
                 else if (transformingNode.Name == "newpage")
                 {
-                    this.cursorY = this.documentTopMargin;
+                    this.cursorY = this.DocumentTopMargin;
                 }
 
                 this.TransformNodes(transformingNode.FirstChild);
 
                 if (nextNode != null
-                    && this.cursorY >= (this.DocumentHeight - this.documentBottomMargin))
+                    && this.cursorY >= (this.DocumentHeight - this.DocumentBottomMargin))
                 {
                     XmlNode newPage = this.Document.CreateElement("newpage");
                     nextNode.ParentNode.InsertBefore(newPage, nextNode);
-                    this.cursorY = this.documentTopMargin;
+                    this.cursorY = this.DocumentTopMargin;
                 }
             }
         }
@@ -366,22 +327,22 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
 
             // if table can not be started on page - create new one
-            if ((this.cursorY + tableLineHeight * 2) > (this.DocumentHeight - this.documentBottomMargin))
+            if ((this.cursorY + tableLineHeight * 2) > (this.DocumentHeight - this.DocumentBottomMargin))
             {
                 XmlNode newPage = this.Document.CreateElement("newpage");
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                this.cursorY = this.documentTopMargin;
+                this.cursorY = this.DocumentTopMargin;
             }
 
             this.TransformTableHeader(tableNode);
 
             foreach (XmlNode dataNode in dataNodes)
             {
-                if ((this.cursorY + tableLineHeight) > (this.DocumentHeight - this.documentBottomMargin))
+                if ((this.cursorY + tableLineHeight) > (this.DocumentHeight - this.DocumentBottomMargin))
                 {
                     XmlNode newPage = this.Document.CreateElement("newpage");
                     tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                    this.cursorY = this.documentTopMargin;
+                    this.cursorY = this.DocumentTopMargin;
                     this.TransformTableHeader(tableNode);
                 }
 
@@ -449,26 +410,6 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);
-        }
-
-        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Stack items will be disposed explicitely.")]
-        private void BeginPrint(object sender, PrintEventArgs e)
-        {
-            this.currentNode = this.Document.DocumentElement.FirstChild;
-            this.cursorX = this.documentLeftMargin;
-            this.cursorY = this.documentTopMargin;
-            this.penStack.ClearAndDispose();
-            this.penStack.Push(new Pen(Color.Black));
-            this.solidBrushStack.ClearAndDispose();
-            this.solidBrushStack.Push(new SolidBrush(Color.Black));
-            this.fontStack.ClearAndDispose();
-            this.fontStack.Push(new Font("Arial", 10));
-        }
-
-        private void PrintPage(object sender, PrintPageEventArgs e)
-        {
-            this.cursorY = this.documentTopMargin;
-            this.PrintNodes(e);
         }
 
         private XmlNode CreateLineNode(int nX1, int nY1, int nX2, int nY2)
@@ -577,12 +518,12 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNode nodeRelY = this.currentNode.Attributes.GetNamedItem("relY");
             if (nodeAbsX != null)
             {
-                this.cursorX = this.documentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
+                this.cursorX = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
             }
 
             if (nodeAbsY != null)
             {
-                this.cursorY = this.documentTopMargin + Convert.ToInt32(nodeAbsY.Value);
+                this.cursorY = this.DocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
             }
 
             if (nodeRelX != null)
@@ -610,12 +551,12 @@ namespace lg2de.SimpleAccounting.Reports
             int nY = this.cursorY;
             if (nodeAbsX != null)
             {
-                nX = this.documentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
+                nX = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
             }
 
             if (nodeAbsY != null)
             {
-                nY = this.documentTopMargin + Convert.ToInt32(nodeAbsY.Value);
+                nY = this.DocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
             }
 
             if (nodeRelX != null)
@@ -628,7 +569,7 @@ namespace lg2de.SimpleAccounting.Reports
                 nY += Convert.ToInt32(nodeRelY.Value);
             }
 
-            string strText = this.currentNode.InnerText;
+            string text = this.currentNode.InnerText;
             using (var format = new StringFormat())
             {
                 switch (nodeAlign?.Value)
@@ -644,7 +585,13 @@ namespace lg2de.SimpleAccounting.Reports
                     break;
                 }
 
-                printArgs.Graphics.DrawString(strText, drawFont, drawBrush, nX * this.printFactor, nY * this.printFactor, format);
+                printArgs.Graphics.DrawString(
+                    text,
+                    drawFont,
+                    drawBrush,
+                    this.ToPhysical(nX),
+                    this.ToPhysical(nY),
+                    format);
             }
         }
 
@@ -660,92 +607,102 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNode nodeAbsToY = this.currentNode.Attributes.GetNamedItem("absToY");
             XmlNode nodeRelToX = this.currentNode.Attributes.GetNamedItem("relToX");
             XmlNode nodeRelToY = this.currentNode.Attributes.GetNamedItem("relToY");
-            float nX1 = this.cursorX;
-            float nY1 = this.cursorY;
-            float nX2 = this.cursorX;
-            float nY2 = this.cursorY;
+            int x1 = this.cursorX;
+            int y1 = this.cursorY;
+            int x2 = this.cursorX;
+            int y2 = this.cursorY;
             if (nodeAbsFromX != null)
             {
-                nX1 = this.documentLeftMargin + Convert.ToSingle(nodeAbsFromX.Value);
+                x1 = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsFromX.Value);
             }
 
             if (nodeAbsFromY != null)
             {
-                nY1 = this.documentTopMargin + Convert.ToSingle(nodeAbsFromY.Value);
+                y1 = this.DocumentTopMargin + Convert.ToInt32(nodeAbsFromY.Value);
             }
 
             if (nodeRelFromX != null)
             {
-                nX1 += Convert.ToSingle(nodeRelFromX.Value);
+                x1 += Convert.ToInt32(nodeRelFromX.Value);
             }
 
             if (nodeRelFromY != null)
             {
-                nY1 += Convert.ToSingle(nodeRelFromY.Value);
+                y1 += Convert.ToInt32(nodeRelFromY.Value);
             }
 
             if (nodeAbsToX != null)
             {
-                nX2 = this.documentLeftMargin + Convert.ToSingle(nodeAbsToX.Value);
+                x2 = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsToX.Value);
             }
 
             if (nodeAbsToY != null)
             {
-                nY2 = this.documentTopMargin + Convert.ToSingle(nodeAbsToY.Value);
+                y2 = this.DocumentTopMargin + Convert.ToInt32(nodeAbsToY.Value);
             }
 
             if (nodeRelToX != null)
             {
-                nX2 += Convert.ToSingle(nodeRelToX.Value);
+                x2 += Convert.ToInt32(nodeRelToX.Value);
             }
 
             if (nodeRelToY != null)
             {
-                nY2 += Convert.ToSingle(nodeRelToY.Value);
+                y2 += Convert.ToInt32(nodeRelToY.Value);
             }
 
-            printArgs.Graphics.DrawLine(drawPen, nX1 * this.printFactor, nY1 * this.printFactor, nX2 * this.printFactor, nY2 * this.printFactor);
+            printArgs.Graphics.DrawLine(
+                drawPen,
+                this.ToPhysical(x1),
+                this.ToPhysical(y1),
+                this.ToPhysical(x2),
+                this.ToPhysical(y2));
         }
 
         private void PrintCircleNode(PrintPageEventArgs printArgs)
         {
             Pen drawPen = this.penStack.Peek();
 
+            int x = this.cursorX;
+            int y = this.cursorY;
+
             XmlNode nodeAbsX = this.currentNode.Attributes.GetNamedItem("absX");
             XmlNode nodeAbsY = this.currentNode.Attributes.GetNamedItem("absY");
             XmlNode nodeRelX = this.currentNode.Attributes.GetNamedItem("relX");
             XmlNode nodeRelY = this.currentNode.Attributes.GetNamedItem("relY");
-            XmlNode nodeRadX = this.currentNode.Attributes.GetNamedItem("radX");
-            XmlNode nodeRadY = this.currentNode.Attributes.GetNamedItem("radY");
-            float nX = this.cursorX;
-            float nY = this.cursorY;
             if (nodeAbsX != null)
             {
-                nX = this.documentLeftMargin + Convert.ToSingle(nodeAbsX.Value);
+                x = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
             }
 
             if (nodeAbsY != null)
             {
-                nY = this.documentTopMargin + Convert.ToSingle(nodeAbsY.Value);
+                y = this.DocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
             }
 
             if (nodeRelX != null)
             {
-                nX += Convert.ToSingle(nodeRelX.Value);
+                x += Convert.ToInt32(nodeRelX.Value);
             }
 
             if (nodeRelY != null)
             {
-                nY += Convert.ToSingle(nodeRelY.Value);
+                y += Convert.ToInt32(nodeRelY.Value);
             }
 
-            float nRadX = Convert.ToSingle(nodeRadX.Value);
-            float nRadY = Convert.ToSingle(nodeRadY.Value);
-            nX -= nRadX;
-            nY -= nRadY;
-            nRadX *= 2;
-            nRadY *= 2;
-            printArgs.Graphics.DrawEllipse(drawPen, nX * this.printFactor, nY * this.printFactor, nRadX * this.printFactor, nRadY * this.printFactor);
+            int radX = this.currentNode.GetAttribute<int>("radX");
+            int radY = this.currentNode.GetAttribute<int>("radY");
+            x -= radX;
+            y -= radY;
+            radX *= 2;
+            radY *= 2;
+
+            printArgs.Graphics.DrawEllipse(
+                drawPen,
+                this.ToPhysical(x),
+                this.ToPhysical(y),
+                this.ToPhysical(radX),
+                this.ToPhysical(radY));
         }
 
         private void PrintFontNode(PrintPageEventArgs printArgs)
@@ -755,32 +712,35 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNode nodeName = this.currentNode.Attributes.GetNamedItem("name");
             XmlNode nodeSize = this.currentNode.Attributes.GetNamedItem("size");
             XmlNode nodeBold = this.currentNode.Attributes.GetNamedItem("bold");
-            string strFontName = drawFont.Name;
-            float nFontSize = drawFont.SizeInPoints;
-            FontStyle nFontStyle = drawFont.Style;
+            string fontName = drawFont.Name;
+            float fontSize = drawFont.SizeInPoints;
+            FontStyle fontStyle = drawFont.Style;
             if (nodeName != null)
             {
-                strFontName = nodeName.Value;
+                fontName = nodeName.Value;
             }
 
             if (nodeSize != null)
             {
-                nFontSize = Convert.ToSingle(nodeSize.Value);
+                fontSize = Convert.ToSingle(nodeSize.Value);
             }
 
             if (nodeBold != null)
             {
                 if (nodeBold.Value == "1")
                 {
-                    nFontStyle |= FontStyle.Bold;
+                    fontStyle |= FontStyle.Bold;
                 }
                 else
                 {
-                    nFontStyle &= ~FontStyle.Bold;
+                    fontStyle &= ~FontStyle.Bold;
                 }
             }
 
-            var newFont = new Font(strFontName, nFontSize, nFontStyle);
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            var newFont = new Font(fontName, fontSize, fontStyle);
+#pragma warning restore CA2000 // The font stack will be disposed explicitely.
+
             if (this.currentNode.ChildNodes.Count > 0)
             {
                 // change font temporary for subnodes
@@ -789,8 +749,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.currentNode = this.currentNode.FirstChild;
                 this.PrintNodes(printArgs);
                 this.currentNode = stackNode;
-                this.fontStack.Pop();
-                newFont.Dispose();
+                this.fontStack.Pop().Dispose();
             }
             else
             {
@@ -822,10 +781,8 @@ namespace lg2de.SimpleAccounting.Reports
                 this.currentNode = this.currentNode.FirstChild;
                 this.PrintNodes(printArgs);
                 this.currentNode = stackNode;
-                this.penStack.Pop();
-                this.solidBrushStack.Pop();
-                newPen.Dispose();
-                newBrush.Dispose();
+                this.penStack.Pop().Dispose();
+                this.solidBrushStack.Pop().Dispose();
             }
             else
             {
@@ -834,6 +791,16 @@ namespace lg2de.SimpleAccounting.Reports
                 this.solidBrushStack.Pop().Dispose();
                 this.solidBrushStack.Push(newBrush);
             }
+        }
+
+        private int ToLogical(int input)
+        {
+            return Convert.ToInt32(input / this.printFactor);
+        }
+
+        private int ToPhysical(int input)
+        {
+            return Convert.ToInt32(input * this.printFactor);
         }
     }
 }
