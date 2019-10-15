@@ -26,6 +26,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         private XmlNode currentNode;
         private int cursorX, cursorY;
+        private XmlNode pageTextsNode;
 
         /// <summary>
         ///     Defines factor to translate logical position to physical position.
@@ -94,6 +95,7 @@ namespace lg2de.SimpleAccounting.Reports
         {
             printDocument.PrintPage += (_, printArgs) =>
             {
+                this.cursorX = this.DocumentLeftMargin;
                 this.cursorY = this.DocumentTopMargin;
                 this.PrintNodes(printArgs);
             };
@@ -164,7 +166,9 @@ namespace lg2de.SimpleAccounting.Reports
         internal void TransformDocument()
         {
             this.currentNode = this.Document.DocumentElement.FirstChild;
-            this.TransformNodes(this.Document.DocumentElement.FirstChild);
+            this.TransformNodes(this.currentNode);
+            this.ProcessPageTexts();
+            this.currentNode = this.Document.DocumentElement.FirstChild;
         }
 
         internal void TransformNodes(XmlNode firstNode)
@@ -209,8 +213,16 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     this.TransformTable(transformingNode);
                 }
+                else if (transformingNode.Name == "pageTexts")
+                {
+                    this.pageTextsNode = transformingNode;
+                    this.InsertPageTexts(transformingNode, 1);
+                    transformingNode.ParentNode.RemoveChild(transformingNode);
+                    continue;
+                }
                 else if (transformingNode.Name == "newpage")
                 {
+                    this.cursorX = this.DocumentLeftMargin;
                     this.cursorY = this.DocumentTopMargin;
                 }
 
@@ -221,6 +233,8 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     XmlNode newPage = this.Document.CreateElement("newpage");
                     nextNode.ParentNode.InsertBefore(newPage, nextNode);
+
+                    this.cursorX = this.DocumentLeftMargin;
                     this.cursorY = this.DocumentTopMargin;
                 }
             }
@@ -336,16 +350,9 @@ namespace lg2de.SimpleAccounting.Reports
 
             this.TransformTableHeader(tableNode);
 
-            foreach (XmlNode dataNode in dataNodes)
+            for (int nodeIndex = 0; nodeIndex < dataNodes.Count; nodeIndex++)
             {
-                if ((this.cursorY + tableLineHeight) > (this.DocumentHeight - this.DocumentBottomMargin))
-                {
-                    XmlNode newPage = this.Document.CreateElement("newpage");
-                    tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                    this.cursorY = this.DocumentTopMargin;
-                    this.TransformTableHeader(tableNode);
-                }
-
+                var dataNode = dataNodes[nodeIndex];
                 XmlNodeList rowNodes = dataNode.SelectNodes("td");
                 int nInnerLineCount = 1;
                 for (int i = 0; i < rowNodes.Count; i++)
@@ -355,11 +362,20 @@ namespace lg2de.SimpleAccounting.Reports
                     nInnerLineCount += strText.Length / 40;
                 }
 
-                int nLineHeight = tableLineHeight * nInnerLineCount;
+                int lineHeight = tableLineHeight * nInnerLineCount;
                 XmlNode lineHeightNode = dataNode.Attributes.GetNamedItem("lineheight");
                 if (lineHeightNode != null)
                 {
-                    nLineHeight = Convert.ToInt32(lineHeightNode.Value);
+                    lineHeight = Convert.ToInt32(lineHeightNode.Value);
+                }
+
+                // check whether oversized line still fits into page
+                if ((this.cursorY + lineHeight) > (this.DocumentHeight - this.DocumentBottomMargin))
+                {
+                    XmlNode newPage = this.Document.CreateElement("newpage");
+                    tableNode.ParentNode.InsertBefore(newPage, tableNode);
+                    this.cursorY = this.DocumentTopMargin;
+                    this.TransformTableHeader(tableNode);
                 }
 
                 int xPosition = 0;
@@ -397,19 +413,70 @@ namespace lg2de.SimpleAccounting.Reports
 
                     textNode.SetAttribute("relX", (xPosition + xAdoption).ToString());
                     tableNode.ParentNode.InsertBefore(textNode, tableNode);
-                    this.CreateFrame(columnNode, textNode, xPosition, 0, xPosition + colmnWidth, nLineHeight);
+                    this.CreateFrame(columnNode, textNode, xPosition, 0, xPosition + colmnWidth, lineHeight);
                     xPosition += colmnWidth;
                 }
 
-                this.CreateFrame(dataNode, tableNode, 0, 0, xPosition, nLineHeight);
+                this.CreateFrame(dataNode, tableNode, 0, 0, xPosition, lineHeight);
 
-                XmlNode moveNode = this.Document.CreateElement("move");
-                moveNode.SetAttribute("relY", nLineHeight.ToString());
-                tableNode.ParentNode.InsertBefore(moveNode, tableNode);
-                this.cursorY += nLineHeight;
+                this.cursorY += lineHeight;
+
+                // check whether next line exists and fits into page
+                if (nodeIndex + 1 < dataNodes.Count
+                    && (this.cursorY + tableLineHeight) > (this.DocumentHeight - this.DocumentBottomMargin))
+                {
+                    // start new page with table header
+                    XmlNode newPage = this.Document.CreateElement("newpage");
+                    tableNode.ParentNode.InsertBefore(newPage, tableNode);
+                    this.cursorY = this.DocumentTopMargin;
+                    this.TransformTableHeader(tableNode);
+                }
+                else
+                {
+                    // move cursor to next line
+                    XmlNode moveNode = this.Document.CreateElement("move");
+                    moveNode.SetAttribute("relY", lineHeight.ToString());
+                    tableNode.ParentNode.InsertBefore(moveNode, tableNode);
+                }
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);
+        }
+
+        private void ProcessPageTexts()
+        {
+            if (this.pageTextsNode == null)
+            {
+                // nothing to do
+                return;
+            }
+
+            // page number 1 already assigned immediately
+            int pageNumber = 1;
+
+            var pageWraps = this.Document.SelectNodes("//newpage");
+            foreach (XmlNode pageWrap in pageWraps)
+            {
+                pageNumber++;
+                this.InsertPageTexts(pageWrap, pageNumber);
+            }
+        }
+
+        private void InsertPageTexts(XmlNode currentNode, int pageNumber)
+        {
+            var insertParent = currentNode;
+            foreach (XmlNode child in this.pageTextsNode.ChildNodes)
+            {
+                var copiedChild = insertParent.OwnerDocument.ImportNode(child, deep: true);
+                var textElements = copiedChild.SelectNodes("//text");
+                foreach (XmlElement element in textElements)
+                {
+                    element.InnerText = element.InnerText.Replace("{page}", pageNumber.ToString());
+                }
+
+                insertParent.ParentNode.InsertAfter(copiedChild, insertParent);
+                insertParent = copiedChild;
+            }
         }
 
         private XmlNode CreateLineNode(int nX1, int nY1, int nX2, int nY2)
