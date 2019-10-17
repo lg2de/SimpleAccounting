@@ -31,7 +31,6 @@ Medium and large changes should be discussed first. Please open a new issue or p
 
 ## TODOs
 
-
 When I started the project in 2005, I saw no relevance for unit testing.
 So far the test coverage is pretty bad.
 With the decision this year to publish it, I started to switch to Test Driven Development.
@@ -43,3 +42,8 @@ Maybe you want to help with the better naming?
 
 Also, the user interface is completely in German.
 Maybe you want to help with the introduction of a localized user interface?
+
+## License
+
+I do not like closed source reuse of my software.
+This is why I decided to license the software under GPLV3.
