@@ -25,8 +25,9 @@ The software focuses on journal and balance sheet reporting.
 
 Some screenshots for first impression:
 
-<img src="./samples/MainView.png" alt="Main View" width="250" align="top" />
-<img src="./samples/TotalsAndBalancesReport.png" alt="Main View" width="250" align="top" />
+|Main view|Totals and balances report|
+|-|-|
+|<img src="./samples/MainView.png" alt="Main view" width="250" />|<img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report" width="250" />|
 
 ## Contribution
 
