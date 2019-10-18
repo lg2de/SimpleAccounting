@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<AccountingData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://lg2.de/SimpleAccounting/AccountingSchema https://lg2de.github.io/SimpleAccounting/AccountingData.xsd">
+  <Setup>
+    <Name>Demo</Name>
+    <Location>World</Location>
+  </Setup>
+  <Accounts>
+    <AccountGroup Name="Default">
+      <Account ID="100" Name="Bank account" Type="Asset" />
+      <Account ID="400" Name="Salary" Type="Income" />
+      <Account ID="600" Name="Food" Type="Expense" />
+      <Account ID="990" Name="Carryforward" Type="Carryforward" />
+    </AccountGroup>
+  </Accounts>
+  <Years>
+    <Year Name="2019" DateStart="20190101" DateEnd="20191231" />
+  </Years>
+  <Journal Year="2019">
+    <Booking Date="20190101" ID="1">
+      <Debit Value="10000" Account="100" Text="EB-Wert" />
+      <Credit Value="10000" Account="990" Text="EB-Wert" />
+    </Booking>
+    <Booking Date="20191018" ID="2">
+      <Debit Value="1500" Account="600" Text="Essen" />
+      <Credit Value="1500" Account="100" Text="Essen" />
+    </Booking>
+    <Booking Date="20191018" ID="3">
+      <Debit Value="5000" Account="100" Text="Gehalt" />
+      <Credit Value="5000" Account="400" Text="Gehalt" />
+    </Booking>
+  </Journal>
+</AccountingData>
