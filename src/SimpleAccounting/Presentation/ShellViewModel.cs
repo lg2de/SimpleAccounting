@@ -599,6 +599,22 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void SaveProject()
         {
+            if (this.fileName == "<new>")
+            {
+                using (var saveFileDialog = new SaveFileDialog())
+                {
+                    saveFileDialog.Filter = "Acconting project files (*.bxml)|*.bxml";
+                    saveFileDialog.RestoreDirectory = true;
+
+                    if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    this.fileName = saveFileDialog.FileName;
+                }
+            }
+
             DateTime fileDate = File.GetLastWriteTime(this.fileName);
             string backupFileName = this.fileName + "." + fileDate.ToString("yyyyMMddHHmmss");
             try
