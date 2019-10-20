@@ -4,13 +4,14 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    using System.Windows.Controls;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     ///     Implements the main view of the application.
     /// </summary>
-    public partial class ShellView : UserControl
+    public partial class ShellView
     {
+        [ExcludeFromCodeCoverage]
         public ShellView()
         {
             this.InitializeComponent();

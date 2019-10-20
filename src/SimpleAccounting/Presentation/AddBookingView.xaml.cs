@@ -4,13 +4,14 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    using System.Windows.Controls;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     ///     Implements the view to create new booking entry.
     /// </summary>
-    public partial class AddBookingView : UserControl
+    public partial class AddBookingView
     {
+        [ExcludeFromCodeCoverage]
         public AddBookingView()
         {
             this.InitializeComponent();

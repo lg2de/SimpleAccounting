@@ -4,13 +4,14 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    using System.Windows.Controls;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     ///     Implements the view to import bookings from file.
     /// </summary>
-    public partial class ImportBookingsView : UserControl
+    public partial class ImportBookingsView
     {
+        [ExcludeFromCodeCoverage]
         public ImportBookingsView()
         {
             this.InitializeComponent();

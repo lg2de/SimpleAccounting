@@ -4,13 +4,14 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    using System.Windows.Controls;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     ///     Implements view to create or edit accounts.
     /// </summary>
-    public partial class AccountView : UserControl
+    public partial class AccountView
     {
+        [ExcludeFromCodeCoverage]
         public AccountView()
         {
             this.InitializeComponent();
