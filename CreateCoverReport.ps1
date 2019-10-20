@@ -12,8 +12,10 @@ if (Test-Path $PSScriptRoot\CoverOutput) {
   Remove-Item $PSScriptRoot\CoverOutput -Confirm:$false -Force -Recurse
 }
 $dummy = md $PSScriptRoot\CoverOutput
+$coverageFilter = "+[SimpleAccounting*]* -[SimpleAccounting.UnitTests*]*"
+$coverageFileExclude = "*.designer.cs;*.g.cs"
 $outputFile = "$PSScriptRoot\CoverOutput\coverage.xml"
-& $openCoverExe -register -target:$xunitExe -targetargs:$testArguments -output:$outputFile -filter:"+[SimpleAccounting*]* -[SimpleAccounting.UnitTests*]*"
+& $openCoverExe -register -target:$xunitExe -targetargs:$testArguments -output:$outputFile -filter:$coverageFilter -excludebyfile:$coverageFileExclude
 
 Write-Host --- creating coverage report ---
 $generatorDir = (Get-ChildItem -Path $PSScriptRoot\packages\ -Directory -Filter ReportGenerator* | select -last 1).Name
