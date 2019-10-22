@@ -27,7 +27,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private AccountingData accountingData;
         private string fileName = "";
-        private string bookingYearName = "";
+        private int bookingYear;
         private AccountingDataJournal currentJournal;
 
         public ShellViewModel(IWindowManager windowManager, IMessageBox messageBox)
@@ -86,7 +86,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand AddBookingsCommand => new RelayCommand(_ =>
         {
-            var bookingModel = new AddBookingViewModel(this)
+            var bookingModel = new AddBookingViewModel(this, this.bookingYear)
             {
                 BookingNumber = this.GetMaxBookIdent() + 1
             };
@@ -97,8 +97,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand ImportBookingsCommand => new RelayCommand(_ =>
         {
-            AccountingDataYear year = this.accountingData
-                .Years.Single(x => x.Name.ToString() == this.bookingYearName);
+            AccountingDataYear year = this.accountingData.Years.Single(x => x.Name == this.bookingYear);
             var min = year.DateStart.ToDateTime();
             var max = year.DateEnd.ToDateTime();
 
@@ -118,7 +117,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ =>
             {
                 var accountingYear =
-                    this.accountingData?.Years.SingleOrDefault(y => y.Name.ToString() == this.bookingYearName);
+                    this.accountingData?.Years.SingleOrDefault(y => y.Name == this.bookingYear);
                 if (accountingYear == null)
                 {
                     return false;
@@ -132,8 +131,8 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = new TotalJournalReport(
                 this.currentJournal,
                 this.accountingData.Setup,
-                this.bookingYearName);
-            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+                this.bookingYear.ToString());
+            var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
 
@@ -143,8 +142,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.accountingData.Accounts.SelectMany(a => a.Account),
                 this.currentJournal,
                 this.accountingData.Setup,
-                this.bookingYearName);
-            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+                this.bookingYear.ToString());
+            var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
 
@@ -154,8 +153,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentJournal,
                 this.accountingData.Accounts,
                 this.accountingData.Setup,
-                this.bookingYearName);
-            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+                this.bookingYear.ToString());
+            var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
 
@@ -183,9 +182,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentJournal,
                 accountGroups,
                 this.accountingData.Setup,
-                this.bookingYearName);
+                this.bookingYear.ToString());
             report.Signatures.AddRange(this.accountingData.Setup.Reports.TotalsAndBalancesReport);
-            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+            var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
 
@@ -195,7 +194,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentJournal,
                 this.accountingData.AllAccounts,
                 this.accountingData.Setup,
-                this.bookingYearName);
+                this.bookingYear.ToString());
             report.CreateReport();
         });
 
@@ -371,7 +370,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private void CloseYear()
         {
             var result = this.messageBox.Show(
-                $"Wollen Sie das Jahr {this.bookingYearName} abschließen?",
+                $"Wollen Sie das Jahr {this.bookingYear} abschließen?",
                 "Jahresabschluss",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question,
@@ -381,14 +380,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var accountingYear = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+            var accountingYear = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             accountingYear.Closed = true;
 
             var carryForwardAccount =
                 this.accountingData.AllAccounts.Single(a => a.Type == AccountDefinitionType.Carryforward && a.Active);
 
-            var newYear = (ushort)(Convert.ToUInt16(this.bookingYearName) + 1);
-
+            var newYear = (ushort)(this.bookingYear + 1);
             var newYearEntry = new AccountingDataYear
             {
                 Name = newYear,
@@ -466,9 +464,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void SelectBookingYear(ushort newYear)
         {
-            this.bookingYearName = newYear.ToString();
+            this.bookingYear = newYear;
             this.currentJournal = this.accountingData.Journal.Single(y => y.Year == newYear);
-            this.DisplayName = $"SimpleAccounting - {this.fileName} - {this.bookingYearName}";
+            this.DisplayName = $"SimpleAccounting - {this.fileName} - {this.bookingYear}";
             this.AccountJournal.Clear();
             this.RefreshJournal();
         }
@@ -527,10 +525,10 @@ namespace lg2de.SimpleAccounting.Presentation
             this.BookingYears.Clear();
             foreach (var year in this.accountingData.Years)
             {
-                var bookingYear = new MenuViewModel(
+                var menu = new MenuViewModel(
                     year.Name.ToString(),
                     new RelayCommand(_ => this.SelectBookingYear(year.Name)));
-                this.BookingYears.Add(bookingYear);
+                this.BookingYears.Add(menu);
             }
         }
 

@@ -4,12 +4,13 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System;
     using lg2de.SimpleAccounting.Model;
 
     internal class AddBookingDesignViewModel : AddBookingViewModel
     {
         public AddBookingDesignViewModel()
-            : base(null)
+            : base(null, DateTime.Now.Year)
         {
             this.BookingNumber = 42;
             this.BookingText = "shoes";

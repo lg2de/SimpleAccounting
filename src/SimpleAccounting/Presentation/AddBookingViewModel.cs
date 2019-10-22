@@ -20,10 +20,10 @@ namespace lg2de.SimpleAccounting.Presentation
         private ulong debitAccount;
         private BookingTemplate selectedTemplate;
 
-        public AddBookingViewModel(ShellViewModel parent)
+        public AddBookingViewModel(ShellViewModel parent, int bookingYear)
         {
             this.parent = parent;
-            this.DisplayName = "Neue Buchung erstellen";
+            this.BookingYear = bookingYear;
         }
 
         public DateTime Date { get; set; } = DateTime.Today;
@@ -81,12 +81,15 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        public int CreditIndex { get; set; } = -1;
+
+        public int DebitIndex { get; set; } = -1;
+
         public ICommand BookCommand => new RelayCommand(_ =>
         {
             var newBooking = new AccountingDataJournalBooking
             {
-                Date = this.Date.ToAccountingDate(),
-                ID = this.BookingNumber
+                Date = this.Date.ToAccountingDate(), ID = this.BookingNumber
             };
             var creditValue = new BookingValue
             {
@@ -103,6 +106,21 @@ namespace lg2de.SimpleAccounting.Presentation
             // update for next booking
             this.BookingNumber++;
             this.NotifyOfPropertyChange(nameof(this.BookingNumber));
-        });
+        }, _ => this.Date.Year == this.BookingYear
+                && this.BookingNumber > 0
+                && this.BookingValue > 0
+                && this.CreditIndex >= 0
+                && this.DebitIndex >= 0
+                && this.CreditIndex != this.DebitIndex
+                && !string.IsNullOrWhiteSpace(this.BookingText));
+
+        internal int BookingYear { get; }
+
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+
+            this.DisplayName = "Neue Buchung erstellen";
+        }
     }
 }

@@ -90,6 +90,7 @@
             Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="2"
             ItemsSource="{Binding Accounts}"
             SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
+            SelectedIndex="{Binding DebitIndex, Mode=OneWayToSource}"
             SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
 
         <TextBlock
@@ -104,6 +105,7 @@
             Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="3"
             ItemsSource="{Binding Accounts}"
             SelectedValue="{Binding CreditAccount, Mode=TwoWay}"
+            SelectedIndex="{Binding CreditIndex, Mode=OneWayToSource}"
             SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
 
         <StackPanel
