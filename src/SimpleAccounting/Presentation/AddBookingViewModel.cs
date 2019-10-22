@@ -99,6 +99,10 @@ namespace lg2de.SimpleAccounting.Presentation
             newBooking.Credit = new List<BookingValue> { creditValue };
             newBooking.Debit = new List<BookingValue> { debitValue };
             this.parent.AddBooking(newBooking);
+
+            // update for next booking
+            this.BookingNumber++;
+            this.NotifyOfPropertyChange(nameof(this.BookingNumber));
         });
     }
 }

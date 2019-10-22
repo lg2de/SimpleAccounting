@@ -91,6 +91,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\XmlExtensionsTests.cs" />
+    <Compile Include="Presentation\AddBookingViewModelTests.cs" />
+    <Compile Include="Presentation\Samples.cs" />
     <Compile Include="Presentation\ShellViewModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reports\XmlPrinterTests.cs" />
