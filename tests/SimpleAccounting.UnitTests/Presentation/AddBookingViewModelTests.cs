@@ -14,6 +14,16 @@ namespace SimpleAccounting.UnitTests.Presentation
     public class AddBookingViewModelTests
     {
         [Fact]
+        public void OnInitialize_Initialized()
+        {
+            var sut = new AddBookingViewModel(null, DateTime.Now.Year);
+
+            ((IActivate)sut).Activate();
+
+            sut.DisplayName.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
         public void BookCommand_FirstBooking_BookingNumberIncremented()
         {
             var windowManager = Substitute.For<IWindowManager>();
@@ -55,7 +65,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var sut = new AddBookingViewModel(null, DateTime.Now.Year)
             {
-                BookingNumber = 1, BookingText = "abc", DebitIndex = 2, BookingValue = 42
+                BookingNumber = 1,
+                BookingText = "abc",
+                DebitIndex = 2,
+                BookingValue = 42
             };
 
             sut.BookCommand.CanExecute(null).Should().BeFalse();
@@ -66,7 +79,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var sut = new AddBookingViewModel(null, DateTime.Now.Year)
             {
-                BookingNumber = 1, BookingText = "abc", CreditIndex = 1, BookingValue = 42
+                BookingNumber = 1,
+                BookingText = "abc",
+                CreditIndex = 1,
+                BookingValue = 42
             };
 
             sut.BookCommand.CanExecute(null).Should().BeFalse();
@@ -77,7 +93,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var sut = new AddBookingViewModel(null, DateTime.Now.Year)
             {
-                BookingText = "abc", CreditIndex = 1, DebitIndex = 2, BookingValue = 42
+                BookingText = "abc",
+                CreditIndex = 1,
+                DebitIndex = 2,
+                BookingValue = 42
             };
 
             sut.BookCommand.CanExecute(null).Should().BeFalse();
@@ -88,7 +107,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var sut = new AddBookingViewModel(null, DateTime.Now.Year)
             {
-                BookingNumber = 1, CreditIndex = 1, DebitIndex = 2, BookingValue = 42
+                BookingNumber = 1,
+                CreditIndex = 1,
+                DebitIndex = 2,
+                BookingValue = 42
             };
 
             sut.BookCommand.CanExecute(null).Should().BeFalse();
@@ -99,7 +121,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var sut = new AddBookingViewModel(null, DateTime.Now.Year)
             {
-                BookingNumber = 1, BookingText = "abc", CreditIndex = 1, DebitIndex = 2
+                BookingNumber = 1,
+                BookingText = "abc",
+                CreditIndex = 1,
+                DebitIndex = 2
             };
 
             sut.BookCommand.CanExecute(null).Should().BeFalse();
