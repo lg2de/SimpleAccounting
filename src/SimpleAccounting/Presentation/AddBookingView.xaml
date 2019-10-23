@@ -11,6 +11,9 @@
     xmlns:currencytextboxcontrol="clr-namespace:CurrencyTextBoxControl;assembly=CurrencyTextBoxControl"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=local:AddBookingDesignViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.InputBindings>
+        <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding BookCommand, Mode=OneWay}" />
+    </UserControl.InputBindings>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -88,6 +91,7 @@
             Text="{Binding DebitAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <ComboBox
             Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="2"
+            Focusable="False"
             ItemsSource="{Binding Accounts}"
             SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
             SelectedIndex="{Binding DebitIndex, Mode=OneWayToSource}"
@@ -103,6 +107,7 @@
             Text="{Binding CreditAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <ComboBox
             Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="3"
+            Focusable="False"
             ItemsSource="{Binding Accounts}"
             SelectedValue="{Binding CreditAccount, Mode=TwoWay}"
             SelectedIndex="{Binding CreditIndex, Mode=OneWayToSource}"
@@ -112,8 +117,8 @@
             Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="4"
             Margin="0 30 0 0"
             Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Buchen" Command="{Binding BookCommand}" />
-            <Button Content="Schließen" IsCancel="True" />
+            <Button Width="140" Content="Buchen (CTRL-ENTER)" Command="{Binding BookCommand}" />
+            <Button Width="140" Content="Schließen (ESC)" IsCancel="True" />
         </StackPanel>
     </Grid>
 </UserControl>
