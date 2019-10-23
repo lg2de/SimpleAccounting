@@ -18,12 +18,12 @@
   <font size="8" />
   <table lineheight="4">
     <columns lineheight="8">
-      <column width="20" rightline="1">Datum</column>
-      <column width="10" rightline="1">Nr. </column>
-      <column width="80" rightline="1">Buchungstext</column>
-      <column width="15" rightline="1" align="right">Soll-
+      <column width="20" rightLine="true">Datum</column>
+      <column width="10" rightLine="true">Nr. </column>
+      <column width="80" rightLine="true">Buchungstext</column>
+      <column width="15" rightLine="true" align="right">Soll-
 wert</column>
-      <column width="15" rightline="1" align="right">Haben-
+      <column width="15" rightLine="true" align="right">Haben-
 wert</column>
       <column width="15" align="right">Gegen-
 konto</column>

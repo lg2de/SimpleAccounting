@@ -51,7 +51,7 @@ namespace lg2de.SimpleAccounting.Reports
             {
                 XmlNode dataLineNode = doc.CreateElement("tr");
                 XmlNode dataItemNode = doc.CreateElement("td");
-                dataLineNode.SetAttribute("topline", "1");
+                dataLineNode.SetAttribute("topLine", true);
                 dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d");
                 dataLineNode.AppendChild(dataItemNode);
                 dataItemNode = dataItemNode.Clone();

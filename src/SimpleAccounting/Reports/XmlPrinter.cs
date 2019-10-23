@@ -281,7 +281,9 @@ namespace lg2de.SimpleAccounting.Reports
         private void TransformTableHeader(XmlNode tableNode)
         {
             XmlNode columnsRoot = tableNode.SelectSingleNode("columns");
-            XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
+            XmlNodeList columnNodes =
+                tableNode.SelectNodes("columns/column")
+                ?? throw new InvalidOperationException($"The table must define columns.");
 
             int tableLineHeight = tableNode.GetAttribute<int>("lineheight", DefaultLineHeight);
 
@@ -300,8 +302,7 @@ namespace lg2de.SimpleAccounting.Reports
                 XmlNode textNode = this.Document.CreateElement("text");
                 textNode.InnerText = columnNode.InnerText;
 
-                XmlNode widthNode = columnNode.Attributes.GetNamedItem("width");
-                int colmnWidth = Convert.ToInt32(widthNode.Value);
+                var columnWidth = columnNode.GetAttribute<int>("width");
                 int xAdoption = 0;
                 var align = columnNode.Attributes.GetNamedItem("align");
                 if (align != null)
@@ -309,19 +310,19 @@ namespace lg2de.SimpleAccounting.Reports
                     textNode.SetAttribute("align", align.Value);
                     if (align.Value == "right")
                     {
-                        xAdoption = colmnWidth;
+                        xAdoption = columnWidth;
                     }
                     else if (align.Value == "center")
                     {
-                        xAdoption = colmnWidth / 2;
+                        xAdoption = columnWidth / 2;
                     }
                 }
 
                 textNode.SetAttribute("relX", (xPosition + xAdoption).ToString());
 
+                this.CreateFrame(columnNode, tableNode, xPosition, 0, xPosition + Convert.ToInt32(width.Value), nHeaderLineHeight);
                 tableNode.ParentNode.InsertBefore(textNode, tableNode);
 
-                this.CreateFrame(columnNode, tableNode, xPosition, 0, xPosition + Convert.ToInt32(width.Value), nHeaderLineHeight);
                 xPosition += Convert.ToInt32(width.Value);
             }
 
@@ -479,44 +480,70 @@ namespace lg2de.SimpleAccounting.Reports
             }
         }
 
-        private XmlNode CreateLineNode(int nX1, int nY1, int nX2, int nY2)
+        private XmlNode CreateLineNode(int fromX, int fromY, int toX, int toY)
         {
             XmlNode newNode = this.Document.CreateElement("line");
-            newNode.SetAttribute("relFromX", nX1.ToString());
-            newNode.SetAttribute("relFromY", nY1.ToString());
-            newNode.SetAttribute("relToX", nX2.ToString());
-            newNode.SetAttribute("relToY", nY2.ToString());
+            if (fromX != 0)
+            {
+                newNode.SetAttribute("relFromX", fromX.ToString());
+            }
+
+            if (fromY != 0)
+            {
+                newNode.SetAttribute("relFromY", fromY.ToString());
+            }
+
+            if (toX != 0)
+            {
+                newNode.SetAttribute("relToX", toX.ToString());
+            }
+
+            if (toY != 0)
+            {
+                newNode.SetAttribute("relToY", toY.ToString());
+            }
+
             return newNode;
         }
 
-        private void CreateFrame(XmlNode referenceNode, XmlNode positionNode, int nX1, int nY1, int nX2, int nY2)
+        private void CreateFrame(XmlNode referenceNode, XmlNode positionNode, int x1, int y1, int x2, int y2)
         {
-            XmlNode attr = referenceNode.Attributes.GetNamedItem("leftline");
-            if (attr != null && attr.Value == "1")
+            if (referenceNode == null)
             {
-                XmlNode leftline = this.CreateLineNode(nX1, nY1, nX1, nY2);
-                positionNode.ParentNode.InsertBefore(leftline, positionNode);
+                throw new ArgumentNullException(nameof(referenceNode));
             }
 
-            attr = referenceNode.Attributes.GetNamedItem("rightline");
-            if (attr != null && attr.Value == "1")
+            if (positionNode?.ParentNode == null)
             {
-                XmlNode rightline = this.CreateLineNode(nX2, nY1, nX2, nY2);
-                positionNode.ParentNode.InsertBefore(rightline, positionNode);
+                throw new ArgumentNullException(nameof(positionNode));
             }
 
-            attr = referenceNode.Attributes.GetNamedItem("topline");
-            if (attr != null && attr.Value == "1")
+            var leftLine = referenceNode.GetAttribute<bool>("leftLine");
+            if (leftLine)
             {
-                XmlNode topline = this.CreateLineNode(nX1, nY1, nX2, nY1);
-                positionNode.ParentNode.InsertBefore(topline, positionNode);
+                XmlNode line = this.CreateLineNode(x1, y1, x1, y2);
+                positionNode.ParentNode.InsertBefore(line, positionNode);
             }
 
-            attr = referenceNode.Attributes.GetNamedItem("bottomline");
-            if (attr != null && attr.Value == "1")
+            var rightLine = referenceNode.GetAttribute<bool>("rightLine");
+            if (rightLine)
             {
-                XmlNode bottomline = this.CreateLineNode(nX1, nY2, nX2, nY2);
-                positionNode.ParentNode.InsertBefore(bottomline, positionNode);
+                XmlNode line = this.CreateLineNode(x2, y1, x2, y2);
+                positionNode.ParentNode.InsertBefore(line, positionNode);
+            }
+
+            var topLine = referenceNode.GetAttribute<bool>("topLine");
+            if (topLine)
+            {
+                XmlNode line = this.CreateLineNode(x1, y1, x2, y1);
+                positionNode.ParentNode.InsertBefore(line, positionNode);
+            }
+
+            var bottomLine = referenceNode.GetAttribute<bool>("bottomLine");
+            if (bottomLine)
+            {
+                XmlNode line = this.CreateLineNode(x1, y2, x2, y2);
+                positionNode.ParentNode.InsertBefore(line, positionNode);
             }
         }
 

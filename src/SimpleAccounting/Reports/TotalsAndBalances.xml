@@ -18,17 +18,17 @@
   <font size="8" />
   <table lineheight="4">
     <columns lineheight="8">
-      <column width="20" rightline="1">Konto</column>
-      <column width="80" rightline="1">Bezeichnung</column>
-      <column width="20" rightline="1">Letzte
+      <column width="20" rightLine="true">Konto</column>
+      <column width="80" rightLine="true">Bezeichnung</column>
+      <column width="20" rightLine="true">Letzte
 Buchung</column>
       <column width="25" align="right">
 Aktiva</column>
-      <column width="25" rightline="1" align="right">Eröffnungsbilanz
+      <column width="25" rightLine="true" align="right">Eröffnungsbilanz
 Passiva</column>
       <column width="25" align="right">
 Soll</column>
-      <column width="25" rightline="1" align="right">Summe im Zeitraum
+      <column width="25" rightLine="true" align="right">Summe im Zeitraum
 Haben</column>
       <column width="25" align="right">
 Soll</column>

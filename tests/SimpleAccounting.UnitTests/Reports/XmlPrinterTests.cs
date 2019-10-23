@@ -100,6 +100,126 @@ namespace SimpleAccounting.UnitTests.Reports
         }
 
         [Fact]
+        public void TransformDocument_TableLeftLine_ConvertedToTexts()
+        {
+            var sut = new XmlPrinter { DocumentHeight = 100 };
+            sut.LoadXml(
+                "<root>"
+                + "<table><columns>"
+                + "<column width=\"10\" leftLine=\"true\">C1</column>"
+                + "<column width=\"20\">C2</column>"
+                + "</columns><data>"
+                + "<tr><td>1</td><td>2</td></tr>"
+                + "</data></table>"
+                + "</root>");
+
+            sut.TransformDocument();
+
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse(
+                    "<root>"
+                    + "<line relToY=\"4\" />" // DefaultLineHeight
+                    + "<text relX=\"0\">C1</text>"
+                    + "<text relX=\"10\">C2</text>"
+                    + "<move relY=\"4\" />"
+                    + "<line relToY=\"4\" />"
+                    + "<text relX=\"0\">1</text>"
+                    + "<text relX=\"10\">2</text>"
+                    + "<move relY=\"4\" />"
+                    + "</root>"));
+        }
+
+        [Fact]
+        public void TransformDocument_TableRightLine_ConvertedToTexts()
+        {
+            var sut = new XmlPrinter { DocumentHeight = 100 };
+            sut.LoadXml(
+                "<root>"
+                + "<table><columns>"
+                + "<column width=\"10\" rightLine=\"true\">C1</column>"
+                + "<column width=\"20\">C2</column>"
+                + "</columns><data>"
+                + "<tr><td>1</td><td>2</td></tr>"
+                + "</data></table>"
+                + "</root>");
+
+            sut.TransformDocument();
+
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse(
+                    "<root>"
+                    + "<line relFromX=\"10\" relToX=\"10\" relToY=\"4\" />"
+                    + "<text relX=\"0\">C1</text>"
+                    + "<text relX=\"10\">C2</text>"
+                    + "<move relY=\"4\" />"
+                    + "<line relFromX=\"10\" relToX=\"10\" relToY=\"4\" />"
+                    + "<text relX=\"0\">1</text>"
+                    + "<text relX=\"10\">2</text>"
+                    + "<move relY=\"4\" />"
+                    + "</root>"));
+        }
+
+        [Fact]
+        public void TransformDocument_TableTopLine_ConvertedToTexts()
+        {
+            var sut = new XmlPrinter { DocumentHeight = 100 };
+            sut.LoadXml(
+                "<root>"
+                + "<table><columns>"
+                + "<column width=\"10\" topLine=\"true\">C1</column>"
+                + "<column width=\"20\">C2</column>"
+                + "</columns><data>"
+                + "<tr><td>1</td><td>2</td></tr>"
+                + "</data></table>"
+                + "</root>");
+
+            sut.TransformDocument();
+
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse(
+                    "<root>"
+                    + "<line relToX=\"10\" />"
+                    + "<text relX=\"0\">C1</text>"
+                    + "<text relX=\"10\">C2</text>"
+                    + "<move relY=\"4\" />"
+                    + "<line relToX=\"10\" />"
+                    + "<text relX=\"0\">1</text>"
+                    + "<text relX=\"10\">2</text>"
+                    + "<move relY=\"4\" />"
+                    + "</root>"));
+        }
+
+        [Fact]
+        public void TransformDocument_TableBottomLine_ConvertedToTexts()
+        {
+            var sut = new XmlPrinter { DocumentHeight = 100 };
+            sut.LoadXml(
+                "<root>"
+                + "<table><columns>"
+                + "<column width=\"10\" bottomLine=\"true\">C1</column>"
+                + "<column width=\"20\">C2</column>"
+                + "</columns><data>"
+                + "<tr><td>1</td><td>2</td></tr>"
+                + "</data></table>"
+                + "</root>");
+
+            sut.TransformDocument();
+
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse(
+                    "<root>"
+                    + "<line relToX=\"10\" relFromY=\"4\" relToY=\"4\" />"
+                    + "<text relX=\"0\">C1</text>"
+                    + "<text relX=\"10\">C2</text>"
+                    + "<move relY=\"4\" />"
+                    + "<line relToX=\"10\" relFromY=\"4\" relToY=\"4\" />"
+                    + "<text relX=\"0\">1</text>"
+                    + "<text relX=\"10\">2</text>"
+                    + "<move relY=\"4\" />"
+                    + "</root>"));
+        }
+
+        [Fact]
         public void TransformDocument_LongTable_NewPageWithHeader()
         {
             var sut = new XmlPrinter { DocumentHeight = 10 };

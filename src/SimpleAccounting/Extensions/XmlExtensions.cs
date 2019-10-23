@@ -9,9 +9,9 @@ namespace lg2de.SimpleAccounting.Extensions
 
     internal static class XmlExtensions
     {
-        public static void SetAttribute(this XmlNode node, string name, string value)
+        public static void SetAttribute(this XmlNode node, string name, object value)
         {
-            if (node == null)
+            if (node?.OwnerDocument == null)
             {
                 throw new ArgumentNullException(nameof(node));
             }
@@ -22,12 +22,17 @@ namespace lg2de.SimpleAccounting.Extensions
             }
 
             XmlAttribute attr = node.OwnerDocument.CreateAttribute(name);
-            attr.Value = value;
+            attr.Value = value.ToString();
             node.Attributes.SetNamedItem(attr);
         }
 
         public static T GetAttribute<T>(this XmlNode node, string name, T defaultValue = default)
         {
+            if (node == null)
+            {
+                throw new ArgumentNullException(nameof(node));
+            }
+
             var attribute = node.Attributes.GetNamedItem(name);
             if (attribute == null)
             {
