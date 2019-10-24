@@ -16,8 +16,8 @@
   <text ID="range" absX="135" align="center">Time Range</text>
   <move relY="10" />
   <font size="8" />
-  <table lineheight="4">
-    <columns lineheight="8">
+  <table lineHeight="4">
+    <columns lineHeight="8">
       <column width="20" rightLine="true">Konto</column>
       <column width="80" rightLine="true">Bezeichnung</column>
       <column width="20" rightLine="true">Letzte

@@ -175,7 +175,7 @@ namespace lg2de.SimpleAccounting.Reports
                     XmlNode groupLineNode = doc.CreateElement("tr");
                     XmlNode groupItemNode = doc.CreateElement("td");
                     groupLineNode.SetAttribute("topLine", true);
-                    groupLineNode.SetAttribute("lineheight", "6");
+                    groupLineNode.SetAttribute("lineHeight", 6);
 
                     groupItemNode.InnerText = string.Empty;
                     groupLineNode.AppendChild(groupItemNode);

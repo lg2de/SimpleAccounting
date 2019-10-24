@@ -227,7 +227,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.TransformNodes(transformingNode.FirstChild);
 
                 if (nextNode != null
-                    && this.cursorY >= (this.DocumentHeight - this.DocumentBottomMargin))
+                    && this.cursorY >= this.DocumentHeight - this.DocumentBottomMargin)
                 {
                     XmlNode newPage = this.Document.CreateElement("newpage");
                     nextNode.ParentNode.InsertBefore(newPage, nextNode);
@@ -278,69 +278,65 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void TransformTableHeader(XmlNode tableNode)
         {
-            XmlNode columnsRoot = tableNode.SelectSingleNode("columns");
+            XmlNode columnsRoot =
+                tableNode.SelectSingleNode("columns")
+                ?? throw new InvalidOperationException($"The table must define columns.");
             XmlNodeList columnNodes =
                 tableNode.SelectNodes("columns/column")
-                ?? throw new InvalidOperationException($"The table must define columns.");
+                ?? throw new InvalidOperationException($"The table must define at least one column.");
 
-            int tableLineHeight = tableNode.GetAttribute<int>("lineheight", DefaultLineHeight);
-
-            int nHeaderLineHeight = tableLineHeight;
-            XmlNode headerLineHeightNode = columnsRoot.Attributes.GetNamedItem("lineheight");
-            if (headerLineHeightNode != null)
-            {
-                nHeaderLineHeight = Convert.ToInt32(headerLineHeightNode.Value);
-            }
+            int tableLineHeight = tableNode.GetAttribute("lineHeight", DefaultLineHeight);
+            int headerLineHeight = columnsRoot.GetAttribute("lineHeight", tableLineHeight);
 
             int xPosition = 0;
             foreach (XmlNode columnNode in columnNodes)
             {
-                XmlNode width = columnNode.Attributes.GetNamedItem("width");
+                var width = columnNode.GetAttribute<int>("width");
 
                 XmlNode textNode = this.Document.CreateElement("text");
                 textNode.InnerText = columnNode.InnerText;
 
                 var columnWidth = columnNode.GetAttribute<int>("width");
                 int xAdoption = 0;
-                var align = columnNode.Attributes.GetNamedItem("align");
-                if (align != null)
+                var align = columnNode.GetAttribute<string>("align");
+                if (!string.IsNullOrEmpty(align))
                 {
-                    textNode.SetAttribute("align", align.Value);
-                    if (align.Value == "right")
+                    textNode.SetAttribute("align", align);
+                    if (align == "right")
                     {
                         xAdoption = columnWidth;
                     }
-                    else if (align.Value == "center")
+                    else if (align == "center")
                     {
                         xAdoption = columnWidth / 2;
                     }
                 }
 
-                textNode.SetAttribute("relX", (xPosition + xAdoption).ToString());
+                textNode.SetAttribute("relX", xPosition + xAdoption);
 
-                this.CreateFrame(columnNode, tableNode, xPosition, 0, xPosition + Convert.ToInt32(width.Value), nHeaderLineHeight);
+                this.CreateFrame(columnNode, tableNode, xPosition, 0, xPosition + width, headerLineHeight);
                 tableNode.ParentNode.InsertBefore(textNode, tableNode);
 
-                xPosition += Convert.ToInt32(width.Value);
+                xPosition += width;
             }
 
-            this.CreateFrame(columnsRoot, tableNode, 0, 0, xPosition, nHeaderLineHeight);
+            this.CreateFrame(columnsRoot, tableNode, 0, 0, xPosition, headerLineHeight);
 
             XmlNode moveNode = this.Document.CreateElement("move");
-            moveNode.SetAttribute("relY", nHeaderLineHeight.ToString());
+            moveNode.SetAttribute("relY", headerLineHeight);
             tableNode.ParentNode.InsertBefore(moveNode, tableNode);
-            this.cursorY += nHeaderLineHeight;
+            this.cursorY += headerLineHeight;
         }
 
         private void TransformTable(XmlNode tableNode)
         {
-            int tableLineHeight = tableNode.GetAttribute<int>("lineheight", DefaultLineHeight);
+            int tableLineHeight = tableNode.GetAttribute<int>("lineHeight", DefaultLineHeight);
 
             XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
             XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
 
             // if table can not be started on page - create new one
-            if ((this.cursorY + tableLineHeight * 2) > (this.DocumentHeight - this.DocumentBottomMargin))
+            if (this.cursorY + tableLineHeight * 2 > this.DocumentHeight - this.DocumentBottomMargin)
             {
                 XmlNode newPage = this.Document.CreateElement("newpage");
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
@@ -361,15 +357,10 @@ namespace lg2de.SimpleAccounting.Reports
                     nInnerLineCount += strText.Length / 40;
                 }
 
-                int lineHeight = tableLineHeight * nInnerLineCount;
-                XmlNode lineHeightNode = dataNode.Attributes.GetNamedItem("lineheight");
-                if (lineHeightNode != null)
-                {
-                    lineHeight = Convert.ToInt32(lineHeightNode.Value);
-                }
+                var lineHeight = dataNode.GetAttribute("lineHeight", tableLineHeight * nInnerLineCount);
 
                 // check whether oversized line still fits into page
-                if ((this.cursorY + lineHeight) > (this.DocumentHeight - this.DocumentBottomMargin))
+                if (this.cursorY + lineHeight > this.DocumentHeight - this.DocumentBottomMargin)
                 {
                     XmlNode newPage = this.Document.CreateElement("newpage");
                     tableNode.ParentNode.InsertBefore(newPage, tableNode);
@@ -422,7 +413,7 @@ namespace lg2de.SimpleAccounting.Reports
 
                 // check whether next line exists and fits into page
                 if (nodeIndex + 1 < dataNodes.Count
-                    && (this.cursorY + tableLineHeight) > (this.DocumentHeight - this.DocumentBottomMargin))
+                    && this.cursorY + tableLineHeight > this.DocumentHeight - this.DocumentBottomMargin)
                 {
                     // start new page with table header
                     XmlNode newPage = this.Document.CreateElement("newpage");
@@ -434,7 +425,7 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     // move cursor to next line
                     XmlNode moveNode = this.Document.CreateElement("move");
-                    moveNode.SetAttribute("relY", lineHeight.ToString());
+                    moveNode.SetAttribute("relY", lineHeight);
                     tableNode.ParentNode.InsertBefore(moveNode, tableNode);
                 }
             }

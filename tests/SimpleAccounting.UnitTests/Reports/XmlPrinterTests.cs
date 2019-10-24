@@ -170,6 +170,62 @@ namespace SimpleAccounting.UnitTests.Reports
         }
 
         [Fact]
+        public void TransformDocument_TableCenterAlign_ConvertedToTexts()
+        {
+            var sut = new XmlPrinter { DocumentHeight = 100 };
+            sut.LoadXml(
+                "<root>"
+                + "<table><columns>"
+                + "<column width=\"10\" align=\"center\">C1</column>"
+                + "<column width=\"20\">C2</column>"
+                + "</columns><data>"
+                + "<tr><td>1</td><td>2</td></tr>"
+                + "</data></table>"
+                + "</root>");
+
+            sut.TransformDocument();
+
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse(
+                    "<root>"
+                    + "<text relX=\"5\" align=\"center\">C1</text>"
+                    + "<text relX=\"10\">C2</text>"
+                    + "<move relY=\"4\" />" // DefaultLineHeight
+                    + "<text relX=\"5\" align=\"center\">1</text>"
+                    + "<text relX=\"10\">2</text>"
+                    + "<move relY=\"4\" />"
+                    + "</root>"));
+        }
+
+        [Fact]
+        public void TransformDocument_TableRightAlign_ConvertedToTexts()
+        {
+            var sut = new XmlPrinter { DocumentHeight = 100 };
+            sut.LoadXml(
+                "<root>"
+                + "<table><columns>"
+                + "<column width=\"10\" align=\"right\">C1</column>"
+                + "<column width=\"20\">C2</column>"
+                + "</columns><data>"
+                + "<tr><td>1</td><td>2</td></tr>"
+                + "</data></table>"
+                + "</root>");
+
+            sut.TransformDocument();
+
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse(
+                    "<root>"
+                    + "<text relX=\"10\" align=\"right\">C1</text>"
+                    + "<text relX=\"10\">C2</text>"
+                    + "<move relY=\"4\" />" // DefaultLineHeight
+                    + "<text relX=\"10\" align=\"right\">1</text>"
+                    + "<text relX=\"10\">2</text>"
+                    + "<move relY=\"4\" />"
+                    + "</root>"));
+        }
+
+        [Fact]
         public void TransformDocument_TableLeftLine_ConvertedToTexts()
         {
             var sut = new XmlPrinter { DocumentHeight = 100 };
