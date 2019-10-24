@@ -31,7 +31,7 @@ namespace lg2de.SimpleAccounting.Reports
         /// <summary>
         ///     Defines factor to translate logical position to physical position.
         /// </summary>
-        private float printFactor;
+        private double printFactor;
 
         public XmlPrinter()
         {
@@ -69,21 +69,25 @@ namespace lg2de.SimpleAccounting.Reports
 
         public void PrintDocument(string documentName)
         {
-            var printDocument = new PrintDocument();
-            printDocument.DocumentName = documentName;
+            var printDocument = new PrintDocument { DocumentName = documentName };
 
             var paperSizes = printDocument.PrinterSettings.PaperSizes;
+            this.SetupDocument(printDocument, paperSizes.OfType<PaperSize>());
 
-            this.SetupDocument(printDocument, paperSizes);
             this.TransformDocument();
+
+            PrintPreviewDialog dialog = null;
             this.SetupGraphics();
-            using (var dialog = new PrintPreviewDialog { Document = printDocument })
+            try
             {
-                dialog.WindowState = FormWindowState.Maximized;
+                dialog = new PrintPreviewDialog { Document = printDocument, WindowState = FormWindowState.Maximized };
                 dialog.ShowDialog();
             }
-
-            this.CleanupGraphics();
+            finally
+            {
+                this.CleanupGraphics();
+                dialog?.Dispose();
+            }
         }
 
         internal void LoadXml(string xml)
@@ -91,7 +95,7 @@ namespace lg2de.SimpleAccounting.Reports
             this.Document.LoadXml(xml);
         }
 
-        internal void SetupDocument(PrintDocument printDocument, PrinterSettings.PaperSizeCollection paperSizes)
+        internal void SetupDocument(PrintDocument printDocument, IEnumerable<PaperSize> paperSizes)
         {
             printDocument.PrintPage += (_, printArgs) =>
             {
@@ -101,14 +105,8 @@ namespace lg2de.SimpleAccounting.Reports
             };
 
             this.printFactor = (float)(100 / 25.4);
-            XmlNode node = this.Document.DocumentElement.Attributes.GetNamedItem("papersize");
-            string documentPaperSize = "A4";
-            if (node != null)
-            {
-                documentPaperSize = node.Value;
-            }
-
-            var paperSize = paperSizes.OfType<PaperSize>().FirstOrDefault(
+            string documentPaperSize = this.Document.DocumentElement.GetAttribute<string>("paperSize", "A4");
+            var paperSize = paperSizes.FirstOrDefault(
                 s => s.PaperName.StartsWith(documentPaperSize, StringComparison.CurrentCultureIgnoreCase));
             if (paperSize != null)
             {
@@ -120,7 +118,7 @@ namespace lg2de.SimpleAccounting.Reports
             {
                 this.DocumentWidth = this.Document.DocumentElement.GetAttribute("width", 210);
                 this.DocumentHeight = this.Document.DocumentElement.GetAttribute("height", 297);
-                var documentScale = this.Document.DocumentElement.GetAttribute("scale", 1);
+                var documentScale = this.Document.DocumentElement.GetAttribute("scale", 1.0);
                 this.printFactor *= documentScale;
                 int width = this.ToPhysical(this.DocumentWidth);
                 int height = this.ToPhysical(this.DocumentHeight);

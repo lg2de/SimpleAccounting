@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
-<xEport papersize="A4" landscape="true" left="13" top="20" bottom="15" right="13">
+<xEport paperSize="A4" landscape="true" left="13" top="20" bottom="15" right="13">
   <pageTexts>
     <font size="8">
       <text absX="135" absY="-10" align="center">- Summen und Salden -</text>

@@ -50,6 +50,11 @@ namespace lg2de.SimpleAccounting.Extensions
                 return (T)(object)bool.Parse(attribute.Value);
             }
 
+            if (returnType == typeof(string))
+            {
+                return (T)(object)attribute.Value;
+            }
+
             throw new ArgumentException($"The type {returnType.Name} is not supported.");
         }
     }

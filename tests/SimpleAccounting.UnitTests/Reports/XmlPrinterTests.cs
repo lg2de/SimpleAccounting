@@ -5,13 +5,18 @@
 namespace SimpleAccounting.UnitTests.Reports
 {
     using System;
+    using System.Collections.Generic;
+    using System.Drawing.Printing;
     using System.Xml.Linq;
     using FluentAssertions;
+    using FluentAssertions.Execution;
     using lg2de.SimpleAccounting.Reports;
     using Xunit;
 
     public class XmlPrinterTests
     {
+        private static readonly List<PaperSize> PaperSizes = new List<PaperSize> { new PaperSize("A4", (int)(210 / 0.254), (int)(297 / 0.254)) };
+
         [Fact]
         public void LoadDocument_UnknownReport_Throws()
         {
@@ -51,6 +56,71 @@ namespace SimpleAccounting.UnitTests.Reports
             var sut = new XmlPrinter();
 
             sut.Invoking(x => x.LoadDocument(TotalsAndBalancesReport.ResourceName)).Should().NotThrow();
+        }
+
+        [Fact]
+        public void SetupDocument_A4_DocumentInitialized()
+        {
+            var sut = new XmlPrinter();
+            var document = new PrintDocument();
+            sut.LoadXml("<root paperSize=\"A4\" />");
+
+            sut.SetupDocument(document, PaperSizes);
+
+            using (new AssertionScope())
+            {
+                sut.DocumentWidth.Should().Be(210);
+                sut.DocumentHeight.Should().Be(297);
+            }
+        }
+
+        [Fact]
+        public void SetupDocument_A4Landscape_DocumentInitialized()
+        {
+            var sut = new XmlPrinter();
+            var document = new PrintDocument();
+            sut.LoadXml("<root paperSize=\"A4\" landscape=\"true\" />");
+
+            sut.SetupDocument(document, PaperSizes);
+
+            using (new AssertionScope())
+            {
+                sut.DocumentWidth.Should().Be(297);
+                sut.DocumentHeight.Should().Be(210);
+            }
+        }
+
+        [Fact]
+        public void SetupDocument_Custom_DocumentInitialized()
+        {
+            var sut = new XmlPrinter();
+            var document = new PrintDocument();
+            sut.LoadXml("<root paperSize=\"custom\" width=\"10\" height=\"20\" />");
+
+            sut.SetupDocument(document, PaperSizes);
+
+            using (new AssertionScope())
+            {
+                sut.DocumentWidth.Should().Be(10);
+                sut.DocumentHeight.Should().Be(20);
+            }
+        }
+
+        [Fact]
+        public void SetupDocument_Margins_DocumentInitialized()
+        {
+            var sut = new XmlPrinter();
+            var document = new PrintDocument();
+            sut.LoadXml("<root left=\"1\" top=\"2\" bottom=\"3\" />");
+
+            sut.SetupDocument(document, PaperSizes);
+
+            using (new AssertionScope())
+            {
+                sut.DocumentLeftMargin.Should().Be(1);
+                sut.DocumentTopMargin.Should().Be(2);
+                sut.DocumentBottomMargin.Should().Be(3);
+            }
         }
 
         [Fact]
