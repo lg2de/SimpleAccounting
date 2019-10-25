@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
@@ -15,26 +16,29 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Windows.Forms;
     using System.Windows.Input;
     using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
 
     [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
-    public class ShellViewModel : Conductor<IScreen>
+    internal class ShellViewModel : Conductor<IScreen>
     {
         private readonly IWindowManager windowManager;
         private readonly IMessageBox messageBox;
+        private readonly IFileSystem fileSystem;
 
         private AccountingData accountingData;
         private string fileName = "";
         private int bookingYear;
         private AccountingDataJournal currentJournal;
 
-        public ShellViewModel(IWindowManager windowManager, IMessageBox messageBox)
+        public ShellViewModel(IWindowManager windowManager, IMessageBox messageBox, IFileSystem fileSystem)
         {
             this.windowManager = windowManager;
             this.messageBox = messageBox;
+            this.fileSystem = fileSystem;
         }
 
         public ObservableCollection<MenuViewModel> RecentProjects { get; }
@@ -301,6 +305,8 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         });
 
+        internal Settings Settings { get; set; } = Settings.Default;
+
         private bool IsDocumentChanged { get; set; }
 
         public override void CanClose(Action<bool> callback)
@@ -330,14 +336,14 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnActivate();
 
-            if (File.Exists(Settings.Default.RecentProject))
+            if (this.fileSystem.FileExists(this.Settings.RecentProject))
             {
-                this.LoadProjectFromFile(Settings.Default.RecentProject);
+                this.LoadProjectFromFile(this.Settings.RecentProject);
             }
 
-            foreach (var project in Settings.Default.RecentProjects)
+            foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
             {
-                if (!File.Exists(project))
+                if (!this.fileSystem.FileExists(project))
                 {
                     continue;
                 }

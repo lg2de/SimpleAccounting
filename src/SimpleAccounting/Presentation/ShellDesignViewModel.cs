@@ -6,10 +6,10 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
 
-    public class ShellDesignViewModel : ShellViewModel
+    internal class ShellDesignViewModel : ShellViewModel
     {
         public ShellDesignViewModel()
-            : base(null, null)
+            : base(null, null, null)
         {
             var menuItem = new MenuViewModel("c:\\Test.bxml", null);
             this.RecentProjects.Add(menuItem);

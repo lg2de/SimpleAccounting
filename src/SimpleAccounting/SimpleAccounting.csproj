@@ -121,6 +121,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstractions\FileSystem.cs" />
+    <Compile Include="Abstractions\IFileSystem.cs" />
     <Compile Include="Model\AccountingData.designer.cs" />
     <Compile Include="Presentation\AccountDesignViewModel.cs" />
     <Compile Include="Presentation\AccountJournalViewModel.cs" />

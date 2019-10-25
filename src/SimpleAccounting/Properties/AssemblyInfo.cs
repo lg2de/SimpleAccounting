@@ -13,3 +13,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyVersion("2.0.0.0")]
 
 [assembly: InternalsVisibleTo("SimpleAccounting.UnitTests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

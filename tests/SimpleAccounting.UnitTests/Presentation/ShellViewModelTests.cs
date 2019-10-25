@@ -6,24 +6,58 @@ namespace SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Linq;
     using System.Windows;
     using Caliburn.Micro;
     using FluentAssertions;
     using FluentAssertions.Execution;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
+    using lg2de.SimpleAccounting.Properties;
     using NSubstitute;
     using Xunit;
 
     public class ShellViewModelTests
     {
         [Fact]
+        public void OnInitialize_Initialized()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+
+            ((IActivate)sut).Activate();
+
+            sut.DisplayName.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public void OnActivate_TwoRecentProjectsOneExisting_ExistingProjectListed()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem)
+            {
+                Settings = new Settings { RecentProjects = new StringCollection { "file1", "file2" } }
+            };
+            fileSystem.FileExists(Arg.Is("file1")).Returns(true);
+
+            ((IActivate)sut).Activate();
+
+            sut.RecentProjects?.Select(x => x.Header).Should().Equal("file1");
+        }
+
+        [Fact]
         public void NewProjectCommand_ProjectInitialized()
         {
             var windowManager = Substitute.For<IWindowManager>();
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
 
             sut.NewProjectCommand.Execute(null);
 
@@ -37,7 +71,8 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
 
             sut.SaveProjectCommand.CanExecute(null).Should()
                 .BeFalse("default instance does not contain modified document");
@@ -48,7 +83,8 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AddBooking(new AccountingDataJournalBooking(), refreshJournal: false);
@@ -63,7 +99,8 @@ namespace SimpleAccounting.UnitTests.Presentation
             AddBookingViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AddBookingsCommand.Execute(null);
@@ -78,7 +115,8 @@ namespace SimpleAccounting.UnitTests.Presentation
             ImportBookingsViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as ImportBookingsViewModel));
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.ImportBookingsCommand.Execute(null);
@@ -100,7 +138,8 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
 
             sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
         }
@@ -110,7 +149,8 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.CloseYearCommand.CanExecute(null).Should().BeTrue();
@@ -123,7 +163,8 @@ namespace SimpleAccounting.UnitTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             messageBox.Show(Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
             var year = sut.BookingYears.Last();
             sut.CloseYearCommand.Execute(null);
@@ -143,7 +184,8 @@ namespace SimpleAccounting.UnitTests.Presentation
                 vm.Identifier = 500;
             })).Returns(true);
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.NewAccountCommand.Execute(null);
@@ -162,7 +204,8 @@ namespace SimpleAccounting.UnitTests.Presentation
                 vm.Identifier += 1000;
             })).Returns(true);
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
             var booking = new AccountingDataJournalBooking
             {
@@ -197,7 +240,8 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var messageBox = Substitute.For<IMessageBox>();
-            var sut = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             var booking = new AccountingDataJournalBooking

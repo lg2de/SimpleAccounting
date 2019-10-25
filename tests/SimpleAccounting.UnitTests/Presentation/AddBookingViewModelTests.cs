@@ -7,6 +7,7 @@ namespace SimpleAccounting.UnitTests.Presentation
     using System;
     using Caliburn.Micro;
     using FluentAssertions;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Presentation;
     using NSubstitute;
     using Xunit;
@@ -28,7 +29,8 @@ namespace SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var messageBox = Substitute.For<IMessageBox>();
-            var parent = new ShellViewModel(windowManager, messageBox);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var parent = new ShellViewModel(windowManager, messageBox, fileSystem);
             parent.LoadProjectData(Samples.SampleProject);
             var sut = new AddBookingViewModel(parent, DateTime.Now.Year);
 
