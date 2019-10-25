@@ -6,8 +6,10 @@ namespace lg2de.SimpleAccounting.Reports
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Xml;
+    using System.Xml.Linq;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
@@ -18,35 +20,39 @@ namespace lg2de.SimpleAccounting.Reports
         private readonly IEnumerable<AccountDefinition> accounts;
         private readonly AccountingDataJournal journal;
         private readonly AccountingDataSetup setup;
-        private readonly string bookingYearName;
+        private readonly CultureInfo culture;
+
+        private XmlPrinter printer;
 
         public AccountJournalReport(
             IEnumerable<AccountDefinition> accounts,
             AccountingDataJournal journal,
             AccountingDataSetup setup,
-            string bookingYearName)
+            CultureInfo culture)
         {
             this.accounts = accounts.OrderBy(a => a.ID);
             this.journal = journal;
             this.setup = setup;
-            this.bookingYearName = bookingYearName;
+            this.culture = culture;
         }
+
+        internal XDocument Document => XDocument.Parse(this.printer.Document.OuterXml);
 
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
-            var print = new XmlPrinter();
-            print.LoadDocument(ResourceName);
+            this.printer = new XmlPrinter();
+            this.printer.LoadDocument(ResourceName);
 
-            XmlDocument doc = print.Document;
+            XmlDocument doc = this.printer.Document;
 
             XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
             firmNode.InnerText = this.setup.Name;
 
             XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            rangeNode.InnerText = dateStart.ToString("d") + " - " + dateEnd.ToString("d");
+            rangeNode.InnerText = dateStart.ToString("d", this.culture) + " - " + dateEnd.ToString("d", this.culture);
 
             var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToLongDateString();
+            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToString("D", this.culture);
 
             XmlNode tableNode = doc.SelectSingleNode("//table");
 
@@ -82,7 +88,7 @@ namespace lg2de.SimpleAccounting.Reports
                     dataNode.AppendChild(dataLineNode);
                     XmlNode dataItemNode = doc.CreateElement("td");
                     dataLineNode.SetAttribute("topLine", true);
-                    dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d");
+                    dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d", this.culture);
                     dataLineNode.AppendChild(dataItemNode);
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = entry.ID.ToString();
@@ -97,11 +103,10 @@ namespace lg2de.SimpleAccounting.Reports
 
                         double nValue = Convert.ToDouble(debitEntry.Value) / 100;
                         dataItemNode = dataItemNode.Clone();
-                        dataItemNode.InnerText = nValue.ToString("0.00");
+                        dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
                         dataLineNode.AppendChild(dataItemNode);
 
-                        dataItemNode = dataItemNode.Clone();
-                        dataItemNode.InnerText = string.Empty;
+                        dataItemNode = doc.CreateElement("td");
                         dataLineNode.AppendChild(dataItemNode);
 
                         dataItemNode = dataItemNode.Clone();
@@ -124,13 +129,12 @@ namespace lg2de.SimpleAccounting.Reports
                         dataItemNode.InnerText = creditEntry.Text;
                         dataLineNode.AppendChild(dataItemNode);
 
-                        dataItemNode = dataItemNode.Clone();
-                        dataItemNode.InnerText = string.Empty;
+                        dataItemNode = doc.CreateElement("td");
                         dataLineNode.AppendChild(dataItemNode);
 
                         double nValue = Convert.ToDouble(creditEntry.Value) / 100;
                         dataItemNode = dataItemNode.Clone();
-                        dataItemNode.InnerText = nValue.ToString("0.00");
+                        dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
                         dataLineNode.AppendChild(dataItemNode);
 
                         dataItemNode = dataItemNode.Clone();
@@ -153,8 +157,11 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);
+        }
 
-            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Journal " + this.bookingYearName);
+        public void ShowPreview(string documentName)
+        {
+            this.printer.PrintDocument(documentName);
         }
     }
 }

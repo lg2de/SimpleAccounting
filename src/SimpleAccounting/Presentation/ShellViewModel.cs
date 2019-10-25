@@ -144,9 +144,10 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.accountingData.Accounts.SelectMany(a => a.Account),
                 this.currentJournal,
                 this.accountingData.Setup,
-                this.bookingYear.ToString());
+                CultureInfo.CurrentUICulture);
             var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
+            report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Journal {this.bookingYear}");
         });
 
         public ICommand TotalsAndBalancesReportCommand => new RelayCommand(_ =>
