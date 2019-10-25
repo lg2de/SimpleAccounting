@@ -8,6 +8,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Windows;
@@ -131,9 +132,10 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = new TotalJournalReport(
                 this.currentJournal,
                 this.accountingData.Setup,
-                this.bookingYear.ToString());
+                CultureInfo.CurrentUICulture);
             var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
+            report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Journal {this.bookingYear}");
         });
 
         public ICommand AccountJournalReportCommand => new RelayCommand(_ =>

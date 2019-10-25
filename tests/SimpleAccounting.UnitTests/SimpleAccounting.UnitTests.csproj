@@ -97,6 +97,7 @@
     <Compile Include="Presentation\Samples.cs" />
     <Compile Include="Presentation\ShellViewModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reports\TotalJournalReportTests.cs" />
     <Compile Include="Reports\XmlPrinterTests.cs" />
   </ItemGroup>
   <ItemGroup>
