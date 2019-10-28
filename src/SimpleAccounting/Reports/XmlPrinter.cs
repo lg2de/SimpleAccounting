@@ -14,6 +14,7 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Reflection;
     using System.Windows.Forms;
     using System.Xml;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
 
     internal class XmlPrinter : IXmlPrinter
@@ -102,7 +103,9 @@ namespace lg2de.SimpleAccounting.Reports
             printDocument.PrintPage += (_, printArgs) =>
             {
                 this.ProcessNewPage();
-                this.PrintNodes(printArgs);
+
+                var graphics = new DrawingGraphics(printArgs);
+                this.PrintNodes(printArgs, graphics);
             };
 
             this.printFactor = (float)(100 / 25.4);
@@ -152,6 +155,8 @@ namespace lg2de.SimpleAccounting.Reports
             this.penStack.Push(defaultPen);
             this.solidBrushStack.Push(defaultBrush);
             this.fontStack.Push(defaultFont);
+
+            this.currentNode = this.Document.DocumentElement.FirstChild;
         }
 
         internal void CleanupGraphics()
@@ -166,7 +171,6 @@ namespace lg2de.SimpleAccounting.Reports
             this.currentNode = this.Document.DocumentElement.FirstChild;
             this.TransformNodes(this.currentNode);
             this.ProcessPageTexts();
-            this.currentNode = this.Document.DocumentElement.FirstChild;
         }
 
         internal void TransformNodes(XmlNode firstNode)
@@ -211,6 +215,63 @@ namespace lg2de.SimpleAccounting.Reports
 
                     this.ProcessNewPage();
                 }
+            }
+        }
+
+        internal void PrintNodes(PrintPageEventArgs printArgs, IGraphics graphics)
+        {
+            while (this.currentNode != null)
+            {
+                if (graphics.HasMorePages)
+                {
+                    return;
+                }
+
+                if (this.currentNode.Name == "move")
+                {
+                    this.ProcessMoveNode(this.currentNode);
+                }
+                else if (this.currentNode.Name == "text")
+                {
+                    this.PrintTextNode(graphics);
+                }
+                else if (this.currentNode.Name == "line")
+                {
+                    this.PrintLineNode(printArgs);
+                }
+                else if (this.currentNode.Name == "circle")
+                {
+                    this.PrintCircleNode(printArgs);
+                }
+                else if (this.currentNode.Name == "font")
+                {
+                    this.PrintFontNode(printArgs, graphics);
+                }
+                else if (this.currentNode.Name == "color")
+                {
+                    this.PrintColorNode(printArgs, graphics);
+                }
+                else if (this.currentNode.Name == "newpage")
+                {
+                    graphics.HasMorePages = true;
+                    this.currentNode = this.currentNode.NextSibling;
+                    return;
+                }
+
+                if (this.currentNode.NextSibling != null)
+                {
+                    this.currentNode = this.currentNode.NextSibling;
+                    continue;
+                }
+
+                if (this.currentNode.ParentNode != null
+                    && this.currentNode.ParentNode.Name != "xEport")
+                {
+                    this.currentNode = this.currentNode.ParentNode.NextSibling;
+                }
+
+                // step back in stack
+                return;
             }
         }
 
@@ -538,64 +599,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
         }
 
-        private void PrintNodes(PrintPageEventArgs printArgs)
-        {
-            while (this.currentNode != null)
-            {
-                if (printArgs.HasMorePages)
-                {
-                    return;
-                }
-
-                if (this.currentNode.Name == "move")
-                {
-                    this.ProcessMoveNode(this.currentNode);
-                }
-                else if (this.currentNode.Name == "text")
-                {
-                    this.PrintTextNode(printArgs);
-                }
-                else if (this.currentNode.Name == "line")
-                {
-                    this.PrintLineNode(printArgs);
-                }
-                else if (this.currentNode.Name == "circle")
-                {
-                    this.PrintCircleNode(printArgs);
-                }
-                else if (this.currentNode.Name == "font")
-                {
-                    this.PrintFontNode(printArgs);
-                }
-                else if (this.currentNode.Name == "color")
-                {
-                    this.PrintColorNode(printArgs);
-                }
-                else if (this.currentNode.Name == "newpage")
-                {
-                    printArgs.HasMorePages = true;
-                    this.currentNode = this.currentNode.NextSibling;
-                    return;
-                }
-
-                if (this.currentNode.NextSibling != null)
-                {
-                    this.currentNode = this.currentNode.NextSibling;
-                    continue;
-                }
-
-                if (this.currentNode.ParentNode != null
-                    && this.currentNode.ParentNode.Name != "xEport")
-                {
-                    this.currentNode = this.currentNode.ParentNode.NextSibling;
-                }
-
-                // step back in stack
-                return;
-            }
-        }
-
-        private void PrintTextNode(PrintPageEventArgs printArgs)
+        private void PrintTextNode(IGraphics graphics)
         {
             SolidBrush drawBrush = this.solidBrushStack.Peek();
             Font drawFont = this.fontStack.Peek();
@@ -643,7 +647,7 @@ namespace lg2de.SimpleAccounting.Reports
                     break;
                 }
 
-                printArgs.Graphics.DrawString(
+                graphics.DrawString(
                     text,
                     drawFont,
                     drawBrush,
@@ -763,7 +767,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.ToPhysical(radY));
         }
 
-        private void PrintFontNode(PrintPageEventArgs printArgs)
+        private void PrintFontNode(PrintPageEventArgs printArgs, IGraphics graphics)
         {
             Font drawFont = this.fontStack.Peek();
 
@@ -805,7 +809,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.fontStack.Push(newFont);
                 var stackNode = this.currentNode;
                 this.currentNode = this.currentNode.FirstChild;
-                this.PrintNodes(printArgs);
+                this.PrintNodes(printArgs, graphics);
                 this.currentNode = stackNode;
                 this.fontStack.Pop().Dispose();
             }
@@ -817,7 +821,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
         }
 
-        private void PrintColorNode(PrintPageEventArgs printArgs)
+        private void PrintColorNode(PrintPageEventArgs printArgs, IGraphics graphics)
         {
             Pen drawPen = this.penStack.Peek();
             SolidBrush drawBrush = this.solidBrushStack.Peek();
@@ -837,7 +841,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.solidBrushStack.Push(newBrush);
                 var stackNode = this.currentNode;
                 this.currentNode = this.currentNode.FirstChild;
-                this.PrintNodes(printArgs);
+                this.PrintNodes(printArgs, graphics);
                 this.currentNode = stackNode;
                 this.penStack.Pop().Dispose();
                 this.solidBrushStack.Pop().Dispose();

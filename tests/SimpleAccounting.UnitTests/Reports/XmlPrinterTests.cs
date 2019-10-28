@@ -10,7 +10,9 @@ namespace SimpleAccounting.UnitTests.Reports
     using System.Xml.Linq;
     using FluentAssertions;
     using FluentAssertions.Execution;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Reports;
+    using NSubstitute;
     using Xunit;
 
     public class XmlPrinterTests
@@ -459,6 +461,27 @@ namespace SimpleAccounting.UnitTests.Reports
                 + "<text relX=\"0\">2</text>"
                 + "<move relY=\"4\" />"
                 + "</root>"));
+        }
+
+        [Fact]
+        public void PrintNodes_Move_CursorUpdated()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><move absX=\"10\" absY=\"20\" /></root>");
+            sut.SetupGraphics();
+            sut.CursorX = 5;
+            sut.CursorY = 8;
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(null, graphics);
+
+            using (new AssertionScope())
+            {
+                sut.CursorX.Should().Be(10);
+                sut.CursorY.Should().Be(20);
+            }
+
+            sut.CleanupGraphics();
         }
     }
 }
