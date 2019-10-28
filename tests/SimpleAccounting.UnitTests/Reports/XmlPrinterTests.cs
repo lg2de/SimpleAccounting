@@ -142,6 +142,59 @@ namespace SimpleAccounting.UnitTests.Reports
         }
 
         [Fact]
+        public void TransformDocument_MoveAbsolute_CursorUpdated()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><move absX=\"10\" absY=\"20\" /></root>");
+            sut.CursorX = 5;
+            sut.CursorY = 8;
+
+            sut.TransformDocument();
+
+            using (new AssertionScope())
+            {
+                sut.CursorX.Should().Be(10);
+                sut.CursorY.Should().Be(20);
+            }
+        }
+
+        [Fact]
+        public void TransformDocument_MoveRelativeOnly_CursorUpdated()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><move relX=\"10\" relY=\"20\" /></root>");
+            sut.CursorX = 5;
+            sut.CursorY = 8;
+
+            sut.TransformDocument();
+
+            using (new AssertionScope())
+            {
+                sut.CursorX.Should().Be(15);
+                sut.CursorY.Should().Be(28);
+            }
+        }
+
+        [Fact]
+        public void TransformDocument_MoveAbsolutAndRelative_CursorUpdated()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><move absX=\"10\" absY=\"20\" relX=\"3\" relY=\"4\" /></root>");
+
+            // initialize cursor with irrelevant values
+            sut.CursorX = 5;
+            sut.CursorY = 8;
+
+            sut.TransformDocument();
+
+            using (new AssertionScope())
+            {
+                sut.CursorX.Should().Be(13);
+                sut.CursorY.Should().Be(24);
+            }
+        }
+
+        [Fact]
         public void TransformDocument_Table_ConvertedToTexts()
         {
             var sut = new XmlPrinter { DocumentHeight = 100 };
