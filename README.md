@@ -1,6 +1,7 @@
 # SimpleAccounting - Simple Accounting Software
 
 [![Build status](https://ci.appveyor.com/api/projects/status/gdw9q7ves4fuu9t4/branch/master?svg=true)](https://ci.appveyor.com/project/lg2de/simpleaccounting/branch/master)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=alert_status)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 
 I started `SimpleAccounting` around 2005, only for my personal use to manage accounts and balances of a small club.
 In 2019, I met a colleague from another small club who was looking for a simple solution to get an overview of the balances of several logical and real accounts.
