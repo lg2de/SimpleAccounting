@@ -96,7 +96,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 BookingNumber = this.GetMaxBookIdent() + 1
             };
             bookingModel.Accounts.AddRange(this.accountingData.AllAccounts);
-            bookingModel.BindingTemplates.Add(new BookingTemplate { Text = "Geld abheben", Credit = 110, Debit = 100 });
+            this.accountingData.Setup.BookingTemplates.Template
+                .Select(t => new BookingTemplate { Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / 100.0 })
+                .ToList().ForEach(bookingModel.BindingTemplates.Add);
             this.windowManager.ShowDialog(bookingModel);
         });
 

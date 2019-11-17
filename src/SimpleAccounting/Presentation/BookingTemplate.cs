@@ -11,5 +11,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ulong Credit { get; set; }
 
         public ulong Debit { get; set; }
+
+        public double Value { get; set; }
     }
 }

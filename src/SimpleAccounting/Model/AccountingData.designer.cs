@@ -269,12 +269,15 @@ namespace lg2de.SimpleAccounting.Model {
         
         private string locationField;
         
+        private AccountingDataSetupBookingTemplates bookingTemplatesField;
+        
         private AccountingDataSetupReports reportsField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
         public AccountingDataSetup() {
             this.reportsField = new AccountingDataSetupReports();
+            this.bookingTemplatesField = new AccountingDataSetupBookingTemplates();
         }
         
         public string Name {
@@ -292,6 +295,15 @@ namespace lg2de.SimpleAccounting.Model {
             }
             set {
                 this.locationField = value;
+            }
+        }
+        
+        public AccountingDataSetupBookingTemplates BookingTemplates {
+            get {
+                return this.bookingTemplatesField;
+            }
+            set {
+                this.bookingTemplatesField = value;
             }
         }
         
@@ -462,30 +474,30 @@ namespace lg2de.SimpleAccounting.Model {
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
-    public partial class AccountingDataSetupReports {
+    public partial class AccountingDataSetupBookingTemplates {
         
-        private List<string> totalsAndBalancesReportField;
+        private List<AccountingDataSetupBookingTemplatesTemplate> templateField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
-        public AccountingDataSetupReports() {
-            this.totalsAndBalancesReportField = new List<string>();
+        public AccountingDataSetupBookingTemplates() {
+            this.templateField = new List<AccountingDataSetupBookingTemplatesTemplate>();
         }
         
-        [System.Xml.Serialization.XmlArrayItemAttribute("Signature", IsNullable=false)]
-        public List<string> TotalsAndBalancesReport {
+        [System.Xml.Serialization.XmlElementAttribute("Template")]
+        public List<AccountingDataSetupBookingTemplatesTemplate> Template {
             get {
-                return this.totalsAndBalancesReportField;
+                return this.templateField;
             }
             set {
-                this.totalsAndBalancesReportField = value;
+                this.templateField = value;
             }
         }
         
         private static System.Xml.Serialization.XmlSerializer Serializer {
             get {
                 if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataSetupReports));
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataSetupBookingTemplates));
                 }
                 return serializer;
             }
@@ -493,7 +505,7 @@ namespace lg2de.SimpleAccounting.Model {
         
         #region Serialize/Deserialize
         /// <summary>
-        /// Serializes current AccountingDataSetupReports object into an XML document
+        /// Serializes current AccountingDataSetupBookingTemplates object into an XML document
         /// </summary>
         /// <returns>string XML value</returns>
         public virtual string Serialize() {
@@ -517,15 +529,15 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         /// <summary>
-        /// Deserializes workflow markup into an AccountingDataSetupReports object
+        /// Deserializes workflow markup into an AccountingDataSetupBookingTemplates object
         /// </summary>
         /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output AccountingDataSetupReports object</param>
+        /// <param name="obj">Output AccountingDataSetupBookingTemplates object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out AccountingDataSetupReports obj, out System.Exception exception) {
+        public static bool Deserialize(string xml, out AccountingDataSetupBookingTemplates obj, out System.Exception exception) {
             exception = null;
-            obj = default(AccountingDataSetupReports);
+            obj = default(AccountingDataSetupBookingTemplates);
             try {
                 obj = Deserialize(xml);
                 return true;
@@ -536,16 +548,16 @@ namespace lg2de.SimpleAccounting.Model {
             }
         }
         
-        public static bool Deserialize(string xml, out AccountingDataSetupReports obj) {
+        public static bool Deserialize(string xml, out AccountingDataSetupBookingTemplates obj) {
             System.Exception exception = null;
             return Deserialize(xml, out obj, out exception);
         }
         
-        public static AccountingDataSetupReports Deserialize(string xml) {
+        public static AccountingDataSetupBookingTemplates Deserialize(string xml) {
             System.IO.StringReader stringReader = null;
             try {
                 stringReader = new System.IO.StringReader(xml);
-                return ((AccountingDataSetupReports)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+                return ((AccountingDataSetupBookingTemplates)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
             }
             finally {
                 if ((stringReader != null)) {
@@ -555,7 +567,7 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         /// <summary>
-        /// Serializes current AccountingDataSetupReports object into file
+        /// Serializes current AccountingDataSetupBookingTemplates object into file
         /// </summary>
         /// <param name="fileName">full path of outupt xml file</param>
         /// <param name="exception">output Exception value if failed</param>
@@ -589,15 +601,15 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         /// <summary>
-        /// Deserializes xml markup from file into an AccountingDataSetupReports object
+        /// Deserializes xml markup from file into an AccountingDataSetupBookingTemplates object
         /// </summary>
         /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output AccountingDataSetupReports object</param>
+        /// <param name="obj">Output AccountingDataSetupBookingTemplates object</param>
         /// <param name="exception">output Exception value if deserialize failed</param>
         /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out AccountingDataSetupReports obj, out System.Exception exception) {
+        public static bool LoadFromFile(string fileName, out AccountingDataSetupBookingTemplates obj, out System.Exception exception) {
             exception = null;
-            obj = default(AccountingDataSetupReports);
+            obj = default(AccountingDataSetupBookingTemplates);
             try {
                 obj = LoadFromFile(fileName);
                 return true;
@@ -608,12 +620,258 @@ namespace lg2de.SimpleAccounting.Model {
             }
         }
         
-        public static bool LoadFromFile(string fileName, out AccountingDataSetupReports obj) {
+        public static bool LoadFromFile(string fileName, out AccountingDataSetupBookingTemplates obj) {
             System.Exception exception = null;
             return LoadFromFile(fileName, out obj, out exception);
         }
         
-        public static AccountingDataSetupReports LoadFromFile(string fileName) {
+        public static AccountingDataSetupBookingTemplates LoadFromFile(string fileName) {
+            System.IO.FileStream file = null;
+            System.IO.StreamReader sr = null;
+            try {
+                file = new System.IO.FileStream(fileName, FileMode.Open, FileAccess.Read);
+                sr = new System.IO.StreamReader(file);
+                string xmlString = sr.ReadToEnd();
+                sr.Close();
+                file.Close();
+                return Deserialize(xmlString);
+            }
+            finally {
+                if ((file != null)) {
+                    file.Dispose();
+                }
+                if ((sr != null)) {
+                    sr.Dispose();
+                }
+            }
+        }
+        #endregion
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
+    public partial class AccountingDataSetupBookingTemplatesTemplate {
+        
+        private string textField;
+        
+        private int valueField;
+        
+        private bool valueFieldSpecified;
+        
+        private ulong creditField;
+        
+        private bool creditFieldSpecified;
+        
+        private ulong debitField;
+        
+        private bool debitFieldSpecified;
+        
+        private static System.Xml.Serialization.XmlSerializer serializer;
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Text {
+            get {
+                return this.textField;
+            }
+            set {
+                this.textField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public int Value {
+            get {
+                return this.valueField;
+            }
+            set {
+                this.valueField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool ValueSpecified {
+            get {
+                return this.valueFieldSpecified;
+            }
+            set {
+                this.valueFieldSpecified = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public ulong Credit {
+            get {
+                return this.creditField;
+            }
+            set {
+                this.creditField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool CreditSpecified {
+            get {
+                return this.creditFieldSpecified;
+            }
+            set {
+                this.creditFieldSpecified = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public ulong Debit {
+            get {
+                return this.debitField;
+            }
+            set {
+                this.debitField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool DebitSpecified {
+            get {
+                return this.debitFieldSpecified;
+            }
+            set {
+                this.debitFieldSpecified = value;
+            }
+        }
+        
+        private static System.Xml.Serialization.XmlSerializer Serializer {
+            get {
+                if ((serializer == null)) {
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataSetupBookingTemplatesTemplate));
+                }
+                return serializer;
+            }
+        }
+        
+        #region Serialize/Deserialize
+        /// <summary>
+        /// Serializes current AccountingDataSetupBookingTemplatesTemplate object into an XML document
+        /// </summary>
+        /// <returns>string XML value</returns>
+        public virtual string Serialize() {
+            System.IO.StreamReader streamReader = null;
+            System.IO.MemoryStream memoryStream = null;
+            try {
+                memoryStream = new System.IO.MemoryStream();
+                Serializer.Serialize(memoryStream, this);
+                memoryStream.Seek(0, System.IO.SeekOrigin.Begin);
+                streamReader = new System.IO.StreamReader(memoryStream);
+                return streamReader.ReadToEnd();
+            }
+            finally {
+                if ((streamReader != null)) {
+                    streamReader.Dispose();
+                }
+                if ((memoryStream != null)) {
+                    memoryStream.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes workflow markup into an AccountingDataSetupBookingTemplatesTemplate object
+        /// </summary>
+        /// <param name="xml">string workflow markup to deserialize</param>
+        /// <param name="obj">Output AccountingDataSetupBookingTemplatesTemplate object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool Deserialize(string xml, out AccountingDataSetupBookingTemplatesTemplate obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountingDataSetupBookingTemplatesTemplate);
+            try {
+                obj = Deserialize(xml);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool Deserialize(string xml, out AccountingDataSetupBookingTemplatesTemplate obj) {
+            System.Exception exception = null;
+            return Deserialize(xml, out obj, out exception);
+        }
+        
+        public static AccountingDataSetupBookingTemplatesTemplate Deserialize(string xml) {
+            System.IO.StringReader stringReader = null;
+            try {
+                stringReader = new System.IO.StringReader(xml);
+                return ((AccountingDataSetupBookingTemplatesTemplate)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+            }
+            finally {
+                if ((stringReader != null)) {
+                    stringReader.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Serializes current AccountingDataSetupBookingTemplatesTemplate object into file
+        /// </summary>
+        /// <param name="fileName">full path of outupt xml file</param>
+        /// <param name="exception">output Exception value if failed</param>
+        /// <returns>true if can serialize and save into file; otherwise, false</returns>
+        public virtual bool SaveToFile(string fileName, out System.Exception exception) {
+            exception = null;
+            try {
+                SaveToFile(fileName);
+                return true;
+            }
+            catch (System.Exception e) {
+                exception = e;
+                return false;
+            }
+        }
+        
+        public virtual void SaveToFile(string fileName) {
+            System.IO.StreamWriter streamWriter = null;
+            try {
+                string xmlString = Serialize();
+                System.IO.FileInfo xmlFile = new System.IO.FileInfo(fileName);
+                streamWriter = xmlFile.CreateText();
+                streamWriter.WriteLine(xmlString);
+                streamWriter.Close();
+            }
+            finally {
+                if ((streamWriter != null)) {
+                    streamWriter.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes xml markup from file into an AccountingDataSetupBookingTemplatesTemplate object
+        /// </summary>
+        /// <param name="fileName">string xml file to load and deserialize</param>
+        /// <param name="obj">Output AccountingDataSetupBookingTemplatesTemplate object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool LoadFromFile(string fileName, out AccountingDataSetupBookingTemplatesTemplate obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountingDataSetupBookingTemplatesTemplate);
+            try {
+                obj = LoadFromFile(fileName);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool LoadFromFile(string fileName, out AccountingDataSetupBookingTemplatesTemplate obj) {
+            System.Exception exception = null;
+            return LoadFromFile(fileName, out obj, out exception);
+        }
+        
+        public static AccountingDataSetupBookingTemplatesTemplate LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {
@@ -1300,6 +1558,184 @@ namespace lg2de.SimpleAccounting.Model {
         
         /// <remarks/>
         Carryforward,
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
+    public partial class AccountingDataSetupReports {
+        
+        private List<string> totalsAndBalancesReportField;
+        
+        private static System.Xml.Serialization.XmlSerializer serializer;
+        
+        public AccountingDataSetupReports() {
+            this.totalsAndBalancesReportField = new List<string>();
+        }
+        
+        [System.Xml.Serialization.XmlArrayItemAttribute("Signature", IsNullable=false)]
+        public List<string> TotalsAndBalancesReport {
+            get {
+                return this.totalsAndBalancesReportField;
+            }
+            set {
+                this.totalsAndBalancesReportField = value;
+            }
+        }
+        
+        private static System.Xml.Serialization.XmlSerializer Serializer {
+            get {
+                if ((serializer == null)) {
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataSetupReports));
+                }
+                return serializer;
+            }
+        }
+        
+        #region Serialize/Deserialize
+        /// <summary>
+        /// Serializes current AccountingDataSetupReports object into an XML document
+        /// </summary>
+        /// <returns>string XML value</returns>
+        public virtual string Serialize() {
+            System.IO.StreamReader streamReader = null;
+            System.IO.MemoryStream memoryStream = null;
+            try {
+                memoryStream = new System.IO.MemoryStream();
+                Serializer.Serialize(memoryStream, this);
+                memoryStream.Seek(0, System.IO.SeekOrigin.Begin);
+                streamReader = new System.IO.StreamReader(memoryStream);
+                return streamReader.ReadToEnd();
+            }
+            finally {
+                if ((streamReader != null)) {
+                    streamReader.Dispose();
+                }
+                if ((memoryStream != null)) {
+                    memoryStream.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes workflow markup into an AccountingDataSetupReports object
+        /// </summary>
+        /// <param name="xml">string workflow markup to deserialize</param>
+        /// <param name="obj">Output AccountingDataSetupReports object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool Deserialize(string xml, out AccountingDataSetupReports obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountingDataSetupReports);
+            try {
+                obj = Deserialize(xml);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool Deserialize(string xml, out AccountingDataSetupReports obj) {
+            System.Exception exception = null;
+            return Deserialize(xml, out obj, out exception);
+        }
+        
+        public static AccountingDataSetupReports Deserialize(string xml) {
+            System.IO.StringReader stringReader = null;
+            try {
+                stringReader = new System.IO.StringReader(xml);
+                return ((AccountingDataSetupReports)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+            }
+            finally {
+                if ((stringReader != null)) {
+                    stringReader.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Serializes current AccountingDataSetupReports object into file
+        /// </summary>
+        /// <param name="fileName">full path of outupt xml file</param>
+        /// <param name="exception">output Exception value if failed</param>
+        /// <returns>true if can serialize and save into file; otherwise, false</returns>
+        public virtual bool SaveToFile(string fileName, out System.Exception exception) {
+            exception = null;
+            try {
+                SaveToFile(fileName);
+                return true;
+            }
+            catch (System.Exception e) {
+                exception = e;
+                return false;
+            }
+        }
+        
+        public virtual void SaveToFile(string fileName) {
+            System.IO.StreamWriter streamWriter = null;
+            try {
+                string xmlString = Serialize();
+                System.IO.FileInfo xmlFile = new System.IO.FileInfo(fileName);
+                streamWriter = xmlFile.CreateText();
+                streamWriter.WriteLine(xmlString);
+                streamWriter.Close();
+            }
+            finally {
+                if ((streamWriter != null)) {
+                    streamWriter.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes xml markup from file into an AccountingDataSetupReports object
+        /// </summary>
+        /// <param name="fileName">string xml file to load and deserialize</param>
+        /// <param name="obj">Output AccountingDataSetupReports object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool LoadFromFile(string fileName, out AccountingDataSetupReports obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountingDataSetupReports);
+            try {
+                obj = LoadFromFile(fileName);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool LoadFromFile(string fileName, out AccountingDataSetupReports obj) {
+            System.Exception exception = null;
+            return LoadFromFile(fileName, out obj, out exception);
+        }
+        
+        public static AccountingDataSetupReports LoadFromFile(string fileName) {
+            System.IO.FileStream file = null;
+            System.IO.StreamReader sr = null;
+            try {
+                file = new System.IO.FileStream(fileName, FileMode.Open, FileAccess.Read);
+                sr = new System.IO.StreamReader(file);
+                string xmlString = sr.ReadToEnd();
+                sr.Close();
+                file.Close();
+                return Deserialize(xmlString);
+            }
+            finally {
+                if ((file != null)) {
+                    file.Dispose();
+                }
+                if ((sr != null)) {
+                    sr.Dispose();
+                }
+            }
+        }
+        #endregion
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]

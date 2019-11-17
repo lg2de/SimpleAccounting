@@ -39,8 +39,20 @@ namespace lg2de.SimpleAccounting.Presentation
             set
             {
                 this.selectedTemplate = value;
-                this.DebitAccount = this.selectedTemplate.Debit;
-                this.CreditAccount = this.selectedTemplate.Credit;
+                if (this.selectedTemplate.Debit > 0)
+                {
+                    this.DebitAccount = this.selectedTemplate.Debit;
+                }
+
+                if (this.selectedTemplate.Credit > 0)
+                {
+                    this.CreditAccount = this.selectedTemplate.Credit;
+                }
+
+                if (this.selectedTemplate.Value > 0)
+                {
+                    this.BookingValue = this.selectedTemplate.Value;
+                }
             }
         }
 
@@ -89,7 +101,8 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var newBooking = new AccountingDataJournalBooking
             {
-                Date = this.Date.ToAccountingDate(), ID = this.BookingNumber
+                Date = this.Date.ToAccountingDate(),
+                ID = this.BookingNumber
             };
             var creditValue = new BookingValue
             {
@@ -106,7 +119,8 @@ namespace lg2de.SimpleAccounting.Presentation
             // update for next booking
             this.BookingNumber++;
             this.NotifyOfPropertyChange(nameof(this.BookingNumber));
-        }, _ => this.Date.Year == this.BookingYear
+        },
+            _ => this.Date.Year == this.BookingYear
                 && this.BookingNumber > 0
                 && this.BookingValue > 0
                 && this.CreditIndex >= 0

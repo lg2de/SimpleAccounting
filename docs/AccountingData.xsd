@@ -9,6 +9,20 @@
             <xs:sequence>
               <xs:element name="Name" type="xs:string" />
               <xs:element name="Location" type="xs:string" />
+              <xs:element name="BookingTemplates">
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name="Template">
+                      <xs:complexType>
+                        <xs:attribute name="Text" type="xs:string" use="required" />
+                        <xs:attribute name="Value" type="xs:int" use="optional" />
+                        <xs:attribute name="Credit" type="xs:unsignedLong" use="optional" />
+                        <xs:attribute name="Debit" type="xs:unsignedLong" use="optional" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
               <xs:element name="Reports" minOccurs="0">
                 <xs:complexType>
                   <xs:sequence>
