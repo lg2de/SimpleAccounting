@@ -14,6 +14,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Windows.Input;
     using Caliburn.Micro;
     using CsvHelper;
+    using CsvHelper.Configuration;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
@@ -92,7 +93,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using (var reader = new StreamReader(stream, Encoding.GetEncoding(1252)))
                 {
-                    this.ImportBookings(reader);
+                    this.ImportBookings(reader, new Configuration());
                 }
 
                 if (!this.ImportData.Any())
@@ -118,7 +119,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.ProcessData(),
             _ => this.ImportData.Any(x => x.RemoteAccount != null));
 
-        internal void ImportBookings(TextReader reader)
+        internal void ImportBookings(TextReader reader, Configuration configuration)
         {
             var dateField = this.SelectedAccount.ImportMapping
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Date)?.Source;
@@ -141,7 +142,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
             }
 
-            using (var csv = new CsvReader(reader))
+            using (var csv = new CsvReader(reader, configuration))
             {
                 csv.Read();
                 if (!csv.ReadHeader())

@@ -8,6 +8,7 @@ namespace SimpleAccounting.UnitTests.Presentation
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using CsvHelper.Configuration;
     using FluentAssertions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
@@ -37,7 +38,7 @@ Date;Name;Text;Value
 2020-01-01;Name2;Text2;-42,42";
             using (var inputStream = new StringReader(input))
             {
-                sut.ImportBookings(inputStream);
+                sut.ImportBookings(inputStream, new Configuration { Delimiter = ";" });
             }
 
             sut.ImportData.Should().BeEquivalentTo(
