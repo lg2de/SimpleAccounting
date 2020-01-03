@@ -86,11 +86,18 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
+                this.ImportData.Clear();
+
                 // note, the stream is disposed by the reader
                 var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using (var reader = new StreamReader(stream, Encoding.GetEncoding(1252)))
                 {
                     this.ImportBookings(reader);
+                }
+
+                if (!this.ImportData.Any())
+                {
+                    this.messageBox.Show($"No relevant data found in {openFileDialog.FileName}.", "Import");
                 }
             }
             catch (IOException e)
@@ -113,8 +120,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal void ImportBookings(TextReader reader)
         {
-            this.ImportData.Clear();
-
             var dateField = this.SelectedAccount.ImportMapping
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Date)?.Source;
             var nameField = this.SelectedAccount.ImportMapping
@@ -124,19 +129,26 @@ namespace lg2de.SimpleAccounting.Presentation
             var valueField = this.SelectedAccount.ImportMapping
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Value)?.Source;
 
-            var lastEntry = this.Journal.Booking
-                .Where(x => x.Credit.Any(c => c.Account == this.ImportAccount) || x.Debit.Any(c => c.Account == this.ImportAccount))
-                .OrderBy(x => x.Date)
-                .LastOrDefault();
-            if (lastEntry != null)
+            if (this.Journal != null)
             {
-                this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
+                var lastEntry = this.Journal.Booking
+                    .Where(x => x.Credit.Any(c => c.Account == this.ImportAccount) || x.Debit.Any(c => c.Account == this.ImportAccount))
+                    .OrderBy(x => x.Date)
+                    .LastOrDefault();
+                if (lastEntry != null)
+                {
+                    this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
+                }
             }
 
             using (var csv = new CsvReader(reader))
             {
                 csv.Read();
-                var header = csv.ReadHeader();
+                if (!csv.ReadHeader())
+                {
+                    return;
+                }
+
                 while (csv.Read())
                 {
                     csv.TryGetField(dateField, out DateTime date);

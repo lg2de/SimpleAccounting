@@ -94,6 +94,7 @@
     <Compile Include="Extensions\XmlExtensionsTests.cs" />
     <Compile Include="Presentation\AddBookingViewModelTests.cs" />
     <Compile Include="Presentation\DesignViewModelTests.cs" />
+    <Compile Include="Presentation\ImportBookingsViewModelTests.cs" />
     <Compile Include="Presentation\Samples.cs" />
     <Compile Include="Presentation\ShellViewModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

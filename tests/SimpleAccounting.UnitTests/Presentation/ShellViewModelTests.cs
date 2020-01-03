@@ -191,7 +191,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.NewAccountCommand.Execute(null);
 
             sut.Accounts.Select(x => x.Name).Should()
-                .Equal("Bank account", "New Account", "Carryforward");
+                .Equal("Bank account", "New Account", "Shoes", "Carryforward");
         }
 
         [Fact]
@@ -228,7 +228,7 @@ namespace SimpleAccounting.UnitTests.Presentation
 
             using (new AssertionScope())
             {
-                sut.Accounts.Select(x => x.Name).Should().Equal("Carryforward", "Bank account");
+                sut.Accounts.Select(x => x.Name).Should().Equal("Shoes", "Carryforward", "Bank account");
                 sut.Journal.Should().BeEquivalentTo(
                     new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
                     new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });

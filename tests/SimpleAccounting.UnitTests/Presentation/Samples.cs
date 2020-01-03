@@ -31,9 +31,17 @@ namespace SimpleAccounting.UnitTests.Presentation
                                     Type = AccountDefinitionType.Asset,
                                     ImportMapping = new List<AccountDefinitionImportMapping>
                                     {
-                                        new AccountDefinitionImportMapping { Source = "A", Target = AccountDefinitionImportMappingTarget.Date },
-                                        new AccountDefinitionImportMapping { Source = "B", Target = AccountDefinitionImportMappingTarget.Value }
+                                        new AccountDefinitionImportMapping { Source = "Date", Target = AccountDefinitionImportMappingTarget.Date },
+                                        new AccountDefinitionImportMapping { Source = "Name", Target = AccountDefinitionImportMappingTarget.Name },
+                                        new AccountDefinitionImportMapping { Source = "Text", Target = AccountDefinitionImportMappingTarget.Text },
+                                        new AccountDefinitionImportMapping { Source = "Value", Target = AccountDefinitionImportMappingTarget.Value }
                                     }
+                                },
+                                new AccountDefinition
+                                {
+                                    ID = 600,
+                                    Name = "Shoes",
+                                    Type = AccountDefinitionType.Expense
                                 },
                                 new AccountDefinition
                                 {
