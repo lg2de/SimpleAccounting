@@ -7,7 +7,7 @@ $xunitDir = (Get-ChildItem -Path $PSScriptRoot\packages\ -Directory -Filter xuni
 $xunitExeDir = (Get-ChildItem -Path $PSScriptRoot\packages\$xunitDir\tools\ -Directory -Filter net4* | select -last 1).Name
 $xunitExe = $PSScriptRoot + "\packages\$xunitDir\tools\$xunitExeDir\xunit.console.x86.exe"
 $testAssemblies = $PSScriptRoot + "\tests\SimpleAccounting.UnitTests\bin\Debug\SimpleAccounting.UnitTests.dll"
-$testArguments = "$testAssemblies -noshadow"
+$testArguments = "$testAssemblies -noshadow -verbose"
 if (Test-Path $PSScriptRoot\CoverOutput) {
   Remove-Item $PSScriptRoot\CoverOutput -Confirm:$false -Force -Recurse
 }
