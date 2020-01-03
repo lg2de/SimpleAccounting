@@ -8,7 +8,7 @@
     xmlns:s="clr-namespace:System;assembly=mscorlib"
     xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    xmlns:currencytextboxcontrol="clr-namespace:CurrencyTextBoxControl;assembly=CurrencyTextBoxControl"
+    xmlns:currencytextboxcontrol="clr-namespace:CurrencyTextBoxControl;assembly=CurrencyTextbox"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=local:AddBookingDesignViewModel, IsDesignTimeCreatable=True}">
     <UserControl.InputBindings>
