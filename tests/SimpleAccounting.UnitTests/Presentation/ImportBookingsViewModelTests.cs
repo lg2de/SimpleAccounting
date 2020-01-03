@@ -6,6 +6,7 @@ namespace SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using CsvHelper.Configuration;
@@ -33,12 +34,12 @@ namespace SimpleAccounting.UnitTests.Presentation
 
             var input = @"
 Date;Name;Text;Value
-2018-12-31;NameIgnore;TextIgnore;12,34
-2019-12-31;Name1;Text1;12,34
-2020-01-01;Name2;Text2;-42,42";
+2018-12-31;NameIgnore;TextIgnore;12.34
+2019-12-31;Name1;Text1;12.34
+2020-01-01;Name2;Text2;-42.42";
             using (var inputStream = new StringReader(input))
             {
-                sut.ImportBookings(inputStream, new Configuration { Delimiter = ";" });
+                sut.ImportBookings(inputStream, new Configuration { CultureInfo = new CultureInfo("en-us") });
             }
 
             sut.ImportData.Should().BeEquivalentTo(
