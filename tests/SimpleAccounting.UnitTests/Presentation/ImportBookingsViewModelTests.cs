@@ -39,7 +39,7 @@ Date;Name;Text;Value
 2020-01-01;Name2;Text2;-42.42";
             using (var inputStream = new StringReader(input))
             {
-                sut.ImportBookings(inputStream, new Configuration { CultureInfo = new CultureInfo("en-us") });
+                sut.ImportBookings(inputStream, new Configuration { Delimiter = ";", CultureInfo = new CultureInfo("en-us") });
             }
 
             sut.ImportData.Should().BeEquivalentTo(
