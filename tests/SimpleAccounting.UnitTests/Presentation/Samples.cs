@@ -4,41 +4,58 @@
 
 namespace SimpleAccounting.UnitTests.Presentation
 {
+    using System;
     using System.Collections.Generic;
     using lg2de.SimpleAccounting.Model;
 
     internal class Samples
     {
-        public static AccountingData SampleProject => new AccountingData
+        public static AccountingData SampleProject
         {
-            Accounts = new List<AccountingDataAccountGroup>
+            get
             {
-                new AccountingDataAccountGroup
+                var year = (uint)DateTime.Now.Year;
+                return new AccountingData
                 {
-                    Name = "Default",
-                    Account = new List<AccountDefinition>
+                    Accounts = new List<AccountingDataAccountGroup>
                     {
-                        new AccountDefinition
+                        new AccountingDataAccountGroup
                         {
-                            ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset
-                        },
-                        new AccountDefinition
+                            Name = "Default",
+                            Account = new List<AccountDefinition>
+                            {
+                                new AccountDefinition
+                                {
+                                    ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset
+                                },
+                                new AccountDefinition
+                                {
+                                    ID = 990,
+                                    Name = "Carryforward",
+                                    Type = AccountDefinitionType.Carryforward
+                                }
+                            }
+                        }
+                    },
+                    Years = new List<AccountingDataYear>
+                    {
+                        new AccountingDataYear
                         {
-                            ID = 990,
-                            Name = "Carryforward",
-                            Type = AccountDefinitionType.Carryforward
+                            Name = (ushort)year,
+                            DateStart = year * 10000 + 101,
+                            DateEnd = year * 10000 + 1231
+                        }
+                    },
+                    Journal = new List<AccountingDataJournal>
+                    {
+                        new AccountingDataJournal
+                        {
+                            Year = (ushort)year,
+                            Booking = new List<AccountingDataJournalBooking>()
                         }
                     }
-                }
-            },
-            Years = new List<AccountingDataYear>
-            {
-                new AccountingDataYear { Name = 2019, DateStart = 20190101, DateEnd = 20191231 }
-            },
-            Journal = new List<AccountingDataJournal>
-            {
-                new AccountingDataJournal { Year = 2019, Booking = new List<AccountingDataJournalBooking>() }
+                };
             }
-        };
+        }
     }
 }
