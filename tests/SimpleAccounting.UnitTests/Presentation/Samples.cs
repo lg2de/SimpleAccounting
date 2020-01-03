@@ -26,7 +26,14 @@ namespace SimpleAccounting.UnitTests.Presentation
                             {
                                 new AccountDefinition
                                 {
-                                    ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset
+                                    ID = 100,
+                                    Name = "Bank account",
+                                    Type = AccountDefinitionType.Asset,
+                                    ImportMapping = new List<AccountDefinitionImportMapping>
+                                    {
+                                        new AccountDefinitionImportMapping { Source = "A", Target = AccountDefinitionImportMappingTarget.Date },
+                                        new AccountDefinitionImportMapping { Source = "B", Target = AccountDefinitionImportMappingTarget.Value }
+                                    }
                                 },
                                 new AccountDefinition
                                 {

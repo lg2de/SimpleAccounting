@@ -111,6 +111,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var importModel = new ImportBookingsViewModel(
                 this.messageBox,
                 this,
+                this.accountingData.AllAccounts,
                 this.accountingData.ImportMappings)
             {
                 BookingNumber = this.GetMaxBookIdent() + 1,
@@ -118,7 +119,6 @@ namespace lg2de.SimpleAccounting.Presentation
                 RangMax = max,
                 Journal = this.currentJournal
             };
-            importModel.Accounts.AddRange(this.accountingData.AllAccounts);
             this.windowManager.ShowDialog(importModel);
         });
 

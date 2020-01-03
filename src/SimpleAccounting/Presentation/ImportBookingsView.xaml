@@ -27,6 +27,7 @@
         <TextBlock DockPanel.Dock="Top">
             Hinweise:<LineBreak/>
             Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.<LineBreak/>
+            (Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)<LineBreak/>
             Die importierten Empfängernamen und Buchungstexte können korrigiert werden.
         </TextBlock>
         <StackPanel
@@ -40,7 +41,7 @@
                 Text="{Binding ImportAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <ComboBox
                 Width="150"
-                ItemsSource="{Binding Accounts}"
+                ItemsSource="{Binding ImportAccounts}"
                 SelectedValue="{Binding ImportAccount, Mode=TwoWay}"
                 SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
                 SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />

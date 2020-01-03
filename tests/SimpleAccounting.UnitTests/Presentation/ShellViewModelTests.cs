@@ -129,7 +129,7 @@ namespace SimpleAccounting.UnitTests.Presentation
                     RangeMin = new DateTime(DateTime.Now.Year, 1, 1),
                     RangMax = new DateTime(DateTime.Now.Year, 12, 31)
                 });
-                vm.Accounts.Should().NotBeEmpty();
+                vm.ImportAccounts.Should().NotBeEmpty();
             }
         }
 

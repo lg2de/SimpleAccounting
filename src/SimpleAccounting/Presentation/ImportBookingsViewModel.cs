@@ -22,22 +22,25 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly IMessageBox messageBox;
         private readonly ShellViewModel parent;
         private readonly List<AccountingDataMapping> importMappings;
+        private readonly List<AccountDefinition> accounts;
         private ulong importAccount;
 
         public ImportBookingsViewModel(
             IMessageBox messageBox,
             ShellViewModel parent,
+            IEnumerable<AccountDefinition> accounts,
             List<AccountingDataMapping> importMappings)
         {
             this.messageBox = messageBox;
             this.parent = parent;
+            this.accounts = accounts.ToList();
             this.importMappings = importMappings ?? new List<AccountingDataMapping>();
 
             this.DisplayName = "Import von Kontodaten";
         }
 
-        public List<AccountDefinition> Accounts { get; }
-            = new List<AccountDefinition>();
+        public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
+            .Where(a => a.ImportMapping.Any(x => x.Target == AccountDefinitionImportMappingTarget.Date) && a.ImportMapping.Any(x => x.Target == AccountDefinitionImportMappingTarget.Value));
 
         public DateTime RangeMin { get; internal set; }
 
@@ -112,6 +115,15 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.ImportData.Clear();
 
+            var dateField = this.SelectedAccount.ImportMapping
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Date)?.Source;
+            var nameField = this.SelectedAccount.ImportMapping
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Name)?.Source;
+            var textField = this.SelectedAccount.ImportMapping
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Text);
+            var valueField = this.SelectedAccount.ImportMapping
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Value)?.Source;
+
             var lastEntry = this.Journal.Booking
                 .Where(x => x.Credit.Any(c => c.Account == this.ImportAccount) || x.Debit.Any(c => c.Account == this.ImportAccount))
                 .OrderBy(x => x.Date)
@@ -127,34 +139,36 @@ namespace lg2de.SimpleAccounting.Presentation
                 var header = csv.ReadHeader();
                 while (csv.Read())
                 {
-                    var dateField = this.SelectedAccount.ImportMapping
-                        .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Date)?.Source;
                     csv.TryGetField(dateField, out DateTime date);
                     if (date < this.RangeMin || date > this.RangMax)
                     {
                         continue;
                     }
 
-                    var nameField = this.SelectedAccount.ImportMapping
-                        .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Name);
-                    var textField = this.SelectedAccount.ImportMapping
-                        .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Text);
-                    var valueField = this.SelectedAccount.ImportMapping
-                        .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Value)?.Source;
-
-                    csv.TryGetField<string>(nameField?.Source, out var name);
-                    csv.TryGetField<string>(textField?.Source, out var text);
+                    // date and value are checked by RelayCommand
+                    // name and text may be empty
                     csv.TryGetField<double>(valueField, out var value);
-
-                    if (!string.IsNullOrEmpty(textField?.IgnorePattern))
+                    string name = string.Empty;
+                    string text = string.Empty;
+                    if (nameField != null)
                     {
-                        text = Regex.Replace(text, textField?.IgnorePattern, string.Empty);
+                        csv.TryGetField<string>(nameField, out name);
                     }
+
+                    if (textField != null)
+                    {
+                        csv.TryGetField<string>(textField.Source, out text);
+                        if (!string.IsNullOrEmpty(textField.IgnorePattern))
+                        {
+                            text = Regex.Replace(text, textField?.IgnorePattern, string.Empty);
+                        }
+                    }
+
 
                     var item = new ImportEntryViewModel
                     {
                         Date = date,
-                        Accounts = this.Accounts,
+                        Accounts = this.accounts,
                         Identifier = this.BookingNumber++,
                         Name = name,
                         Text = text,
@@ -177,7 +191,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         }
 
                         // use first match
-                        item.RemoteAccount = this.Accounts.SingleOrDefault(a => a.ID == importMapping.AccountID);
+                        item.RemoteAccount = this.accounts.SingleOrDefault(a => a.ID == importMapping.AccountID);
                         break;
                     }
 
