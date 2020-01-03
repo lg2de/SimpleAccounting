@@ -108,7 +108,10 @@ namespace lg2de.SimpleAccounting.Presentation
             var min = year.DateStart.ToDateTime();
             var max = year.DateEnd.ToDateTime();
 
-            var importModel = new ImportBookingsViewModel(this, this.accountingData.ImportMappings)
+            var importModel = new ImportBookingsViewModel(
+                this.messageBox,
+                this,
+                this.accountingData.ImportMappings)
             {
                 BookingNumber = this.GetMaxBookIdent() + 1,
                 RangeMin = min,

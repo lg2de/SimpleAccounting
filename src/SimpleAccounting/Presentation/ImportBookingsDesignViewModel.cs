@@ -11,7 +11,7 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     {
         public ImportBookingsDesignViewModel()
-            : base(null, null)
+            : base(null, null, null)
         {
             this.Accounts.Add(new AccountDefinition { ID = 100, Name = "Cash" });
             this.Accounts.Add(new AccountDefinition { ID = 600, Name = "Shopping" });

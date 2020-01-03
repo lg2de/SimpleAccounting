@@ -19,12 +19,17 @@ namespace lg2de.SimpleAccounting.Presentation
 
     internal class ImportBookingsViewModel : Screen
     {
+        private readonly IMessageBox messageBox;
         private readonly ShellViewModel parent;
         private readonly List<AccountingDataMapping> importMappings;
         private ulong importAccount;
 
-        public ImportBookingsViewModel(ShellViewModel parent, List<AccountingDataMapping> importMappings)
+        public ImportBookingsViewModel(
+            IMessageBox messageBox,
+            ShellViewModel parent,
+            List<AccountingDataMapping> importMappings)
         {
+            this.messageBox = messageBox;
             this.parent = parent;
             this.importMappings = importMappings ?? new List<AccountingDataMapping>();
 
@@ -64,22 +69,35 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand LoadDataCommand => new RelayCommand(_ =>
         {
-            using (var openFileDialog = new System.Windows.Forms.OpenFileDialog())
+            System.Windows.Forms.OpenFileDialog openFileDialog = null;
+            try
             {
-                openFileDialog.Filter = "Booking data files (*.csv)|*.csv";
-                openFileDialog.RestoreDirectory = true;
+                openFileDialog = new System.Windows.Forms.OpenFileDialog
+                {
+                    Filter = "Booking data files (*.csv)|*.csv",
+                    RestoreDirectory = true
+                };
 
                 if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
                     return;
                 }
 
-                using (var reader = new StreamReader(openFileDialog.FileName, Encoding.GetEncoding(1252)))
+                // note, the stream is disposed by the reader
+                var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using (var reader = new StreamReader(stream, Encoding.GetEncoding(1252)))
                 {
                     this.ImportBookings(reader);
                 }
             }
-
+            catch (IOException e)
+            {
+                this.messageBox.Show($"Failed to load file '{openFileDialog.FileName}':\n{e.Message}", "Import");
+            }
+            finally
+            {
+                openFileDialog?.Dispose();
+            }
         }, _ => this.SelectedAccount != null);
 
         public ICommand BookAllCommand => new RelayCommand(
