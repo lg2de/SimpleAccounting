@@ -9,7 +9,7 @@
             <xs:sequence>
               <xs:element name="Name" type="xs:string" />
               <xs:element name="Location" type="xs:string" />
-              <xs:element name="BookingTemplates">
+              <xs:element name="BookingTemplates" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
                   <xs:sequence minOccurs="1" maxOccurs="unbounded">
                     <xs:element name="Template">
