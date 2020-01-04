@@ -22,26 +22,23 @@ namespace lg2de.SimpleAccounting.Presentation
     {
         private readonly IMessageBox messageBox;
         private readonly ShellViewModel parent;
-        private readonly List<AccountingDataMapping> importMappings;
         private readonly List<AccountDefinition> accounts;
         private ulong importAccount;
 
         public ImportBookingsViewModel(
             IMessageBox messageBox,
             ShellViewModel parent,
-            IEnumerable<AccountDefinition> accounts,
-            List<AccountingDataMapping> importMappings)
+            IEnumerable<AccountDefinition> accounts)
         {
             this.messageBox = messageBox;
             this.parent = parent;
             this.accounts = accounts.ToList();
-            this.importMappings = importMappings ?? new List<AccountingDataMapping>();
 
             this.DisplayName = "Import von Kontodaten";
         }
 
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
-            .Where(a => a.ImportMapping.Any(x => x.Target == AccountDefinitionImportMappingTarget.Date) && a.ImportMapping.Any(x => x.Target == AccountDefinitionImportMappingTarget.Value));
+            .Where(a => a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value));
 
         public DateTime RangeMin { get; internal set; }
 
@@ -121,14 +118,14 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal void ImportBookings(TextReader reader, Configuration configuration)
         {
-            var dateField = this.SelectedAccount.ImportMapping
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Date)?.Source;
-            var nameField = this.SelectedAccount.ImportMapping
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Name)?.Source;
-            var textField = this.SelectedAccount.ImportMapping
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Text);
-            var valueField = this.SelectedAccount.ImportMapping
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingTarget.Value)?.Source;
+            var dateField = this.SelectedAccount.ImportMapping.Columns
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source;
+            var nameField = this.SelectedAccount.ImportMapping.Columns
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source;
+            var textField = this.SelectedAccount.ImportMapping.Columns
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
+            var valueField = this.SelectedAccount.ImportMapping.Columns
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source;
 
             if (this.Journal != null)
             {
@@ -177,7 +174,6 @@ namespace lg2de.SimpleAccounting.Presentation
                         }
                     }
 
-
                     var item = new ImportEntryViewModel
                     {
                         Date = date,
@@ -189,9 +185,9 @@ namespace lg2de.SimpleAccounting.Presentation
                     };
 
                     var longValue = (long)(value * 100);
-                    foreach (var importMapping in this.importMappings)
+                    foreach (var importMapping in this.SelectedAccount.ImportMapping.Patterns)
                     {
-                        if (!Regex.IsMatch(text, importMapping.TextPattern))
+                        if (!Regex.IsMatch(text, importMapping.Expression))
                         {
                             // mapping does not match
                             continue;

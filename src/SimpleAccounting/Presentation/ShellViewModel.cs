@@ -111,8 +111,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var importModel = new ImportBookingsViewModel(
                 this.messageBox,
                 this,
-                this.accountingData.AllAccounts,
-                this.accountingData.ImportMappings)
+                this.accountingData.AllAccounts)
             {
                 BookingNumber = this.GetMaxBookIdent() + 1,
                 RangeMin = min,

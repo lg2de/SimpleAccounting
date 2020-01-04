@@ -18,10 +18,13 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 ID = 100,
                 Name = "Cash",
-                ImportMapping = new List<AccountDefinitionImportMapping>
+                ImportMapping = new AccountDefinitionImportMapping
                 {
-                    new AccountDefinitionImportMapping { Source = "A", Target = AccountDefinitionImportMappingTarget.Date },
-                    new AccountDefinitionImportMapping { Source = "B", Target = AccountDefinitionImportMappingTarget.Value }
+                    Columns = new List<AccountDefinitionImportMappingColumn>
+                    {
+                        new AccountDefinitionImportMappingColumn { Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date },
+                        new AccountDefinitionImportMappingColumn { Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value }
+                    }
                 }
             },
             new AccountDefinition
@@ -32,7 +35,7 @@ namespace lg2de.SimpleAccounting.Presentation
         };
 
         public ImportBookingsDesignViewModel()
-            : base(null, null, SampleAccounts, null)
+            : base(null, null, SampleAccounts)
         {
             this.ImportAccount = 100;
 

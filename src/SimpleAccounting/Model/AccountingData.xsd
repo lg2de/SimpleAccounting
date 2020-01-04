@@ -101,38 +101,50 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="ImportMappings" minOccurs="0" maxOccurs="1">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="Mapping" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                  <xs:attribute name="TextPattern" type="xs:string" use="required" />
-                  <xs:attribute name="Value" type="xs:int" use="optional" />
-                  <xs:attribute name="AccountID" type="xs:unsignedLong" use="required" />
-                </xs:complexType>
-              </xs:element>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:complexType name="AccountDefinition">
     <xs:sequence>
-      <xs:element name="ImportMapping" minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="ImportMapping" minOccurs="0" maxOccurs="1">
         <xs:complexType>
-          <xs:attribute name="Target" use="required">
-            <xs:simpleType>
-              <xs:restriction base="xs:string">
-                <xs:enumeration value="Date" />
-                <xs:enumeration value="Name" />
-                <xs:enumeration value="Text" />
-                <xs:enumeration value="Value" />
-              </xs:restriction>
-            </xs:simpleType>
-          </xs:attribute>
-          <xs:attribute name="Source" use="required" type="xs:string" />
-          <xs:attribute name="IgnorePattern" type="xs:string" use="optional" />
+          <xs:sequence>
+            <xs:element name="Columns" minOccurs="1" maxOccurs="1">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Column" minOccurs="1" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:attribute name="Target" use="required">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="Date" />
+                            <xs:enumeration value="Name" />
+                            <xs:enumeration value="Text" />
+                            <xs:enumeration value="Value" />
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                      <xs:attribute name="Source" use="required" type="xs:string" />
+                      <xs:attribute name="IgnorePattern" type="xs:string" use="optional" />
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="Patterns" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Pattern" minOccurs="1" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:attribute name="Expression" type="xs:string" use="required" />
+                      <xs:attribute name="Value" type="xs:int" use="optional" />
+                      <xs:attribute name="AccountID" type="xs:unsignedLong" use="required" />
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
         </xs:complexType>
       </xs:element>
     </xs:sequence>

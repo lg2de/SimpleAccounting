@@ -20,15 +20,20 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookings_SampleInput_DataImported()
         {
+            var accounts = Samples.SampleProject.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(
                 null,
                 null,
-                Samples.SampleProject.AllAccounts,
-                new List<AccountingDataMapping>
+                accounts);
+            sut.SelectedAccount = accounts.Single(x => x.Name == "Bank account");
+            sut.SelectedAccount.ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
+            {
+                new AccountDefinitionImportMappingPattern
                 {
-                    new AccountingDataMapping { TextPattern = "Text1", AccountID = 600 }
-                });
-            sut.SelectedAccount = Samples.SampleProject.AllAccounts.Single(x => x.Name == "Bank account");
+                    Expression = "Text1",
+                    AccountID = 600
+                }
+            };
             sut.RangeMin = new DateTime(2019, 1, 1);
             sut.RangMax = new DateTime(2021, 1, 1);
 

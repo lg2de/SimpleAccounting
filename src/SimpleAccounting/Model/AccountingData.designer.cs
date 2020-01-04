@@ -33,12 +33,9 @@ namespace lg2de.SimpleAccounting.Model {
         
         private List<AccountingDataEntry> openIssuesField;
         
-        private List<AccountingDataMapping> importMappingsField;
-        
         private static System.Xml.Serialization.XmlSerializer serializer;
         
         public AccountingData() {
-            this.importMappingsField = new List<AccountingDataMapping>();
             this.openIssuesField = new List<AccountingDataEntry>();
             this.journalField = new List<AccountingDataJournal>();
             this.yearsField = new List<AccountingDataYear>();
@@ -92,16 +89,6 @@ namespace lg2de.SimpleAccounting.Model {
             }
             set {
                 this.openIssuesField = value;
-            }
-        }
-        
-        [System.Xml.Serialization.XmlArrayItemAttribute("Mapping", IsNullable=false)]
-        public List<AccountingDataMapping> ImportMappings {
-            get {
-                return this.importMappingsField;
-            }
-            set {
-                this.importMappingsField = value;
             }
         }
         
@@ -1098,7 +1085,7 @@ namespace lg2de.SimpleAccounting.Model {
     [System.Xml.Serialization.XmlRootAttribute(Namespace="", IsNullable=true)]
     public partial class AccountDefinition {
         
-        private List<AccountDefinitionImportMapping> importMappingField;
+        private AccountDefinitionImportMapping importMappingField;
         
         private ulong idField;
         
@@ -1111,12 +1098,11 @@ namespace lg2de.SimpleAccounting.Model {
         private static System.Xml.Serialization.XmlSerializer serializer;
         
         public AccountDefinition() {
-            this.importMappingField = new List<AccountDefinitionImportMapping>();
+            this.importMappingField = new AccountDefinitionImportMapping();
             this.activeField = true;
         }
         
-        [System.Xml.Serialization.XmlElementAttribute("ImportMapping")]
-        public List<AccountDefinitionImportMapping> ImportMapping {
+        public AccountDefinitionImportMapping ImportMapping {
             get {
                 return this.importMappingField;
             }
@@ -1326,41 +1312,34 @@ namespace lg2de.SimpleAccounting.Model {
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
     public partial class AccountDefinitionImportMapping {
         
-        private AccountDefinitionImportMappingTarget targetField;
+        private List<AccountDefinitionImportMappingColumn> columnsField;
         
-        private string sourceField;
-        
-        private string ignorePatternField;
+        private List<AccountDefinitionImportMappingPattern> patternsField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public AccountDefinitionImportMappingTarget Target {
+        public AccountDefinitionImportMapping() {
+            this.patternsField = new List<AccountDefinitionImportMappingPattern>();
+            this.columnsField = new List<AccountDefinitionImportMappingColumn>();
+        }
+        
+        [System.Xml.Serialization.XmlArrayItemAttribute("Column", IsNullable=false)]
+        public List<AccountDefinitionImportMappingColumn> Columns {
             get {
-                return this.targetField;
+                return this.columnsField;
             }
             set {
-                this.targetField = value;
+                this.columnsField = value;
             }
         }
         
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Source {
+        [System.Xml.Serialization.XmlArrayItemAttribute("Pattern", IsNullable=false)]
+        public List<AccountDefinitionImportMappingPattern> Patterns {
             get {
-                return this.sourceField;
+                return this.patternsField;
             }
             set {
-                this.sourceField = value;
-            }
-        }
-        
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string IgnorePattern {
-            get {
-                return this.ignorePatternField;
-            }
-            set {
-                this.ignorePatternField = value;
+                this.patternsField = value;
             }
         }
         
@@ -1520,8 +1499,206 @@ namespace lg2de.SimpleAccounting.Model {
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
     [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
-    public enum AccountDefinitionImportMappingTarget {
+    public partial class AccountDefinitionImportMappingColumn {
+        
+        private AccountDefinitionImportMappingColumnTarget targetField;
+        
+        private string sourceField;
+        
+        private string ignorePatternField;
+        
+        private static System.Xml.Serialization.XmlSerializer serializer;
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public AccountDefinitionImportMappingColumnTarget Target {
+            get {
+                return this.targetField;
+            }
+            set {
+                this.targetField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Source {
+            get {
+                return this.sourceField;
+            }
+            set {
+                this.sourceField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string IgnorePattern {
+            get {
+                return this.ignorePatternField;
+            }
+            set {
+                this.ignorePatternField = value;
+            }
+        }
+        
+        private static System.Xml.Serialization.XmlSerializer Serializer {
+            get {
+                if ((serializer == null)) {
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountDefinitionImportMappingColumn));
+                }
+                return serializer;
+            }
+        }
+        
+        #region Serialize/Deserialize
+        /// <summary>
+        /// Serializes current AccountDefinitionImportMappingColumn object into an XML document
+        /// </summary>
+        /// <returns>string XML value</returns>
+        public virtual string Serialize() {
+            System.IO.StreamReader streamReader = null;
+            System.IO.MemoryStream memoryStream = null;
+            try {
+                memoryStream = new System.IO.MemoryStream();
+                Serializer.Serialize(memoryStream, this);
+                memoryStream.Seek(0, System.IO.SeekOrigin.Begin);
+                streamReader = new System.IO.StreamReader(memoryStream);
+                return streamReader.ReadToEnd();
+            }
+            finally {
+                if ((streamReader != null)) {
+                    streamReader.Dispose();
+                }
+                if ((memoryStream != null)) {
+                    memoryStream.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes workflow markup into an AccountDefinitionImportMappingColumn object
+        /// </summary>
+        /// <param name="xml">string workflow markup to deserialize</param>
+        /// <param name="obj">Output AccountDefinitionImportMappingColumn object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool Deserialize(string xml, out AccountDefinitionImportMappingColumn obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountDefinitionImportMappingColumn);
+            try {
+                obj = Deserialize(xml);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool Deserialize(string xml, out AccountDefinitionImportMappingColumn obj) {
+            System.Exception exception = null;
+            return Deserialize(xml, out obj, out exception);
+        }
+        
+        public static AccountDefinitionImportMappingColumn Deserialize(string xml) {
+            System.IO.StringReader stringReader = null;
+            try {
+                stringReader = new System.IO.StringReader(xml);
+                return ((AccountDefinitionImportMappingColumn)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+            }
+            finally {
+                if ((stringReader != null)) {
+                    stringReader.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Serializes current AccountDefinitionImportMappingColumn object into file
+        /// </summary>
+        /// <param name="fileName">full path of outupt xml file</param>
+        /// <param name="exception">output Exception value if failed</param>
+        /// <returns>true if can serialize and save into file; otherwise, false</returns>
+        public virtual bool SaveToFile(string fileName, out System.Exception exception) {
+            exception = null;
+            try {
+                SaveToFile(fileName);
+                return true;
+            }
+            catch (System.Exception e) {
+                exception = e;
+                return false;
+            }
+        }
+        
+        public virtual void SaveToFile(string fileName) {
+            System.IO.StreamWriter streamWriter = null;
+            try {
+                string xmlString = Serialize();
+                System.IO.FileInfo xmlFile = new System.IO.FileInfo(fileName);
+                streamWriter = xmlFile.CreateText();
+                streamWriter.WriteLine(xmlString);
+                streamWriter.Close();
+            }
+            finally {
+                if ((streamWriter != null)) {
+                    streamWriter.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes xml markup from file into an AccountDefinitionImportMappingColumn object
+        /// </summary>
+        /// <param name="fileName">string xml file to load and deserialize</param>
+        /// <param name="obj">Output AccountDefinitionImportMappingColumn object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool LoadFromFile(string fileName, out AccountDefinitionImportMappingColumn obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountDefinitionImportMappingColumn);
+            try {
+                obj = LoadFromFile(fileName);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool LoadFromFile(string fileName, out AccountDefinitionImportMappingColumn obj) {
+            System.Exception exception = null;
+            return LoadFromFile(fileName, out obj, out exception);
+        }
+        
+        public static AccountDefinitionImportMappingColumn LoadFromFile(string fileName) {
+            System.IO.FileStream file = null;
+            System.IO.StreamReader sr = null;
+            try {
+                file = new System.IO.FileStream(fileName, FileMode.Open, FileAccess.Read);
+                sr = new System.IO.StreamReader(file);
+                string xmlString = sr.ReadToEnd();
+                sr.Close();
+                file.Close();
+                return Deserialize(xmlString);
+            }
+            finally {
+                if ((file != null)) {
+                    file.Dispose();
+                }
+                if ((sr != null)) {
+                    sr.Dispose();
+                }
+            }
+        }
+        #endregion
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
+    public enum AccountDefinitionImportMappingColumnTarget {
         
         /// <remarks/>
         Date,
@@ -1534,6 +1711,216 @@ namespace lg2de.SimpleAccounting.Model {
         
         /// <remarks/>
         Value,
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
+    [System.SerializableAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
+    public partial class AccountDefinitionImportMappingPattern {
+        
+        private string expressionField;
+        
+        private int valueField;
+        
+        private bool valueFieldSpecified;
+        
+        private ulong accountIDField;
+        
+        private static System.Xml.Serialization.XmlSerializer serializer;
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Expression {
+            get {
+                return this.expressionField;
+            }
+            set {
+                this.expressionField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public int Value {
+            get {
+                return this.valueField;
+            }
+            set {
+                this.valueField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool ValueSpecified {
+            get {
+                return this.valueFieldSpecified;
+            }
+            set {
+                this.valueFieldSpecified = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public ulong AccountID {
+            get {
+                return this.accountIDField;
+            }
+            set {
+                this.accountIDField = value;
+            }
+        }
+        
+        private static System.Xml.Serialization.XmlSerializer Serializer {
+            get {
+                if ((serializer == null)) {
+                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountDefinitionImportMappingPattern));
+                }
+                return serializer;
+            }
+        }
+        
+        #region Serialize/Deserialize
+        /// <summary>
+        /// Serializes current AccountDefinitionImportMappingPattern object into an XML document
+        /// </summary>
+        /// <returns>string XML value</returns>
+        public virtual string Serialize() {
+            System.IO.StreamReader streamReader = null;
+            System.IO.MemoryStream memoryStream = null;
+            try {
+                memoryStream = new System.IO.MemoryStream();
+                Serializer.Serialize(memoryStream, this);
+                memoryStream.Seek(0, System.IO.SeekOrigin.Begin);
+                streamReader = new System.IO.StreamReader(memoryStream);
+                return streamReader.ReadToEnd();
+            }
+            finally {
+                if ((streamReader != null)) {
+                    streamReader.Dispose();
+                }
+                if ((memoryStream != null)) {
+                    memoryStream.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes workflow markup into an AccountDefinitionImportMappingPattern object
+        /// </summary>
+        /// <param name="xml">string workflow markup to deserialize</param>
+        /// <param name="obj">Output AccountDefinitionImportMappingPattern object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool Deserialize(string xml, out AccountDefinitionImportMappingPattern obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountDefinitionImportMappingPattern);
+            try {
+                obj = Deserialize(xml);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool Deserialize(string xml, out AccountDefinitionImportMappingPattern obj) {
+            System.Exception exception = null;
+            return Deserialize(xml, out obj, out exception);
+        }
+        
+        public static AccountDefinitionImportMappingPattern Deserialize(string xml) {
+            System.IO.StringReader stringReader = null;
+            try {
+                stringReader = new System.IO.StringReader(xml);
+                return ((AccountDefinitionImportMappingPattern)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
+            }
+            finally {
+                if ((stringReader != null)) {
+                    stringReader.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Serializes current AccountDefinitionImportMappingPattern object into file
+        /// </summary>
+        /// <param name="fileName">full path of outupt xml file</param>
+        /// <param name="exception">output Exception value if failed</param>
+        /// <returns>true if can serialize and save into file; otherwise, false</returns>
+        public virtual bool SaveToFile(string fileName, out System.Exception exception) {
+            exception = null;
+            try {
+                SaveToFile(fileName);
+                return true;
+            }
+            catch (System.Exception e) {
+                exception = e;
+                return false;
+            }
+        }
+        
+        public virtual void SaveToFile(string fileName) {
+            System.IO.StreamWriter streamWriter = null;
+            try {
+                string xmlString = Serialize();
+                System.IO.FileInfo xmlFile = new System.IO.FileInfo(fileName);
+                streamWriter = xmlFile.CreateText();
+                streamWriter.WriteLine(xmlString);
+                streamWriter.Close();
+            }
+            finally {
+                if ((streamWriter != null)) {
+                    streamWriter.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Deserializes xml markup from file into an AccountDefinitionImportMappingPattern object
+        /// </summary>
+        /// <param name="fileName">string xml file to load and deserialize</param>
+        /// <param name="obj">Output AccountDefinitionImportMappingPattern object</param>
+        /// <param name="exception">output Exception value if deserialize failed</param>
+        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
+        public static bool LoadFromFile(string fileName, out AccountDefinitionImportMappingPattern obj, out System.Exception exception) {
+            exception = null;
+            obj = default(AccountDefinitionImportMappingPattern);
+            try {
+                obj = LoadFromFile(fileName);
+                return true;
+            }
+            catch (System.Exception ex) {
+                exception = ex;
+                return false;
+            }
+        }
+        
+        public static bool LoadFromFile(string fileName, out AccountDefinitionImportMappingPattern obj) {
+            System.Exception exception = null;
+            return LoadFromFile(fileName, out obj, out exception);
+        }
+        
+        public static AccountDefinitionImportMappingPattern LoadFromFile(string fileName) {
+            System.IO.FileStream file = null;
+            System.IO.StreamReader sr = null;
+            try {
+                file = new System.IO.FileStream(fileName, FileMode.Open, FileAccess.Read);
+                sr = new System.IO.StreamReader(file);
+                string xmlString = sr.ReadToEnd();
+                sr.Close();
+                file.Close();
+                return Deserialize(xmlString);
+            }
+            finally {
+                if ((file != null)) {
+                    file.Dispose();
+                }
+                if ((sr != null)) {
+                    sr.Dispose();
+                }
+            }
+        }
+        #endregion
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
@@ -2774,216 +3161,6 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         public static AccountingDataEntry LoadFromFile(string fileName) {
-            System.IO.FileStream file = null;
-            System.IO.StreamReader sr = null;
-            try {
-                file = new System.IO.FileStream(fileName, FileMode.Open, FileAccess.Read);
-                sr = new System.IO.StreamReader(file);
-                string xmlString = sr.ReadToEnd();
-                sr.Close();
-                file.Close();
-                return Deserialize(xmlString);
-            }
-            finally {
-                if ((file != null)) {
-                    file.Dispose();
-                }
-                if ((sr != null)) {
-                    sr.Dispose();
-                }
-            }
-        }
-        #endregion
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
-    public partial class AccountingDataMapping {
-        
-        private string textPatternField;
-        
-        private int valueField;
-        
-        private bool valueFieldSpecified;
-        
-        private ulong accountIDField;
-        
-        private static System.Xml.Serialization.XmlSerializer serializer;
-        
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string TextPattern {
-            get {
-                return this.textPatternField;
-            }
-            set {
-                this.textPatternField = value;
-            }
-        }
-        
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int Value {
-            get {
-                return this.valueField;
-            }
-            set {
-                this.valueField = value;
-            }
-        }
-        
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool ValueSpecified {
-            get {
-                return this.valueFieldSpecified;
-            }
-            set {
-                this.valueFieldSpecified = value;
-            }
-        }
-        
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public ulong AccountID {
-            get {
-                return this.accountIDField;
-            }
-            set {
-                this.accountIDField = value;
-            }
-        }
-        
-        private static System.Xml.Serialization.XmlSerializer Serializer {
-            get {
-                if ((serializer == null)) {
-                    serializer = new System.Xml.Serialization.XmlSerializer(typeof(AccountingDataMapping));
-                }
-                return serializer;
-            }
-        }
-        
-        #region Serialize/Deserialize
-        /// <summary>
-        /// Serializes current AccountingDataMapping object into an XML document
-        /// </summary>
-        /// <returns>string XML value</returns>
-        public virtual string Serialize() {
-            System.IO.StreamReader streamReader = null;
-            System.IO.MemoryStream memoryStream = null;
-            try {
-                memoryStream = new System.IO.MemoryStream();
-                Serializer.Serialize(memoryStream, this);
-                memoryStream.Seek(0, System.IO.SeekOrigin.Begin);
-                streamReader = new System.IO.StreamReader(memoryStream);
-                return streamReader.ReadToEnd();
-            }
-            finally {
-                if ((streamReader != null)) {
-                    streamReader.Dispose();
-                }
-                if ((memoryStream != null)) {
-                    memoryStream.Dispose();
-                }
-            }
-        }
-        
-        /// <summary>
-        /// Deserializes workflow markup into an AccountingDataMapping object
-        /// </summary>
-        /// <param name="xml">string workflow markup to deserialize</param>
-        /// <param name="obj">Output AccountingDataMapping object</param>
-        /// <param name="exception">output Exception value if deserialize failed</param>
-        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool Deserialize(string xml, out AccountingDataMapping obj, out System.Exception exception) {
-            exception = null;
-            obj = default(AccountingDataMapping);
-            try {
-                obj = Deserialize(xml);
-                return true;
-            }
-            catch (System.Exception ex) {
-                exception = ex;
-                return false;
-            }
-        }
-        
-        public static bool Deserialize(string xml, out AccountingDataMapping obj) {
-            System.Exception exception = null;
-            return Deserialize(xml, out obj, out exception);
-        }
-        
-        public static AccountingDataMapping Deserialize(string xml) {
-            System.IO.StringReader stringReader = null;
-            try {
-                stringReader = new System.IO.StringReader(xml);
-                return ((AccountingDataMapping)(Serializer.Deserialize(System.Xml.XmlReader.Create(stringReader))));
-            }
-            finally {
-                if ((stringReader != null)) {
-                    stringReader.Dispose();
-                }
-            }
-        }
-        
-        /// <summary>
-        /// Serializes current AccountingDataMapping object into file
-        /// </summary>
-        /// <param name="fileName">full path of outupt xml file</param>
-        /// <param name="exception">output Exception value if failed</param>
-        /// <returns>true if can serialize and save into file; otherwise, false</returns>
-        public virtual bool SaveToFile(string fileName, out System.Exception exception) {
-            exception = null;
-            try {
-                SaveToFile(fileName);
-                return true;
-            }
-            catch (System.Exception e) {
-                exception = e;
-                return false;
-            }
-        }
-        
-        public virtual void SaveToFile(string fileName) {
-            System.IO.StreamWriter streamWriter = null;
-            try {
-                string xmlString = Serialize();
-                System.IO.FileInfo xmlFile = new System.IO.FileInfo(fileName);
-                streamWriter = xmlFile.CreateText();
-                streamWriter.WriteLine(xmlString);
-                streamWriter.Close();
-            }
-            finally {
-                if ((streamWriter != null)) {
-                    streamWriter.Dispose();
-                }
-            }
-        }
-        
-        /// <summary>
-        /// Deserializes xml markup from file into an AccountingDataMapping object
-        /// </summary>
-        /// <param name="fileName">string xml file to load and deserialize</param>
-        /// <param name="obj">Output AccountingDataMapping object</param>
-        /// <param name="exception">output Exception value if deserialize failed</param>
-        /// <returns>true if this XmlSerializer can deserialize the object; otherwise, false</returns>
-        public static bool LoadFromFile(string fileName, out AccountingDataMapping obj, out System.Exception exception) {
-            exception = null;
-            obj = default(AccountingDataMapping);
-            try {
-                obj = LoadFromFile(fileName);
-                return true;
-            }
-            catch (System.Exception ex) {
-                exception = ex;
-                return false;
-            }
-        }
-        
-        public static bool LoadFromFile(string fileName, out AccountingDataMapping obj) {
-            System.Exception exception = null;
-            return LoadFromFile(fileName, out obj, out exception);
-        }
-        
-        public static AccountingDataMapping LoadFromFile(string fileName) {
             System.IO.FileStream file = null;
             System.IO.StreamReader sr = null;
             try {

@@ -29,12 +29,15 @@ namespace SimpleAccounting.UnitTests.Presentation
                                     ID = 100,
                                     Name = "Bank account",
                                     Type = AccountDefinitionType.Asset,
-                                    ImportMapping = new List<AccountDefinitionImportMapping>
+                                    ImportMapping = new AccountDefinitionImportMapping
                                     {
-                                        new AccountDefinitionImportMapping { Source = "Date", Target = AccountDefinitionImportMappingTarget.Date },
-                                        new AccountDefinitionImportMapping { Source = "Name", Target = AccountDefinitionImportMappingTarget.Name },
-                                        new AccountDefinitionImportMapping { Source = "Text", Target = AccountDefinitionImportMappingTarget.Text },
-                                        new AccountDefinitionImportMapping { Source = "Value", Target = AccountDefinitionImportMappingTarget.Value }
+                                        Columns = new List<AccountDefinitionImportMappingColumn>
+                                        {
+                                            new AccountDefinitionImportMappingColumn { Source = "Date", Target = AccountDefinitionImportMappingColumnTarget.Date },
+                                            new AccountDefinitionImportMappingColumn { Source = "Name", Target = AccountDefinitionImportMappingColumnTarget.Name },
+                                            new AccountDefinitionImportMappingColumn { Source = "Text", Target = AccountDefinitionImportMappingColumnTarget.Text },
+                                            new AccountDefinitionImportMappingColumn { Source = "Value", Target = AccountDefinitionImportMappingColumnTarget.Value }
+                                        }
                                     }
                                 },
                                 new AccountDefinition
