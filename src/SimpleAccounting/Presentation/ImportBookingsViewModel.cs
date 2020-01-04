@@ -226,10 +226,27 @@ namespace lg2de.SimpleAccounting.Presentation
                 };
                 var creditValue = new BookingValue
                 {
-                    Text = $"{item.Name} - {item.Text}",
                     Value = (int)Math.Abs(Math.Round(item.Value * 100))
                 };
+
+                // build booking text from name and/or text
+                if (string.IsNullOrWhiteSpace(item.Text))
+                {
+                    creditValue.Text = item.Name;
+                }
+                else if (string.IsNullOrWhiteSpace(item.Name))
+                {
+                    creditValue.Text = item.Text;
+                }
+                else
+                {
+                    creditValue.Text = $"{item.Name} - {item.Text}";
+                }
+
+                // start debit with clone of credit
                 var debitValue = creditValue.Clone();
+
+                // set accounts according to the value
                 if (item.Value > 0)
                 {
                     creditValue.Account = item.RemoteAccount.ID;
