@@ -23,7 +23,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly IMessageBox messageBox;
         private readonly ShellViewModel parent;
         private readonly List<AccountDefinition> accounts;
-        private ulong importAccount;
+        private ulong selectedAccountNumber;
 
         public ImportBookingsViewModel(
             IMessageBox messageBox,
@@ -48,17 +48,17 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ulong BookingNumber { get; internal set; }
 
-        public ulong ImportAccount
+        public ulong SelectedAccountNumber
         {
-            get => this.importAccount;
+            get => this.selectedAccountNumber;
             set
             {
-                if (this.importAccount == value)
+                if (this.selectedAccountNumber == value)
                 {
                     return;
                 }
 
-                this.importAccount = value;
+                this.selectedAccountNumber = value;
                 this.NotifyOfPropertyChange();
             }
         }
@@ -130,7 +130,7 @@ namespace lg2de.SimpleAccounting.Presentation
             if (this.Journal != null)
             {
                 var lastEntry = this.Journal.Booking
-                    .Where(x => x.Credit.Any(c => c.Account == this.ImportAccount) || x.Debit.Any(c => c.Account == this.ImportAccount))
+                    .Where(x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) || x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
                     .OrderBy(x => x.Date)
                     .LastOrDefault();
                 if (lastEntry != null)
@@ -211,9 +211,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal void ProcessData()
         {
-            foreach (var item in this.ImportData)
+            foreach (var importing in this.ImportData)
             {
-                if (item.RemoteAccount == null)
+                if (importing.RemoteAccount == null)
                 {
                     // mapping missing - abort
                     break;
@@ -221,41 +221,41 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var newBooking = new AccountingDataJournalBooking
                 {
-                    Date = item.Date.ToAccountingDate(),
-                    ID = item.Identifier
+                    Date = importing.Date.ToAccountingDate(),
+                    ID = importing.Identifier
                 };
                 var creditValue = new BookingValue
                 {
-                    Value = (int)Math.Abs(Math.Round(item.Value * 100))
+                    Value = (int)Math.Abs(Math.Round(importing.Value * 100))
                 };
 
                 // build booking text from name and/or text
-                if (string.IsNullOrWhiteSpace(item.Text))
+                if (string.IsNullOrWhiteSpace(importing.Text))
                 {
-                    creditValue.Text = item.Name;
+                    creditValue.Text = importing.Name;
                 }
-                else if (string.IsNullOrWhiteSpace(item.Name))
+                else if (string.IsNullOrWhiteSpace(importing.Name))
                 {
-                    creditValue.Text = item.Text;
+                    creditValue.Text = importing.Text;
                 }
                 else
                 {
-                    creditValue.Text = $"{item.Name} - {item.Text}";
+                    creditValue.Text = $"{importing.Name} - {importing.Text}";
                 }
 
                 // start debit with clone of credit
                 var debitValue = creditValue.Clone();
 
                 // set accounts according to the value
-                if (item.Value > 0)
+                if (importing.Value > 0)
                 {
-                    creditValue.Account = item.RemoteAccount.ID;
-                    debitValue.Account = this.ImportAccount;
+                    creditValue.Account = importing.RemoteAccount.ID;
+                    debitValue.Account = this.SelectedAccountNumber;
                 }
                 else
                 {
-                    creditValue.Account = this.ImportAccount;
-                    debitValue.Account = item.RemoteAccount.ID;
+                    creditValue.Account = this.SelectedAccountNumber;
+                    debitValue.Account = importing.RemoteAccount.ID;
                 }
 
                 newBooking.Credit = new List<BookingValue> { creditValue };

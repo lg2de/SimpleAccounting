@@ -63,7 +63,7 @@ Date;Name;Text;Value
                 parent,
                 accounts);
             sut.SelectedAccount = accounts.Single(x => x.Name == "Bank account");
-            sut.ImportAccount = sut.SelectedAccount.ID;
+            sut.SelectedAccountNumber = sut.SelectedAccount.ID;
             var remoteAccount = accounts.Single(x => x.ID == 600);
             sut.ImportData.Add(new ImportEntryViewModel { Date = new DateTime(2020, 1, 1), Identifier = 101, Name = "Name", Text = "Text", Value = 1, RemoteAccount = remoteAccount });
             sut.ImportData.Add(new ImportEntryViewModel { Date = new DateTime(2020, 1, 2), Identifier = 102, Text = "Text", Value = 2, RemoteAccount = remoteAccount });

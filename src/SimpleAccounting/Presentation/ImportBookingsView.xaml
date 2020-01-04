@@ -34,15 +34,14 @@
             DockPanel.Dock="Top"
             Orientation="Horizontal">
             <xctk:ValueRangeTextBox
-                x:Name="ImportAccount"
                 Width="100"
                 ValueDataType="{x:Type s:UInt64}"
                 AutoSelectBehavior="OnFocus"
-                Text="{Binding ImportAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                Text="{Binding SelectedAccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <ComboBox
                 Width="150"
                 ItemsSource="{Binding ImportAccounts}"
-                SelectedValue="{Binding ImportAccount, Mode=TwoWay}"
+                SelectedValue="{Binding SelectedAccountNumber, Mode=TwoWay}"
                 SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
                 SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
             <Button
