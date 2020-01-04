@@ -81,7 +81,8 @@
                                 Margin="0"
                                 ItemsSource="{Binding Accounts}"
                                 SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+                                ItemTemplate="{StaticResource AccountSelectionTemplate}"
+                                TextSearch.TextPath="Name"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

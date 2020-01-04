@@ -91,11 +91,11 @@
             Text="{Binding DebitAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <ComboBox
             Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="2"
-            Focusable="False"
             ItemsSource="{Binding Accounts}"
             SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
             SelectedIndex="{Binding DebitIndex, Mode=OneWayToSource}"
-            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
+            TextSearch.TextPath="Name" />
 
         <TextBlock
             Grid.Column="0" Grid.Row="3"
@@ -107,11 +107,11 @@
             Text="{Binding CreditAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <ComboBox
             Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="3"
-            Focusable="False"
             ItemsSource="{Binding Accounts}"
             SelectedValue="{Binding CreditAccount, Mode=TwoWay}"
             SelectedIndex="{Binding CreditIndex, Mode=OneWayToSource}"
-            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
+            TextSearch.TextPath="Name" />
 
         <StackPanel
             Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="4"
