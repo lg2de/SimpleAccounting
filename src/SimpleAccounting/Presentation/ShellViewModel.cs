@@ -100,7 +100,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 .Select(t => new BookingTemplate { Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / 100.0 })
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
             this.windowManager.ShowDialog(bookingModel);
-        });
+        }, _ => this.IsCurrentYearOpen);
 
         public ICommand ImportBookingsCommand => new RelayCommand(_ =>
         {
@@ -120,21 +120,11 @@ namespace lg2de.SimpleAccounting.Presentation
                 Journal = this.currentJournal
             };
             this.windowManager.ShowDialog(importModel);
-        });
+        }, _ => this.IsCurrentYearOpen);
 
         public ICommand CloseYearCommand => new RelayCommand(
             _ => this.CloseYear(),
-            _ =>
-            {
-                var accountingYear =
-                    this.accountingData?.Years.SingleOrDefault(y => y.Name == this.bookingYear);
-                if (accountingYear == null)
-                {
-                    return false;
-                }
-
-                return !accountingYear.Closed;
-            });
+            _ => this.IsCurrentYearOpen);
 
         public ICommand TotalJournalReportCommand => new RelayCommand(_ =>
         {
@@ -313,6 +303,20 @@ namespace lg2de.SimpleAccounting.Presentation
         internal Settings Settings { get; set; } = Settings.Default;
 
         private bool IsDocumentChanged { get; set; }
+
+        private bool IsCurrentYearOpen
+        {
+            get
+            {
+                if (this.accountingData == null || this.currentJournal == null)
+                {
+                    return false;
+                }
+
+                var year = this.accountingData.Years.SingleOrDefault(y => y.Name == this.currentJournal.Year);
+                return !year.Closed;
+            }
+        }
 
         public override void CanClose(Action<bool> callback)
         {
@@ -495,18 +499,25 @@ namespace lg2de.SimpleAccounting.Presentation
             this.IsDocumentChanged = false;
             this.fileName = projectFileName;
 
-            var projectData = AccountingData.LoadFromFile(this.fileName);
-            this.LoadProjectData(projectData);
-
-            Settings.Default.RecentProject = this.fileName;
-            Settings.Default.RecentProjects.Remove(this.fileName);
-            Settings.Default.RecentProjects.Insert(0, this.fileName);
-            while (Settings.Default.RecentProjects.Count > 10)
+            try
             {
-                Settings.Default.RecentProjects.RemoveAt(10);
-            }
+                var projectData = AccountingData.LoadFromFile(this.fileName);
+                this.LoadProjectData(projectData);
 
-            Settings.Default.Save();
+                Settings.Default.RecentProject = this.fileName;
+                Settings.Default.RecentProjects.Remove(this.fileName);
+                Settings.Default.RecentProjects.Insert(0, this.fileName);
+                while (Settings.Default.RecentProjects.Count > 10)
+                {
+                    Settings.Default.RecentProjects.RemoveAt(10);
+                }
+
+                Settings.Default.Save();
+            }
+            catch (InvalidOperationException e)
+            {
+                this.messageBox.Show($"Failed to load file '{this.fileName}':\n{e.Message}", "Load");
+            }
         }
 
         internal void LoadProjectData(AccountingData projectData)

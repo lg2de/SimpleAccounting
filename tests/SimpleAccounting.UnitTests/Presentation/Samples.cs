@@ -56,6 +56,13 @@ namespace SimpleAccounting.UnitTests.Presentation
                     {
                         new AccountingDataYear
                         {
+                            Name = 2000,
+                            DateStart = 20000101,
+                            DateEnd = 20001231,
+                            Closed = true
+                        },
+                        new AccountingDataYear
+                        {
                             Name = (ushort)year,
                             DateStart = year * 10000 + 101,
                             DateEnd = year * 10000 + 1231
@@ -63,6 +70,11 @@ namespace SimpleAccounting.UnitTests.Presentation
                     },
                     Journal = new List<AccountingDataJournal>
                     {
+                        new AccountingDataJournal
+                        {
+                            Year = 2000,
+                            Booking = new List<AccountingDataJournalBooking>()
+                        },
                         new AccountingDataJournal
                         {
                             Year = (ushort)year,

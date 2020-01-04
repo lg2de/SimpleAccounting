@@ -93,6 +93,43 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void AddBookingsCommand_NoProject_CannotExecute()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+
+            sut.AddBookingsCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AddBookingsCommand_OpenYear_CanExecute()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            sut.LoadProjectData(Samples.SampleProject);
+            sut.BookingYears.Last().Command.Execute(null);
+
+            sut.AddBookingsCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AddBookingsCommand_ClosedYear_CannotExecute()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            sut.LoadProjectData(Samples.SampleProject);
+            sut.BookingYears.First().Command.Execute(null);
+
+            sut.AddBookingsCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
         public void AddBookingsCommand_BookingNumberInitialized()
         {
             var windowManager = Substitute.For<IWindowManager>();
@@ -106,6 +143,43 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.AddBookingsCommand.Execute(null);
 
             vm.BookingNumber.Should().Be(1);
+        }
+
+        [Fact]
+        public void ImportBookingsCommand_NoProject_CannotExecute()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+
+            sut.ImportBookingsCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void ImportBookingsCommand_OpenYear_CanExecute()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            sut.LoadProjectData(Samples.SampleProject);
+            sut.BookingYears.Last().Command.Execute(null);
+
+            sut.ImportBookingsCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ImportBookingsCommand_ClosedYear_CannotExecute()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            sut.LoadProjectData(Samples.SampleProject);
+            sut.BookingYears.First().Command.Execute(null);
+
+            sut.ImportBookingsCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -166,9 +240,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             var fileSystem = Substitute.For<IFileSystem>();
             var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
-            var year = sut.BookingYears.Last();
-            sut.CloseYearCommand.Execute(null);
-            year.Command.Execute(null);
+            sut.BookingYears.First().Command.Execute(null);
 
             sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
         }
