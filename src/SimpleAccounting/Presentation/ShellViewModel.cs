@@ -143,6 +143,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentJournal,
                 this.accountingData.Setup,
                 CultureInfo.CurrentUICulture);
+            report.PageBreakBetweenAccounts = this.accountingData.Setup.Reports.AccountJournalReport.PageBreakBetweenAccounts;
             var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
             report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Kontoblätter {this.bookingYear}");

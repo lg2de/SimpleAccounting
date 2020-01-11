@@ -36,6 +36,11 @@ namespace lg2de.SimpleAccounting.Reports
             this.culture = culture;
         }
 
+        /// <summary>
+        ///     Gets or sets a value indicating whether account reports should be separated by page break.
+        /// </summary>
+        public bool PageBreakBetweenAccounts { get; set; }
+
         internal XDocument Document => XDocument.Parse(this.printer.Document.OuterXml);
 
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
@@ -56,6 +61,8 @@ namespace lg2de.SimpleAccounting.Reports
 
             XmlNode tableNode = doc.SelectSingleNode("//table");
 
+            bool firstAccount = true;
+
             foreach (var account in this.accounts)
             {
                 var accountEntries = this.journal.Booking
@@ -67,6 +74,22 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     // ignore
                     continue;
+                }
+
+                if (!firstAccount)
+                {
+                    XmlNode separatorNode;
+                    if (this.PageBreakBetweenAccounts)
+                    {
+                        separatorNode = doc.CreateElement("newPage");
+                    }
+                    else
+                    {
+                        separatorNode = doc.CreateElement("move");
+                        separatorNode.SetAttribute("relY", "5");
+                    }
+
+                    tableNode.ParentNode.InsertBefore(separatorNode, tableNode);
                 }
 
                 var titleFont = doc.CreateElement("font");
@@ -207,11 +230,10 @@ namespace lg2de.SimpleAccounting.Reports
                     saldoLineNode.AppendChild(saldoItemNode);
                 }
 
-                saldoLineNode.AppendChild(doc.CreateElement("td")); // remote
+                // empty remote account column
+                saldoLineNode.AppendChild(doc.CreateElement("td"));
 
-                moveNode = doc.CreateElement("move");
-                moveNode.SetAttribute("relY", "5");
-                tableNode.ParentNode.InsertBefore(moveNode, tableNode);
+                firstAccount = false;
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);

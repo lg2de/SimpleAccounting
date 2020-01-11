@@ -23,10 +23,15 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
-              <xs:element name="Reports" minOccurs="0">
+              <xs:element name="Reports" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="TotalsAndBalancesReport" minOccurs="0">
+                    <xs:element name="AccountJournalReport" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:attribute name="PageBreakBetweenAccounts" type="xs:boolean" default="false" />
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="TotalsAndBalancesReport" minOccurs="0" maxOccurs="1">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="Signature" type="xs:string" minOccurs="0" maxOccurs="unbounded" />

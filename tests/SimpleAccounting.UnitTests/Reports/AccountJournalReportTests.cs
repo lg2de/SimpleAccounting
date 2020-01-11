@@ -18,8 +18,10 @@ namespace SimpleAccounting.UnitTests.Reports
 
     public class AccountJournalReportTests
     {
-        [Fact]
-        public void CreateReport_SampleData_Converted()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void CreateReport_SampleData_Converted(bool pageBreakBetweenAccounts)
         {
             var accounts = new List<AccountDefinition>
             {
@@ -80,6 +82,7 @@ namespace SimpleAccounting.UnitTests.Reports
             };
             var setup = new AccountingDataSetup();
             var sut = new AccountJournalReport(accounts, journal, setup, new CultureInfo("en-us"));
+            sut.PageBreakBetweenAccounts = pageBreakBetweenAccounts;
 
             sut.CreateReport(new DateTime(2019, 1, 1), new DateTime(2019, 12, 31));
 
@@ -164,6 +167,31 @@ namespace SimpleAccounting.UnitTests.Reports
         <td />
     </tr>
 </data>";
+
+            var rootElements = sut.Document.Element("xEport").Elements().Select(e => e.Name).Should().Equal(
+                "pageTexts",
+                "font", // header
+                "text",
+                "move",
+                "font", // firm
+                "text",
+                "move",
+                "text", // time range
+                "move",
+                "font", // default font
+                "font", // account header
+                "move",
+                "table", // account data
+                pageBreakBetweenAccounts ? "newPage" : "move",
+                "font", // account header
+                "move",
+                "table", // account data
+                pageBreakBetweenAccounts ? "newPage" : "move",
+                "font", // account header
+                "move",
+                "table", // account data
+                "move", // footer
+                "text");
 
             var actual = sut.Document.XPathSelectElements("//table/data").ToArray();
             actual.Should().HaveCount(3);

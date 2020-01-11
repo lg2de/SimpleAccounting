@@ -197,6 +197,25 @@ namespace SimpleAccounting.UnitTests.Reports
         }
 
         [Fact]
+        public void TransformDocument_NewPage_CursorReset()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><move absX=\"10\" absY=\"20\" relX=\"3\" relY=\"4\" /><newPage/></root>");
+
+            // initialize cursor with irrelevant values
+            sut.CursorX = 5;
+            sut.CursorY = 8;
+
+            sut.TransformDocument();
+
+            using (new AssertionScope())
+            {
+                sut.CursorX.Should().Be(0);
+                sut.CursorY.Should().Be(0);
+            }
+        }
+
+        [Fact]
         public void TransformDocument_Table_ConvertedToTexts()
         {
             var sut = new XmlPrinter { DocumentHeight = 100 };
@@ -422,8 +441,72 @@ namespace SimpleAccounting.UnitTests.Reports
                 + "<text relX=\"0\">C1</text>"
                 + "<move relY=\"4\" />"
                 + "<text relX=\"0\">1</text>"
-                + "<newpage />"
+                + "<newPage />"
                 + "<text relX=\"0\">C1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">2</text>"
+                + "<move relY=\"4\" />"
+                + "</root>"));
+        }
+
+        [Fact]
+        public void TransformDocument_TableWithHighLine_NewPageBefore()
+        {
+            var sut = new XmlPrinter { DocumentHeight = 30 };
+            sut.LoadXml(
+                "<root>"
+                + "<move relY=\"15\" />"
+                + "<table><columns>"
+                + "<column width=\"10\">C1</column>"
+                + "</columns><data>"
+                + "<tr><td>1</td></tr>"
+                + "<tr lineHeight=\"20\"><td>2</td></tr>"
+                + "</data></table>"
+                + "</root>");
+
+            sut.TransformDocument();
+
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse(
+                "<root>"
+                + "<move relY=\"15\" />"
+                + "<text relX=\"0\">C1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">1</text>"
+                + "<move relY=\"4\" />"
+                + "<newPage />"
+                + "<text relX=\"0\">C1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">2</text>"
+                + "<move relY=\"20\" />"
+                + "</root>"));
+        }
+
+        [Fact]
+        public void TransformDocument_TableStartAtBottom_NewPageBeforeTable()
+        {
+            var sut = new XmlPrinter { DocumentHeight = 20 };
+            sut.LoadXml(
+                "<root>"
+                + "<move relY=\"15\" />"
+                + "<table><columns>"
+                + "<column width=\"10\">C1</column>"
+                + "</columns><data>"
+                + "<tr><td>1</td></tr>"
+                + "<tr><td>2</td></tr>"
+                + "</data></table>"
+                + "</root>");
+
+            sut.TransformDocument();
+
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse(
+                "<root>"
+                + "<move relY=\"15\" />"
+                + "<newPage />"
+                + "<text relX=\"0\">C1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">1</text>"
                 + "<move relY=\"4\" />"
                 + "<text relX=\"0\">2</text>"
                 + "<move relY=\"4\" />"
@@ -454,7 +537,7 @@ namespace SimpleAccounting.UnitTests.Reports
                 + "<text relX=\"0\">C1</text>"
                 + "<move relY=\"4\" />"
                 + "<text relX=\"0\">1</text>"
-                + "<newpage />"
+                + "<newPage />"
                 + "<font><text>page 2</text></font>"
                 + "<text relX=\"0\">C1</text>"
                 + "<move relY=\"4\" />"
@@ -477,9 +560,27 @@ namespace SimpleAccounting.UnitTests.Reports
 
             using (new AssertionScope())
             {
+                graphics.HasMorePages.Should().BeFalse();
                 sut.CursorX.Should().Be(10);
                 sut.CursorY.Should().Be(20);
             }
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_NewPage_MorePagesRequested()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><move absX=\"10\" absY=\"20\" /><newPage /></root>");
+            sut.SetupGraphics();
+            sut.CursorX = 5;
+            sut.CursorY = 8;
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(null, graphics);
+
+            graphics.HasMorePages.Should().BeTrue();
 
             sut.CleanupGraphics();
         }

@@ -201,7 +201,7 @@ namespace lg2de.SimpleAccounting.Reports
                     transformingNode.ParentNode.RemoveChild(transformingNode);
                     continue;
                 }
-                else if (transformingNode.Name == "newpage")
+                else if (transformingNode.Name == "newPage")
                 {
                     this.ProcessNewPage();
                 }
@@ -211,7 +211,7 @@ namespace lg2de.SimpleAccounting.Reports
                 if (nextNode != null
                     && this.CursorY >= this.DocumentHeight - this.DocumentBottomMargin)
                 {
-                    XmlNode newPage = this.Document.CreateElement("newpage");
+                    XmlNode newPage = this.Document.CreateElement("newPage");
                     nextNode.ParentNode.InsertBefore(newPage, nextNode);
 
                     this.ProcessNewPage();
@@ -252,7 +252,7 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     this.PrintColorNode(printArgs, graphics);
                 }
-                else if (this.currentNode.Name == "newpage")
+                else if (this.currentNode.Name == "newPage")
                 {
                     graphics.HasMorePages = true;
                     this.currentNode = this.currentNode.NextSibling;
@@ -376,7 +376,7 @@ namespace lg2de.SimpleAccounting.Reports
             // if table can not be started on page - create new one
             if (this.CursorY + tableLineHeight * 2 > this.DocumentHeight - this.DocumentBottomMargin)
             {
-                XmlNode newPage = this.Document.CreateElement("newpage");
+                XmlNode newPage = this.Document.CreateElement("newPage");
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
                 this.CursorY = this.DocumentTopMargin;
             }
@@ -400,7 +400,7 @@ namespace lg2de.SimpleAccounting.Reports
                 // check whether oversized line still fits into page
                 if (this.CursorY + lineHeight > this.DocumentHeight - this.DocumentBottomMargin)
                 {
-                    XmlNode newPage = this.Document.CreateElement("newpage");
+                    XmlNode newPage = this.Document.CreateElement("newPage");
                     tableNode.ParentNode.InsertBefore(newPage, tableNode);
                     this.CursorY = this.DocumentTopMargin;
                     this.TransformTableHeader(tableNode);
@@ -454,7 +454,7 @@ namespace lg2de.SimpleAccounting.Reports
                     && this.CursorY + tableLineHeight > this.DocumentHeight - this.DocumentBottomMargin)
                 {
                     // start new page with table header
-                    XmlNode newPage = this.Document.CreateElement("newpage");
+                    XmlNode newPage = this.Document.CreateElement("newPage");
                     tableNode.ParentNode.InsertBefore(newPage, tableNode);
                     this.CursorY = this.DocumentTopMargin;
                     this.TransformTableHeader(tableNode);
@@ -508,7 +508,7 @@ namespace lg2de.SimpleAccounting.Reports
             // page number 1 already assigned immediately
             int pageNumber = 1;
 
-            var pageWraps = this.Document.SelectNodes("//newpage");
+            var pageWraps = this.Document.SelectNodes("//newPage");
             foreach (XmlNode pageWrap in pageWraps)
             {
                 pageNumber++;
