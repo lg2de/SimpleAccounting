@@ -79,17 +79,18 @@ namespace lg2de.SimpleAccounting.Reports
 
             this.TransformDocument();
 
-            PrintPreviewDialog dialog = null;
-            this.SetupGraphics();
-            try
+            // The setup and cleanup procedured must be executed by event handlers
+            // because they are executed for preview AND real printing.
+            printDocument.BeginPrint += (_, printArgs) => this.SetupGraphics();
+            printDocument.EndPrint += (_, printArgs) => this.CleanupGraphics();
+
+            using (var dialog = new PrintPreviewDialog
             {
-                dialog = new PrintPreviewDialog { Document = printDocument, WindowState = FormWindowState.Maximized };
+                Document = printDocument,
+                WindowState = FormWindowState.Maximized,
+            })
+            {
                 dialog.ShowDialog();
-            }
-            finally
-            {
-                this.CleanupGraphics();
-                dialog?.Dispose();
             }
         }
 
