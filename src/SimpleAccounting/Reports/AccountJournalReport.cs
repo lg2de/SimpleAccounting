@@ -69,9 +69,14 @@ namespace lg2de.SimpleAccounting.Reports
                     continue;
                 }
 
+                var titleFont = doc.CreateElement("font");
+                titleFont.SetAttribute("size", 10);
+                titleFont.SetAttribute("bold", 1);
+                tableNode.ParentNode.InsertBefore(titleFont, tableNode);
+
                 var titleNode = doc.CreateElement("text");
                 titleNode.InnerText = account.FormatName();
-                tableNode.ParentNode.InsertBefore(titleNode, tableNode);
+                titleFont.AppendChild(titleNode);
 
                 var moveNode = doc.CreateElement("move");
                 moveNode.SetAttribute("relY", "5");
@@ -82,12 +87,15 @@ namespace lg2de.SimpleAccounting.Reports
 
                 var dataNode = newTable.SelectSingleNode("data");
 
+                double nCreditSum = 0;
+                double nDebitSum = 0;
+
                 foreach (var entry in accountEntries)
                 {
                     XmlNode dataLineNode = doc.CreateElement("tr");
+                    dataLineNode.SetAttribute("topLine", true);
                     dataNode.AppendChild(dataLineNode);
                     XmlNode dataItemNode = doc.CreateElement("td");
-                    dataLineNode.SetAttribute("topLine", true);
                     dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d", this.culture);
                     dataLineNode.AppendChild(dataItemNode);
                     dataItemNode = dataItemNode.Clone();
@@ -102,6 +110,7 @@ namespace lg2de.SimpleAccounting.Reports
                         dataLineNode.AppendChild(dataItemNode);
 
                         double nValue = Convert.ToDouble(debitEntry.Value) / 100;
+                        nDebitSum += nValue;
                         dataItemNode = dataItemNode.Clone();
                         dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
                         dataLineNode.AppendChild(dataItemNode);
@@ -133,6 +142,7 @@ namespace lg2de.SimpleAccounting.Reports
                         dataLineNode.AppendChild(dataItemNode);
 
                         double nValue = Convert.ToDouble(creditEntry.Value) / 100;
+                        nCreditSum += nValue;
                         dataItemNode = dataItemNode.Clone();
                         dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
                         dataLineNode.AppendChild(dataItemNode);
@@ -150,6 +160,54 @@ namespace lg2de.SimpleAccounting.Reports
                         }
                     }
                 }
+
+                // sum
+                if (nDebitSum > 0 && nCreditSum > 0)
+                {
+                    XmlNode sumLineNode = doc.CreateElement("tr");
+                    sumLineNode.SetAttribute("topLine", true);
+                    dataNode.AppendChild(sumLineNode);
+                    XmlNode sumItemNode = doc.CreateElement("td");
+                    sumItemNode.InnerText = "Summen";
+                    sumItemNode.SetAttribute("align", "right");
+                    sumLineNode.AppendChild(sumItemNode);
+                    sumLineNode.AppendChild(doc.CreateElement("td")); // id
+                    sumLineNode.AppendChild(doc.CreateElement("td")); // text
+                    sumItemNode = doc.CreateElement("td");
+                    sumItemNode.InnerText = nDebitSum.ToString("0.00", this.culture);
+                    sumLineNode.AppendChild(sumItemNode);
+                    sumItemNode = sumItemNode.Clone();
+                    sumItemNode.InnerText = nCreditSum.ToString("0.00", this.culture);
+                    sumLineNode.AppendChild(sumItemNode);
+                    sumLineNode.AppendChild(doc.CreateElement("td")); // remote
+                }
+
+                // saldo
+                XmlNode saldoLineNode = doc.CreateElement("tr");
+                saldoLineNode.SetAttribute("topLine", true);
+                dataNode.AppendChild(saldoLineNode);
+                XmlNode saldoItemNode = doc.CreateElement("td");
+                saldoItemNode.InnerText = "Saldo";
+                saldoItemNode.SetAttribute("align", "right");
+                saldoLineNode.AppendChild(saldoItemNode);
+                saldoLineNode.AppendChild(doc.CreateElement("td")); // id
+                saldoLineNode.AppendChild(doc.CreateElement("td")); // text
+                if (nDebitSum > nCreditSum)
+                {
+                    saldoItemNode = doc.CreateElement("td");
+                    saldoItemNode.InnerText = (nDebitSum - nCreditSum).ToString("0.00", this.culture);
+                    saldoLineNode.AppendChild(saldoItemNode);
+                    saldoLineNode.AppendChild(doc.CreateElement("td"));
+                }
+                else
+                {
+                    saldoLineNode.AppendChild(doc.CreateElement("td"));
+                    saldoItemNode = doc.CreateElement("td");
+                    saldoItemNode.InnerText = (nCreditSum - nDebitSum).ToString("0.00", this.culture);
+                    saldoLineNode.AppendChild(saldoItemNode);
+                }
+
+                saldoLineNode.AppendChild(doc.CreateElement("td")); // remote
 
                 moveNode = doc.CreateElement("move");
                 moveNode.SetAttribute("relY", "5");

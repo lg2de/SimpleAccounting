@@ -109,6 +109,22 @@ namespace SimpleAccounting.UnitTests.Reports
         <td/>
         <td>Diverse</td>
     </tr>
+    <tr topLine=""True"">
+        <td align=""right"">Summen</td>
+        <td />
+        <td />
+        <td>550.00</td>
+        <td>100.00</td>
+        <td />
+    </tr>
+    <tr topLine=""True"">
+        <td align=""right"">Saldo</td>
+        <td />
+        <td />
+        <td>450.00</td>
+        <td />
+        <td />
+    </tr>
 </data>";
             var expectedSelling = @"
 <data>
@@ -119,6 +135,14 @@ namespace SimpleAccounting.UnitTests.Reports
         <td/>
         <td>25.00</td>
         <td>Diverse</td>
+    </tr>
+    <tr topLine=""True"">
+        <td align=""right"">Saldo</td>
+        <td />
+        <td />
+        <td />
+        <td>25.00</td>
+        <td />
     </tr>
 </data>";
             var expectedBuying = @"
@@ -131,15 +155,29 @@ namespace SimpleAccounting.UnitTests.Reports
         <td/>
         <td>100</td>
     </tr>
+    <tr topLine=""True"">
+        <td align=""right"">Saldo</td>
+        <td />
+        <td />
+        <td>50.00</td>
+        <td />
+        <td />
+    </tr>
 </data>";
 
             var actual = sut.Document.XPathSelectElements("//table/data").ToArray();
             actual.Should().HaveCount(3);
             using (new AssertionScope())
             {
-                actual[0].Should().BeEquivalentTo(XDocument.Parse(expectedMoney).Root);
-                actual[1].Should().BeEquivalentTo(XDocument.Parse(expectedSelling).Root);
-                actual[2].Should().BeEquivalentTo(XDocument.Parse(expectedBuying).Root);
+                actual[0].Should().BeEquivalentTo(
+                    XDocument.Parse(expectedMoney).Root,
+                    "money table should match");
+                actual[1].Should().BeEquivalentTo(
+                    XDocument.Parse(expectedSelling).Root,
+                    "selling table should match");
+                actual[2].Should().BeEquivalentTo(
+                    XDocument.Parse(expectedBuying).Root,
+                    "buying table should match");
             }
         }
     }
