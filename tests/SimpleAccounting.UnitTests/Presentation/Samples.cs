@@ -42,6 +42,12 @@ namespace SimpleAccounting.UnitTests.Presentation
                                 },
                                 new AccountDefinition
                                 {
+                                    ID = 400,
+                                    Name = "Salary",
+                                    Type = AccountDefinitionType.Income
+                                },
+                                new AccountDefinition
+                                {
                                     ID = 600,
                                     Name = "Shoes",
                                     Type = AccountDefinitionType.Expense
@@ -83,6 +89,57 @@ namespace SimpleAccounting.UnitTests.Presentation
                             Year = (ushort)year,
                             Booking = new List<AccountingDataJournalBooking>()
                         }
+                    }
+                };
+            }
+        }
+
+        public static IEnumerable<AccountingDataJournalBooking> SampleBookings
+        {
+            get
+            {
+                var baseDate = (uint)DateTime.Now.Year * 10000;
+
+                yield return new AccountingDataJournalBooking
+                {
+                    ID = 1,
+                    Date = baseDate + 101,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 990, Text = "Open", Value = 100000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Open", Value = 100000 }
+                    }
+                };
+
+                yield return new AccountingDataJournalBooking
+                {
+                    ID = 2,
+                    Date = baseDate + 131,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 400, Text = "Salary1", Value = 10000 },
+                        new BookingValue { Account = 400, Text = "Salary2", Value = 10000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Salary", Value = 20000 }
+                    }
+                };
+                yield return new AccountingDataJournalBooking
+                {
+                    ID = 3,
+                    Date = baseDate + 201,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Shoes", Value = 10000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 600, Text = "Shoes1", Value = 5000 },
+                        new BookingValue { Account = 600, Text = "Shoes2", Value = 5000 }
                     }
                 };
             }

@@ -10,13 +10,24 @@ namespace lg2de.SimpleAccounting.Model
 
     public partial class AccountingData
     {
+        internal const string DefaultXsiSchemaLocation = DefaultSchemaNamespacee + " " + DefaultSchemaLocation;
+
+        private const string DefaultSchemaNamespacee = "https://lg2.de/SimpleAccounting/AccountingSchema";
+        private const string DefaultSchemaLocation = "https://lg2de.github.io/SimpleAccounting/AccountingData.xsd";
+
+        private string schema = DefaultXsiSchemaLocation;
+
         [XmlAttribute("schemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
         public string xsiSchemaLocation
         {
-            get => "https://lg2.de/SimpleAccounting/AccountingSchema https://lg2de.github.io/SimpleAccounting/AccountingData.xsd";
+            get => this.schema;
             set
             {
-                // ignored
+                this.schema = value;
+                if (this.schema != DefaultXsiSchemaLocation)
+                {
+                    this.schema = DefaultXsiSchemaLocation;
+                }
             }
         }
 

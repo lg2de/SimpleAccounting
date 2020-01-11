@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Extensions
 {
     using System;
+    using System.Globalization;
     using System.Xml;
 
     internal static class XmlExtensions
@@ -42,7 +43,7 @@ namespace lg2de.SimpleAccounting.Extensions
             Type returnType = typeof(T);
             if (returnType == typeof(int))
             {
-                return (T)(object)Convert.ToInt32(attribute.Value);
+                return (T)(object)Convert.ToInt32(attribute.Value, CultureInfo.InvariantCulture);
             }
 
             if (returnType == typeof(bool))

@@ -64,7 +64,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.fileName = "<new>";
-            this.LoadProjectData(this.GetTemplateProject());
+            this.LoadProjectData(GetTemplateProject());
         });
 
         public ICommand OpenProjectCommand => new RelayCommand(_ =>
@@ -473,10 +473,9 @@ namespace lg2de.SimpleAccounting.Presentation
             this.UpdateBookingYears();
         }
 
-        private string BuildAccountDescription(string strAccountNumber)
+        private string BuildAccountDescription(ulong accountNumber)
         {
-            var nAccountNumber = Convert.ToUInt32(strAccountNumber);
-            var account = this.accountingData.AllAccounts.Single(a => a.ID == nAccountNumber);
+            var account = this.accountingData.AllAccounts.Single(a => a.ID == accountNumber);
             return account.FormatName();
         }
 
@@ -545,19 +544,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.BookingYears.Last().Command.Execute(null);
         }
 
-        private void UpdateBookingYears()
-        {
-            this.BookingYears.Clear();
-            foreach (var year in this.accountingData.Years)
-            {
-                var menu = new MenuViewModel(
-                    year.Name.ToString(),
-                    new RelayCommand(_ => this.SelectBookingYear(year.Name)));
-                this.BookingYears.Add(menu);
-            }
-        }
-
-        private AccountingData GetTemplateProject()
+        private static AccountingData GetTemplateProject()
         {
             var year = (ushort)DateTime.Now.Year;
             var defaultAccounts = new List<AccountDefinition>
@@ -594,6 +581,18 @@ namespace lg2de.SimpleAccounting.Presentation
                 Years = new List<AccountingDataYear> { accountYear },
                 Journal = new List<AccountingDataJournal> { accountJournal }
             };
+        }
+
+        private void UpdateBookingYears()
+        {
+            this.BookingYears.Clear();
+            foreach (var year in this.accountingData.Years)
+            {
+                var menu = new MenuViewModel(
+                    year.Name.ToString(),
+                    new RelayCommand(_ => this.SelectBookingYear(year.Name)));
+                this.BookingYears.Add(menu);
+            }
         }
 
         private bool CheckSaveProject()
@@ -666,10 +665,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debit = debitAccounts[0];
                     item.Text = debit.Text;
                     item.Value = Convert.ToDouble(debit.Value) / 100;
-                    string accountNumber = debit.Account.ToString();
-                    item.DebitAccount = this.BuildAccountDescription(accountNumber);
-                    accountNumber = creditAccounts[0].Account.ToString();
-                    item.CreditAccount = this.BuildAccountDescription(accountNumber);
+                    item.DebitAccount = this.BuildAccountDescription(debit.Account);
+                    item.CreditAccount = this.BuildAccountDescription(creditAccounts[0].Account);
                     this.Journal.Add(item);
                     continue;
                 }
@@ -679,8 +676,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debitItem = item.Clone();
                     debitItem.Text = debitEntry.Text;
                     debitItem.Value = Convert.ToDouble(debitEntry.Value) / 100;
-                    string strAccountNumber = debitEntry.Account.ToString();
-                    debitItem.DebitAccount = this.BuildAccountDescription(strAccountNumber);
+                    debitItem.DebitAccount = this.BuildAccountDescription(debitEntry.Account);
                     this.Journal.Add(debitItem);
                 }
 
@@ -689,8 +685,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     var creditItem = item.Clone();
                     creditItem.Text = creditEntry.Text;
                     creditItem.Value = Convert.ToDouble(creditEntry.Value) / 100;
-                    string strAccountNumber = creditEntry.Account.ToString();
-                    creditItem.CreditAccount = this.BuildAccountDescription(strAccountNumber);
+                    creditItem.CreditAccount = this.BuildAccountDescription(creditEntry.Account);
                     this.Journal.Add(creditItem);
                 }
             }
@@ -715,15 +710,9 @@ namespace lg2de.SimpleAccounting.Presentation
                     item.Text = debitEntry.Text;
                     item.DebitValue = Convert.ToDouble(debitEntry.Value) / 100;
                     nDebitSum += item.DebitValue;
-                    if (entry.Credit.Count == 1)
-                    {
-                        string creditAccount = entry.Credit[0].Account.ToString();
-                        item.RemoteAccount = this.BuildAccountDescription(creditAccount);
-                    }
-                    else
-                    {
-                        item.RemoteAccount = "Diverse";
-                    }
+                    item.RemoteAccount = entry.Credit.Count == 1
+                        ? this.BuildAccountDescription(entry.Credit.Single().Account)
+                        : "Diverse";
                 }
                 else
                 {
@@ -731,15 +720,9 @@ namespace lg2de.SimpleAccounting.Presentation
                     item.Text = creditEntry.Text;
                     item.CreditValue = Convert.ToDouble(creditEntry.Value) / 100;
                     nCreditSum += item.CreditValue;
-                    if (entry.Debit.Count == 1)
-                    {
-                        string debitAccount = entry.Debit[0].Account.ToString();
-                        item.RemoteAccount = this.BuildAccountDescription(debitAccount);
-                    }
-                    else
-                    {
-                        item.RemoteAccount = "Diverse";
-                    }
+                    item.RemoteAccount = entry.Debit.Count == 1
+                        ? this.BuildAccountDescription(entry.Debit.Single().Account)
+                        : "Diverse";
                 }
             }
 

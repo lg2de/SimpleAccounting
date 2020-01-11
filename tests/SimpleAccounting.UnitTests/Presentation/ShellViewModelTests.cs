@@ -22,7 +22,7 @@ namespace SimpleAccounting.UnitTests.Presentation
     public class ShellViewModelTests
     {
         [Fact]
-        public void OnInitialize_Initialized()
+        public void OnInitialize_NoProject_Initialized()
         {
             var windowManager = Substitute.For<IWindowManager>();
             var messageBox = Substitute.For<IMessageBox>();
@@ -49,6 +49,29 @@ namespace SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
 
             sut.RecentProjects?.Select(x => x.Header).Should().Equal("file1");
+        }
+
+        [Fact]
+        public void OnActivate_SampleProject_JournalUpdates()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            ((IActivate)sut).Activate();
+
+            sut.Journal.Should().BeEquivalentTo(
+                new { Text = "Open", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
+                new { Text = "Salary", CreditAccount = (string)null, DebitAccount = "100 (Bank account)" },
+                new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = (string)null },
+                new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = (string)null },
+                new { Text = "Shoes1", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
+                new { Text = "Shoes2", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
+                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = (string)null });
         }
 
         [Fact]
@@ -90,6 +113,28 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.AddBooking(new AccountingDataJournalBooking(), refreshJournal: false);
 
             sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AccountSelectionCommand_SampleBookings_JournalCorrect()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            sut.AccountSelectionCommand.Execute(sut.Accounts.Single(x => x.Identifier == 100));
+
+            sut.AccountJournal.Should().BeEquivalentTo(
+                new { Text = "Open", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
+                new { Text = "Salary", RemoteAccount = "Diverse", CreditValue = 0, DebitValue = 200 },
+                new { Text = "Shoes", RemoteAccount = "Diverse", CreditValue = 100, DebitValue = 0 },
+                new { Text = "Summe", RemoteAccount = (string)null, CreditValue = 100, DebitValue = 1200 },
+                new { Text = "Saldo", RemoteAccount = (string)null, CreditValue = 0, DebitValue = 1100 });
+
         }
 
         [Fact]
@@ -263,7 +308,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.NewAccountCommand.Execute(null);
 
             sut.Accounts.Select(x => x.Name).Should()
-                .Equal("Bank account", "New Account", "Shoes", "Carryforward");
+                .Equal("Bank account", "Salary", "New Account", "Shoes", "Carryforward");
         }
 
         [Fact]
@@ -300,7 +345,7 @@ namespace SimpleAccounting.UnitTests.Presentation
 
             using (new AssertionScope())
             {
-                sut.Accounts.Select(x => x.Name).Should().Equal("Shoes", "Carryforward", "Bank account");
+                sut.Accounts.Select(x => x.Name).Should().Equal("Salary", "Shoes", "Carryforward", "Bank account");
                 sut.Journal.Should().BeEquivalentTo(
                     new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
                     new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });
