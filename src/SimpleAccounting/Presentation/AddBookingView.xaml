@@ -8,9 +8,12 @@
     xmlns:s="clr-namespace:System;assembly=mscorlib"
     xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    xmlns:currencytextboxcontrol="clr-namespace:CurrencyTextBoxControl;assembly=CurrencyTextBoxControl"
+    xmlns:currencytextboxcontrol="clr-namespace:CurrencyTextBoxControl;assembly=CurrencyTextbox"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=local:AddBookingDesignViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.InputBindings>
+        <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding BookCommand, Mode=OneWay}" />
+    </UserControl.InputBindings>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -90,7 +93,9 @@
             Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="2"
             ItemsSource="{Binding Accounts}"
             SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
-            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+            SelectedIndex="{Binding DebitIndex, Mode=OneWayToSource}"
+            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
+            TextSearch.TextPath="Name" />
 
         <TextBlock
             Grid.Column="0" Grid.Row="3"
@@ -104,14 +109,16 @@
             Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="3"
             ItemsSource="{Binding Accounts}"
             SelectedValue="{Binding CreditAccount, Mode=TwoWay}"
-            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+            SelectedIndex="{Binding CreditIndex, Mode=OneWayToSource}"
+            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
+            TextSearch.TextPath="Name" />
 
         <StackPanel
             Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="4"
             Margin="0 30 0 0"
             Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Buchen" Command="{Binding BookCommand}" />
-            <Button Content="Schließen" IsCancel="True" />
+            <Button Width="140" Content="Buchen (CTRL-ENTER)" Command="{Binding BookCommand}" />
+            <Button Width="140" Content="Schließen (ESC)" IsCancel="True" />
         </StackPanel>
     </Grid>
 </UserControl>

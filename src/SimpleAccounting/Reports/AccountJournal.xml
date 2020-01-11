@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
-<xEport papersize="A4" left="20" top="15" bottom="15" right="20">
+<xEport paperSize="A4" left="20" top="15" bottom="15" right="20">
   <pageTexts>
     <font size="8">
       <text absX="85" absY="-5" align="center">- Kontenblätter -</text>
@@ -16,14 +16,14 @@
   <text ID="range" absX="85" align="center">Time Range</text>
   <move relY="10" />
   <font size="8" />
-  <table lineheight="4">
-    <columns lineheight="8">
-      <column width="20" rightline="1">Datum</column>
-      <column width="10" rightline="1">Nr. </column>
-      <column width="80" rightline="1">Buchungstext</column>
-      <column width="15" rightline="1" align="right">Soll-
+  <table lineHeight="4">
+    <columns lineHeight="8">
+      <column width="20" rightLine="true">Datum</column>
+      <column width="10" rightLine="true">Nr. </column>
+      <column width="80" rightLine="true">Buchungstext</column>
+      <column width="15" rightLine="true" align="right">Soll-
 wert</column>
-      <column width="15" rightline="1" align="right">Haben-
+      <column width="15" rightLine="true" align="right">Haben-
 wert</column>
       <column width="15" align="right">Gegen-
 konto</column>

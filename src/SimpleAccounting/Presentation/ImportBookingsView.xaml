@@ -27,21 +27,21 @@
         <TextBlock DockPanel.Dock="Top">
             Hinweise:<LineBreak/>
             Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.<LineBreak/>
+            (Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)<LineBreak/>
             Die importierten Empfängernamen und Buchungstexte können korrigiert werden.
         </TextBlock>
         <StackPanel
             DockPanel.Dock="Top"
             Orientation="Horizontal">
             <xctk:ValueRangeTextBox
-                x:Name="ImportAccount"
                 Width="100"
                 ValueDataType="{x:Type s:UInt64}"
                 AutoSelectBehavior="OnFocus"
-                Text="{Binding ImportAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                Text="{Binding SelectedAccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <ComboBox
                 Width="150"
-                ItemsSource="{Binding Accounts}"
-                SelectedValue="{Binding ImportAccount, Mode=TwoWay}"
+                ItemsSource="{Binding ImportAccounts}"
+                SelectedValue="{Binding SelectedAccountNumber, Mode=TwoWay}"
                 SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
                 SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
             <Button
@@ -80,7 +80,8 @@
                                 Margin="0"
                                 ItemsSource="{Binding Accounts}"
                                 SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+                                ItemTemplate="{StaticResource AccountSelectionTemplate}"
+                                TextSearch.TextPath="Name"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

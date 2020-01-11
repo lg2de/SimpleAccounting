@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
-<xEport papersize="A4" left="20" top="15" bottom="15" right="20">
+<xEport paperSize="A4" left="20" top="15" bottom="15" right="20">
   <font size="20" />
   <text absX="85" align="center">Jahresbilanz</text>
   <move relY="10" />
@@ -10,7 +10,7 @@
   <text ID="range" absX="85" align="center">Time Range</text>
   <move relY="10" />
   <font size="8" />
-  <table lineheight="4">
+  <table lineHeight="4">
     <columns>
       <column width="40">Einnahmen</column>
       <column width="80" />
@@ -20,7 +20,7 @@
     <data target="income" />
   </table>
   <move relY="10" />
-  <table lineheight="4">
+  <table lineHeight="4">
     <columns>
       <column width="40">Ausgaben</column>
       <column width="80" />
@@ -33,7 +33,7 @@
   <text>Jahresüberschuß/-verlust</text>
   <text ID="saldo" absX="160" align="right">xxx</text>
   <move relY="20" />
-  <table lineheight="4">
+  <table lineHeight="4">
     <columns>
       <column width="40">Forderungen</column>
       <column width="80" />
@@ -43,7 +43,7 @@
     <data target="receivable" />
   </table>
   <move relY="10" />
-  <table lineheight="4">
+  <table lineHeight="4">
     <columns>
       <column width="40">Verbindlichkeiten</column>
       <column width="80" />
@@ -53,7 +53,7 @@
     <data target="liability" />
   </table>
   <move relY="20" />
-  <table lineheight="4">
+  <table lineHeight="4">
     <columns>
       <column width="40">Vermögen</column>
       <column width="80" />

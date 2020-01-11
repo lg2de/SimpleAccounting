@@ -1,6 +1,7 @@
 # SimpleAccounting - Simple Accounting Software
 
-[![Build status](https://ci.appveyor.com/api/projects/status/gdw9q7ves4fuu9t4?svg=true)](https://ci.appveyor.com/project/lg2de/simpleaccounting)
+[![Build status](https://ci.appveyor.com/api/projects/status/gdw9q7ves4fuu9t4/branch/master?svg=true)](https://ci.appveyor.com/project/lg2de/simpleaccounting/branch/master)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=alert_status)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 
 I started `SimpleAccounting` around 2005, only for my personal use to manage accounts and balances of a small club.
 In 2019, I met a colleague from another small club who was looking for a simple solution to get an overview of the balances of several logical and real accounts.
@@ -52,6 +53,16 @@ Maybe you want to help with the better naming?
 
 Also, the user interface is completely in German.
 Maybe you want to help with the introduction of a localized user interface?
+
+## Roadmap
+
+Currently I'm working on completing the software into version 2.0.0, the first public release.
+The software available in the repository is intended as contiguous alpha version:
+No guarantee that a project can be loaded without manual modification.
+The file format will be fixed only with the first beta release.
+
+I hope to release the first beta in december 2019.
+I plan to release the version 2.0.0 in january 2020.
 
 ## License
 

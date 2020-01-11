@@ -7,33 +7,38 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Input;
     using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
 
     [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
-    public class ShellViewModel : Conductor<IScreen>
+    internal class ShellViewModel : Conductor<IScreen>
     {
         private readonly IWindowManager windowManager;
         private readonly IMessageBox messageBox;
+        private readonly IFileSystem fileSystem;
 
         private AccountingData accountingData;
         private string fileName = "";
-        private string bookingYearName = "";
+        private int bookingYear;
         private AccountingDataJournal currentJournal;
 
-        public ShellViewModel(IWindowManager windowManager, IMessageBox messageBox)
+        public ShellViewModel(IWindowManager windowManager, IMessageBox messageBox, IFileSystem fileSystem)
         {
             this.windowManager = windowManager;
             this.messageBox = messageBox;
+            this.fileSystem = fileSystem;
         }
 
         public ObservableCollection<MenuViewModel> RecentProjects { get; }
@@ -59,7 +64,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.fileName = "<new>";
-            this.LoadProjectData(this.GetTemplateProject());
+            this.LoadProjectData(GetTemplateProject());
         });
 
         public ICommand OpenProjectCommand => new RelayCommand(_ =>
@@ -86,55 +91,49 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand AddBookingsCommand => new RelayCommand(_ =>
         {
-            var bookingModel = new AddBookingViewModel(this)
+            var bookingModel = new AddBookingViewModel(this, this.bookingYear)
             {
                 BookingNumber = this.GetMaxBookIdent() + 1
             };
             bookingModel.Accounts.AddRange(this.accountingData.AllAccounts);
-            bookingModel.BindingTemplates.Add(new BookingTemplate { Text = "Geld abheben", Credit = 110, Debit = 100 });
+            this.accountingData.Setup.BookingTemplates.Template
+                .Select(t => new BookingTemplate { Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / 100.0 })
+                .ToList().ForEach(bookingModel.BindingTemplates.Add);
             this.windowManager.ShowDialog(bookingModel);
-        });
+        }, _ => this.IsCurrentYearOpen);
 
         public ICommand ImportBookingsCommand => new RelayCommand(_ =>
         {
-            AccountingDataYear year = this.accountingData
-                .Years.Single(x => x.Name.ToString() == this.bookingYearName);
+            AccountingDataYear year = this.accountingData.Years.Single(x => x.Name == this.bookingYear);
             var min = year.DateStart.ToDateTime();
             var max = year.DateEnd.ToDateTime();
 
-            var importModel = new ImportBookingsViewModel(this, this.accountingData.ImportMappings)
+            var importModel = new ImportBookingsViewModel(
+                this.messageBox,
+                this,
+                this.accountingData.AllAccounts)
             {
                 BookingNumber = this.GetMaxBookIdent() + 1,
                 RangeMin = min,
                 RangMax = max,
                 Journal = this.currentJournal
             };
-            importModel.Accounts.AddRange(this.accountingData.AllAccounts);
             this.windowManager.ShowDialog(importModel);
-        });
+        }, _ => this.IsCurrentYearOpen);
 
         public ICommand CloseYearCommand => new RelayCommand(
             _ => this.CloseYear(),
-            _ =>
-            {
-                var accountingYear =
-                    this.accountingData?.Years.SingleOrDefault(y => y.Name.ToString() == this.bookingYearName);
-                if (accountingYear == null)
-                {
-                    return false;
-                }
-
-                return !accountingYear.Closed;
-            });
+            _ => this.IsCurrentYearOpen);
 
         public ICommand TotalJournalReportCommand => new RelayCommand(_ =>
         {
             var report = new TotalJournalReport(
                 this.currentJournal,
                 this.accountingData.Setup,
-                this.bookingYearName);
-            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+                CultureInfo.CurrentUICulture);
+            var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
+            report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Journal {this.bookingYear}");
         });
 
         public ICommand AccountJournalReportCommand => new RelayCommand(_ =>
@@ -143,9 +142,11 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.accountingData.Accounts.SelectMany(a => a.Account),
                 this.currentJournal,
                 this.accountingData.Setup,
-                this.bookingYearName);
-            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+                CultureInfo.CurrentUICulture);
+            report.PageBreakBetweenAccounts = this.accountingData.Setup.Reports.AccountJournalReport.PageBreakBetweenAccounts;
+            var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
+            report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Kontoblätter {this.bookingYear}");
         });
 
         public ICommand TotalsAndBalancesReportCommand => new RelayCommand(_ =>
@@ -154,8 +155,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentJournal,
                 this.accountingData.Accounts,
                 this.accountingData.Setup,
-                this.bookingYearName);
-            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+                this.bookingYear.ToString());
+            var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
 
@@ -183,9 +184,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentJournal,
                 accountGroups,
                 this.accountingData.Setup,
-                this.bookingYearName);
+                this.bookingYear.ToString());
             report.Signatures.AddRange(this.accountingData.Setup.Reports.TotalsAndBalancesReport);
-            var yearNode = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+            var yearNode = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             report.CreateReport(yearNode.DateStart.ToDateTime(), yearNode.DateEnd.ToDateTime());
         });
 
@@ -195,7 +196,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentJournal,
                 this.accountingData.AllAccounts,
                 this.accountingData.Setup,
-                this.bookingYearName);
+                this.bookingYear.ToString());
             report.CreateReport();
         });
 
@@ -299,7 +300,23 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         });
 
+        internal Settings Settings { get; set; } = Settings.Default;
+
         private bool IsDocumentChanged { get; set; }
+
+        private bool IsCurrentYearOpen
+        {
+            get
+            {
+                if (this.accountingData == null || this.currentJournal == null)
+                {
+                    return false;
+                }
+
+                var year = this.accountingData.Years.SingleOrDefault(y => y.Name == this.currentJournal.Year);
+                return !year.Closed;
+            }
+        }
 
         public override void CanClose(Action<bool> callback)
         {
@@ -328,14 +345,14 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnActivate();
 
-            if (File.Exists(Settings.Default.RecentProject))
+            if (this.fileSystem.FileExists(this.Settings.RecentProject))
             {
-                this.LoadProjectFromFile(Settings.Default.RecentProject);
+                this.LoadProjectFromFile(this.Settings.RecentProject);
             }
 
-            foreach (var project in Settings.Default.RecentProjects)
+            foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
             {
-                if (!File.Exists(project))
+                if (!this.fileSystem.FileExists(project))
                 {
                     continue;
                 }
@@ -371,7 +388,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private void CloseYear()
         {
             var result = this.messageBox.Show(
-                $"Wollen Sie das Jahr {this.bookingYearName} abschließen?",
+                $"Wollen Sie das Jahr {this.bookingYear} abschließen?",
                 "Jahresabschluss",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question,
@@ -381,14 +398,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var accountingYear = this.accountingData.Years.Single(y => y.Name.ToString() == this.bookingYearName);
+            var accountingYear = this.accountingData.Years.Single(y => y.Name == this.bookingYear);
             accountingYear.Closed = true;
 
             var carryForwardAccount =
                 this.accountingData.AllAccounts.Single(a => a.Type == AccountDefinitionType.Carryforward && a.Active);
 
-            var newYear = (ushort)(Convert.ToUInt16(this.bookingYearName) + 1);
-
+            var newYear = (ushort)(this.bookingYear + 1);
             var newYearEntry = new AccountingDataYear
             {
                 Name = newYear,
@@ -457,18 +473,17 @@ namespace lg2de.SimpleAccounting.Presentation
             this.UpdateBookingYears();
         }
 
-        private string BuildAccountDescription(string strAccountNumber)
+        private string BuildAccountDescription(ulong accountNumber)
         {
-            var nAccountNumber = Convert.ToUInt32(strAccountNumber);
-            var account = this.accountingData.AllAccounts.Single(a => a.ID == nAccountNumber);
+            var account = this.accountingData.AllAccounts.Single(a => a.ID == accountNumber);
             return account.FormatName();
         }
 
         private void SelectBookingYear(ushort newYear)
         {
-            this.bookingYearName = newYear.ToString();
+            this.bookingYear = newYear;
             this.currentJournal = this.accountingData.Journal.Single(y => y.Year == newYear);
-            this.DisplayName = $"SimpleAccounting - {this.fileName} - {this.bookingYearName}";
+            this.DisplayName = $"SimpleAccounting - {this.fileName} - {this.bookingYear}";
             this.AccountJournal.Clear();
             this.RefreshJournal();
         }
@@ -483,18 +498,25 @@ namespace lg2de.SimpleAccounting.Presentation
             this.IsDocumentChanged = false;
             this.fileName = projectFileName;
 
-            var projectData = AccountingData.LoadFromFile(this.fileName);
-            this.LoadProjectData(projectData);
-
-            Settings.Default.RecentProject = this.fileName;
-            Settings.Default.RecentProjects.Remove(this.fileName);
-            Settings.Default.RecentProjects.Insert(0, this.fileName);
-            while (Settings.Default.RecentProjects.Count > 10)
+            try
             {
-                Settings.Default.RecentProjects.RemoveAt(10);
-            }
+                var projectData = AccountingData.LoadFromFile(this.fileName);
+                this.LoadProjectData(projectData);
 
-            Settings.Default.Save();
+                Settings.Default.RecentProject = this.fileName;
+                Settings.Default.RecentProjects.Remove(this.fileName);
+                Settings.Default.RecentProjects.Insert(0, this.fileName);
+                while (Settings.Default.RecentProjects.Count > 10)
+                {
+                    Settings.Default.RecentProjects.RemoveAt(10);
+                }
+
+                Settings.Default.Save();
+            }
+            catch (InvalidOperationException e)
+            {
+                this.messageBox.Show($"Failed to load file '{this.fileName}':\n{e.Message}", "Load");
+            }
         }
 
         internal void LoadProjectData(AccountingData projectData)
@@ -522,19 +544,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.BookingYears.Last().Command.Execute(null);
         }
 
-        private void UpdateBookingYears()
-        {
-            this.BookingYears.Clear();
-            foreach (var year in this.accountingData.Years)
-            {
-                var bookingYear = new MenuViewModel(
-                    year.Name.ToString(),
-                    new RelayCommand(_ => this.SelectBookingYear(year.Name)));
-                this.BookingYears.Add(bookingYear);
-            }
-        }
-
-        private AccountingData GetTemplateProject()
+        private static AccountingData GetTemplateProject()
         {
             var year = (ushort)DateTime.Now.Year;
             var defaultAccounts = new List<AccountDefinition>
@@ -571,6 +581,18 @@ namespace lg2de.SimpleAccounting.Presentation
                 Years = new List<AccountingDataYear> { accountYear },
                 Journal = new List<AccountingDataJournal> { accountJournal }
             };
+        }
+
+        private void UpdateBookingYears()
+        {
+            this.BookingYears.Clear();
+            foreach (var year in this.accountingData.Years)
+            {
+                var menu = new MenuViewModel(
+                    year.Name.ToString(),
+                    new RelayCommand(_ => this.SelectBookingYear(year.Name)));
+                this.BookingYears.Add(menu);
+            }
         }
 
         private bool CheckSaveProject()
@@ -643,10 +665,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debit = debitAccounts[0];
                     item.Text = debit.Text;
                     item.Value = Convert.ToDouble(debit.Value) / 100;
-                    string accountNumber = debit.Account.ToString();
-                    item.DebitAccount = this.BuildAccountDescription(accountNumber);
-                    accountNumber = creditAccounts[0].Account.ToString();
-                    item.CreditAccount = this.BuildAccountDescription(accountNumber);
+                    item.DebitAccount = this.BuildAccountDescription(debit.Account);
+                    item.CreditAccount = this.BuildAccountDescription(creditAccounts[0].Account);
                     this.Journal.Add(item);
                     continue;
                 }
@@ -656,8 +676,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debitItem = item.Clone();
                     debitItem.Text = debitEntry.Text;
                     debitItem.Value = Convert.ToDouble(debitEntry.Value) / 100;
-                    string strAccountNumber = debitEntry.Account.ToString();
-                    debitItem.DebitAccount = this.BuildAccountDescription(strAccountNumber);
+                    debitItem.DebitAccount = this.BuildAccountDescription(debitEntry.Account);
                     this.Journal.Add(debitItem);
                 }
 
@@ -666,8 +685,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     var creditItem = item.Clone();
                     creditItem.Text = creditEntry.Text;
                     creditItem.Value = Convert.ToDouble(creditEntry.Value) / 100;
-                    string strAccountNumber = creditEntry.Account.ToString();
-                    creditItem.CreditAccount = this.BuildAccountDescription(strAccountNumber);
+                    creditItem.CreditAccount = this.BuildAccountDescription(creditEntry.Account);
                     this.Journal.Add(creditItem);
                 }
             }
@@ -692,15 +710,9 @@ namespace lg2de.SimpleAccounting.Presentation
                     item.Text = debitEntry.Text;
                     item.DebitValue = Convert.ToDouble(debitEntry.Value) / 100;
                     nDebitSum += item.DebitValue;
-                    if (entry.Credit.Count == 1)
-                    {
-                        string creditAccount = entry.Credit[0].Account.ToString();
-                        item.RemoteAccount = this.BuildAccountDescription(creditAccount);
-                    }
-                    else
-                    {
-                        item.RemoteAccount = "Diverse";
-                    }
+                    item.RemoteAccount = entry.Credit.Count == 1
+                        ? this.BuildAccountDescription(entry.Credit.Single().Account)
+                        : "Diverse";
                 }
                 else
                 {
@@ -708,15 +720,9 @@ namespace lg2de.SimpleAccounting.Presentation
                     item.Text = creditEntry.Text;
                     item.CreditValue = Convert.ToDouble(creditEntry.Value) / 100;
                     nCreditSum += item.CreditValue;
-                    if (entry.Debit.Count == 1)
-                    {
-                        string debitAccount = entry.Debit[0].Account.ToString();
-                        item.RemoteAccount = this.BuildAccountDescription(debitAccount);
-                    }
-                    else
-                    {
-                        item.RemoteAccount = "Diverse";
-                    }
+                    item.RemoteAccount = entry.Debit.Count == 1
+                        ? this.BuildAccountDescription(entry.Debit.Single().Account)
+                        : "Diverse";
                 }
             }
 

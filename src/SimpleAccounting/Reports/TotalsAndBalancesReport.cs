@@ -118,7 +118,7 @@ namespace lg2de.SimpleAccounting.Reports
 
                     XmlNode dataLineNode = doc.CreateElement("tr");
                     XmlNode dataItemNode = doc.CreateElement("td");
-                    dataLineNode.SetAttribute("topline", "1");
+                    dataLineNode.SetAttribute("topLine", true);
 
                     dataItemNode.InnerText = account.ID.ToString();
                     dataLineNode.AppendChild(dataItemNode);
@@ -174,8 +174,8 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     XmlNode groupLineNode = doc.CreateElement("tr");
                     XmlNode groupItemNode = doc.CreateElement("td");
-                    groupLineNode.SetAttribute("topline", "1");
-                    groupLineNode.SetAttribute("lineheight", "6");
+                    groupLineNode.SetAttribute("topLine", true);
+                    groupLineNode.SetAttribute("lineHeight", 6);
 
                     groupItemNode.InnerText = string.Empty;
                     groupLineNode.AppendChild(groupItemNode);
@@ -216,7 +216,7 @@ namespace lg2de.SimpleAccounting.Reports
 
             XmlNode totalLineNode = doc.CreateElement("tr");
             XmlNode totalItemNode = doc.CreateElement("td");
-            totalLineNode.SetAttribute("topline", "1");
+            totalLineNode.SetAttribute("topLine", true);
 
             totalItemNode.InnerText = string.Empty;
             totalLineNode.AppendChild(totalItemNode);

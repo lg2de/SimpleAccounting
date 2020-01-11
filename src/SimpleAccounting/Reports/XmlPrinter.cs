@@ -14,6 +14,7 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Reflection;
     using System.Windows.Forms;
     using System.Xml;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
 
     internal class XmlPrinter : IXmlPrinter
@@ -25,13 +26,12 @@ namespace lg2de.SimpleAccounting.Reports
         private readonly Stack<Font> fontStack;
 
         private XmlNode currentNode;
-        private int cursorX, cursorY;
         private XmlNode pageTextsNode;
 
         /// <summary>
         ///     Defines factor to translate logical position to physical position.
         /// </summary>
-        private float printFactor;
+        private double printFactor;
 
         public XmlPrinter()
         {
@@ -49,6 +49,9 @@ namespace lg2de.SimpleAccounting.Reports
         internal int DocumentLeftMargin { get; set; }
         internal int DocumentTopMargin { get; set; }
         internal int DocumentBottomMargin { get; set; }
+
+        internal int CursorX { get; set; }
+        internal int CursorY { get; set; }
 
         public void LoadDocument(string resourceName)
         {
@@ -69,21 +72,26 @@ namespace lg2de.SimpleAccounting.Reports
 
         public void PrintDocument(string documentName)
         {
-            var printDocument = new PrintDocument();
-            printDocument.DocumentName = documentName;
+            var printDocument = new PrintDocument { DocumentName = documentName };
 
             var paperSizes = printDocument.PrinterSettings.PaperSizes;
+            this.SetupDocument(printDocument, paperSizes.OfType<PaperSize>());
 
-            this.SetupDocument(printDocument, paperSizes);
             this.TransformDocument();
-            this.SetupGraphics();
-            using (var dialog = new PrintPreviewDialog { Document = printDocument })
+
+            // The setup and cleanup procedured must be executed by event handlers
+            // because they are executed for preview AND real printing.
+            printDocument.BeginPrint += (_, printArgs) => this.SetupGraphics();
+            printDocument.EndPrint += (_, printArgs) => this.CleanupGraphics();
+
+            using (var dialog = new PrintPreviewDialog
             {
-                dialog.WindowState = FormWindowState.Maximized;
+                Document = printDocument,
+                WindowState = FormWindowState.Maximized,
+            })
+            {
                 dialog.ShowDialog();
             }
-
-            this.CleanupGraphics();
         }
 
         internal void LoadXml(string xml)
@@ -91,24 +99,19 @@ namespace lg2de.SimpleAccounting.Reports
             this.Document.LoadXml(xml);
         }
 
-        internal void SetupDocument(PrintDocument printDocument, PrinterSettings.PaperSizeCollection paperSizes)
+        internal void SetupDocument(PrintDocument printDocument, IEnumerable<PaperSize> paperSizes)
         {
             printDocument.PrintPage += (_, printArgs) =>
             {
-                this.cursorX = this.DocumentLeftMargin;
-                this.cursorY = this.DocumentTopMargin;
-                this.PrintNodes(printArgs);
+                this.ProcessNewPage();
+
+                var graphics = new DrawingGraphics(printArgs);
+                this.PrintNodes(printArgs, graphics);
             };
 
             this.printFactor = (float)(100 / 25.4);
-            XmlNode node = this.Document.DocumentElement.Attributes.GetNamedItem("papersize");
-            string documentPaperSize = "A4";
-            if (node != null)
-            {
-                documentPaperSize = node.Value;
-            }
-
-            var paperSize = paperSizes.OfType<PaperSize>().FirstOrDefault(
+            string documentPaperSize = this.Document.DocumentElement.GetAttribute<string>("paperSize", "A4");
+            var paperSize = paperSizes.FirstOrDefault(
                 s => s.PaperName.StartsWith(documentPaperSize, StringComparison.CurrentCultureIgnoreCase));
             if (paperSize != null)
             {
@@ -120,7 +123,7 @@ namespace lg2de.SimpleAccounting.Reports
             {
                 this.DocumentWidth = this.Document.DocumentElement.GetAttribute("width", 210);
                 this.DocumentHeight = this.Document.DocumentElement.GetAttribute("height", 297);
-                var documentScale = this.Document.DocumentElement.GetAttribute("scale", 1);
+                var documentScale = this.Document.DocumentElement.GetAttribute("scale", 1.0);
                 this.printFactor *= documentScale;
                 int width = this.ToPhysical(this.DocumentWidth);
                 int height = this.ToPhysical(this.DocumentHeight);
@@ -141,8 +144,7 @@ namespace lg2de.SimpleAccounting.Reports
             this.DocumentTopMargin = this.Document.DocumentElement.GetAttribute("top", 0);
             this.DocumentBottomMargin = this.Document.DocumentElement.GetAttribute("bottom", 0);
 
-            this.cursorX = this.DocumentLeftMargin;
-            this.cursorY = this.DocumentTopMargin;
+            this.ProcessNewPage();
         }
 
         [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Stack items will be disposed explicitely.")]
@@ -154,6 +156,8 @@ namespace lg2de.SimpleAccounting.Reports
             this.penStack.Push(defaultPen);
             this.solidBrushStack.Push(defaultBrush);
             this.fontStack.Push(defaultFont);
+
+            this.currentNode = this.Document.DocumentElement.FirstChild;
         }
 
         internal void CleanupGraphics()
@@ -168,7 +172,6 @@ namespace lg2de.SimpleAccounting.Reports
             this.currentNode = this.Document.DocumentElement.FirstChild;
             this.TransformNodes(this.currentNode);
             this.ProcessPageTexts();
-            this.currentNode = this.Document.DocumentElement.FirstChild;
         }
 
         internal void TransformNodes(XmlNode firstNode)
@@ -181,29 +184,7 @@ namespace lg2de.SimpleAccounting.Reports
 
                 if (transformingNode.Name == "move")
                 {
-                    XmlNode attr = transformingNode.Attributes.GetNamedItem("absX");
-                    if (attr != null)
-                    {
-                        this.cursorX = this.DocumentLeftMargin + Convert.ToInt32(attr.Value);
-                    }
-
-                    attr = transformingNode.Attributes.GetNamedItem("absY");
-                    if (attr != null)
-                    {
-                        this.cursorY = this.DocumentTopMargin + Convert.ToInt32(attr.Value);
-                    }
-
-                    attr = transformingNode.Attributes.GetNamedItem("relX");
-                    if (attr != null)
-                    {
-                        this.cursorX += Convert.ToInt32(attr.Value);
-                    }
-
-                    attr = transformingNode.Attributes.GetNamedItem("relY");
-                    if (attr != null)
-                    {
-                        this.cursorY += Convert.ToInt32(attr.Value);
-                    }
+                    this.ProcessMoveNode(transformingNode);
                 }
                 else if (transformingNode.Name == "rectangle")
                 {
@@ -220,23 +201,78 @@ namespace lg2de.SimpleAccounting.Reports
                     transformingNode.ParentNode.RemoveChild(transformingNode);
                     continue;
                 }
-                else if (transformingNode.Name == "newpage")
+                else if (transformingNode.Name == "newPage")
                 {
-                    this.cursorX = this.DocumentLeftMargin;
-                    this.cursorY = this.DocumentTopMargin;
+                    this.ProcessNewPage();
                 }
 
                 this.TransformNodes(transformingNode.FirstChild);
 
                 if (nextNode != null
-                    && this.cursorY >= (this.DocumentHeight - this.DocumentBottomMargin))
+                    && this.CursorY >= this.DocumentHeight - this.DocumentBottomMargin)
                 {
-                    XmlNode newPage = this.Document.CreateElement("newpage");
+                    XmlNode newPage = this.Document.CreateElement("newPage");
                     nextNode.ParentNode.InsertBefore(newPage, nextNode);
 
-                    this.cursorX = this.DocumentLeftMargin;
-                    this.cursorY = this.DocumentTopMargin;
+                    this.ProcessNewPage();
                 }
+            }
+        }
+
+        internal void PrintNodes(PrintPageEventArgs printArgs, IGraphics graphics)
+        {
+            while (this.currentNode != null)
+            {
+                if (graphics.HasMorePages)
+                {
+                    return;
+                }
+
+                if (this.currentNode.Name == "move")
+                {
+                    this.ProcessMoveNode(this.currentNode);
+                }
+                else if (this.currentNode.Name == "text")
+                {
+                    this.PrintTextNode(graphics);
+                }
+                else if (this.currentNode.Name == "line")
+                {
+                    this.PrintLineNode(printArgs);
+                }
+                else if (this.currentNode.Name == "circle")
+                {
+                    this.PrintCircleNode(printArgs);
+                }
+                else if (this.currentNode.Name == "font")
+                {
+                    this.PrintFontNode(printArgs, graphics);
+                }
+                else if (this.currentNode.Name == "color")
+                {
+                    this.PrintColorNode(printArgs, graphics);
+                }
+                else if (this.currentNode.Name == "newPage")
+                {
+                    graphics.HasMorePages = true;
+                    this.currentNode = this.currentNode.NextSibling;
+                    return;
+                }
+
+                if (this.currentNode.NextSibling != null)
+                {
+                    this.currentNode = this.currentNode.NextSibling;
+                    continue;
+                }
+
+                if (this.currentNode.ParentNode != null
+                    && this.currentNode.ParentNode.Name != "xEport")
+                {
+                    this.currentNode = this.currentNode.ParentNode.NextSibling;
+                }
+
+                // step back in stack
+                return;
             }
         }
 
@@ -280,72 +316,69 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void TransformTableHeader(XmlNode tableNode)
         {
-            XmlNode columnsRoot = tableNode.SelectSingleNode("columns");
-            XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
+            XmlNode columnsRoot =
+                tableNode.SelectSingleNode("columns")
+                ?? throw new InvalidOperationException($"The table must define columns.");
+            XmlNodeList columnNodes =
+                tableNode.SelectNodes("columns/column")
+                ?? throw new InvalidOperationException($"The table must define at least one column.");
 
-            int tableLineHeight = tableNode.GetAttribute<int>("lineheight", DefaultLineHeight);
-
-            int nHeaderLineHeight = tableLineHeight;
-            XmlNode headerLineHeightNode = columnsRoot.Attributes.GetNamedItem("lineheight");
-            if (headerLineHeightNode != null)
-            {
-                nHeaderLineHeight = Convert.ToInt32(headerLineHeightNode.Value);
-            }
+            int tableLineHeight = tableNode.GetAttribute("lineHeight", DefaultLineHeight);
+            int headerLineHeight = columnsRoot.GetAttribute("lineHeight", tableLineHeight);
 
             int xPosition = 0;
             foreach (XmlNode columnNode in columnNodes)
             {
-                XmlNode width = columnNode.Attributes.GetNamedItem("width");
+                var width = columnNode.GetAttribute<int>("width");
 
                 XmlNode textNode = this.Document.CreateElement("text");
                 textNode.InnerText = columnNode.InnerText;
 
-                XmlNode widthNode = columnNode.Attributes.GetNamedItem("width");
-                int colmnWidth = Convert.ToInt32(widthNode.Value);
+                var columnWidth = columnNode.GetAttribute<int>("width");
                 int xAdoption = 0;
-                var align = columnNode.Attributes.GetNamedItem("align");
-                if (align != null)
+                var align = columnNode.GetAttribute<string>("align");
+                if (!string.IsNullOrEmpty(align))
                 {
-                    textNode.SetAttribute("align", align.Value);
-                    if (align.Value == "right")
+                    textNode.SetAttribute("align", align);
+                    if (align == "right")
                     {
-                        xAdoption = colmnWidth;
+                        xAdoption = columnWidth;
                     }
-                    else if (align.Value == "center")
+                    else if (align == "center")
                     {
-                        xAdoption = colmnWidth / 2;
+                        xAdoption = columnWidth / 2;
                     }
                 }
 
-                textNode.SetAttribute("relX", (xPosition + xAdoption).ToString());
+                textNode.SetAttribute("relX", xPosition + xAdoption);
 
+                this.CreateFrame(columnNode, tableNode, xPosition, 0, xPosition + width, headerLineHeight);
                 tableNode.ParentNode.InsertBefore(textNode, tableNode);
 
-                this.CreateFrame(columnNode, tableNode, xPosition, 0, xPosition + Convert.ToInt32(width.Value), nHeaderLineHeight);
-                xPosition += Convert.ToInt32(width.Value);
+                xPosition += width;
             }
 
-            this.CreateFrame(columnsRoot, tableNode, 0, 0, xPosition, nHeaderLineHeight);
+            this.CreateFrame(columnsRoot, tableNode, 0, 0, xPosition, headerLineHeight);
 
             XmlNode moveNode = this.Document.CreateElement("move");
-            moveNode.SetAttribute("relY", nHeaderLineHeight.ToString());
+            moveNode.SetAttribute("relY", headerLineHeight);
             tableNode.ParentNode.InsertBefore(moveNode, tableNode);
-            this.cursorY += nHeaderLineHeight;
+            this.CursorY += headerLineHeight;
         }
 
         private void TransformTable(XmlNode tableNode)
         {
-            int tableLineHeight = tableNode.GetAttribute<int>("lineheight", DefaultLineHeight);
+            int tableLineHeight = tableNode.GetAttribute<int>("lineHeight", DefaultLineHeight);
 
             XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
             XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
 
             // if table can not be started on page - create new one
-            if ((this.cursorY + tableLineHeight * 2) > (this.DocumentHeight - this.DocumentBottomMargin))
+            if (this.CursorY + tableLineHeight * 2 > this.DocumentHeight - this.DocumentBottomMargin)
             {
-                XmlNode newPage = this.Document.CreateElement("newpage");
+                XmlNode newPage = this.Document.CreateElement("newPage");
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                this.cursorY = this.DocumentTopMargin;
+                this.CursorY = this.DocumentTopMargin;
             }
 
             this.TransformTableHeader(tableNode);
@@ -362,19 +395,14 @@ namespace lg2de.SimpleAccounting.Reports
                     nInnerLineCount += strText.Length / 40;
                 }
 
-                int lineHeight = tableLineHeight * nInnerLineCount;
-                XmlNode lineHeightNode = dataNode.Attributes.GetNamedItem("lineheight");
-                if (lineHeightNode != null)
-                {
-                    lineHeight = Convert.ToInt32(lineHeightNode.Value);
-                }
+                var lineHeight = dataNode.GetAttribute("lineHeight", tableLineHeight * nInnerLineCount);
 
                 // check whether oversized line still fits into page
-                if ((this.cursorY + lineHeight) > (this.DocumentHeight - this.DocumentBottomMargin))
+                if (this.CursorY + lineHeight > this.DocumentHeight - this.DocumentBottomMargin)
                 {
-                    XmlNode newPage = this.Document.CreateElement("newpage");
+                    XmlNode newPage = this.Document.CreateElement("newPage");
                     tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                    this.cursorY = this.DocumentTopMargin;
+                    this.CursorY = this.DocumentTopMargin;
                     this.TransformTableHeader(tableNode);
                 }
 
@@ -419,28 +447,54 @@ namespace lg2de.SimpleAccounting.Reports
 
                 this.CreateFrame(dataNode, tableNode, 0, 0, xPosition, lineHeight);
 
-                this.cursorY += lineHeight;
+                this.CursorY += lineHeight;
 
                 // check whether next line exists and fits into page
                 if (nodeIndex + 1 < dataNodes.Count
-                    && (this.cursorY + tableLineHeight) > (this.DocumentHeight - this.DocumentBottomMargin))
+                    && this.CursorY + tableLineHeight > this.DocumentHeight - this.DocumentBottomMargin)
                 {
                     // start new page with table header
-                    XmlNode newPage = this.Document.CreateElement("newpage");
+                    XmlNode newPage = this.Document.CreateElement("newPage");
                     tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                    this.cursorY = this.DocumentTopMargin;
+                    this.CursorY = this.DocumentTopMargin;
                     this.TransformTableHeader(tableNode);
                 }
                 else
                 {
                     // move cursor to next line
                     XmlNode moveNode = this.Document.CreateElement("move");
-                    moveNode.SetAttribute("relY", lineHeight.ToString());
+                    moveNode.SetAttribute("relY", lineHeight);
                     tableNode.ParentNode.InsertBefore(moveNode, tableNode);
                 }
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);
+        }
+
+        private void ProcessMoveNode(XmlNode node)
+        {
+            var absX = node.GetAttribute<int>("absX");
+            var absY = node.GetAttribute<int>("absY");
+            var relX = node.GetAttribute<int>("relX");
+            var relY = node.GetAttribute<int>("relY");
+            if (absX != 0)
+            {
+                this.CursorX = this.DocumentLeftMargin + absX;
+            }
+
+            if (absY != 0)
+            {
+                this.CursorY = this.DocumentTopMargin + absY;
+            }
+
+            this.CursorX += relX;
+            this.CursorY += relY;
+        }
+
+        private void ProcessNewPage()
+        {
+            this.CursorX = this.DocumentLeftMargin;
+            this.CursorY = this.DocumentTopMargin;
         }
 
         private void ProcessPageTexts()
@@ -454,7 +508,7 @@ namespace lg2de.SimpleAccounting.Reports
             // page number 1 already assigned immediately
             int pageNumber = 1;
 
-            var pageWraps = this.Document.SelectNodes("//newpage");
+            var pageWraps = this.Document.SelectNodes("//newPage");
             foreach (XmlNode pageWrap in pageWraps)
             {
                 pageNumber++;
@@ -479,132 +533,74 @@ namespace lg2de.SimpleAccounting.Reports
             }
         }
 
-        private XmlNode CreateLineNode(int nX1, int nY1, int nX2, int nY2)
+        private XmlNode CreateLineNode(int fromX, int fromY, int toX, int toY)
         {
             XmlNode newNode = this.Document.CreateElement("line");
-            newNode.SetAttribute("relFromX", nX1.ToString());
-            newNode.SetAttribute("relFromY", nY1.ToString());
-            newNode.SetAttribute("relToX", nX2.ToString());
-            newNode.SetAttribute("relToY", nY2.ToString());
+            if (fromX != 0)
+            {
+                newNode.SetAttribute("relFromX", fromX.ToString());
+            }
+
+            if (fromY != 0)
+            {
+                newNode.SetAttribute("relFromY", fromY.ToString());
+            }
+
+            if (toX != 0)
+            {
+                newNode.SetAttribute("relToX", toX.ToString());
+            }
+
+            if (toY != 0)
+            {
+                newNode.SetAttribute("relToY", toY.ToString());
+            }
+
             return newNode;
         }
 
-        private void CreateFrame(XmlNode referenceNode, XmlNode positionNode, int nX1, int nY1, int nX2, int nY2)
+        private void CreateFrame(XmlNode referenceNode, XmlNode positionNode, int x1, int y1, int x2, int y2)
         {
-            XmlNode attr = referenceNode.Attributes.GetNamedItem("leftline");
-            if (attr != null && attr.Value == "1")
+            if (referenceNode == null)
             {
-                XmlNode leftline = this.CreateLineNode(nX1, nY1, nX1, nY2);
-                positionNode.ParentNode.InsertBefore(leftline, positionNode);
+                throw new ArgumentNullException(nameof(referenceNode));
             }
 
-            attr = referenceNode.Attributes.GetNamedItem("rightline");
-            if (attr != null && attr.Value == "1")
+            if (positionNode?.ParentNode == null)
             {
-                XmlNode rightline = this.CreateLineNode(nX2, nY1, nX2, nY2);
-                positionNode.ParentNode.InsertBefore(rightline, positionNode);
+                throw new ArgumentNullException(nameof(positionNode));
             }
 
-            attr = referenceNode.Attributes.GetNamedItem("topline");
-            if (attr != null && attr.Value == "1")
+            var leftLine = referenceNode.GetAttribute<bool>("leftLine");
+            if (leftLine)
             {
-                XmlNode topline = this.CreateLineNode(nX1, nY1, nX2, nY1);
-                positionNode.ParentNode.InsertBefore(topline, positionNode);
+                XmlNode line = this.CreateLineNode(x1, y1, x1, y2);
+                positionNode.ParentNode.InsertBefore(line, positionNode);
             }
 
-            attr = referenceNode.Attributes.GetNamedItem("bottomline");
-            if (attr != null && attr.Value == "1")
+            var rightLine = referenceNode.GetAttribute<bool>("rightLine");
+            if (rightLine)
             {
-                XmlNode bottomline = this.CreateLineNode(nX1, nY2, nX2, nY2);
-                positionNode.ParentNode.InsertBefore(bottomline, positionNode);
+                XmlNode line = this.CreateLineNode(x2, y1, x2, y2);
+                positionNode.ParentNode.InsertBefore(line, positionNode);
+            }
+
+            var topLine = referenceNode.GetAttribute<bool>("topLine");
+            if (topLine)
+            {
+                XmlNode line = this.CreateLineNode(x1, y1, x2, y1);
+                positionNode.ParentNode.InsertBefore(line, positionNode);
+            }
+
+            var bottomLine = referenceNode.GetAttribute<bool>("bottomLine");
+            if (bottomLine)
+            {
+                XmlNode line = this.CreateLineNode(x1, y2, x2, y2);
+                positionNode.ParentNode.InsertBefore(line, positionNode);
             }
         }
 
-        private void PrintNodes(PrintPageEventArgs printArgs)
-        {
-            while (this.currentNode != null)
-            {
-                if (printArgs.HasMorePages)
-                {
-                    return;
-                }
-
-                if (this.currentNode.Name == "move")
-                {
-                    this.ProcessMoveNode();
-                }
-                else if (this.currentNode.Name == "text")
-                {
-                    this.PrintTextNode(printArgs);
-                }
-                else if (this.currentNode.Name == "line")
-                {
-                    this.PrintLineNode(printArgs);
-                }
-                else if (this.currentNode.Name == "circle")
-                {
-                    this.PrintCircleNode(printArgs);
-                }
-                else if (this.currentNode.Name == "font")
-                {
-                    this.PrintFontNode(printArgs);
-                }
-                else if (this.currentNode.Name == "color")
-                {
-                    this.PrintColorNode(printArgs);
-                }
-                else if (this.currentNode.Name == "newpage")
-                {
-                    printArgs.HasMorePages = true;
-                    this.currentNode = this.currentNode.NextSibling;
-                    return;
-                }
-
-                if (this.currentNode.NextSibling != null)
-                {
-                    this.currentNode = this.currentNode.NextSibling;
-                    continue;
-                }
-
-                if (this.currentNode.ParentNode != null
-                    && this.currentNode.ParentNode.Name != "xEport")
-                {
-                    this.currentNode = this.currentNode.ParentNode.NextSibling;
-                }
-
-                // step back in stack
-                return;
-            }
-        }
-
-        private void ProcessMoveNode()
-        {
-            XmlNode nodeAbsX = this.currentNode.Attributes.GetNamedItem("absX");
-            XmlNode nodeAbsY = this.currentNode.Attributes.GetNamedItem("absY");
-            XmlNode nodeRelX = this.currentNode.Attributes.GetNamedItem("relX");
-            XmlNode nodeRelY = this.currentNode.Attributes.GetNamedItem("relY");
-            if (nodeAbsX != null)
-            {
-                this.cursorX = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
-            }
-
-            if (nodeAbsY != null)
-            {
-                this.cursorY = this.DocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
-            }
-
-            if (nodeRelX != null)
-            {
-                this.cursorX += Convert.ToInt32(nodeRelX.Value);
-            }
-
-            if (nodeRelY != null)
-            {
-                this.cursorY += Convert.ToInt32(nodeRelY.Value);
-            }
-        }
-
-        private void PrintTextNode(PrintPageEventArgs printArgs)
+        private void PrintTextNode(IGraphics graphics)
         {
             SolidBrush drawBrush = this.solidBrushStack.Peek();
             Font drawFont = this.fontStack.Peek();
@@ -614,8 +610,8 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNode nodeRelX = this.currentNode.Attributes.GetNamedItem("relX");
             XmlNode nodeRelY = this.currentNode.Attributes.GetNamedItem("relY");
             XmlNode nodeAlign = this.currentNode.Attributes.GetNamedItem("align");
-            int nX = this.cursorX;
-            int nY = this.cursorY;
+            int nX = this.CursorX;
+            int nY = this.CursorY;
             if (nodeAbsX != null)
             {
                 nX = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
@@ -652,7 +648,7 @@ namespace lg2de.SimpleAccounting.Reports
                     break;
                 }
 
-                printArgs.Graphics.DrawString(
+                graphics.DrawString(
                     text,
                     drawFont,
                     drawBrush,
@@ -674,10 +670,10 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNode nodeAbsToY = this.currentNode.Attributes.GetNamedItem("absToY");
             XmlNode nodeRelToX = this.currentNode.Attributes.GetNamedItem("relToX");
             XmlNode nodeRelToY = this.currentNode.Attributes.GetNamedItem("relToY");
-            int x1 = this.cursorX;
-            int y1 = this.cursorY;
-            int x2 = this.cursorX;
-            int y2 = this.cursorY;
+            int x1 = this.CursorX;
+            int y1 = this.CursorY;
+            int x2 = this.CursorX;
+            int y2 = this.CursorY;
             if (nodeAbsFromX != null)
             {
                 x1 = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsFromX.Value);
@@ -730,8 +726,8 @@ namespace lg2de.SimpleAccounting.Reports
         {
             Pen drawPen = this.penStack.Peek();
 
-            int x = this.cursorX;
-            int y = this.cursorY;
+            int x = this.CursorX;
+            int y = this.CursorY;
 
             XmlNode nodeAbsX = this.currentNode.Attributes.GetNamedItem("absX");
             XmlNode nodeAbsY = this.currentNode.Attributes.GetNamedItem("absY");
@@ -772,7 +768,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.ToPhysical(radY));
         }
 
-        private void PrintFontNode(PrintPageEventArgs printArgs)
+        private void PrintFontNode(PrintPageEventArgs printArgs, IGraphics graphics)
         {
             Font drawFont = this.fontStack.Peek();
 
@@ -814,7 +810,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.fontStack.Push(newFont);
                 var stackNode = this.currentNode;
                 this.currentNode = this.currentNode.FirstChild;
-                this.PrintNodes(printArgs);
+                this.PrintNodes(printArgs, graphics);
                 this.currentNode = stackNode;
                 this.fontStack.Pop().Dispose();
             }
@@ -826,7 +822,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
         }
 
-        private void PrintColorNode(PrintPageEventArgs printArgs)
+        private void PrintColorNode(PrintPageEventArgs printArgs, IGraphics graphics)
         {
             Pen drawPen = this.penStack.Peek();
             SolidBrush drawBrush = this.solidBrushStack.Peek();
@@ -846,7 +842,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.solidBrushStack.Push(newBrush);
                 var stackNode = this.currentNode;
                 this.currentNode = this.currentNode.FirstChild;
-                this.PrintNodes(printArgs);
+                this.PrintNodes(printArgs, graphics);
                 this.currentNode = stackNode;
                 this.penStack.Pop().Dispose();
                 this.solidBrushStack.Pop().Dispose();

@@ -8,6 +8,7 @@ namespace lg2de.SimpleAccounting
     using System.Collections.Generic;
     using System.Windows;
     using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Presentation;
 
     public class AppBootstrapper : BootstrapperBase
@@ -20,6 +21,7 @@ namespace lg2de.SimpleAccounting
 
             this.container.Singleton<IWindowManager, WindowManager>();
             this.container.Singleton<IMessageBox, MessageBoxWrapper>();
+            this.container.Singleton<IFileSystem, FileSystem>();
             this.container.PerRequest<ShellViewModel>();
         }
 

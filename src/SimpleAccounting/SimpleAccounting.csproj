@@ -4,12 +4,12 @@
     <!-- ProjectGuid is required for SonarQube -->
     <ProjectGuid>{976604F7-86B8-407E-A9B2-592E376D7006}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>lg2de.SimpleAccounting</RootNamespace>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Authors>Lukas Grützmacher</Authors>
-    <Copyright>Copyright © 2007-2019</Copyright>
+    <Copyright>Copyright © 2007-2020</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,9 +19,9 @@
 
   <ItemGroup>
     <PackageReference Include="Caliburn.Micro" Version="3.2.0" />
-    <PackageReference Include="CsvHelper" Version="12.1.2" />
-    <PackageReference Include="CurrencyTextBox" Version="1.4.3" />
-    <PackageReference Include="Extended.Wpf.Toolkit" Version="3.6.0" />
+    <PackageReference Include="CsvHelper" Version="12.2.3" />
+    <PackageReference Include="CurrencyTextBox" Version="2.0.2" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="3.7.0" />
   </ItemGroup>
 
 </Project>
