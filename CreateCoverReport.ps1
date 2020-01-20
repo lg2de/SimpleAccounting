@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 Write-Host --- running tests with coverage ---
-$packagesFolder = $env:USERPROFILE + "\.nuget\packages"
+$packagesFolder = $PSScriptRoot + "\packages"
 $openCoverDir = (Get-ChildItem -Path "$packagesFolder\OpenCover" -Directory | select -last 1).Name
 $openCoverExe = $packagesFolder + "\OpenCover\$openCoverDir\tools\OpenCover.Console.exe"
 $dotNetExe = $env:ProgramFiles + "\dotnet\dotnet.exe"
