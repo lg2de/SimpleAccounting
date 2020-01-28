@@ -38,6 +38,49 @@ namespace lg2de.SimpleAccounting.Model
             var xml = this.Serialize();
             return AccountingData.Deserialize(xml);
         }
+
+        public bool Migrate()
+        {
+            var result = false;
+            // merge Year nodes into Journal
+            foreach (var year in this.Years)
+            {
+                var journal = this.Journal.SingleOrDefault(x => x.Year == year.Name);
+                if (journal == null)
+                {
+                    journal = new AccountingDataJournal { Year = year.Name };
+                    this.Journal.Add(journal);
+                }
+
+                journal.DateStart = year.DateStart;
+                journal.DateEnd = year.DateEnd;
+                journal.Closed = year.Closed;
+
+                result = true;
+            }
+
+            this.Years = null;
+
+            foreach (var group in this.Accounts)
+            {
+                foreach (var account in group.Account)
+                {
+                    if (account.ImportMapping == null)
+                    {
+                        continue;
+                    }
+
+                    if (account.ImportMapping.Columns?.Any() == false
+                        && account.ImportMapping.Patterns?.Any() == false)
+                    {
+                        account.ImportMapping = null;
+                        result = true;
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 
     public partial class AccountDefinition

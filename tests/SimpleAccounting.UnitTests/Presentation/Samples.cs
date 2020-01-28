@@ -61,32 +61,21 @@ namespace SimpleAccounting.UnitTests.Presentation
                             }
                         }
                     },
-                    Years = new List<AccountingDataYear>
-                    {
-                        new AccountingDataYear
-                        {
-                            Name = 2000,
-                            DateStart = 20000101,
-                            DateEnd = 20001231,
-                            Closed = true
-                        },
-                        new AccountingDataYear
-                        {
-                            Name = (ushort)year,
-                            DateStart = year * 10000 + 101,
-                            DateEnd = year * 10000 + 1231
-                        }
-                    },
                     Journal = new List<AccountingDataJournal>
                     {
                         new AccountingDataJournal
                         {
                             Year = 2000,
+                            DateStart = 20000101,
+                            DateEnd = 20001231,
+                            Closed = true,
                             Booking = new List<AccountingDataJournalBooking>()
                         },
                         new AccountingDataJournal
                         {
                             Year = (ushort)year,
+                            DateStart = year * 10000 + 101,
+                            DateEnd = year * 10000 + 1231,
                             Booking = new List<AccountingDataJournalBooking>()
                         }
                     }
