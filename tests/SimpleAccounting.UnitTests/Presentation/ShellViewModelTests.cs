@@ -255,6 +255,35 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void CloseYearCommand_SampleProject_YearClosedAndNewAdded()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            messageBox.Show(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No).Returns(MessageBoxResult.Yes);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.CloseYearCommand.Execute(null);
+
+            messageBox.Received(1).Show(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No);
+            var thisYear = DateTime.Now.Year;
+            sut.BookingYears.Select(x => x.Header).Should()
+                .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
+        }
+
+        [Fact]
         public void TotalJournalReportCommand_NoJournal_CannotExecute()
         {
             var sut = CreateSut();

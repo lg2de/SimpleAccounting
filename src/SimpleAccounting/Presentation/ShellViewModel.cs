@@ -375,11 +375,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal void AddBooking(AccountingDataJournalBooking booking, bool refreshJournal = true)
         {
-            if (this.currentJournal.Booking == null)
-            {
-                this.currentJournal.Booking = new List<AccountingDataJournalBooking>();
-            }
-
             this.currentJournal.Booking.Add(booking);
             this.IsDocumentChanged = true;
 
