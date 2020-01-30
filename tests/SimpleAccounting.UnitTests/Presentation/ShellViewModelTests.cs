@@ -24,10 +24,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void OnInitialize_NoProject_Initialized()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
 
             ((IActivate)sut).Activate();
 
@@ -54,10 +51,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void OnActivate_SampleProject_JournalUpdates()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
             AccountingData project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
@@ -77,10 +71,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void NewProjectCommand_ProjectInitialized()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
 
             sut.NewProjectCommand.Execute(null);
 
@@ -92,10 +83,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SaveProjectCommand_Initialized_CannotExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
 
             sut.SaveProjectCommand.CanExecute(null).Should()
                 .BeFalse("default instance does not contain modified document");
@@ -104,10 +92,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SaveProjectCommand_DocumentModified_CanExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AddBooking(new AccountingDataJournalBooking(), refreshJournal: false);
@@ -118,10 +103,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AccountSelectionCommand_SampleBookings_JournalCorrect()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
             AccountingData project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
@@ -140,10 +122,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddBookingsCommand_NoProject_CannotExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
 
             sut.AddBookingsCommand.CanExecute(null).Should().BeFalse();
         }
@@ -151,10 +130,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddBookingsCommand_OpenYear_CanExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
             sut.LoadProjectData(Samples.SampleProject);
             sut.BookingYears.Last().Command.Execute(null);
 
@@ -164,10 +140,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddBookingsCommand_ClosedYear_CannotExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
             sut.LoadProjectData(Samples.SampleProject);
             sut.BookingYears.First().Command.Execute(null);
 
@@ -193,10 +166,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookingsCommand_NoProject_CannotExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
 
             sut.ImportBookingsCommand.CanExecute(null).Should().BeFalse();
         }
@@ -204,10 +174,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookingsCommand_OpenYear_CanExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
             sut.LoadProjectData(Samples.SampleProject);
             sut.BookingYears.Last().Command.Execute(null);
 
@@ -217,10 +184,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookingsCommand_ClosedYear_CannotExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
             sut.LoadProjectData(Samples.SampleProject);
             sut.BookingYears.First().Command.Execute(null);
 
@@ -255,10 +219,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CloseYearCommand_EmptyProject_CannotExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
 
             sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
         }
@@ -266,10 +227,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CloseYearCommand_DefaultProject_CanExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var sut = CreateSut();
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.CloseYearCommand.CanExecute(null).Should().BeTrue();
@@ -288,6 +246,91 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.BookingYears.First().Command.Execute(null);
 
             sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void TotalJournalReportCommand_NoJournal_CannotExecute()
+        {
+            var sut = CreateSut();
+
+            sut.TotalJournalReportCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void TotalJournalReportCommand_JournalWithEntries_CannotExecute()
+        {
+            var sut = CreateSut();
+            sut.Journal.Add(new JournalViewModel());
+
+            sut.TotalJournalReportCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AccountJournalReportCommand_NoJournal_CannotExecute()
+        {
+            var sut = CreateSut();
+
+            sut.AccountJournalReportCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AccountJournalReportCommand_JournalWithEntries_CannotExecute()
+        {
+            var sut = CreateSut();
+            sut.Journal.Add(new JournalViewModel());
+
+            sut.AccountJournalReportCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void TotalsAndBalancesReportCommand_NoJournal_CannotExecute()
+        {
+            var sut = CreateSut();
+
+            sut.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void TotalsAndBalancesReportCommand_JournalWithEntries_CannotExecute()
+        {
+            var sut = CreateSut();
+            sut.Journal.Add(new JournalViewModel());
+
+            sut.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AssetBalancesReportCommand_NoJournal_CannotExecute()
+        {
+            var sut = CreateSut();
+
+            sut.AssetBalancesReportCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AssetBalancesReportCommand_JournalWithEntries_CannotExecute()
+        {
+            var sut = CreateSut();
+            sut.Journal.Add(new JournalViewModel());
+
+            sut.AssetBalancesReportCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AnnualBalanceReportCommand_NoJournal_CannotExecute()
+        {
+            var sut = CreateSut();
+
+            sut.AnnualBalanceReportCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AnnualBalanceReportCommand_JournalWithEntries_CannotExecute()
+        {
+            var sut = CreateSut();
+            sut.Journal.Add(new JournalViewModel());
+
+            sut.AnnualBalanceReportCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -380,6 +423,15 @@ namespace SimpleAccounting.UnitTests.Presentation
                     CreditAccount = "990 (Carryforward)",
                     DebitAccount = "100 (Bank account)"
                 });
+        }
+
+        private static ShellViewModel CreateSut()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, messageBox, fileSystem);
+            return sut;
         }
     }
 }
