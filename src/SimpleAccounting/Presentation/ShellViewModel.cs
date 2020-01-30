@@ -156,7 +156,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentJournal,
                     this.accountingData.Accounts,
                     this.accountingData.Setup,
-                    this.currentJournal.Year.ToString());
+                    this.currentJournal.Year.ToString(CultureInfo.InvariantCulture));
                 report.CreateReport(this.currentJournal.DateStart.ToDateTime(), this.currentJournal.DateEnd.ToDateTime());
             },
             _ => this.Journal.Any());
@@ -186,7 +186,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentJournal,
                     accountGroups,
                     this.accountingData.Setup,
-                    this.currentJournal.Year.ToString());
+                    this.currentJournal.Year.ToString(CultureInfo.InvariantCulture));
                 this.accountingData.Setup.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
                 report.CreateReport(this.currentJournal.DateStart.ToDateTime(), this.currentJournal.DateEnd.ToDateTime());
             },
@@ -199,7 +199,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentJournal,
                     this.accountingData.AllAccounts,
                     this.accountingData.Setup,
-                    this.currentJournal.Year.ToString());
+                    this.currentJournal.Year.ToString(CultureInfo.InvariantCulture));
                 report.CreateReport();
             },
             _ => this.Journal.Any());
@@ -608,7 +608,7 @@ namespace lg2de.SimpleAccounting.Presentation
             foreach (var year in this.accountingData.Journal)
             {
                 var menu = new MenuViewModel(
-                    year.Year.ToString(),
+                    year.Year.ToString(CultureInfo.InvariantCulture),
                     new RelayCommand(_ => this.SelectBookingYear(year.Year)));
                 this.BookingYears.Add(menu);
             }
