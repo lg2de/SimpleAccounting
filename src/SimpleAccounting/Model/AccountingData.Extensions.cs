@@ -31,7 +31,7 @@ namespace lg2de.SimpleAccounting.Model
             }
         }
 
-        internal IEnumerable<AccountDefinition> AllAccounts => this.Accounts.SelectMany(g => g.Account);
+        internal IEnumerable<AccountDefinition> AllAccounts => this.Accounts?.SelectMany(g => g.Account);
 
         internal AccountingData Clone()
         {
@@ -42,9 +42,26 @@ namespace lg2de.SimpleAccounting.Model
         public bool Migrate()
         {
             var result = false;
-            // merge Year nodes into Journal
+            result |= this.MergeYearsIntoJournal();
+            result |= this.RemoveEmptyElements();
+            return result;
+        }
+
+        private bool MergeYearsIntoJournal()
+        {
+            if (this.Years == null)
+            {
+                return false;
+            }
+
+            var result = false;
             foreach (var year in this.Years)
             {
+                if (this.Journal == null)
+                {
+                    this.Journal = new List<AccountingDataJournal>();
+                }
+
                 var journal = this.Journal.SingleOrDefault(x => x.Year == year.Name);
                 if (journal == null)
                 {
@@ -61,6 +78,17 @@ namespace lg2de.SimpleAccounting.Model
 
             this.Years = null;
 
+            return result;
+        }
+
+        private bool RemoveEmptyElements()
+        {
+            if (this.Accounts == null)
+            {
+                return false;
+            }
+
+            var result = false;
             foreach (var group in this.Accounts)
             {
                 foreach (var account in group.Account)
@@ -70,8 +98,8 @@ namespace lg2de.SimpleAccounting.Model
                         continue;
                     }
 
-                    if (account.ImportMapping.Columns?.Any() == false
-                        && account.ImportMapping.Patterns?.Any() == false)
+                    if (!(account.ImportMapping.Columns?.Any() ?? false)
+                        && !(account.ImportMapping.Patterns?.Any() ?? false))
                     {
                         account.ImportMapping = null;
                         result = true;
