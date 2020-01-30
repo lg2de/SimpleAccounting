@@ -9,6 +9,7 @@ namespace SimpleAccounting.UnitTests.Presentation
     using FluentAssertions;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Presentation;
+    using lg2de.SimpleAccounting.Reports;
     using NSubstitute;
     using Xunit;
 
@@ -28,9 +29,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         public void BookCommand_FirstBooking_BookingNumberIncremented()
         {
             var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var parent = new ShellViewModel(windowManager, messageBox, fileSystem);
+            var parent = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             parent.LoadProjectData(Samples.SampleProject);
             var sut = new AddBookingViewModel(parent, DateTime.Now.Year);
 

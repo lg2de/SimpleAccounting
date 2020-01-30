@@ -26,6 +26,7 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class ShellViewModel : Conductor<IScreen>
     {
         private readonly IWindowManager windowManager;
+        private readonly IReportFactory reportFactory;
         private readonly IMessageBox messageBox;
         private readonly IFileSystem fileSystem;
 
@@ -33,9 +34,14 @@ namespace lg2de.SimpleAccounting.Presentation
         private string fileName = "";
         private AccountingDataJournal currentJournal;
 
-        public ShellViewModel(IWindowManager windowManager, IMessageBox messageBox, IFileSystem fileSystem)
+        public ShellViewModel(
+            IWindowManager windowManager,
+            IReportFactory reportFactory,
+            IMessageBox messageBox,
+            IFileSystem fileSystem)
         {
             this.windowManager = windowManager;
+            this.reportFactory = reportFactory;
             this.messageBox = messageBox;
             this.fileSystem = fileSystem;
         }
@@ -138,12 +144,12 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand AccountJournalReportCommand => new RelayCommand(
             _ =>
             {
-                var report = new AccountJournalReport(
+                var report = this.reportFactory.CreateAccountJournal(
                     this.accountingData.Accounts.SelectMany(a => a.Account),
                     this.currentJournal,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
-                report.PageBreakBetweenAccounts = this.accountingData.Setup.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
+                report.PageBreakBetweenAccounts = this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
                 report.CreateReport(this.currentJournal.DateStart.ToDateTime(), this.currentJournal.DateEnd.ToDateTime());
                 report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Kontoblätter {this.currentJournal.Year}");
             },

@@ -6,11 +6,14 @@ namespace lg2de.SimpleAccounting
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Presentation;
+    using lg2de.SimpleAccounting.Reports;
 
+    [ExcludeFromCodeCoverage]
     public class AppBootstrapper : BootstrapperBase
     {
         private readonly SimpleContainer container = new SimpleContainer();
@@ -20,6 +23,7 @@ namespace lg2de.SimpleAccounting
             this.Initialize();
 
             this.container.Singleton<IWindowManager, WindowManager>();
+            this.container.Singleton<IReportFactory, ReportFactory>();
             this.container.Singleton<IMessageBox, MessageBoxWrapper>();
             this.container.Singleton<IFileSystem, FileSystem>();
             this.container.PerRequest<ShellViewModel>();

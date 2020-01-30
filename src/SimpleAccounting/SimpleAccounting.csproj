@@ -155,8 +155,11 @@
     <Compile Include="Model\AccountingData.Extensions.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Presentation\JournalBaseViewModel.cs" />
+    <Compile Include="Reports\IAccountJournalReport.cs" />
+    <Compile Include="Reports\IReportFactory.cs" />
     <Compile Include="Reports\IXmlPrinter.cs" />
     <Compile Include="Reports\AccountJournalReport.cs" />
+    <Compile Include="Reports\ReportFactory.cs" />
     <Compile Include="Reports\TotalJournalReport.cs" />
     <Compile Include="Presentation\JournalViewModel.cs" />
     <Compile Include="Presentation\MenuViewModel.cs" />
