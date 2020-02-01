@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Model
 {
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Xml.Serialization;
 
@@ -31,12 +32,84 @@ namespace lg2de.SimpleAccounting.Model
             }
         }
 
-        internal IEnumerable<AccountDefinition> AllAccounts => this.Accounts.SelectMany(g => g.Account);
+        internal IEnumerable<AccountDefinition> AllAccounts => this.Accounts?.SelectMany(g => g.Account);
 
         internal AccountingData Clone()
         {
             var xml = this.Serialize();
             return AccountingData.Deserialize(xml);
+        }
+
+        public bool Migrate()
+        {
+            var result = false;
+            result |= this.MergeYearsIntoJournal();
+            result |= this.RemoveEmptyElements();
+            return result;
+        }
+
+        private bool MergeYearsIntoJournal()
+        {
+            if (this.Years == null)
+            {
+                return false;
+            }
+
+            var result = false;
+            foreach (var year in this.Years)
+            {
+                if (this.Journal == null)
+                {
+                    this.Journal = new List<AccountingDataJournal>();
+                }
+
+                string oldYearName = year.Name.ToString(CultureInfo.InvariantCulture);
+                var journal = this.Journal.SingleOrDefault(x =>x.Year == oldYearName);
+                if (journal == null)
+                {
+                    journal = new AccountingDataJournal { Year = oldYearName };
+                    this.Journal.Add(journal);
+                }
+
+                journal.DateStart = year.DateStart;
+                journal.DateEnd = year.DateEnd;
+                journal.Closed = year.Closed;
+
+                result = true;
+            }
+
+            this.Years = null;
+
+            return result;
+        }
+
+        private bool RemoveEmptyElements()
+        {
+            if (this.Accounts == null)
+            {
+                return false;
+            }
+
+            var result = false;
+            foreach (var group in this.Accounts)
+            {
+                foreach (var account in group.Account)
+                {
+                    if (account.ImportMapping == null)
+                    {
+                        continue;
+                    }
+
+                    if (!(account.ImportMapping.Columns?.Any() ?? false)
+                        && !(account.ImportMapping.Patterns?.Any() ?? false))
+                    {
+                        account.ImportMapping = null;
+                        result = true;
+                    }
+                }
+            }
+
+            return result;
         }
     }
 

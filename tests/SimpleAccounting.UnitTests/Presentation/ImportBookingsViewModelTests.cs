@@ -55,7 +55,7 @@ Date;Name;Text;Value
         [Fact]
         public void ProcessData_SampleData_DataConverted()
         {
-            var parent = new ShellViewModel(null, null, null);
+            var parent = new ShellViewModel(null, null, null, null);
             parent.LoadProjectData(Samples.SampleProject);
             var accounts = Samples.SampleProject.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(
