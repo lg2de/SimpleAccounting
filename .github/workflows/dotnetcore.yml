@@ -1,0 +1,42 @@
+name: continous integration
+on: [push]
+
+jobs:
+  build:
+    name: build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.100
+    - name: Setup SonarScanner
+      run: choco install "sonarscanner-msbuild-net46" -y
+
+    - name: Restore packages
+      run: dotnet restore --configfile nuget.config
+    - name: Prepare SonarScanner
+      run: |
+        $branch = $env:GITHUB_REF -replace "(\w+/)*",""
+        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting /d:sonar.branch.name=$branch /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
+      shell: pwsh
+    - name: Build Debug
+      run: dotnet build --configuration Debug
+    - name: Test with OpenCover
+      run: |
+        .\CreateCoverReport.ps1
+        Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+        bash codecov.sh -f "CoverOutput/coverage.xml"
+      shell: pwsh
+    - name: Build Release
+      run: dotnet build --configuration Release
+    - name: Complete SonarScanner
+      run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: application
+        path: src\SimpleAccounting\bin\Release\netcoreapp3.1

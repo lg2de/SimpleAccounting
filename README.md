@@ -1,6 +1,6 @@
 # SimpleAccounting - Simple Accounting Software
 
-[![Build status](https://ci.appveyor.com/api/projects/status/gdw9q7ves4fuu9t4/branch/master?svg=true)](https://ci.appveyor.com/project/lg2de/simpleaccounting/branch/master)
+![Build status](https://github.com/lg2de/SimpleAccounting/workflows/continous%20integration/badge.svg?branch=master)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=alert_status)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
