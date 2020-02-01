@@ -6,6 +6,7 @@ namespace SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using lg2de.SimpleAccounting.Model;
 
     internal class Samples
@@ -61,32 +62,21 @@ namespace SimpleAccounting.UnitTests.Presentation
                             }
                         }
                     },
-                    Years = new List<AccountingDataYear>
-                    {
-                        new AccountingDataYear
-                        {
-                            Name = 2000,
-                            DateStart = 20000101,
-                            DateEnd = 20001231,
-                            Closed = true
-                        },
-                        new AccountingDataYear
-                        {
-                            Name = (ushort)year,
-                            DateStart = year * 10000 + 101,
-                            DateEnd = year * 10000 + 1231
-                        }
-                    },
                     Journal = new List<AccountingDataJournal>
                     {
                         new AccountingDataJournal
                         {
-                            Year = 2000,
+                            Year = "2000",
+                            DateStart = 20000101,
+                            DateEnd = 20001231,
+                            Closed = true,
                             Booking = new List<AccountingDataJournalBooking>()
                         },
                         new AccountingDataJournal
                         {
-                            Year = (ushort)year,
+                            Year = year.ToString(CultureInfo.InvariantCulture),
+                            DateStart = year * 10000 + 101,
+                            DateEnd = year * 10000 + 1231,
                             Booking = new List<AccountingDataJournalBooking>()
                         }
                     }

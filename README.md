@@ -1,7 +1,11 @@
 # SimpleAccounting - Simple Accounting Software
 
 [![Build status](https://ci.appveyor.com/api/projects/status/gdw9q7ves4fuu9t4/branch/master?svg=true)](https://ci.appveyor.com/project/lg2de/simpleaccounting/branch/master)
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=alert_status)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=security_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 
 I started `SimpleAccounting` around 2005, only for my personal use to manage accounts and balances of a small club.
 In 2019, I met a colleague from another small club who was looking for a simple solution to get an overview of the balances of several logical and real accounts.
@@ -42,9 +46,9 @@ Medium and large changes should be discussed first. Please open a new issue or p
 When I started the project in 2005, I saw no relevance for unit testing.
 So far the test coverage is pretty bad:
 
-[![codecov](https://codecov.io/gh/lg2de/SimpleAccounting/branch/master/graph/badge.svg)](https://codecov.io/gh/lg2de/SimpleAccounting)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=coverage)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 
-With the decision this year to publish it, I started to switch to Test Driven Development.
+With the decision last year to publish it, I started to switch to Test Driven Development.
 I hope to increase coverage step by step. Maybe you want to help by creating component tests?
 
 I am German and have no experience with English names for the financial world.
@@ -61,8 +65,8 @@ The software available in the repository is intended as contiguous alpha version
 No guarantee that a project can be loaded without manual modification.
 The file format will be fixed only with the first beta release.
 
-I hope to release the first beta in december 2019.
-I plan to release the version 2.0.0 in january 2020.
+I hope to release the first beta in january 2020.
+I plan to release the version 2.0.0 in february 2020.
 
 ## License
 

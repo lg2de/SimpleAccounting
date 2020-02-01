@@ -127,7 +127,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var valueField = this.SelectedAccount.ImportMapping.Columns
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source;
 
-            if (this.Journal != null)
+            if (this.Journal?.Booking != null)
             {
                 var lastEntry = this.Journal.Booking
                     .Where(x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) || x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
@@ -226,7 +226,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 };
                 var creditValue = new BookingValue
                 {
-                    Value = (int)Math.Abs(Math.Round(importing.Value * 100))
+                    Value = (long)Math.Abs(Math.Round(importing.Value * 100))
                 };
 
                 // build booking text from name and/or text

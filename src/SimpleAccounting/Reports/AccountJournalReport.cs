@@ -13,7 +13,7 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-    internal class AccountJournalReport
+    internal class AccountJournalReport : IAccountJournalReport
     {
         public const string ResourceName = "AccountJournal.xml";
 

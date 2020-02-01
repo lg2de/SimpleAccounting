@@ -31,7 +31,7 @@ namespace SimpleAccounting.UnitTests.Reports
             };
             var journal = new AccountingDataJournal
             {
-                Year = 2019,
+                Year = "2019",
                 Booking = new List<AccountingDataJournalBooking>
                 {
                     new AccountingDataJournalBooking
