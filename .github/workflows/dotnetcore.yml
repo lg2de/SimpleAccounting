@@ -18,7 +18,8 @@ jobs:
     - name: Restore packages
       run: dotnet restore --configfile nuget.config
     - name: Prepare SonarScanner
-      run: SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.branch.name=${GITHUB_REF##*/} /d:"sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml"
+      run: SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting /d:sonar.branch.name=${GITHUB_REF##*/} /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
+      shell: pwsh
     - name: Build Debug
       run: dotnet build --configuration Debug
     - name: Test with OpenCover
