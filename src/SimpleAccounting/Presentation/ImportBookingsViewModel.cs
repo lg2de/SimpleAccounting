@@ -38,7 +38,9 @@ namespace lg2de.SimpleAccounting.Presentation
         }
 
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
-            .Where(a => a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value));
+            .Where(a =>
+                a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) == true
+                && a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) == true);
 
         public DateTime RangeMin { get; internal set; }
 
@@ -88,7 +90,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 // note, the stream is disposed by the reader
                 var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using (var reader = new StreamReader(stream, Encoding.GetEncoding(1252)))
+                var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
+                using (var reader = new StreamReader(stream, enc1252))
                 {
                     this.ImportBookings(reader, new Configuration());
                 }

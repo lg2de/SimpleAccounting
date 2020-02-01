@@ -41,6 +41,11 @@ namespace lg2de.SimpleAccounting.Presentation
             set
             {
                 this.selectedTemplate = value;
+                if (this.selectedTemplate == null)
+                {
+                    return;
+                }
+
                 if (this.selectedTemplate.Debit > 0)
                 {
                     this.DebitAccount = this.selectedTemplate.Debit;
