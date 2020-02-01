@@ -16,11 +16,11 @@ namespace lg2de.SimpleAccounting.Presentation
             this.BookingText = "shoes";
             this.BookingValue = 169.95;
 
-            this.Accounts.Add(new AccountDefinition { ID = 100, Name = "Cash" });
-            this.Accounts.Add(new AccountDefinition { ID = 600, Name = "Shopping" });
+            this.Accounts.Add(new AccountDefinition { ID = 100, Name = "Cash", Type = AccountDefinitionType.Asset });
+            this.Accounts.Add(new AccountDefinition { ID = 600, Name = "Shopping", Type = AccountDefinitionType.Expense });
 
-            this.DebitAccount = 100;
-            this.CreditAccount = 600;
+            this.DebitAccount = 600;
+            this.CreditAccount = 100;
         }
     }
 }

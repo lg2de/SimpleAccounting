@@ -8,6 +8,7 @@ namespace SimpleAccounting.UnitTests.Presentation
     using Caliburn.Micro;
     using FluentAssertions;
     using lg2de.SimpleAccounting.Abstractions;
+    using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Reports;
     using NSubstitute;
@@ -26,6 +27,23 @@ namespace SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
 
             sut.DisplayName.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public void Accounts_AllAccountTypesAdded_AccountRelatedPropertiesNotEmpty()
+        {
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd);
+
+            foreach (AccountDefinitionType type in Enum.GetValues(typeof(AccountDefinitionType)))
+            {
+                sut.Accounts.Add(new AccountDefinition { Name = type.ToString(), Type = type });
+            }
+
+            sut.Accounts.Should().NotBeEmpty();
+            sut.IncomeAccounts.Should().NotBeEmpty();
+            sut.IncomeRemoteAccounts.Should().NotBeEmpty();
+            sut.ExpenseAccounts.Should().NotBeEmpty();
+            sut.ExpenseRemoteAccounts.Should().NotBeEmpty();
         }
 
         [Fact]
