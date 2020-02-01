@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Extensions;
@@ -63,6 +64,18 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public List<AccountDefinition> Accounts { get; }
             = new List<AccountDefinition>();
+
+        public IEnumerable<AccountDefinition> IncomeAccounts =>
+            this.Accounts.Where(x => x.Type == AccountDefinitionType.Income);
+
+        public IEnumerable<AccountDefinition> IncomeRemoteAccounts =>
+            this.Accounts.Where(x => x.Type != AccountDefinitionType.Income);
+
+        public IEnumerable<AccountDefinition> ExpenseAccounts =>
+            this.Accounts.Where(x => x.Type == AccountDefinitionType.Expense);
+
+        public IEnumerable<AccountDefinition> ExpenseRemoteAccounts =>
+            this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense);
 
         public ulong CreditAccount
         {
