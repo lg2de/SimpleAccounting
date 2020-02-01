@@ -15,8 +15,14 @@ jobs:
         dotnet-version: 3.1.100
     - name: Restore packages
       run: dotnet restore --configfile nuget.config
-    - name: Test with dotnet
+    - name: Build Debug
+      run: dotnet build --configuration Debug
+    - name: Test with OpenCover
       run: .\CreateCoverReport.ps1
       shell: pwsh
-    - name: Build with dotnet
+    - name: Build Release
       run: dotnet build --configuration Release
+    - uses: actions/upload-artifact@v1
+      with:
+        name: application
+        path: src\SimpleAccounting\bin\Release\netcoreapp3.1
