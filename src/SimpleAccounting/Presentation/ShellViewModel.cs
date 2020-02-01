@@ -96,7 +96,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand AddBookingsCommand => new RelayCommand(_ =>
         {
-            var bookingModel = new AddBookingViewModel(this, this.currentJournal.Year)
+            var bookingModel = new AddBookingViewModel(
+                this,
+                this.currentJournal.DateStart.ToDateTime(),
+                this.currentJournal.DateEnd.ToDateTime())
             {
                 BookingNumber = this.GetMaxBookIdent() + 1
             };
@@ -412,14 +415,13 @@ namespace lg2de.SimpleAccounting.Presentation
             var carryForwardAccount =
                 this.accountingData.AllAccounts.Single(a => a.Type == AccountDefinitionType.Carryforward && a.Active);
 
-            var newYear = (ushort)(this.currentJournal.Year + 1);
             var newYearJournal = new AccountingDataJournal
             {
-                Year = newYear,
                 DateStart = this.currentJournal.DateStart + 10000,
                 DateEnd = this.currentJournal.DateEnd + 10000,
                 Booking = new List<AccountingDataJournalBooking>()
             };
+            newYearJournal.Year = newYearJournal.DateStart.ToDateTime().Year.ToString(CultureInfo.InvariantCulture);
             this.accountingData.Journal.Add(newYearJournal);
 
             ulong bookingId = 1;
@@ -480,7 +482,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.IsDocumentChanged = true;
-            this.SelectBookingYear(newYear);
+            this.SelectBookingYear(newYearJournal.Year);
 
             this.UpdateBookingYears();
         }
@@ -491,9 +493,9 @@ namespace lg2de.SimpleAccounting.Presentation
             return account.FormatName();
         }
 
-        private void SelectBookingYear(ushort newYear)
+        private void SelectBookingYear(string newYearName)
         {
-            this.currentJournal = this.accountingData.Journal.Single(y => y.Year == newYear);
+            this.currentJournal = this.accountingData.Journal.Single(y => y.Year == newYearName);
             this.DisplayName = $"SimpleAccounting - {this.fileName} - {this.currentJournal.Year}";
             this.AccountJournal.Clear();
             this.RefreshJournal();
@@ -584,7 +586,7 @@ namespace lg2de.SimpleAccounting.Presentation
             };
             var accountJournal = new AccountingDataJournal
             {
-                Year = year,
+                Year = year.ToString(CultureInfo.InvariantCulture),
                 DateStart = (uint)year * 10000 + 101,
                 DateEnd = (uint)year * 10000 + 1231,
                 Booking = new List<AccountingDataJournalBooking>()

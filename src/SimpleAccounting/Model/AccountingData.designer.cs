@@ -626,7 +626,7 @@ namespace lg2de.SimpleAccounting.Model {
         
         private string textField;
         
-        private int valueField;
+        private long valueField;
         
         private bool valueFieldSpecified;
         
@@ -651,7 +651,7 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int Value {
+        public long Value {
             get {
                 return this.valueField;
             }
@@ -870,7 +870,7 @@ namespace lg2de.SimpleAccounting.Model {
     [System.Xml.Serialization.XmlRootAttribute(Namespace="", IsNullable=true)]
     public partial class BookingValue {
         
-        private int valueField;
+        private long valueField;
         
         private ulong accountField;
         
@@ -879,7 +879,7 @@ namespace lg2de.SimpleAccounting.Model {
         private static System.Xml.Serialization.XmlSerializer serializer;
         
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int Value {
+        public long Value {
             get {
                 return this.valueField;
             }
@@ -1698,7 +1698,7 @@ namespace lg2de.SimpleAccounting.Model {
         
         private string expressionField;
         
-        private int valueField;
+        private long valueField;
         
         private bool valueFieldSpecified;
         
@@ -1717,7 +1717,7 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public int Value {
+        public long Value {
             get {
                 return this.valueField;
             }
@@ -2697,7 +2697,7 @@ namespace lg2de.SimpleAccounting.Model {
         
         private List<AccountingDataJournalBooking> bookingField;
         
-        private ushort yearField;
+        private string yearField;
         
         private uint dateStartField;
         
@@ -2722,7 +2722,7 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public ushort Year {
+        public string Year {
             get {
                 return this.yearField;
             }
@@ -3149,22 +3149,22 @@ namespace lg2de.SimpleAccounting.Model {
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
     public partial class AccountingDataEntry {
         
-        private ushort yearField;
+        private string yearField;
         
         private uint dateField;
         
         private ulong idField;
         
-        private ushort valueField;
+        private long valueField;
         
-        private ushort accountField;
+        private ulong accountField;
         
         private string textField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
         
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public ushort Year {
+        public string Year {
             get {
                 return this.yearField;
             }
@@ -3194,7 +3194,7 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public ushort Value {
+        public long Value {
             get {
                 return this.valueField;
             }
@@ -3204,7 +3204,7 @@ namespace lg2de.SimpleAccounting.Model {
         }
         
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public ushort Account {
+        public ulong Account {
             get {
                 return this.accountField;
             }

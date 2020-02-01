@@ -15,10 +15,13 @@ namespace SimpleAccounting.UnitTests.Presentation
 
     public class AddBookingViewModelTests
     {
+        private static DateTime YearBegin = new DateTime(DateTime.Now.Year, 1, 1);
+        private static DateTime YearEnd = new DateTime(DateTime.Now.Year, 12, 31);
+
         [Fact]
         public void OnInitialize_Initialized()
         {
-            var sut = new AddBookingViewModel(null, DateTime.Now.Year);
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd);
 
             ((IActivate)sut).Activate();
 
@@ -34,7 +37,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             var fileSystem = Substitute.For<IFileSystem>();
             var parent = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             parent.LoadProjectData(Samples.SampleProject);
-            var sut = new AddBookingViewModel(parent, DateTime.Now.Year);
+            var sut = new AddBookingViewModel(parent, YearBegin, YearEnd);
 
             var oldNumber = sut.BookingNumber;
             sut.CreditAccount = 100;
@@ -52,13 +55,14 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookCommand_InvalidYear_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, DateTime.Now.Year - 1)
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
             {
                 BookingNumber = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 2,
-                BookingValue = 42
+                BookingValue = 42,
+                Date = YearEnd + TimeSpan.FromDays(1)
             };
 
             sut.BookCommand.CanExecute(null).Should().BeFalse();
@@ -67,7 +71,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookCommand_MissingCredit_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, DateTime.Now.Year)
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
             {
                 BookingNumber = 1,
                 BookingText = "abc",
@@ -81,7 +85,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookCommand_MissingDebit_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, DateTime.Now.Year)
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
             {
                 BookingNumber = 1,
                 BookingText = "abc",
@@ -95,7 +99,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookCommand_MissingNumber_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, DateTime.Now.Year)
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
             {
                 BookingText = "abc",
                 CreditIndex = 1,
@@ -109,7 +113,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookCommand_MissingText_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, DateTime.Now.Year)
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
             {
                 BookingNumber = 1,
                 CreditIndex = 1,
@@ -123,7 +127,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookCommand_MissingValue_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, DateTime.Now.Year)
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
             {
                 BookingNumber = 1,
                 BookingText = "abc",
@@ -137,7 +141,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookCommand_SameAccount_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, DateTime.Now.Year)
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
             {
                 BookingNumber = 1,
                 BookingText = "abc",
@@ -152,7 +156,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookCommand_ValidValues_CanExecute()
         {
-            var sut = new AddBookingViewModel(null, DateTime.Now.Year)
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
             {
                 BookingNumber = 1,
                 BookingText = "abc",

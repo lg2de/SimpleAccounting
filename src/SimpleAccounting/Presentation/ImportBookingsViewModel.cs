@@ -226,7 +226,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 };
                 var creditValue = new BookingValue
                 {
-                    Value = (int)Math.Abs(Math.Round(importing.Value * 100))
+                    Value = (long)Math.Abs(Math.Round(importing.Value * 100))
                 };
 
                 // build booking text from name and/or text

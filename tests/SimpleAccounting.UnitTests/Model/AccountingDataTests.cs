@@ -72,8 +72,8 @@ namespace SimpleAccounting.UnitTests.Model
             {
                 Journal = new List<AccountingDataJournal>
                 {
-                    new AccountingDataJournal { Year = 2001, DateStart = 20010101, DateEnd = 20011231, Closed = true },
-                    new AccountingDataJournal { Year=2002, DateStart = 20020101, DateEnd = 20021231, Closed = false }
+                    new AccountingDataJournal { Year = "2001", DateStart = 20010101, DateEnd = 20011231, Closed = true },
+                    new AccountingDataJournal { Year = "2002", DateStart = 20020101, DateEnd = 20021231, Closed = false }
                 }
             };
             sut.Should().BeEquivalentTo(expectation);

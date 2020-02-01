@@ -20,10 +20,11 @@ namespace lg2de.SimpleAccounting.Presentation
         private ulong debitAccount;
         private BookingTemplate selectedTemplate;
 
-        public AddBookingViewModel(ShellViewModel parent, int bookingYear)
+        public AddBookingViewModel(ShellViewModel parent, DateTime dateStart, DateTime dateEnd)
         {
             this.parent = parent;
-            this.BookingYear = bookingYear;
+            this.DateStart = dateStart;
+            this.DateEnd = dateEnd;
         }
 
         public DateTime Date { get; set; } = DateTime.Today;
@@ -97,38 +98,42 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public int DebitIndex { get; set; } = -1;
 
-        public ICommand BookCommand => new RelayCommand(_ =>
-        {
-            var newBooking = new AccountingDataJournalBooking
+        public ICommand BookCommand => new RelayCommand(
+            _ =>
             {
-                Date = this.Date.ToAccountingDate(),
-                ID = this.BookingNumber
-            };
-            var creditValue = new BookingValue
-            {
-                Account = this.CreditAccount,
-                Text = this.BookingText,
-                Value = (int)Math.Round(this.BookingValue * 100)
-            };
-            var debitValue = creditValue.Clone();
-            debitValue.Account = this.DebitAccount;
-            newBooking.Credit = new List<BookingValue> { creditValue };
-            newBooking.Debit = new List<BookingValue> { debitValue };
-            this.parent.AddBooking(newBooking);
+                var newBooking = new AccountingDataJournalBooking
+                {
+                    Date = this.Date.ToAccountingDate(),
+                    ID = this.BookingNumber
+                };
+                var creditValue = new BookingValue
+                {
+                    Account = this.CreditAccount,
+                    Text = this.BookingText,
+                    Value = (long)Math.Round(this.BookingValue * 100)
+                };
+                var debitValue = creditValue.Clone();
+                debitValue.Account = this.DebitAccount;
+                newBooking.Credit = new List<BookingValue> { creditValue };
+                newBooking.Debit = new List<BookingValue> { debitValue };
+                this.parent.AddBooking(newBooking);
 
-            // update for next booking
-            this.BookingNumber++;
-            this.NotifyOfPropertyChange(nameof(this.BookingNumber));
-        },
-            _ => this.Date.Year == this.BookingYear
-                && this.BookingNumber > 0
-                && this.BookingValue > 0
-                && this.CreditIndex >= 0
-                && this.DebitIndex >= 0
-                && this.CreditIndex != this.DebitIndex
-                && !string.IsNullOrWhiteSpace(this.BookingText));
+                // update for next booking
+                this.BookingNumber++;
+                this.NotifyOfPropertyChange(nameof(this.BookingNumber));
+            },
+            _ => this.Date >= this.DateStart
+            && this.Date <= this.DateEnd
+            && this.BookingNumber > 0
+            && this.BookingValue > 0
+            && this.CreditIndex >= 0
+            && this.DebitIndex >= 0
+            && this.CreditIndex != this.DebitIndex
+            && !string.IsNullOrWhiteSpace(this.BookingText));
 
-        internal int BookingYear { get; }
+        internal DateTime DateStart { get; }
+
+        internal DateTime DateEnd { get; }
 
         protected override void OnInitialize()
         {

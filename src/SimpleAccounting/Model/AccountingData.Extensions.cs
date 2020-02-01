@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Model
 {
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Xml.Serialization;
 
@@ -62,10 +63,11 @@ namespace lg2de.SimpleAccounting.Model
                     this.Journal = new List<AccountingDataJournal>();
                 }
 
-                var journal = this.Journal.SingleOrDefault(x => x.Year == year.Name);
+                string oldYearName = year.Name.ToString(CultureInfo.InvariantCulture);
+                var journal = this.Journal.SingleOrDefault(x =>x.Year == oldYearName);
                 if (journal == null)
                 {
-                    journal = new AccountingDataJournal { Year = year.Name };
+                    journal = new AccountingDataJournal { Year = oldYearName };
                     this.Journal.Add(journal);
                 }
 
