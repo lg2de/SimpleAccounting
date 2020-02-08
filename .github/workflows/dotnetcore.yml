@@ -43,5 +43,5 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: application
+        name: SimpleAccounting
         path: src\SimpleAccounting\bin\Release\netcoreapp3.1
