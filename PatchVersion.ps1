@@ -5,7 +5,7 @@ if ($env:GITHUB_REF -match "/tags/") {
   $version = $env:GITHUB_REF -replace "(\w+/)*",""
 } else {
   # use git sha as version name
-  $version = $env:GITHUB_SHA
+  $version = ($env:GITHUB_SHA).Substring(0, 8)
 }
 
 Write-Host version = $version
