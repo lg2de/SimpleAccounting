@@ -18,6 +18,18 @@ namespace SimpleAccounting.UnitTests.Presentation
     public class ImportBookingsViewModelTests
     {
         [Fact]
+        public void ImportBookings_SampleData_AccountsFiltered()
+        {
+            var accounts = Samples.SampleProject.AllAccounts.ToList();
+            var sut = new ImportBookingsViewModel(
+                null,
+                null,
+                accounts);
+
+            sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
+        }
+
+        [Fact]
         public void ImportBookings_SampleInput_DataImported()
         {
             var accounts = Samples.SampleProject.AllAccounts.ToList();

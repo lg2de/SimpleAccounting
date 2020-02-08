@@ -130,16 +130,13 @@ namespace lg2de.SimpleAccounting.Presentation
             var valueField = this.SelectedAccount.ImportMapping.Columns
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source;
 
-            if (this.Journal?.Booking != null)
+            var lastEntry = this.Journal?.Booking?
+                .Where(x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) || x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
+                .OrderBy(x => x.Date)
+                .LastOrDefault();
+            if (lastEntry != null)
             {
-                var lastEntry = this.Journal.Booking
-                    .Where(x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) || x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
-                    .OrderBy(x => x.Date)
-                    .LastOrDefault();
-                if (lastEntry != null)
-                {
-                    this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
-                }
+                this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
             }
 
             using (var csv = new CsvReader(reader, configuration))
@@ -152,64 +149,74 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 while (csv.Read())
                 {
-                    csv.TryGetField(dateField, out DateTime date);
-                    if (date < this.RangeMin || date > this.RangMax)
-                    {
-                        continue;
-                    }
-
-                    // date and value are checked by RelayCommand
-                    // name and text may be empty
-                    csv.TryGetField<double>(valueField, out var value);
-                    string name = string.Empty;
-                    string text = string.Empty;
-                    if (nameField != null)
-                    {
-                        csv.TryGetField<string>(nameField, out name);
-                    }
-
-                    if (textField != null)
-                    {
-                        csv.TryGetField<string>(textField.Source, out text);
-                        if (!string.IsNullOrEmpty(textField.IgnorePattern))
-                        {
-                            text = Regex.Replace(text, textField?.IgnorePattern, string.Empty);
-                        }
-                    }
-
-                    var item = new ImportEntryViewModel
-                    {
-                        Date = date,
-                        Accounts = this.accounts,
-                        Identifier = this.BookingNumber++,
-                        Name = name,
-                        Text = text,
-                        Value = value
-                    };
-
-                    var longValue = (long)(value * 100);
-                    foreach (var importMapping in this.SelectedAccount.ImportMapping.Patterns)
-                    {
-                        if (!Regex.IsMatch(text, importMapping.Expression))
-                        {
-                            // mapping does not match
-                            continue;
-                        }
-
-                        if (importMapping.ValueSpecified && longValue != importMapping.Value)
-                        {
-                            // mapping does not match
-                            continue;
-                        }
-
-                        // use first match
-                        item.RemoteAccount = this.accounts.SingleOrDefault(a => a.ID == importMapping.AccountID);
-                        break;
-                    }
-
-                    this.ImportData.Add(item);
+                    this.ImportBooking(csv, dateField, nameField, textField, valueField);
                 }
             }
+        }
+
+        private void ImportBooking(
+            CsvReader csv,
+            string dateField,
+            string nameField,
+            AccountDefinitionImportMappingColumn textField,
+            string valueField)
+        {
+            csv.TryGetField(dateField, out DateTime date);
+            if (date < this.RangeMin || date > this.RangMax)
+            {
+                return;
+            }
+
+            // date and value are checked by RelayCommand
+            // name and text may be empty
+            csv.TryGetField<double>(valueField, out var value);
+            string name = string.Empty;
+            string text = string.Empty;
+            if (nameField != null)
+            {
+                csv.TryGetField<string>(nameField, out name);
+            }
+
+            if (textField != null)
+            {
+                csv.TryGetField<string>(textField.Source, out text);
+                if (!string.IsNullOrEmpty(textField.IgnorePattern))
+                {
+                    text = Regex.Replace(text, textField?.IgnorePattern, string.Empty);
+                }
+            }
+
+            var item = new ImportEntryViewModel
+            {
+                Date = date,
+                Accounts = this.accounts,
+                Identifier = this.BookingNumber++,
+                Name = name,
+                Text = text,
+                Value = value
+            };
+
+            var longValue = (long)(value * 100);
+            foreach (var importMapping in this.SelectedAccount.ImportMapping.Patterns)
+            {
+                if (!Regex.IsMatch(text, importMapping.Expression))
+                {
+                    // mapping does not match
+                    continue;
+                }
+
+                if (importMapping.ValueSpecified && longValue != importMapping.Value)
+                {
+                    // mapping does not match
+                    continue;
+                }
+
+                // use first match
+                item.RemoteAccount = this.accounts.SingleOrDefault(a => a.ID == importMapping.AccountID);
+                break;
+            }
+
+            this.ImportData.Add(item);
         }
 
         internal void ProcessData()
