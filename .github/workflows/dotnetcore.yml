@@ -7,8 +7,8 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+    - run: |
+        git fetch --prune --unshallow
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
@@ -16,6 +16,9 @@ jobs:
         dotnet-version: 3.1.100
     - name: Setup SonarScanner
       run: choco install "sonarscanner-msbuild-net46" -y
+    - name: Patch version info
+      run: .\PatchVersion.ps1
+      shell: pwsh
 
     - name: Restore packages
       run: dotnet restore --configfile nuget.config
