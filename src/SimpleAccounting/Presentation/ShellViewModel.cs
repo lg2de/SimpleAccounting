@@ -452,6 +452,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     Date = newYearJournal.DateStart,
                     ID = bookingId,
+                    Debit = new List<BookingValue>(),
+                    Credit = new List<BookingValue>(),
                     Opening = true
                 };
                 newYearJournal.Booking.Add(newBooking);

@@ -5,8 +5,10 @@
 namespace SimpleAccounting.UnitTests.Presentation
 {
     using System;
+    using System.Linq;
     using Caliburn.Micro;
     using FluentAssertions;
+    using FluentAssertions.Execution;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
@@ -44,6 +46,82 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.IncomeRemoteAccounts.Should().NotBeEmpty();
             sut.ExpenseAccounts.Should().NotBeEmpty();
             sut.ExpenseRemoteAccounts.Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public void SelectedTemplate_SetTemplateWithCredit_CreditAccountSet()
+        {
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            { CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42 };
+            sut.Accounts.Add(new AccountDefinition { ID = 1 });
+            sut.Accounts.Add(new AccountDefinition { ID = 2 });
+            sut.Accounts.Add(new AccountDefinition { ID = 3 });
+            sut.BindingTemplates.Add(new BookingTemplate { Credit = 3 });
+
+            sut.SelectedTemplate = sut.BindingTemplates.Last();
+
+            using var _ = new AssertionScope();
+            sut.DebitAccount.Should().Be(2);
+            sut.CreditAccount.Should().Be(3);
+            sut.BookingValue.Should().Be(42);
+            sut.BookingText.Should().Be("default");
+        }
+
+        [Fact]
+        public void SelectedTemplate_SetTemplateWithDebit_DebitAccountSet()
+        {
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            { CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42 };
+            sut.Accounts.Add(new AccountDefinition { ID = 1 });
+            sut.Accounts.Add(new AccountDefinition { ID = 2 });
+            sut.Accounts.Add(new AccountDefinition { ID = 3 });
+            sut.BindingTemplates.Add(new BookingTemplate { Debit = 3 });
+
+            sut.SelectedTemplate = sut.BindingTemplates.Last();
+
+            using var _ = new AssertionScope();
+            sut.DebitAccount.Should().Be(3);
+            sut.CreditAccount.Should().Be(1);
+            sut.BookingValue.Should().Be(42);
+            sut.BookingText.Should().Be("default");
+        }
+
+        [Fact]
+        public void SelectedTemplate_SetTemplateWithValue_ValueSet()
+        {
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            { CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42 };
+            sut.Accounts.Add(new AccountDefinition { ID = 1 });
+            sut.Accounts.Add(new AccountDefinition { ID = 2 });
+            sut.Accounts.Add(new AccountDefinition { ID = 3 });
+            sut.BindingTemplates.Add(new BookingTemplate { Value = 123 });
+
+            sut.SelectedTemplate = sut.BindingTemplates.Last();
+
+            using var _ = new AssertionScope();
+            sut.DebitAccount.Should().Be(2);
+            sut.CreditAccount.Should().Be(1);
+            sut.BookingValue.Should().Be(123);
+            sut.BookingText.Should().Be("default");
+        }
+
+        [Fact]
+        public void SelectedTemplate_SetNull_PropertiesUnchanged()
+        {
+            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            { CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42 };
+            sut.Accounts.Add(new AccountDefinition { ID = 1 });
+            sut.Accounts.Add(new AccountDefinition { ID = 2 });
+            sut.Accounts.Add(new AccountDefinition { ID = 3 });
+            sut.BindingTemplates.Add(new BookingTemplate { Value = 123 });
+
+            sut.SelectedTemplate = null;
+
+            using var _ = new AssertionScope();
+            sut.DebitAccount.Should().Be(2);
+            sut.CreditAccount.Should().Be(1);
+            sut.BookingValue.Should().Be(42);
+            sut.BookingText.Should().Be("default");
         }
 
         [Fact]

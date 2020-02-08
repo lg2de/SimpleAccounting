@@ -14,6 +14,7 @@ namespace SimpleAccounting.UnitTests.Presentation
     using FluentAssertions;
     using FluentAssertions.Execution;
     using lg2de.SimpleAccounting.Abstractions;
+    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
@@ -255,7 +256,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void CloseYearCommand_SampleProject_YearClosedAndNewAdded()
+        public void CloseYearCommand_HappyPath_YearClosedAndNewAdded()
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
@@ -269,6 +270,14 @@ namespace SimpleAccounting.UnitTests.Presentation
             var fileSystem = Substitute.For<IFileSystem>();
             var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
+            var booking = new AccountingDataJournalBooking
+            {
+                Date = DateTime.Now.ToAccountingDate(),
+                ID = 1,
+                Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
+                Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
+            };
+            sut.AddBooking(booking);
 
             sut.CloseYearCommand.Execute(null);
 
@@ -281,6 +290,38 @@ namespace SimpleAccounting.UnitTests.Presentation
             var thisYear = DateTime.Now.Year;
             sut.BookingYears.Select(x => x.Header).Should()
                 .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
+            sut.Journal.Should().BeEquivalentTo(
+                new
+                {
+                    Identifier = 1,
+                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Text = "Eröffnungsbetrag 1",
+                    Value = 0.42,
+                    CreditAccount = "990 (Carryforward)",
+                    DebitAccount = "100 (Bank account)"
+                });
+        }
+
+        [Fact]
+        public void CloseYearCommand_ActionAborted_YearsUnchanged()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            messageBox.Show(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No).Returns(MessageBoxResult.No);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.CloseYearCommand.Execute(null);
+
+            var thisYear = DateTime.Now.Year;
+            sut.BookingYears.Select(x => x.Header).Should().Equal("2000", thisYear.ToString());
         }
 
         [Fact]
@@ -428,7 +469,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.LoadProjectData(Samples.SampleProject);
             var booking = new AccountingDataJournalBooking
             {
-                Date = 20190201,
+                Date = DateTime.Now.ToAccountingDate(),
                 ID = 1,
                 Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
                 Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
@@ -436,7 +477,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.AddBooking(booking);
             booking = new AccountingDataJournalBooking
             {
-                Date = 20190301,
+                Date = DateTime.Now.ToAccountingDate(),
                 ID = 2,
                 Credit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Back", Value = 5 } },
                 Debit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Back", Value = 5 } }

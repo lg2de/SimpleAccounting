@@ -26,6 +26,13 @@
     <PackageReference Include="CurrencyTextBox" Version="2.0.2" />
     <!-- 3.6.0 is the last WpfToolKit version with MS-PL license -->
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.6.0" />
+    <!-- licecnse is LGPL -->
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.3.0.14607">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <!-- licecnse is MIT -->
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.0" />
   </ItemGroup>
 
 </Project>
