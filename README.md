@@ -44,7 +44,7 @@ Medium and large changes should be discussed first. Please open a new issue or p
 ## TODOs
 
 When I started the project in 2005, I saw no relevance for unit testing.
-So far the test coverage is pretty bad:
+So far the test coverage is not yet good:
 
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=coverage)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 
@@ -60,13 +60,10 @@ Maybe you want to help with the introduction of a localized user interface?
 
 ## Roadmap
 
-Currently I'm working on completing the software into version 2.0.0, the first public release.
-The software available in the repository is intended as contiguous alpha version:
-No guarantee that a project can be loaded without manual modification.
-The file format will be fixed only with the first beta release.
+The first public release is [available](https://github.com/lg2de/SimpleAccounting/releases).
+Please download, test and send feedback.
 
-I hope to release the first beta in january 2020.
-I plan to release the version 2.0.0 in february 2020.
+After release of first non-beta version I'll create future roadmap.
 
 ## License
 
