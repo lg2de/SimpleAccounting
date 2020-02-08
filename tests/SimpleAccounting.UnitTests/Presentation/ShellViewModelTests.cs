@@ -274,8 +274,24 @@ namespace SimpleAccounting.UnitTests.Presentation
             {
                 Date = DateTime.Now.ToAccountingDate(),
                 ID = 1,
-                Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
-                Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
+                Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 1000 } },
+                Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 1000 } }
+            };
+            sut.AddBooking(booking);
+            booking = new AccountingDataJournalBooking
+            {
+                Date = DateTime.Now.ToAccountingDate(),
+                ID = 2,
+                Credit = new List<BookingValue> { new BookingValue { Account = 400, Text = "Income", Value = 500 } },
+                Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Income", Value = 500 } }
+            };
+            sut.AddBooking(booking);
+            booking = new AccountingDataJournalBooking
+            {
+                Date = DateTime.Now.ToAccountingDate(),
+                ID = 2,
+                Credit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Expense", Value = 800 } },
+                Debit = new List<BookingValue> { new BookingValue { Account = 600, Text = "Expense", Value = 800 } }
             };
             sut.AddBooking(booking);
 
@@ -296,7 +312,7 @@ namespace SimpleAccounting.UnitTests.Presentation
                     Identifier = 1,
                     Date = new DateTime(thisYear + 1, 1, 1),
                     Text = "Eröffnungsbetrag 1",
-                    Value = 0.42,
+                    Value = 7.00,
                     CreditAccount = "990 (Carryforward)",
                     DebitAccount = "100 (Bank account)"
                 });

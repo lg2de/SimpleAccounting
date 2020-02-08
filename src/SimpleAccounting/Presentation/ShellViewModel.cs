@@ -35,6 +35,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly IReportFactory reportFactory;
         private readonly IMessageBox messageBox;
         private readonly IFileSystem fileSystem;
+        private readonly string version;
 
         private AccountingData accountingData;
         private string fileName = "";
@@ -50,6 +51,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.reportFactory = reportFactory;
             this.messageBox = messageBox;
             this.fileSystem = fileSystem;
+
+            this.version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
         }
 
         public ObservableCollection<MenuViewModel> RecentProjects { get; }
@@ -364,7 +367,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnInitialize();
 
-            this.DisplayName = "SimpleAccounting";
+            this.DisplayName = $"SimpleAccounting {this.version}";
         }
 
         protected override void OnActivate()
@@ -512,8 +515,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private void SelectBookingYear(string newYearName)
         {
             this.currentJournal = this.accountingData.Journal.Single(y => y.Year == newYearName);
-            var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-            this.DisplayName = $"SimpleAccounting {version} - {this.fileName} - {this.currentJournal.Year}";
+            this.DisplayName = $"SimpleAccounting {this.version} - {this.fileName} - {this.currentJournal.Year}";
             this.RefreshJournal();
             var firstBooking = this.currentJournal.Booking.FirstOrDefault();
             if (firstBooking != null)
