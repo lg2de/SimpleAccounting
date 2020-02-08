@@ -30,7 +30,7 @@ jobs:
       run: |
         .\CreateCoverReport.ps1
         Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-        bash codecov.sh -f "CoverOutput/coverage.xml"
+        bash codecov.sh -f "CoverOutput/coverage.xml" -t ${{ secrets.CODECOV_TOKEN }}
       shell: pwsh
     - name: Build Release
       run: dotnet build --configuration Release
