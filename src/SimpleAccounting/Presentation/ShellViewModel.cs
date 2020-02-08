@@ -8,10 +8,12 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Input;
@@ -25,10 +27,15 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
     internal class ShellViewModel : Conductor<IScreen>
     {
+        private const string Github = "github.com";
+        private const string ProjectUrl = "https://" + Github + "/lg2de/SimpleAccounting";
+        private const string NewIssueUrl = ProjectUrl + "/issues/new?template=bug-report.md";
+
         private readonly IWindowManager windowManager;
         private readonly IReportFactory reportFactory;
         private readonly IMessageBox messageBox;
         private readonly IFileSystem fileSystem;
+        private readonly string version;
 
         private AccountingData accountingData;
         private string fileName = "";
@@ -44,6 +51,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.reportFactory = reportFactory;
             this.messageBox = messageBox;
             this.fileSystem = fileSystem;
+
+            this.version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
         }
 
         public ObservableCollection<MenuViewModel> RecentProjects { get; }
@@ -54,6 +63,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ObservableCollection<AccountViewModel> Accounts { get; }
             = new ObservableCollection<AccountViewModel>();
+
+        public AccountViewModel SelectedAccount { get; set; }
 
         public ObservableCollection<JournalViewModel> Journal { get; }
             = new ObservableCollection<JournalViewModel>();
@@ -213,11 +224,17 @@ namespace lg2de.SimpleAccounting.Presentation
             },
             _ => this.Journal.Any());
 
+        public ICommand HelpAboutCommand => new RelayCommand(
+            _ => Process.Start(new ProcessStartInfo(ProjectUrl) { UseShellExecute = true }));
+
+        public ICommand HelpFeedbackCommand => new RelayCommand(
+            _ => Process.Start(new ProcessStartInfo(NewIssueUrl) { UseShellExecute = true }));
+
         public ICommand AccountSelectionCommand => new RelayCommand(o =>
         {
             if (o is AccountViewModel account)
             {
-                this.BuildAccountJournal(account.Identifier);
+                this.BuildAccountJournal(account);
             }
         });
 
@@ -350,7 +367,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnInitialize();
 
-            this.DisplayName = "SimpleAccounting";
+            this.DisplayName = $"SimpleAccounting {this.version}";
         }
 
         protected override void OnActivate()
@@ -498,9 +515,25 @@ namespace lg2de.SimpleAccounting.Presentation
         private void SelectBookingYear(string newYearName)
         {
             this.currentJournal = this.accountingData.Journal.Single(y => y.Year == newYearName);
-            this.DisplayName = $"SimpleAccounting - {this.fileName} - {this.currentJournal.Year}";
-            this.AccountJournal.Clear();
+            this.DisplayName = $"SimpleAccounting {this.version} - {this.fileName} - {this.currentJournal.Year}";
             this.RefreshJournal();
+            var firstBooking = this.currentJournal.Booking.FirstOrDefault();
+            if (firstBooking != null)
+            {
+                var firstAccount =
+                    firstBooking.Credit.Select(x => x.Account)
+                    .Concat(firstBooking.Debit.Select(x => x.Account))
+                    .Min();
+                this.BuildAccountJournal(this.Accounts.Single(x => x.Identifier == firstAccount));
+            }
+            else if (this.Accounts.Any())
+            {
+                this.BuildAccountJournal(this.Accounts.First());
+            }
+            else
+            {
+                this.AccountJournal.Clear();
+            }
         }
 
         internal void LoadProjectFromFile(string projectFileName)
@@ -720,16 +753,20 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        private void BuildAccountJournal(ulong accountNumber)
+        private void BuildAccountJournal(AccountViewModel account)
         {
+            this.SelectedAccount = account;
+            this.NotifyOfPropertyChange(nameof(this.SelectedAccount));
+
             this.AccountJournal.Clear();
             if (this.currentJournal.Booking == null)
             {
                 return;
             }
 
-            double nCreditSum = 0;
-            double nDebitSum = 0;
+            var accountNumber = account.Identifier;
+            double creditSum = 0;
+            double debitSum = 0;
             var entries =
                 this.currentJournal.Booking.Where(b => b.Credit.Any(x => x.Account == accountNumber))
                 .Concat(this.currentJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)));
@@ -743,7 +780,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     item.Text = debitEntry.Text;
                     item.DebitValue = Convert.ToDouble(debitEntry.Value) / 100;
-                    nDebitSum += item.DebitValue;
+                    debitSum += item.DebitValue;
                     item.RemoteAccount = entry.Credit.Count == 1
                         ? this.BuildAccountDescription(entry.Credit.Single().Account)
                         : "Diverse";
@@ -753,31 +790,37 @@ namespace lg2de.SimpleAccounting.Presentation
                     var creditEntry = entry.Credit.FirstOrDefault(x => x.Account == accountNumber);
                     item.Text = creditEntry.Text;
                     item.CreditValue = Convert.ToDouble(creditEntry.Value) / 100;
-                    nCreditSum += item.CreditValue;
+                    creditSum += item.CreditValue;
                     item.RemoteAccount = entry.Debit.Count == 1
                         ? this.BuildAccountDescription(entry.Debit.Single().Account)
                         : "Diverse";
                 }
             }
 
+            if (debitSum == 0 && creditSum == 0)
+            {
+                // no summary required
+                return;
+            }
+
             var sumItem = new AccountJournalViewModel();
             this.AccountJournal.Add(sumItem);
             sumItem.IsSummary = true;
             sumItem.Text = "Summe";
-            sumItem.DebitValue = nDebitSum;
-            sumItem.CreditValue = nCreditSum;
+            sumItem.DebitValue = debitSum;
+            sumItem.CreditValue = creditSum;
 
             var saldoItem = new AccountJournalViewModel();
             this.AccountJournal.Add(saldoItem);
             saldoItem.IsSummary = true;
             saldoItem.Text = "Saldo";
-            if (nDebitSum > nCreditSum)
+            if (debitSum > creditSum)
             {
-                saldoItem.DebitValue = nDebitSum - nCreditSum;
+                saldoItem.DebitValue = debitSum - creditSum;
             }
             else
             {
-                saldoItem.CreditValue = nCreditSum - nDebitSum;
+                saldoItem.CreditValue = creditSum - debitSum;
             }
         }
     }

@@ -16,6 +16,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             var accountItem = new AccountViewModel { Identifier = 100, Name = "Kasse" };
             this.Accounts.Add(accountItem);
+            this.SelectedAccount = accountItem;
 
             var journalItem = new JournalViewModel
             {
