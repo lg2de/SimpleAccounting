@@ -20,6 +20,7 @@ namespace SimpleAccounting.UnitTests.Presentation
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
     using NSubstitute;
+    using Octokit;
     using Xunit;
 
     public class ShellViewModelTests
@@ -566,6 +567,37 @@ namespace SimpleAccounting.UnitTests.Presentation
                 });
         }
 
+        [Theory]
+        [InlineData("2.0.0", "2.0.0", null)]
+        [InlineData("2.0.0", "2.0.1", "2.0.1")]
+        [InlineData("2.0.0", "2.1.0", "2.1.0")]
+        [InlineData("2.1.0", "2.0.0", null)]
+        [InlineData("2.0.0-beta1", "2.0.0-beta1", null)]
+        [InlineData("2.0.0-beta1", "2.0.0-beta2", "2.0.0-beta2")]
+        [InlineData("2.0.0-beta1", "2.0.1-beta1", "2.0.1-beta1")]
+        [InlineData("2.0.0-beta2", "2.0.0-beta1", null)]
+        [InlineData("2.0.0", "2.0.0-beta1", null)] // release is greater than beta
+        [InlineData("2.0.0-beta1", "2.0.0", "2.0.0")] // update to release
+        [InlineData("2.0.0", "2.0.1-beta1", null)] // do not update to beta
+        public void GetNewRelease_TestScenarios(
+            string currentVersion,
+            string availableVersion,
+            string expectedVersion)
+        {
+            var sut = CreateSut();
+
+            var result = sut.GetNewRelease(currentVersion, CreateRelease(availableVersion));
+
+            if (string.IsNullOrEmpty(expectedVersion))
+            {
+                result.Should().BeNull();
+            }
+            else
+            {
+                result.Should().BeEquivalentTo(new { TagName = expectedVersion });
+            }
+        }
+
         private static ShellViewModel CreateSut()
         {
             var windowManager = Substitute.For<IWindowManager>();
@@ -574,6 +606,20 @@ namespace SimpleAccounting.UnitTests.Presentation
             var fileSystem = Substitute.For<IFileSystem>();
             var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             return sut;
+        }
+
+        private static IReadOnlyList<Release> CreateRelease(string tag)
+        {
+            var tagProperty = typeof(Release).GetProperty(nameof(Release.TagName));
+            var prereleaseProperty = typeof(Release).GetProperty(nameof(Release.Prerelease));
+            var release = new Release();
+            tagProperty.SetValue(release, tag);
+            if (tag.Contains("beta"))
+            {
+                prereleaseProperty.SetValue(release, true);
+            }
+
+            return new List<Release> { release };
         }
     }
 }

@@ -57,6 +57,7 @@
             <MenuItem Header="Hilfe">
                 <MenuItem Header="Über" Command="{Binding HelpAboutCommand}" />
                 <MenuItem Header="Problem melden" Command="{Binding HelpFeedbackCommand}" />
+                <MenuItem Header="Auf Update prüfen" Command="{Binding HelpCheckForUpdateCommand}" />
             </MenuItem>
         </Menu>
         <Grid>

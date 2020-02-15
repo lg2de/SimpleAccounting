@@ -15,7 +15,9 @@
 
   <ItemGroup>
     <None Remove="Reports\*.xml" />
+    <None Remove="UpdateApplication.ps1" />
     <EmbeddedResource Include="Reports\*.xml" />
+    <EmbeddedResource Include="UpdateApplication.ps1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +29,8 @@
     <PackageReference Include="CurrencyTextBox" Version="2.0.2" />
     <!-- 3.6.0 is the last WpfToolKit version with MS-PL license -->
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.6.0" />
+    <!-- license is MIT -->
+    <PackageReference Include="Octokit" Version="0.40.0" />
     <!-- license is LGPL -->
     <PackageReference Include="SonarAnalyzer.CSharp" Version="8.3.0.14607">
       <PrivateAssets>all</PrivateAssets>

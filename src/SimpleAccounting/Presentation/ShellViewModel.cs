@@ -23,13 +23,16 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
+    using Octokit;
 
     [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
     internal class ShellViewModel : Conductor<IScreen>
     {
-        private const string Github = "github.com";
-        private const string ProjectUrl = "https://" + Github + "/lg2de/SimpleAccounting";
-        private const string NewIssueUrl = ProjectUrl + "/issues/new?template=bug-report.md";
+        private const string GithubDomain = "github.com";
+        private const string OrganizationName = "lg2de";
+        private const string ProjectName = "SimpleAccounting";
+        private static string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
+        private static string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
 
         private readonly IWindowManager windowManager;
         private readonly IReportFactory reportFactory;
@@ -241,6 +244,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand HelpFeedbackCommand => new RelayCommand(
             _ => Process.Start(new ProcessStartInfo(NewIssueUrl) { UseShellExecute = true }));
 
+        public ICommand HelpCheckForUpdateCommand => new RelayCommand(this.OnCheckForUpdate);
+
         public ICommand AccountSelectionCommand => new RelayCommand(o =>
         {
             if (o is AccountViewModel account)
@@ -408,6 +413,128 @@ namespace lg2de.SimpleAccounting.Presentation
             if (refreshJournal)
             {
                 this.RefreshJournal();
+            }
+        }
+
+        [ExcludeFromCodeCoverage]
+#pragma warning disable S3168 // "async" methods should not return "void"
+        internal async void OnCheckForUpdate(object _)
+#pragma warning restore S3168
+        {
+            const string Caption = "Update-Prüfung";
+            IEnumerable<Release> releases;
+            try
+            {
+                var client = new GitHubClient(new ProductHeaderValue(ProjectName));
+                releases = await client.Repository.Release.GetAll(OrganizationName, ProjectName);
+            }
+            catch (Exception exception)
+            {
+                this.messageBox.Show(
+                    $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
+                    Caption,
+                    icon: MessageBoxImage.Error);
+                return;
+            }
+
+            var newRelease = this.GetNewRelease(this.version, releases);
+            if (newRelease == null)
+            {
+                this.messageBox.Show("Sie verwenden die neueste Version.", Caption);
+                return;
+            }
+
+            var result = this.messageBox.Show(
+                $"Wollen Sie auf die neue Version {newRelease.TagName} aktualisieren?",
+                Caption,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No);
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            if (!this.CheckSaveProject())
+            {
+                return;
+            }
+
+            var stream = this.GetType().Assembly.GetManifestResourceStream(
+                "lg2de.SimpleAccounting.UpdateApplication.ps1");
+            using var reader = new StreamReader(stream);
+            var script = reader.ReadToEnd();
+            string scriptPath = Path.Combine(Path.GetTempPath(), "UpdateApplication.ps1");
+            File.WriteAllText(scriptPath, script);
+
+            var asset = newRelease.Assets.FirstOrDefault(
+                x => x.Name.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase));
+            if (asset == null)
+            {
+                // asset not found :(
+                return;
+            }
+
+            string assetUrl = asset.BrowserDownloadUrl;
+            string targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
+            int processId = Process.GetCurrentProcess().Id;
+            var info = new ProcessStartInfo(
+                "powershell",
+                $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
+            Process.Start(info);
+
+            // The user was asked whether saving the project.
+            // We do not want to ask again.
+            this.IsDocumentChanged = false;
+
+            this.TryClose(null);
+        }
+
+        internal Release GetNewRelease(string currentVersion, IEnumerable<Release> releases)
+        {
+            bool isPreRelease = currentVersion.Contains("beta");
+            var candidates = releases.Where(x => !x.Draft);
+            if (!isPreRelease)
+            {
+                candidates = candidates.Where(x => !x.Prerelease);
+            }
+
+            return candidates.SingleOrDefault(x => IsGreater(x.TagName, currentVersion));
+
+            bool IsGreater(string tag, string current)
+            {
+                if (tag == current)
+                {
+                    return false;
+                }
+
+                var tagElements = tag.Split('-');
+                var tagMain = tagElements[0];
+                var tagBeta = tagElements.Length > 1 ? tagElements[1] : string.Empty;
+                var currentElements = current.Split('-');
+                var currentMain = currentElements[0];
+                var currentBeta = currentElements.Length > 1 ? currentElements[1] : string.Empty;
+
+                if (tagMain.CompareTo(currentMain) > 0)
+                {
+                    // new release
+                    return true;
+                }
+
+                if (tagMain == currentMain)
+                {
+                    // same target version -> check beta
+                    if (string.IsNullOrEmpty(tagBeta))
+                    {
+                        // update from beta to release?
+                        return !string.IsNullOrEmpty(currentBeta);
+                    }
+
+                    return tagBeta.CompareTo(currentBeta) > 0;
+                }
+
+                // older release version
+                return false;
             }
         }
 
