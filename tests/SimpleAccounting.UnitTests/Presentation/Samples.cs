@@ -58,6 +58,12 @@ namespace SimpleAccounting.UnitTests.Presentation
                                     ID = 990,
                                     Name = "Carryforward",
                                     Type = AccountDefinitionType.Carryforward
+                                },
+                                new AccountDefinition
+                                {
+                                    ID = 9999,
+                                    Name = "Inactive",
+                                    Active = false
                                 }
                             }
                         }
