@@ -28,9 +28,11 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
     internal class ShellViewModel : Conductor<IScreen>
     {
-        private const string Github = "github.com";
-        private const string ProjectUrl = "https://" + Github + "/lg2de/SimpleAccounting";
-        private const string NewIssueUrl = ProjectUrl + "/issues/new?template=bug-report.md";
+        private const string GithubDomain = "github.com";
+        private const string OrganizationName = "lg2de";
+        private const string ProjectName = "SimpleAccounting";
+        private static string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
+        private static string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
 
         private readonly IWindowManager windowManager;
         private readonly IReportFactory reportFactory;
@@ -412,18 +414,32 @@ namespace lg2de.SimpleAccounting.Presentation
         internal async void OnCheckForUpdate(object _)
 #pragma warning restore S3168
         {
-            var client = new GitHubClient(new ProductHeaderValue("SimpleAccounting"));
-            var releases = await client.Repository.Release.GetAll("lg2de", "SimpleAccounting");
+            const string Caption = "Update-Prüfung";
+            IEnumerable<Release> releases;
+            try
+            {
+                var client = new GitHubClient(new ProductHeaderValue(ProjectName));
+                releases = await client.Repository.Release.GetAll(OrganizationName, ProjectName);
+            }
+            catch (Exception exception)
+            {
+                this.messageBox.Show(
+                    $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
+                    Caption,
+                    icon: MessageBoxImage.Error);
+                return;
+            }
+
             var newRelease = this.GetNewRelease(this.version, releases);
             if (newRelease == null)
             {
-                this.messageBox.Show("Sie verwenden die neueste Version.", "Update-Prüfung");
+                this.messageBox.Show("Sie verwenden die neueste Version.", Caption);
                 return;
             }
 
             var result = this.messageBox.Show(
                 $"Wollen Sie auf die neue Version {newRelease.TagName} aktualisieren?",
-                "Update-Prüfung",
+                Caption,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question,
                 MessageBoxResult.No);
@@ -448,7 +464,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.TryClose(null);
         }
 
-        internal Release GetNewRelease(string currentVersion, IReadOnlyList<Release> releases)
+        internal Release GetNewRelease(string currentVersion, IEnumerable<Release> releases)
         {
             bool isPreRelease = currentVersion.Contains("beta");
             var candidates = releases.Where(x => !x.Draft);
