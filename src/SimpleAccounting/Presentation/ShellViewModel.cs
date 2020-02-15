@@ -408,7 +408,9 @@ namespace lg2de.SimpleAccounting.Presentation
         }
 
         [ExcludeFromCodeCoverage]
+#pragma warning disable S3168 // "async" methods should not return "void"
         internal async void OnCheckForUpdate(object _)
+#pragma warning restore S3168
         {
             var client = new GitHubClient(new ProductHeaderValue("SimpleAccounting"));
             var releases = await client.Repository.Release.GetAll("lg2de", "SimpleAccounting");
