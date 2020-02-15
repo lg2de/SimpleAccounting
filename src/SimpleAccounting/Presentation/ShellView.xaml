@@ -156,6 +156,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Nummer" Binding="{Binding Identifier}" />
                         <DataGridTextColumn Header="Bezeichnung" Binding="{Binding Name}" />
+                        <DataGridTextColumn Header="Gruppe" Binding="{Binding Group.Name}" />
                         <DataGridTextColumn Header="Typ" Binding="{Binding Type}" />
                     </DataGrid.Columns>
                     <DataGrid.InputBindings>
@@ -178,6 +179,11 @@
                             <MenuItem
                                 Header="Konto erstellen"
                                 Command="{Binding NewAccountCommand}" />
+                            <Separator />
+                            <MenuItem
+                                Header="Inaktive Konten anzeigen"
+                                IsCheckable="True"
+                                IsChecked="{Binding ShowInactiveAccounts}" />
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </DataGrid>

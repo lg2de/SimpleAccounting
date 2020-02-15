@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
+    using lg2de.SimpleAccounting.Model;
 
     internal class ShellDesignViewModel : ShellViewModel
     {
@@ -14,7 +15,13 @@ namespace lg2de.SimpleAccounting.Presentation
             var menuItem = new MenuViewModel("c:\\Test.bxml", null);
             this.RecentProjects.Add(menuItem);
 
-            var accountItem = new AccountViewModel { Identifier = 100, Name = "Kasse" };
+            var accountItem = new AccountViewModel
+            {
+                Identifier = 100,
+                Name = "Kasse",
+                Group = new AccountingDataAccountGroup { Name = "Bestandskonten" },
+                Type = AccountDefinitionType.Asset
+            };
             this.Accounts.Add(accountItem);
             this.SelectedAccount = accountItem;
 

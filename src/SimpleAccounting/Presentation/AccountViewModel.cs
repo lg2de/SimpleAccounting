@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Model;
@@ -26,9 +27,14 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public string Name { get; set; }
 
+        public IEnumerable<AccountingDataAccountGroup> Groups { get; set; }
+            = Enumerable.Empty<AccountingDataAccountGroup>();
+
         public AccountingDataAccountGroup Group { get; set; }
 
         public AccountDefinitionType Type { get; set; }
+
+        public bool IsActivated { get; set; } = true;
 
         internal Func<ulong, bool> IsAvalidIdentifierFunc { get; set; }
 

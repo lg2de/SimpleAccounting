@@ -40,6 +40,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private AccountingData accountingData;
         private string fileName = "";
         private AccountingDataJournal currentJournal;
+        private bool showInactiveAccounts;
 
         public ShellViewModel(
             IWindowManager windowManager,
@@ -61,10 +62,20 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<MenuViewModel> BookingYears { get; }
             = new ObservableCollection<MenuViewModel>();
 
+        public List<AccountViewModel> AllAccounts { get; } = new List<AccountViewModel>();
         public ObservableCollection<AccountViewModel> Accounts { get; }
             = new ObservableCollection<AccountViewModel>();
 
         public AccountViewModel SelectedAccount { get; set; }
+        public bool ShowInactiveAccounts
+        {
+            get => this.showInactiveAccounts;
+            set
+            {
+                this.showInactiveAccounts = value;
+                this.RefreshAccounts();
+            }
+        }
 
         public ObservableCollection<JournalViewModel> Journal { get; }
             = new ObservableCollection<JournalViewModel>();
@@ -243,8 +254,9 @@ namespace lg2de.SimpleAccounting.Presentation
             var accountVm = new AccountViewModel
             {
                 DisplayName = "Account erstellen",
-                Group = this.accountingData.Accounts[0], // TODO make selectable
-                IsAvalidIdentifierFunc = id => this.Accounts.All(a => a.Identifier != id)
+                Group = this.accountingData.Accounts.FirstOrDefault(),
+                Groups = this.accountingData.Accounts,
+                IsAvalidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
             };
             var result = this.windowManager.ShowDialog(accountVm);
             if (result != true)
@@ -257,16 +269,15 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 ID = accountVm.Identifier,
                 Name = accountVm.Name,
-                Type = accountVm.Type
+                Type = accountVm.Type,
+                Active = accountVm.IsActivated
             };
             accountVm.Group.Account.Add(newAccount);
             accountVm.Group.Account = accountVm.Group.Account.OrderBy(x => x.ID).ToList();
 
             // update view
-            this.Accounts.Add(accountVm);
-            var sorted = this.Accounts.OrderBy(x => x.Identifier).ToList();
-            this.Accounts.Clear();
-            sorted.ForEach(this.Accounts.Add);
+            this.AllAccounts.Add(accountVm);
+            this.RefreshAccounts();
 
             this.IsDocumentChanged = true;
         });
@@ -281,7 +292,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             var vm = account.Clone();
             vm.DisplayName = "Account bearbeiten";
-            var invalidIds = this.Accounts.Select(x => x.Identifier).Where(x => x != account.Identifier).ToList();
+            var invalidIds = this.AllAccounts.Select(x => x.Identifier).Where(x => x != account.Identifier).ToList();
             vm.IsAvalidIdentifierFunc = id => !invalidIds.Contains(id);
             var result = this.windowManager.ShowDialog(vm);
             if (result != true)
@@ -307,15 +318,11 @@ namespace lg2de.SimpleAccounting.Presentation
 
             // update view
             account.Name = vm.Name;
+            account.Group = vm.Group;
             account.Type = vm.Type;
-            if (account.Identifier != vm.Identifier)
-            {
-                account.Identifier = vm.Identifier;
-                var sorted = this.Accounts.OrderBy(x => x.Identifier).ToList();
-                this.Accounts.Clear();
-                sorted.ForEach(this.Accounts.Add);
-            }
-
+            account.Identifier = vm.Identifier;
+            account.IsActivated = vm.IsActivated;
+            this.RefreshAccounts();
             account.Refresh();
             this.RefreshJournal();
 
@@ -577,7 +584,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.accountingData = projectData;
             this.UpdateBookingYears();
 
-            this.Accounts.Clear();
+            this.AllAccounts.Clear();
             foreach (var accountGroup in this.accountingData.Accounts)
             {
                 foreach (var account in accountGroup.Account)
@@ -587,11 +594,15 @@ namespace lg2de.SimpleAccounting.Presentation
                         Identifier = account.ID,
                         Name = account.Name,
                         Group = accountGroup,
-                        Type = account.Type
+                        Groups = this.accountingData.Accounts,
+                        Type = account.Type,
+                        IsActivated = account.Active
                     };
-                    this.Accounts.Add(accountModel);
+                    this.AllAccounts.Add(accountModel);
                 }
             }
+
+            this.RefreshAccounts();
 
             // select last booking year after loading
             this.BookingYears.Last().Command.Execute(null);
@@ -751,6 +762,20 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.Journal.Add(creditItem);
                 }
             }
+        }
+
+        private void RefreshAccounts()
+        {
+            IEnumerable<AccountViewModel> accounts = this.AllAccounts;
+            if (!this.ShowInactiveAccounts)
+            {
+                accounts = accounts.Where(x => x.IsActivated);
+            }
+
+            var sorted = accounts.OrderBy(x => x.Identifier).ToList();
+
+            this.Accounts.Clear();
+            sorted.ForEach(this.Accounts.Add);
         }
 
         private void BuildAccountJournal(AccountViewModel account)
