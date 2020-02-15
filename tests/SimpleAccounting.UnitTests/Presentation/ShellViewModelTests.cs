@@ -62,6 +62,14 @@ namespace SimpleAccounting.UnitTests.Presentation
 
             ((IActivate)sut).Activate();
 
+            using var _ = new AssertionScope();
+
+            sut.Accounts.Should().BeEquivalentTo(
+                new { Name = "Bank account" },
+                new { Name = "Salary" },
+                new { Name = "Shoes" },
+                new { Name = "Carryforward" });
+
             sut.Journal.Should().BeEquivalentTo(
                 new { Text = "Open", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
                 new { Text = "Salary", CreditAccount = (string)null, DebitAccount = "100 (Bank account)" },
@@ -102,6 +110,26 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.AddBooking(new AccountingDataJournalBooking(), refreshJournal: false);
 
             sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShowInactiveAccounts_SetTrue_InactiveAccountsGetVisible()
+        {
+            var sut = CreateSut();
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            sut.ShowInactiveAccounts = true;
+
+            using var _ = new AssertionScope();
+
+            sut.Accounts.Should().BeEquivalentTo(
+                new { Name = "Bank account" },
+                new { Name = "Salary" },
+                new { Name = "Shoes" },
+                new { Name = "Carryforward" },
+                new { Name = "Inactive" });
         }
 
         [Fact]
