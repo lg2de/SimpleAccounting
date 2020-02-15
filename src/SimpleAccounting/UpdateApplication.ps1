@@ -5,13 +5,14 @@
 )
 
 $tempFile = $env:TEMP + "\package.zip"
+Remove-Item $tempFile -ErrorAction SilentlyContinue
 
 Write-Host Waiting for current application to finish...
 Wait-Process -Id $processId -ErrorAction SilentlyContinue
 
 try {
   Write-Host Download new release...
-  Remove-Item $tempFile
+  Write-Host $assetUrl
   Invoke-WebRequest -Uri $assetUrl -OutFile $tempFile
 
   Write-Host Extracting new release...

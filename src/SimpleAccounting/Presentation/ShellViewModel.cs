@@ -448,19 +448,38 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var stream = this.GetType().Assembly.GetManifestResourceStream("lg2de.SimpleAccounting.UpdateApplication.ps1");
+            if (!this.CheckSaveProject())
+            {
+                return;
+            }
+
+            var stream = this.GetType().Assembly.GetManifestResourceStream(
+                "lg2de.SimpleAccounting.UpdateApplication.ps1");
             using var reader = new StreamReader(stream);
             var script = reader.ReadToEnd();
             string scriptPath = Path.Combine(Path.GetTempPath(), "UpdateApplication.ps1");
             File.WriteAllText(scriptPath, script);
 
-            string assetUrl = newRelease.Assets[0].BrowserDownloadUrl;
+            var asset = newRelease.Assets.FirstOrDefault(
+                x => x.Name.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase));
+            if (asset == null)
+            {
+                // asset not found :(
+                return;
+            }
+
+            string assetUrl = asset.BrowserDownloadUrl;
             string targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
             int processId = Process.GetCurrentProcess().Id;
             var info = new ProcessStartInfo(
                 "powershell",
                 $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
             Process.Start(info);
+
+            // The user was asked whether saving the project.
+            // We do not want to ask again.
+            this.IsDocumentChanged = false;
+
             this.TryClose(null);
         }
 

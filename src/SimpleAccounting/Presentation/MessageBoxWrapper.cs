@@ -19,7 +19,15 @@ namespace lg2de.SimpleAccounting.Presentation
             MessageBoxResult defaultResult = MessageBoxResult.None,
             MessageBoxOptions options = MessageBoxOptions.None)
         {
-            return MessageBox.Show(messageBoxText, caption, button, icon, defaultResult, options);
+            Application.Current.MainWindow.Activate();
+            return MessageBox.Show(
+                Application.Current.MainWindow,
+                messageBoxText,
+                caption,
+                button,
+                icon,
+                defaultResult,
+                options);
         }
     }
 }
