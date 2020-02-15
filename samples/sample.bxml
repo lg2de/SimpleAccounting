@@ -12,18 +12,18 @@
       <Account ID="990" Name="Carryforward" Type="Carryforward" />
     </AccountGroup>
   </Accounts>
-  <Journal Year="2019" DateStart="20190101" DateEnd="20191231">
-    <Booking Date="20190101" ID="1">
-      <Debit Value="10000" Account="100" Text="EB-Wert" />
-      <Credit Value="10000" Account="990" Text="EB-Wert" />
+  <Journal Year="2020" DateStart="20200101" DateEnd="20201231">
+    <Booking Date="20200101" ID="1" Opening="true">
+      <Debit Value="10000" Account="100" Text="Opening value 1" />
+      <Credit Value="10000" Account="990" Text="Opening value 1" />
     </Booking>
-    <Booking Date="20191018" ID="2">
-      <Debit Value="1500" Account="600" Text="Essen" />
-      <Credit Value="1500" Account="100" Text="Essen" />
+    <Booking Date="20200115" ID="2">
+      <Debit Value="1500" Account="600" Text="Order food" />
+      <Credit Value="1500" Account="100" Text="Order food" />
     </Booking>
-    <Booking Date="20191018" ID="3">
-      <Debit Value="5000" Account="100" Text="Gehalt" />
-      <Credit Value="5000" Account="400" Text="Gehalt" />
+    <Booking Date="20200128" ID="3">
+      <Debit Value="5000" Account="100" Text="Monthly salary" />
+      <Credit Value="5000" Account="400" Text="Monthly salary" />
     </Booking>
   </Journal>
 </AccountingData>

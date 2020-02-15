@@ -63,7 +63,7 @@ Maybe you want to help with the introduction of a localized user interface?
 The first public release is [available](https://github.com/lg2de/SimpleAccounting/releases).
 Please download, test and send feedback.
 
-After release of first non-beta version I'll create future roadmap.
+The roadmap is defined by issues and milestones.
 
 ## License
 
