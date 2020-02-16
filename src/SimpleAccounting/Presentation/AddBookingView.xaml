@@ -5,9 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:s="clr-namespace:System;assembly=mscorlib"
     xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
-    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:currencytextboxcontrol="clr-namespace:CurrencyTextBoxControl;assembly=CurrencyTextbox"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=local:AddBookingDesignViewModel, IsDesignTimeCreatable=True}">
@@ -32,7 +30,7 @@
             <Style TargetType="TextBlock">
                 <Setter Property="Margin" Value="5" />
             </Style>
-            <Style TargetType="xctk:ValueRangeTextBox">
+            <Style TargetType="local:NumberTextBox">
                 <Setter Property="Margin" Value="5" />
                 <Setter Property="Height" Value="30" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -57,12 +55,10 @@
             Grid.Column="2" Grid.Row="0"
             HorizontalAlignment="Right" VerticalAlignment="Center"
             Text="Belegnummer" />
-        <xctk:ValueRangeTextBox
+        <local:NumberTextBox
             Grid.Column="3" Grid.Row="0"
             Width="100" HorizontalContentAlignment="Right"
-            AutoSelectBehavior="OnFocus"
-            ValueDataType="{x:Type s:UInt64}"
-            Value="{Binding BookingNumber}" />
+            Text="{Binding BookingNumber}" />
 
         <ComboBox
             Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
@@ -101,10 +97,8 @@
                         Grid.Column="0" Grid.Row="0"
                         VerticalAlignment="Center"
                         Text="Soll" />
-                    <xctk:ValueRangeTextBox
+                    <local:NumberTextBox
                         Grid.Column="1" Grid.Row="0"
-                        ValueDataType="{x:Type s:UInt64}"
-                        AutoSelectBehavior="OnFocus"
                         Text="{Binding DebitAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox
                         Grid.Column="2" Grid.Row="0"
@@ -118,10 +112,8 @@
                         Grid.Column="0" Grid.Row="1"
                         VerticalAlignment="Center"
                         Text="Haben" />
-                    <xctk:ValueRangeTextBox
+                    <local:NumberTextBox
                         Grid.Column="1" Grid.Row="1"
-                        ValueDataType="{x:Type s:UInt64}"
-                        AutoSelectBehavior="OnFocus"
                         Text="{Binding CreditAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox
                         Grid.Column="2" Grid.Row="1"
@@ -151,10 +143,8 @@
                         Grid.Column="0" Grid.Row="0"
                         VerticalAlignment="Center"
                         Text="Einnahmeart" />
-                    <xctk:ValueRangeTextBox
+                    <local:NumberTextBox
                         Grid.Column="1" Grid.Row="0"
-                        ValueDataType="{x:Type s:UInt64}"
-                        AutoSelectBehavior="OnFocus"
                         Text="{Binding CreditAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox
                         Grid.Column="2" Grid.Row="0"
@@ -168,10 +158,8 @@
                         Grid.Column="0" Grid.Row="1"
                         VerticalAlignment="Center"
                         Text="Herkunft&#10;Gegenkonto" />
-                    <xctk:ValueRangeTextBox
+                    <local:NumberTextBox
                         Grid.Column="1" Grid.Row="1"
-                        ValueDataType="{x:Type s:UInt64}"
-                        AutoSelectBehavior="OnFocus"
                         Text="{Binding DebitAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox
                         Grid.Column="2" Grid.Row="1"
@@ -201,10 +189,8 @@
                         Grid.Column="0" Grid.Row="0"
                         VerticalAlignment="Center"
                         Text="Ausgabeart" />
-                    <xctk:ValueRangeTextBox
+                    <local:NumberTextBox
                         Grid.Column="1" Grid.Row="0"
-                        ValueDataType="{x:Type s:UInt64}"
-                        AutoSelectBehavior="OnFocus"
                         Text="{Binding DebitAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox
                         Grid.Column="2" Grid.Row="0"
@@ -218,10 +204,8 @@
                         Grid.Column="0" Grid.Row="1"
                         VerticalAlignment="Center"
                         Text="Belastungskonto&#10;Gegenkonto" />
-                    <xctk:ValueRangeTextBox
+                    <local:NumberTextBox
                         Grid.Column="1" Grid.Row="1"
-                        ValueDataType="{x:Type s:UInt64}"
-                        AutoSelectBehavior="OnFocus"
                         Text="{Binding CreditAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox
                         Grid.Column="2" Grid.Row="1"
