@@ -275,7 +275,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.parent.AddBooking(newBooking);
             }
 
-            this.TryClose(null);
+            this.TryClose();
         }
     }
 }

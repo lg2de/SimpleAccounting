@@ -962,7 +962,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
             }
 
-            if (debitSum < 0.001 && creditSum < 0.001)
+            if (debitSum < double.Epsilon && creditSum < double.Epsilon)
             {
                 // no summary required
                 return;
