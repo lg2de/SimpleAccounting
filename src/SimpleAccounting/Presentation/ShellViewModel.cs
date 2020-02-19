@@ -25,12 +25,16 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Reports;
     using Octokit;
 
+#pragma warning disable S4055 // string literals => pending translation
+
     [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
     internal class ShellViewModel : Conductor<IScreen>
     {
         private const string GithubDomain = "github.com";
         private const string OrganizationName = "lg2de";
         private const string ProjectName = "SimpleAccounting";
+        private const int MaxRecentProjects = 10;
+        private const double CentFactor = 100.0;
         private static string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
         private static string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
 
@@ -56,7 +60,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.messageBox = messageBox;
             this.fileSystem = fileSystem;
 
-            this.version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            this.version = this.GetType().Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
         }
 
         public ObservableCollection<MenuViewModel> RecentProjects { get; }
@@ -117,7 +122,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.SaveProject(),
             _ => this.IsDocumentChanged);
 
-        public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose(null));
+        public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
         public ICommand AddBookingsCommand => new RelayCommand(_ =>
         {
@@ -134,7 +139,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 : this.accountingData.AllAccounts.Where(x => x.Active));
 
             this.accountingData.Setup?.BookingTemplates?.Template
-                .Select(t => new BookingTemplate { Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / 100.0 })
+                .Select(t => new BookingTemplate { Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor })
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
             this.windowManager.ShowDialog(bookingModel);
         }, _ => this.IsCurrentYearOpen);
@@ -313,6 +318,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var accountData = this.accountingData.AllAccounts.Single(x => x.ID == account.Identifier);
             accountData.Name = vm.Name;
             accountData.Type = vm.Type;
+            accountData.Active = vm.IsActivated;
             if (account.Identifier != vm.Identifier)
             {
                 accountData.ID = vm.Identifier;
@@ -491,12 +497,12 @@ namespace lg2de.SimpleAccounting.Presentation
             // We do not want to ask again.
             this.IsDocumentChanged = false;
 
-            this.TryClose(null);
+            this.TryClose();
         }
 
         internal Release GetNewRelease(string currentVersion, IEnumerable<Release> releases)
         {
-            bool isPreRelease = currentVersion.Contains("beta");
+            bool isPreRelease = currentVersion.Contains("beta", StringComparison.InvariantCultureIgnoreCase);
             var candidates = releases.Where(x => !x.Draft);
             if (!isPreRelease)
             {
@@ -697,9 +703,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 Settings.Default.RecentProject = this.fileName;
                 Settings.Default.RecentProjects.Remove(this.fileName);
                 Settings.Default.RecentProjects.Insert(0, this.fileName);
-                while (Settings.Default.RecentProjects.Count > 10)
+                while (Settings.Default.RecentProjects.Count > MaxRecentProjects)
                 {
-                    Settings.Default.RecentProjects.RemoveAt(10);
+                    Settings.Default.RecentProjects.RemoveAt(MaxRecentProjects);
                 }
 
                 Settings.Default.Save();
@@ -813,9 +819,12 @@ namespace lg2de.SimpleAccounting.Presentation
             else if (result == MessageBoxResult.Yes)
             {
                 this.SaveProject();
+                return true;
             }
-
-            return true;
+            else
+            {
+                return true;
+            }
         }
 
         private void SaveProject()
@@ -837,7 +846,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             DateTime fileDate = File.GetLastWriteTime(this.fileName);
-            string backupFileName = this.fileName + "." + fileDate.ToString("yyyyMMddHHmmss");
+            string backupFileName = $"{this.fileName}.{fileDate:yyyyMMddHHmmss}";
             try
             {
                 File.Move(this.fileName, backupFileName);
@@ -868,7 +877,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var debit = debitAccounts[0];
                     item.Text = debit.Text;
-                    item.Value = Convert.ToDouble(debit.Value) / 100;
+                    item.Value = Convert.ToDouble(debit.Value) / CentFactor;
                     item.DebitAccount = this.BuildAccountDescription(debit.Account);
                     item.CreditAccount = this.BuildAccountDescription(creditAccounts[0].Account);
                     this.Journal.Add(item);
@@ -879,7 +888,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var debitItem = item.Clone();
                     debitItem.Text = debitEntry.Text;
-                    debitItem.Value = Convert.ToDouble(debitEntry.Value) / 100;
+                    debitItem.Value = Convert.ToDouble(debitEntry.Value) / CentFactor;
                     debitItem.DebitAccount = this.BuildAccountDescription(debitEntry.Account);
                     this.Journal.Add(debitItem);
                 }
@@ -888,7 +897,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var creditItem = item.Clone();
                     creditItem.Text = creditEntry.Text;
-                    creditItem.Value = Convert.ToDouble(creditEntry.Value) / 100;
+                    creditItem.Value = Convert.ToDouble(creditEntry.Value) / CentFactor;
                     creditItem.CreditAccount = this.BuildAccountDescription(creditEntry.Account);
                     this.Journal.Add(creditItem);
                 }
@@ -935,7 +944,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (debitEntry != null)
                 {
                     item.Text = debitEntry.Text;
-                    item.DebitValue = Convert.ToDouble(debitEntry.Value) / 100;
+                    item.DebitValue = Convert.ToDouble(debitEntry.Value) / CentFactor;
                     debitSum += item.DebitValue;
                     item.RemoteAccount = entry.Credit.Count == 1
                         ? this.BuildAccountDescription(entry.Credit.Single().Account)
@@ -945,7 +954,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var creditEntry = entry.Credit.FirstOrDefault(x => x.Account == accountNumber);
                     item.Text = creditEntry.Text;
-                    item.CreditValue = Convert.ToDouble(creditEntry.Value) / 100;
+                    item.CreditValue = Convert.ToDouble(creditEntry.Value) / CentFactor;
                     creditSum += item.CreditValue;
                     item.RemoteAccount = entry.Debit.Count == 1
                         ? this.BuildAccountDescription(entry.Debit.Single().Account)
@@ -953,7 +962,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
             }
 
-            if (debitSum == 0 && creditSum == 0)
+            if (debitSum < 0.001 && creditSum < 0.001)
             {
                 // no summary required
                 return;
