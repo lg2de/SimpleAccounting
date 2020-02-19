@@ -128,14 +128,10 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 BookingNumber = this.GetMaxBookIdent() + 1
             };
-            if (this.ShowInactiveAccounts)
-            {
-                bookingModel.Accounts.AddRange(this.accountingData.AllAccounts);
-            }
-            else
-            {
-                bookingModel.Accounts.AddRange(this.accountingData.AllAccounts.Where(x => x.Active));
-            }
+            bookingModel.Accounts.AddRange(
+                this.ShowInactiveAccounts
+                ? this.accountingData.AllAccounts
+                : this.accountingData.AllAccounts.Where(x => x.Active));
 
             this.accountingData.Setup?.BookingTemplates?.Template
                 .Select(t => new BookingTemplate { Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / 100.0 })
