@@ -181,7 +181,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AddBookingsCommand_BookingNumberInitialized()
+        public void AddBookingsCommand_ShowInactiveAccounts_DialogInitialized()
         {
             var windowManager = Substitute.For<IWindowManager>();
             AddBookingViewModel vm = null;
@@ -191,10 +191,33 @@ namespace SimpleAccounting.UnitTests.Presentation
             var fileSystem = Substitute.For<IFileSystem>();
             var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
+            sut.ShowInactiveAccounts = true;
 
             sut.AddBookingsCommand.Execute(null);
 
+            using var _ = new AssertionScope();
             vm.BookingNumber.Should().Be(1);
+            vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts);
+        }
+
+        [Fact]
+        public void AddBookingsCommand_HideInactiveAccounts_DialogInitialized()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            AddBookingViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            sut.LoadProjectData(Samples.SampleProject);
+            sut.ShowInactiveAccounts = false;
+
+            sut.AddBookingsCommand.Execute(null);
+
+            using var _ = new AssertionScope();
+            vm.BookingNumber.Should().Be(1);
+            vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts.Where(x => x.Active));
         }
 
         [Fact]

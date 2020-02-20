@@ -17,6 +17,8 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
 
+#pragma warning disable S4055 // string literals => pending translation
+
     internal class XmlPrinter : IXmlPrinter
     {
         public const int DefaultLineHeight = 4;

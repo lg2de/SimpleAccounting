@@ -18,6 +18,8 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
+#pragma warning disable S4055 // string literals => pending translation
+
     internal class ImportBookingsViewModel : Screen
     {
         private readonly IMessageBox messageBox;
@@ -273,7 +275,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.parent.AddBooking(newBooking);
             }
 
-            this.TryClose(null);
+            this.TryClose();
         }
     }
 }

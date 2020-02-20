@@ -10,6 +10,8 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Xml;
     using lg2de.SimpleAccounting.Model;
 
+#pragma warning disable S4055 // string literals => pending translation
+
     internal class AnnualBalanceReport
     {
         public const string ResourceName = "AnnualBalance.xml";

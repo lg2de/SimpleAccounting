@@ -11,6 +11,8 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
+#pragma warning disable S4055 // string literals => pending translation
+
     internal class TotalsAndBalancesReport
     {
         public const string ResourceName = "TotalsAndBalances.xml";
