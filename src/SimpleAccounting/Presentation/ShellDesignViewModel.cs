@@ -22,10 +22,10 @@ namespace lg2de.SimpleAccounting.Presentation
                 Group = new AccountingDataAccountGroup { Name = "Bestandskonten" },
                 Type = AccountDefinitionType.Asset
             };
-            this.Accounts.Add(accountItem);
+            this.AccountList.Add(accountItem);
             this.SelectedAccount = accountItem;
 
-            var journalItem = new JournalViewModel
+            var journalItem = new FullJournalViewModel
             {
                 Identifier = 42,
                 Date = DateTime.Now,
@@ -34,8 +34,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditAccount = "100",
                 DebitAccount = "400"
             };
-            this.Journal.Add(journalItem);
-            journalItem = new JournalViewModel
+            this.FullJournal.Add(journalItem);
+            journalItem = new FullJournalViewModel
             {
                 Identifier = 42,
                 Date = DateTime.Now,
@@ -44,7 +44,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditAccount = "101",
                 DebitAccount = "401"
             };
-            this.Journal.Add(journalItem);
+            this.FullJournal.Add(journalItem);
 
             var accountJournalItem = new AccountJournalViewModel
             {
