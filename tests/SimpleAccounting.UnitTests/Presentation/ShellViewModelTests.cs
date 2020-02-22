@@ -616,7 +616,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             var booking = new AccountingDataJournalBooking
             {
                 Date = Samples.BaseDate + 401,
-                ID = 1,
+                ID = 4567,
                 Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
                 Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
             };
@@ -628,7 +628,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             sut.FullJournal.Should().BeEquivalentTo(
                 new
                 {
-                    Identifier = 1,
+                    Identifier = 4567,
                     Date = new DateTime(DateTime.Now.Year, 4, 1),
                     Text = "Init",
                     Value = 0.42,
@@ -636,11 +636,11 @@ namespace SimpleAccounting.UnitTests.Presentation
                     DebitAccount = "100 (Bank account)"
                 });
             monitor.Should().RaisePropertyChangeFor(x => x.SelectedFullJournalEntry);
-            sut.SelectedFullJournalEntry.Should().NotBeNull();
+            sut.SelectedFullJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
             sut.AccountJournal.Should().BeEquivalentTo(
                 new
                 {
-                    Identifier = 1,
+                    Identifier = 4567,
                     Date = new DateTime(DateTime.Now.Year, 4, 1),
                     Text = "Init",
                     CreditValue = 0.0,
@@ -662,7 +662,7 @@ namespace SimpleAccounting.UnitTests.Presentation
                     DebitValue = 0.42
                 });
             monitor.Should().RaisePropertyChangeFor(x => x.SelectedAccountJournalEntry);
-            sut.SelectedAccountJournalEntry.Should().NotBeNull();
+            sut.SelectedAccountJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
         }
 
         [Theory]
