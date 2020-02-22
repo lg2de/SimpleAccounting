@@ -72,6 +72,8 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
                 <Style x:Key="GridRowStyle" TargetType="{x:Type DataGridRow}">
                     <Setter Property="FontSize" Value="11" />
                 </Style>
