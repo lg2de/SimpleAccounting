@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace SimpleAccounting.UnitTests.Extensions
+namespace lg2de.SimpleAccounting.UnitTests.Extensions
 {
     using System;
     using System.Xml;

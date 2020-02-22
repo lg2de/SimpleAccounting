@@ -231,8 +231,9 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentModelJournal,
                     this.accountingData.Accounts,
                     this.accountingData.Setup,
-                    this.currentModelJournal.Year.ToString(CultureInfo.InvariantCulture));
+                    CultureInfo.CurrentUICulture);
                 report.CreateReport(this.currentModelJournal.DateStart.ToDateTime(), this.currentModelJournal.DateEnd.ToDateTime());
+                report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Summen und Salden {this.currentModelJournal.Year}");
             },
             _ => this.FullJournal.Any());
 
@@ -261,9 +262,10 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentModelJournal,
                     accountGroups,
                     this.accountingData.Setup,
-                    this.currentModelJournal.Year.ToString(CultureInfo.InvariantCulture));
+                    CultureInfo.CurrentUICulture);
                 this.accountingData.Setup.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
                 report.CreateReport(this.currentModelJournal.DateStart.ToDateTime(), this.currentModelJournal.DateEnd.ToDateTime());
+                report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Bestandskontosalden {this.currentModelJournal.Year}");
             },
             _ => this.FullJournal.Any());
 

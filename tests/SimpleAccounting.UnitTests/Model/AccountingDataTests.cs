@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace SimpleAccounting.UnitTests.Model
+namespace lg2de.SimpleAccounting.UnitTests.Model
 {
     using System.Collections.Generic;
     using FluentAssertions;

@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace SimpleAccounting.UnitTests.Presentation
+namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
@@ -61,6 +61,12 @@ namespace SimpleAccounting.UnitTests.Presentation
                                 },
                                 new AccountDefinition
                                 {
+                                    ID = 5000,
+                                    Name = "Bank credit",
+                                    Type = AccountDefinitionType.Credit
+                                },
+                                new AccountDefinition
+                                {
                                     ID = 9999,
                                     Name = "Inactive",
                                     Active = false
@@ -102,18 +108,34 @@ namespace SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 101,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 990, Text = "Open", Value = 100000 }
+                        new BookingValue { Account = 990, Text = "Open 1", Value = 100000 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 100, Text = "Open", Value = 100000 }
-                    }
+                        new BookingValue { Account = 100, Text = "Open 1", Value = 100000 }
+                    },
+                    Opening = true
                 };
 
                 yield return new AccountingDataJournalBooking
                 {
                     ID = 2,
-                    Date = BaseDate + 131,
+                    Date = BaseDate + 101,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 5000, Text = "Open 2", Value = 300000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 990, Text = "Open 2", Value = 300000 }
+                    },
+                    Opening = true
+                };
+
+                yield return new AccountingDataJournalBooking
+                {
+                    ID = 3,
+                    Date = BaseDate + 128,
                     Credit = new List<BookingValue>
                     {
                         new BookingValue { Account = 400, Text = "Salary1", Value = 10000 },
@@ -126,16 +148,30 @@ namespace SimpleAccounting.UnitTests.Presentation
                 };
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = 3,
-                    Date = BaseDate + 201,
+                    ID = 4,
+                    Date = BaseDate + 129,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 100, Text = "Shoes", Value = 10000 }
+                        new BookingValue { Account = 100, Text = "Credit rate", Value = 40000 },
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 600, Text = "Shoes1", Value = 5000 },
-                        new BookingValue { Account = 600, Text = "Shoes2", Value = 5000 }
+                        new BookingValue { Account = 5000, Text = "Credit rate", Value = 40000 }
+                    }
+                };
+
+                yield return new AccountingDataJournalBooking
+                {
+                    ID = 5,
+                    Date = BaseDate + 201,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Shoes", Value = 5000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 600, Text = "Shoes1", Value = 2000 },
+                        new BookingValue { Account = 600, Text = "Shoes2", Value = 3000 }
                     }
                 };
             }

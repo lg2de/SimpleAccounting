@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace SimpleAccounting.UnitTests.Reports
+namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
     using System;
     using System.Collections.Generic;
