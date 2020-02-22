@@ -54,7 +54,7 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void OnActivate_SampleProject_JournalUpdates()
+        public void OnActivate_SampleProject_JournalsUpdates()
         {
             var sut = CreateSut();
             AccountingData project = Samples.SampleProject;
@@ -64,14 +64,13 @@ namespace SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
 
             using var _ = new AssertionScope();
-
-            sut.Accounts.Should().BeEquivalentTo(
+            sut.AccountList.Should().BeEquivalentTo(
                 new { Name = "Bank account" },
                 new { Name = "Salary" },
                 new { Name = "Shoes" },
                 new { Name = "Carryforward" });
 
-            sut.Journal.Should().BeEquivalentTo(
+            sut.FullJournal.Should().BeEquivalentTo(
                 new { Text = "Open", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
                 new { Text = "Salary", CreditAccount = (string)null, DebitAccount = "100 (Bank account)" },
                 new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = (string)null },
@@ -79,6 +78,12 @@ namespace SimpleAccounting.UnitTests.Presentation
                 new { Text = "Shoes1", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
                 new { Text = "Shoes2", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
                 new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = (string)null });
+            sut.AccountJournal.Should().BeEquivalentTo(
+                new { Text = "Open", RemoteAccount = "990 (Carryforward)" },
+                new { Text = "Salary", RemoteAccount = "Diverse" },
+                new { Text = "Shoes", RemoteAccount = "Diverse" },
+                new { Text = "Summe" },
+                new { Text = "Saldo" });
         }
 
         [Fact]
@@ -88,8 +93,8 @@ namespace SimpleAccounting.UnitTests.Presentation
 
             sut.NewProjectCommand.Execute(null);
 
-            sut.Accounts.Should().NotBeEmpty();
-            sut.Journal.Should().BeEmpty();
+            sut.AccountList.Should().NotBeEmpty();
+            sut.FullJournal.Should().BeEmpty();
             sut.AccountJournal.Should().BeEmpty();
         }
 
@@ -105,10 +110,20 @@ namespace SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SaveProjectCommand_DocumentModified_CanExecute()
         {
-            var sut = CreateSut();
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            messageBox.Show(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No).Returns(MessageBoxResult.Yes);
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
-            sut.AddBooking(new AccountingDataJournalBooking(), refreshJournal: false);
+            sut.CloseYearCommand.Execute(null);
 
             sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
         }
@@ -125,7 +140,7 @@ namespace SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
 
-            sut.Accounts.Should().BeEquivalentTo(
+            sut.AccountList.Should().BeEquivalentTo(
                 new { Name = "Bank account" },
                 new { Name = "Salary" },
                 new { Name = "Shoes" },
@@ -134,14 +149,14 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AccountSelectionCommand_SampleBookings_JournalCorrect()
+        public void AccountSelectionCommand_SampleBookings_AccountJournalUpdated()
         {
             var sut = CreateSut();
             AccountingData project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.AccountSelectionCommand.Execute(sut.Accounts.Single(x => x.Identifier == 100));
+            sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 100));
 
             sut.AccountJournal.Should().BeEquivalentTo(
                 new { Text = "Open", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
@@ -358,7 +373,7 @@ namespace SimpleAccounting.UnitTests.Presentation
             var thisYear = DateTime.Now.Year;
             sut.BookingYears.Select(x => x.Header).Should()
                 .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
-            sut.Journal.Should().BeEquivalentTo(
+            sut.FullJournal.Should().BeEquivalentTo(
                 new
                 {
                     Identifier = 1,
@@ -367,6 +382,30 @@ namespace SimpleAccounting.UnitTests.Presentation
                     Value = 7.00,
                     CreditAccount = "990 (Carryforward)",
                     DebitAccount = "100 (Bank account)"
+                });
+            sut.AccountJournal.Should().BeEquivalentTo(
+                new
+                {
+                    Identifier = 1,
+                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Text = "Eröffnungsbetrag 1",
+                    DebitValue = 7.00,
+                    CreditValue = 0.0,
+                    RemoteAccount = "990 (Carryforward)"
+                },
+                new
+                {
+                    Text = "Summe",
+                    IsSummary = true,
+                    DebitValue = 7.00,
+                    CreditValue = 0.0
+                },
+                new
+                {
+                    Text = "Saldo",
+                    IsSummary = true,
+                    DebitValue = 7.00,
+                    CreditValue = 0.0
                 });
         }
 
@@ -401,10 +440,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void TotalJournalReportCommand_JournalWithEntries_CannotExecute()
+        public void TotalJournalReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.Journal.Add(new JournalViewModel());
+            sut.FullJournal.Add(new FullJournalViewModel());
 
             sut.TotalJournalReportCommand.CanExecute(null).Should().BeTrue();
         }
@@ -418,10 +457,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AccountJournalReportCommand_JournalWithEntries_CannotExecute()
+        public void AccountJournalReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.Journal.Add(new JournalViewModel());
+            sut.FullJournal.Add(new FullJournalViewModel());
 
             sut.AccountJournalReportCommand.CanExecute(null).Should().BeTrue();
         }
@@ -457,10 +496,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void TotalsAndBalancesReportCommand_JournalWithEntries_CannotExecute()
+        public void TotalsAndBalancesReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.Journal.Add(new JournalViewModel());
+            sut.FullJournal.Add(new FullJournalViewModel());
 
             sut.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeTrue();
         }
@@ -474,10 +513,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AssetBalancesReportCommand_JournalWithEntries_CannotExecute()
+        public void AssetBalancesReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.Journal.Add(new JournalViewModel());
+            sut.FullJournal.Add(new FullJournalViewModel());
 
             sut.AssetBalancesReportCommand.CanExecute(null).Should().BeTrue();
         }
@@ -491,10 +530,10 @@ namespace SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AnnualBalanceReportCommand_JournalWithEntries_CannotExecute()
+        public void AnnualBalanceReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.Journal.Add(new JournalViewModel());
+            sut.FullJournal.Add(new FullJournalViewModel());
 
             sut.AnnualBalanceReportCommand.CanExecute(null).Should().BeTrue();
         }
@@ -517,7 +556,7 @@ namespace SimpleAccounting.UnitTests.Presentation
 
             sut.NewAccountCommand.Execute(null);
 
-            sut.Accounts.Select(x => x.Name).Should()
+            sut.AccountList.Select(x => x.Name).Should()
                 .Equal("Bank account", "Salary", "New Account", "Shoes", "Carryforward");
         }
 
@@ -551,43 +590,79 @@ namespace SimpleAccounting.UnitTests.Presentation
                 Debit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Back", Value = 5 } }
             };
             sut.AddBooking(booking);
+            sut.AccountSelectionCommand.Execute(sut.AccountList.FirstOrDefault(x => x.Identifier == 990));
 
-            sut.EditAccountCommand.Execute(sut.Accounts.First());
+            sut.EditAccountCommand.Execute(sut.AccountList.First());
 
             using (new AssertionScope())
             {
-                sut.Accounts.Select(x => x.Name).Should().Equal("Salary", "Shoes", "Carryforward", "Bank account");
-                sut.Journal.Should().BeEquivalentTo(
+                sut.AccountList.Select(x => x.Name).Should().Equal("Salary", "Shoes", "Carryforward", "Bank account");
+                sut.FullJournal.Should().BeEquivalentTo(
                     new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
                     new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });
+                sut.AccountJournal.Should().BeEquivalentTo(
+                    new { RemoteAccount = "1100 (Bank account)" },
+                    new { RemoteAccount = "1100 (Bank account)" },
+                    new { Text = "Summe" },
+                    new { Text = "Saldo" });
             }
         }
 
         [Fact]
-        public void AddBooking_FirstBooking_JournalUpdated()
+        public void AddBooking_FirstBooking_JournalsUpdated()
         {
             var sut = CreateSut();
             sut.LoadProjectData(Samples.SampleProject);
-
             var booking = new AccountingDataJournalBooking
             {
-                Date = 20190401,
-                ID = 1,
+                Date = Samples.BaseDate + 401,
+                ID = 4567,
                 Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
                 Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
             };
+
+            using var monitor = sut.Monitor();
             sut.AddBooking(booking);
 
-            sut.Journal.Should().BeEquivalentTo(
+            using var _ = new AssertionScope();
+            sut.FullJournal.Should().BeEquivalentTo(
                 new
                 {
-                    Identifier = 1,
-                    Date = new DateTime(2019, 4, 1),
+                    Identifier = 4567,
+                    Date = new DateTime(DateTime.Now.Year, 4, 1),
                     Text = "Init",
                     Value = 0.42,
                     CreditAccount = "990 (Carryforward)",
                     DebitAccount = "100 (Bank account)"
                 });
+            monitor.Should().RaisePropertyChangeFor(x => x.SelectedFullJournalEntry);
+            sut.SelectedFullJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
+            sut.AccountJournal.Should().BeEquivalentTo(
+                new
+                {
+                    Identifier = 4567,
+                    Date = new DateTime(DateTime.Now.Year, 4, 1),
+                    Text = "Init",
+                    CreditValue = 0.0,
+                    DebitValue = 0.42,
+                    RemoteAccount = "990 (Carryforward)"
+                },
+                new
+                {
+                    Text = "Summe",
+                    IsSummary = true,
+                    CreditValue = 0.0,
+                    DebitValue = 0.42
+                },
+                new
+                {
+                    Text = "Saldo",
+                    IsSummary = true,
+                    CreditValue = 0.0,
+                    DebitValue = 0.42
+                });
+            monitor.Should().RaisePropertyChangeFor(x => x.SelectedAccountJournalEntry);
+            sut.SelectedAccountJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
         }
 
         [Theory]

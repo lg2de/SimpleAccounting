@@ -4,7 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    public class JournalViewModel : JournalBaseViewModel
+    public class FullJournalViewModel : JournalBaseViewModel
     {
         public double Value { get; set; }
 
@@ -12,9 +12,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public string DebitAccount { get; set; }
 
-        internal JournalViewModel Clone()
+        internal FullJournalViewModel Clone()
         {
-            return this.MemberwiseClone() as JournalViewModel;
+            return this.MemberwiseClone() as FullJournalViewModel;
         }
     }
 }

@@ -84,7 +84,7 @@ Date;Name;Text;Value
 
             sut.ProcessData();
 
-            parent.Journal.Should().BeEquivalentTo(
+            parent.FullJournal.Should().BeEquivalentTo(
                 new { Identifier = 101, Text = "Name - Text", Value = 1, CreditAccount = "600 (Shoes)", DebitAccount = "100 (Bank account)" },
                 new { Identifier = 102, Text = "Text", Value = 2, CreditAccount = "600 (Shoes)", DebitAccount = "100 (Bank account)" },
                 new { Identifier = 103, Text = "Name", Value = 1, CreditAccount = "100 (Bank account)", DebitAccount = "600 (Shoes)" });

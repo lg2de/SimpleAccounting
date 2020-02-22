@@ -90,16 +90,16 @@ namespace SimpleAccounting.UnitTests.Presentation
             }
         }
 
+        public static uint BaseDate = (uint)DateTime.Now.Year * 10000;
+
         public static IEnumerable<AccountingDataJournalBooking> SampleBookings
         {
             get
             {
-                var baseDate = (uint)DateTime.Now.Year * 10000;
-
                 yield return new AccountingDataJournalBooking
                 {
                     ID = 1,
-                    Date = baseDate + 101,
+                    Date = BaseDate + 101,
                     Credit = new List<BookingValue>
                     {
                         new BookingValue { Account = 990, Text = "Open", Value = 100000 }
@@ -113,7 +113,7 @@ namespace SimpleAccounting.UnitTests.Presentation
                 yield return new AccountingDataJournalBooking
                 {
                     ID = 2,
-                    Date = baseDate + 131,
+                    Date = BaseDate + 131,
                     Credit = new List<BookingValue>
                     {
                         new BookingValue { Account = 400, Text = "Salary1", Value = 10000 },
@@ -127,7 +127,7 @@ namespace SimpleAccounting.UnitTests.Presentation
                 yield return new AccountingDataJournalBooking
                 {
                     ID = 3,
-                    Date = baseDate + 201,
+                    Date = BaseDate + 201,
                     Credit = new List<BookingValue>
                     {
                         new BookingValue { Account = 100, Text = "Shoes", Value = 10000 }

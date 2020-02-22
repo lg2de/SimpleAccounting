@@ -72,6 +72,8 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
                 <Style x:Key="GridRowStyle" TargetType="{x:Type DataGridRow}">
                     <Setter Property="FontSize" Value="11" />
                 </Style>
@@ -92,9 +94,11 @@
                     Text="Journal des Buchungsjahres" />
                 <DataGrid
                     DockPanel.Dock="Bottom"
-                    ItemsSource="{Binding Journal}"
+                    ItemsSource="{Binding FullJournal}"
+                    SelectedItem="{Binding SelectedFullJournalEntry}"
                     RowStyle="{StaticResource GridRowStyle}"
-                    AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
+                    AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                    SelectionChanged="OnGridSelectionChanged">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Datum" Width="60" Binding="{Binding Date, StringFormat=\{0:d\}}" />
                         <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}" />
@@ -115,9 +119,9 @@
                 <DataGrid
                     DockPanel.Dock="Bottom"
                     ItemsSource="{Binding AccountJournal}"
-                    AutoGenerateColumns="False"
-                    CanUserAddRows="False"
-                    IsReadOnly="True">
+                    SelectedItem="{Binding SelectedAccountJournalEntry}"
+                    AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                    SelectionChanged="OnGridSelectionChanged">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Datum" Width="60" Binding="{Binding Date, StringFormat=\{0:d\}}" CellStyle="{StaticResource SummaryGridStyle}" />
                         <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}" CellStyle="{StaticResource SummaryGridStyle}" />
@@ -149,7 +153,7 @@
                 </TextBlock>
                 <DataGrid
                     DockPanel.Dock="Right"
-                    ItemsSource="{Binding Accounts}"
+                    ItemsSource="{Binding AccountList}"
                     AutoGenerateColumns="False"
                     CanUserAddRows="False"
                     IsReadOnly="True"
@@ -164,18 +168,18 @@
                         <MouseBinding
                             MouseAction="LeftDoubleClick"
                             Command="{Binding AccountSelectionCommand}"
-                            CommandParameter="{Binding Accounts/}" />
+                            CommandParameter="{Binding AccountList/}" />
                     </DataGrid.InputBindings>
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem
                                 Header="Kontenblatt aktualisieren"
                                 Command="{Binding AccountSelectionCommand}"
-                                CommandParameter="{Binding Accounts/}" />
+                                CommandParameter="{Binding AccountList/}" />
                             <MenuItem
                                 Header="Konto bearbeiten"
                                 Command="{Binding EditAccountCommand}"
-                                CommandParameter="{Binding Accounts/}" />
+                                CommandParameter="{Binding AccountList/}" />
                             <Separator />
                             <MenuItem
                                 Header="Konto erstellen"
