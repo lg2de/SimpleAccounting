@@ -58,7 +58,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                                     ID = 990,
                                     Name = "Carryforward",
                                     Type = AccountDefinitionType.Carryforward
-                                },
+                                }
+                            }
+                        },
+                        new AccountingDataAccountGroup
+                        {
+                            Name = "Credit",
+                            Account = new List<AccountDefinition>
+                            {
                                 new AccountDefinition
                                 {
                                     ID = 5000,

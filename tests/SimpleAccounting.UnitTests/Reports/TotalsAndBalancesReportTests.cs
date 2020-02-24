@@ -29,7 +29,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CreateReport(journal.DateStart.ToDateTime(), journal.DateEnd.ToDateTime());
 
             var expected = @"
- <data>
+<data>
   <tr topLine=""True"">
     <td>100</td>
     <td>Bank account</td>
@@ -74,10 +74,32 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>2000.00</td>
     <td></td>
   </tr>
+  <tr topLine=""True"" lineHeight=""6"">
+    <td></td>
+    <td align=""right"">Default</td>
+    <td></td>
+    <td>3000.00</td>
+    <td></td>
+    <td>250.00</td>
+    <td>650.00</td>
+    <td>2800.00</td>
+    <td>200.00</td>
+  </tr>
   <tr topLine=""True"">
     <td>5000</td>
     <td>Bank credit</td>
     <td>1/29/2020</td>
+    <td></td>
+    <td>3000.00</td>
+    <td>400.00</td>
+    <td></td>
+    <td></td>
+    <td>2600.00</td>
+  </tr>
+  <tr topLine=""True"" lineHeight=""6"">
+    <td></td>
+    <td align=""right"">Credit</td>
+    <td></td>
     <td></td>
     <td>3000.00</td>
     <td>400.00</td>

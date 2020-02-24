@@ -31,7 +31,7 @@ namespace lg2de.SimpleAccounting.Reports
         private double groupOpeningCredit, groupOpeningDebit;
         private double groupSumCredit, groupSumDebit;
         private double groupSaldoCredit, groupSaldoDebit;
-        private int groupCount;
+        private int accountsPerGroup;
 
         public TotalsAndBalancesReport(
             AccountingDataJournal journal,
@@ -80,14 +80,15 @@ namespace lg2de.SimpleAccounting.Reports
                 this.groupSumDebit = 0;
                 this.groupSaldoCredit = 0;
                 this.groupSaldoDebit = 0;
-                this.groupCount = 0;
+                this.accountsPerGroup = 0;
                 foreach (var account in accountGroup.Account)
                 {
                     this.ProcessAccount(dataNode, account);
                 }
 
-                if (this.groupCount <= 0 || this.accountGroups.Count <= 1)
+                if (this.accountsPerGroup <= 0 || this.accountGroups.Count <= 1)
                 {
+                    // There is no account in group or we only one group at all.
                     continue;
                 }
 
@@ -197,6 +198,7 @@ namespace lg2de.SimpleAccounting.Reports
                 return;
             }
 
+            this.accountsPerGroup++;
             var lastBookingDate = this.journal.Booking
                 .Where(x => x.Debit.Any(a => a.Account == account.ID) || x.Credit.Any(a => a.Account == account.ID))
                 .Select(x => x.Date).DefaultIfEmpty().Max();
@@ -289,7 +291,6 @@ namespace lg2de.SimpleAccounting.Reports
             this.groupSumDebit += sumDebit;
             this.groupSaldoCredit += saldoCredit;
             this.groupSaldoDebit += saldoDebit;
-            this.groupCount++;
 
             this.totalOpeningCredit += openingCredit;
             this.totalOpeningDebit += openingDebit;
