@@ -133,5 +133,20 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.Document.XPathSelectElement("//table/data")
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
         }
+
+        [Fact]
+        public void CreateReport_SampleWithSignature_SignatureLinesCreated()
+        {
+            AccountingData project = Samples.SampleProject;
+            var setup = new AccountingDataSetup();
+            AccountingDataJournal journal = project.Journal.Last();
+            var sut = new TotalsAndBalancesReport(journal, project.Accounts, setup, new CultureInfo("en-us"));
+            sut.Signatures.Add("The Name");
+
+            sut.CreateReport(journal.DateStart.ToDateTime(), journal.DateEnd.ToDateTime());
+
+            sut.Document.XPathSelectElements("//text[@tag='signature']")
+                .Select(x => x.Value).Should().Equal("The Name");
+        }
     }
 }

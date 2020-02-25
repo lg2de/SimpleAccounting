@@ -185,6 +185,7 @@ namespace lg2de.SimpleAccounting.Reports
 
                 var text = doc.CreateElement("text");
                 text.InnerText = signature;
+                text.SetAttribute("tag", "signature");
                 signatures.ParentNode.InsertBefore(text, signatures);
             }
 
