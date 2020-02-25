@@ -33,12 +33,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   <tr topLine=""True"">
     <td>100</td>
     <td>Bank account</td>
-    <td>2/1/2020</td>
+    <td>2/5/2020</td>
     <td>1000.00</td>
     <td></td>
     <td>200.00</td>
-    <td>450.00</td>
-    <td>750.00</td>
+    <td>549.00</td>
+    <td>651.00</td>
     <td></td>
   </tr>
   <tr topLine=""True"">
@@ -81,8 +81,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>3000.00</td>
     <td></td>
     <td>250.00</td>
-    <td>650.00</td>
-    <td>2800.00</td>
+    <td>749.00</td>
+    <td>2701.00</td>
     <td>200.00</td>
   </tr>
   <tr topLine=""True"">
@@ -96,15 +96,26 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td></td>
     <td>2600.00</td>
   </tr>
+  <tr topLine=""True"">
+    <td>6000</td>
+    <td>Friends debit</td>
+    <td>2/5/2020</td>
+    <td></td>
+    <td></td>
+    <td>99.00</td>
+    <td></td>
+    <td>99.00</td>
+    <td></td>
+  </tr>
   <tr topLine=""True"" lineHeight=""6"">
     <td></td>
-    <td align=""right"">Credit</td>
+    <td align=""right"">Second</td>
     <td></td>
     <td></td>
     <td>3000.00</td>
-    <td>400.00</td>
+    <td>499.00</td>
     <td></td>
-    <td></td>
+    <td>99.00</td>
     <td>2600.00</td>
   </tr>
   <tr topLine=""True"">
@@ -113,8 +124,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td></td>
     <td>3000.00</td>
     <td>3000.00</td>
-    <td>650.00</td>
-    <td>650.00</td>
+    <td>749.00</td>
+    <td>749.00</td>
     <td>2800.00</td>
     <td>2800.00</td>
   </tr>

@@ -111,6 +111,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>100</td>
     <td>50.00</td>
   </tr>
+  <tr topLine=""True"">
+    <td>2/5/2020</td>
+    <td>6</td>
+    <td>Rent to friend</td>
+    <td>6000</td>
+    <td>99.00</td>
+    <td>100</td>
+    <td>99.00</td>
+  </tr>
 </data>";
             sut.Document.XPathSelectElement("//table/data")
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);

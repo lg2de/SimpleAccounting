@@ -63,7 +63,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                         },
                         new AccountingDataAccountGroup
                         {
-                            Name = "Credit",
+                            Name = "Second",
                             Account = new List<AccountDefinition>
                             {
                                 new AccountDefinition
@@ -71,6 +71,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                                     ID = 5000,
                                     Name = "Bank credit",
                                     Type = AccountDefinitionType.Credit
+                                },
+                                new AccountDefinition
+                                {
+                                    ID = 6000,
+                                    Name = "Friends debit",
+                                    Type = AccountDefinitionType.Debit
                                 },
                                 new AccountDefinition
                                 {
@@ -179,6 +185,20 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     {
                         new BookingValue { Account = 600, Text = "Shoes1", Value = 2000 },
                         new BookingValue { Account = 600, Text = "Shoes2", Value = 3000 }
+                    }
+                };
+
+                yield return new AccountingDataJournalBooking
+                {
+                    ID = 6,
+                    Date = BaseDate + 205,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Rent to friend", Value = 9900 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 6000, Text = "Rent to friend", Value = 9900 }
                     }
                 };
             }

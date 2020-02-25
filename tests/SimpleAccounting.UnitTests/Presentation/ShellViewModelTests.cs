@@ -69,7 +69,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Name = "Salary" },
                 new { Name = "Shoes" },
                 new { Name = "Carryforward" },
-                new { Name = "Bank credit" });
+                new { Name = "Bank credit" },
+                new { Name = "Friends debit" });
 
             sut.FullJournal.Should().BeEquivalentTo(
                 new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
@@ -80,12 +81,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Text = "Credit rate", CreditAccount = "100 (Bank account)", DebitAccount = "5000 (Bank credit)" },
                 new { Text = "Shoes1", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
                 new { Text = "Shoes2", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = (string)null });
+                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = (string)null },
+                new { Text = "Rent to friend", CreditAccount = "100 (Bank account)", DebitAccount = "6000 (Friends debit)" });
             sut.AccountJournal.Should().BeEquivalentTo(
                 new { Text = "Open 1", RemoteAccount = "990 (Carryforward)" },
                 new { Text = "Salary", RemoteAccount = "Diverse" },
                 new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)" },
                 new { Text = "Shoes", RemoteAccount = "Diverse" },
+                new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)" },
                 new { Text = "Summe" },
                 new { Text = "Saldo" });
         }
@@ -150,6 +153,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Name = "Shoes" },
                 new { Name = "Carryforward" },
                 new { Name = "Bank credit" },
+                new { Name = "Friends debit" },
                 new { Name = "Inactive" });
         }
 
@@ -168,8 +172,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Text = "Salary", RemoteAccount = "Diverse", CreditValue = 0, DebitValue = 200 },
                 new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", CreditValue = 400, DebitValue = 0 },
                 new { Text = "Shoes", RemoteAccount = "Diverse", CreditValue = 50, DebitValue = 0 },
-                new { Text = "Summe", RemoteAccount = (string)null, CreditValue = 450, DebitValue = 1200 },
-                new { Text = "Saldo", RemoteAccount = (string)null, CreditValue = 0, DebitValue = 750 });
+                new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)", CreditValue = 99, DebitValue = 0 },
+                new { Text = "Summe", RemoteAccount = (string)null, CreditValue = 549, DebitValue = 1200 },
+                new { Text = "Saldo", RemoteAccount = (string)null, CreditValue = 0, DebitValue = 651 });
         }
 
         [Fact]
@@ -549,8 +554,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.NewAccountCommand.Execute(null);
 
-            sut.AccountList.Select(x => x.Name).Should()
-                .Equal("Bank account", "Salary", "New Account", "Shoes", "Carryforward", "Bank credit");
+            sut.AccountList.Select(x => x.Name).Should().Equal(
+                "Bank account", "Salary", "New Account", "Shoes", "Carryforward", "Bank credit", "Friends debit");
         }
 
         [Fact]
@@ -589,7 +594,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using (new AssertionScope())
             {
-                sut.AccountList.Select(x => x.Name).Should().Equal("Salary", "Shoes", "Carryforward", "Bank account", "Bank credit");
+                sut.AccountList.Select(x => x.Name).Should().Equal(
+                    "Salary", "Shoes", "Carryforward", "Bank account", "Bank credit", "Friends debit");
                 sut.FullJournal.Should().BeEquivalentTo(
                     new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
                     new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });

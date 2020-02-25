@@ -276,8 +276,10 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentModelJournal,
                     this.accountingData.AllAccounts,
                     this.accountingData.Setup,
-                    this.currentModelJournal.Year.ToString(CultureInfo.InvariantCulture));
+                    this.currentModelJournal.Year,
+                    CultureInfo.CurrentUICulture);
                 report.CreateReport();
+                report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Jahresbilanz {this.currentModelJournal.Year}");
             },
             _ => this.FullJournal.Any());
 
