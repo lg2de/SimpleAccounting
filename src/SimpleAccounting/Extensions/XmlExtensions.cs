@@ -41,12 +41,12 @@ namespace lg2de.SimpleAccounting.Extensions
             }
 
             Type returnType = typeof(T);
-            if (returnType == typeof(int))
+            if (returnType == typeof(int) || returnType == typeof(int?))
             {
                 return (T)(object)Convert.ToInt32(attribute.Value, CultureInfo.InvariantCulture);
             }
 
-            if (returnType == typeof(bool))
+            if (returnType == typeof(bool) || returnType == typeof(bool?))
             {
                 return (T)(object)bool.Parse(attribute.Value);
             }

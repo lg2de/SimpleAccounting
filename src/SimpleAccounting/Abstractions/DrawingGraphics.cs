@@ -31,8 +31,9 @@ namespace lg2de.SimpleAccounting.Abstractions
             set => this.printPageEventArgs.HasMorePages = value;
         }
 
-        public void DrawString(string s, Font font, Brush brush, float x, float y, StringFormat format)
+        public void DrawString(string s, Font font, Brush brush, float x, float y, StringAlignment alignment)
         {
+            using var format = new StringFormat { Alignment = alignment };
             this.printPageEventArgs.Graphics.DrawString(s, font, brush, x, y, format);
         }
     }

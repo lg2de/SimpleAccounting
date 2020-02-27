@@ -607,57 +607,48 @@ namespace lg2de.SimpleAccounting.Reports
             SolidBrush drawBrush = this.solidBrushStack.Peek();
             Font drawFont = this.fontStack.Peek();
 
-            XmlNode nodeAbsX = this.currentNode.Attributes.GetNamedItem("absX");
-            XmlNode nodeAbsY = this.currentNode.Attributes.GetNamedItem("absY");
-            XmlNode nodeRelX = this.currentNode.Attributes.GetNamedItem("relX");
-            XmlNode nodeRelY = this.currentNode.Attributes.GetNamedItem("relY");
-            XmlNode nodeAlign = this.currentNode.Attributes.GetNamedItem("align");
+            var absX = this.currentNode.GetAttribute<int?>("absX");
+            var absY = this.currentNode.GetAttribute<int?>("absY");
+            var relX = this.currentNode.GetAttribute<int>("relX");
+            var relY = this.currentNode.GetAttribute<int>("relY");
+            var align = this.currentNode.GetAttribute("align", "left");
             int nX = this.CursorX;
             int nY = this.CursorY;
-            if (nodeAbsX != null)
+            if (absX.HasValue)
             {
-                nX = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
+                nX = this.DocumentLeftMargin + absX.Value;
             }
 
-            if (nodeAbsY != null)
+            if (absY.HasValue)
             {
-                nY = this.DocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
+                nY = this.DocumentTopMargin + absY.Value;
             }
 
-            if (nodeRelX != null)
-            {
-                nX += Convert.ToInt32(nodeRelX.Value);
-            }
-
-            if (nodeRelY != null)
-            {
-                nY += Convert.ToInt32(nodeRelY.Value);
-            }
+            nX += relX;
+            nY += relY;
 
             string text = this.currentNode.InnerText;
-            using (var format = new StringFormat())
+            StringAlignment alignment;
+            switch (align)
             {
-                switch (nodeAlign?.Value)
-                {
-                case "center":
-                    format.Alignment = StringAlignment.Center;
-                    break;
-                case "right":
-                    format.Alignment = StringAlignment.Far;
-                    break;
-                default:
-                    format.Alignment = StringAlignment.Near;
-                    break;
-                }
-
-                graphics.DrawString(
-                    text,
-                    drawFont,
-                    drawBrush,
-                    this.ToPhysical(nX),
-                    this.ToPhysical(nY),
-                    format);
+            case "center":
+                alignment = StringAlignment.Center;
+                break;
+            case "right":
+                alignment = StringAlignment.Far;
+                break;
+            default:
+                alignment = StringAlignment.Near;
+                break;
             }
+
+            graphics.DrawString(
+                text,
+                drawFont,
+                drawBrush,
+                this.ToPhysical(nX),
+                this.ToPhysical(nY),
+                alignment);
         }
 
         private void PrintLineNode(PrintPageEventArgs printArgs)
