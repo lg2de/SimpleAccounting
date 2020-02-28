@@ -2,10 +2,11 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace SimpleAccounting.UnitTests.Reports
+namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Drawing.Printing;
     using System.Xml.Linq;
     using FluentAssertions;
@@ -556,13 +557,223 @@ namespace SimpleAccounting.UnitTests.Reports
             sut.CursorY = 8;
 
             var graphics = Substitute.For<IGraphics>();
-            sut.PrintNodes(null, graphics);
+            sut.PrintNodes(graphics);
 
             using (new AssertionScope())
             {
                 graphics.HasMorePages.Should().BeFalse();
                 sut.CursorX.Should().Be(10);
                 sut.CursorY.Should().Be(20);
+            }
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_TextAbsolute_TextPrintedCursorUnchanged()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><text absX=\"10\" absY=\"20\">The text.</text></root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+            sut.CursorX = 5;
+            sut.CursorY = 8;
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            using (new AssertionScope())
+            {
+                graphics.Received(1).DrawString(
+                    "The text.",
+                    Arg.Any<Font>(),
+                    Arg.Any<Brush>(),
+                    39, // 10*(100/25.4)
+                    79, // 20*(100/25.4)
+                    StringAlignment.Near);
+                sut.CursorX.Should().Be(5);
+                sut.CursorY.Should().Be(8);
+            }
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_TextRight_TextPrintedAtCursor()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><text align=\"right\">The text.</text></root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+            sut.CursorX = 5;
+            sut.CursorY = 8;
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            graphics.Received(1).DrawString(
+                "The text.",
+                Arg.Any<Font>(),
+                Arg.Any<Brush>(),
+                20, // 5*(100/25.4)
+                31, // 8*(100/25.4)
+                StringAlignment.Far);
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_TextRelative_TextPrinted()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><text relX=\"10\" relY=\"20\" align=\"center\">The text.</text></root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+            sut.CursorX = 5;
+            sut.CursorY = 8;
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            graphics.Received(1).DrawString(
+                "The text.",
+                Arg.Any<Font>(),
+                Arg.Any<Brush>(),
+                59, // 15*(100/25.4)
+                110, // 28*(100/25.4)
+                StringAlignment.Center);
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_TextWithFontStack_TextPrintedWithFont()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml(
+                "<root>" +
+                "<text>text1</text>" +
+                "<font bold=\"1\"><text>text2</text></font>" +
+                "</root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            graphics.Received(1).DrawString(
+                "text1",
+                Arg.Is<Font>(x => x.Style == FontStyle.Regular),
+                Arg.Any<Brush>(),
+                Arg.Any<float>(),
+                Arg.Any<float>(),
+                Arg.Any<StringAlignment>());
+            graphics.Received(1).DrawString(
+                "text2",
+                Arg.Is<Font>(x => x.Style == FontStyle.Bold),
+                Arg.Any<Brush>(),
+                Arg.Any<float>(),
+                Arg.Any<float>(),
+                Arg.Any<StringAlignment>());
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_TextWithFontChange_TextPrintedWithFont()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml(
+                "<root>" +
+                "<text>text1</text>" +
+                "<font size=\"20\" />" +
+                "<text>text2</text>" +
+                "</root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            graphics.Received(1).DrawString(
+                "text1",
+                Arg.Is<Font>(x => x.SizeInPoints == 10),
+                Arg.Any<Brush>(),
+                Arg.Any<float>(),
+                Arg.Any<float>(),
+                Arg.Any<StringAlignment>());
+            graphics.Received(1).DrawString(
+                "text2",
+                Arg.Is<Font>(x => x.SizeInPoints == 20),
+                Arg.Any<Brush>(),
+                Arg.Any<float>(),
+                Arg.Any<float>(),
+                Arg.Any<StringAlignment>());
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_LineAbsolute_LinePrinted()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><line absFromX=\"10\" absFromY=\"20\" absToX=\"30\" absToY=\"40\" /></root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+            sut.CursorX = 12;
+            sut.CursorY = 14;
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            using (new AssertionScope())
+            {
+                graphics.Received(1).DrawLine(
+                    Arg.Any<Pen>(),
+                    39, // 10*(100/25.4)
+                    79, // 20*(100/25.4)
+                    118, // 30*(100/25.4)
+                    157); // 40*(100/25.4)
+            }
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_LineRelative_LinePrinted()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><line relFromX=\"10\" relFromY=\"20\" relToX=\"30\" relToY=\"40\" /></root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+            sut.CursorX = 12;
+            sut.CursorY = 14;
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            using (new AssertionScope())
+            {
+                graphics.Received(1).DrawLine(
+                    Arg.Any<Pen>(),
+                    87, // 22*(100/25.4)
+                    134, // 34*(100/25.4)
+                    165, // 52*(100/25.4)
+                    213); // 74*(100/25.4)
             }
 
             sut.CleanupGraphics();
@@ -578,7 +789,7 @@ namespace SimpleAccounting.UnitTests.Reports
             sut.CursorY = 8;
 
             var graphics = Substitute.For<IGraphics>();
-            sut.PrintNodes(null, graphics);
+            sut.PrintNodes(graphics);
 
             graphics.HasMorePages.Should().BeTrue();
 

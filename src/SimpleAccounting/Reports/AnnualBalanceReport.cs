@@ -6,8 +6,10 @@ namespace lg2de.SimpleAccounting.Reports
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Xml;
+    using System.Xml.Linq;
     using lg2de.SimpleAccounting.Model;
 
 #pragma warning disable S4055 // string literals => pending translation
@@ -20,25 +22,32 @@ namespace lg2de.SimpleAccounting.Reports
         private readonly List<AccountDefinition> allAccounts;
         private readonly AccountingDataSetup setup;
         private readonly string bookingYearName;
+        private readonly CultureInfo culture;
+
+        private XmlPrinter printer;
 
         public AnnualBalanceReport(
             AccountingDataJournal journal,
             IEnumerable<AccountDefinition> accounts,
             AccountingDataSetup setup,
-            string bookingYearName)
+            string bookingYearName,
+            CultureInfo culture)
         {
             this.journal = journal;
             this.allAccounts = accounts.ToList();
             this.setup = setup;
             this.bookingYearName = bookingYearName;
+            this.culture = culture;
         }
+
+        internal XDocument Document => XDocument.Parse(this.printer.Document.OuterXml);
 
         public void CreateReport()
         {
-            var print = new XmlPrinter();
-            print.LoadDocument(ResourceName);
+            this.printer = new XmlPrinter();
+            this.printer.LoadDocument(ResourceName);
 
-            XmlDocument doc = print.Document;
+            XmlDocument doc = this.printer.Document;
 
             var firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
             firmNode.InnerText = this.setup.Name;
@@ -47,7 +56,7 @@ namespace lg2de.SimpleAccounting.Reports
             rangeNode.InnerText = this.bookingYearName;
 
             var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToLongDateString();
+            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToString("D", this.culture);
 
             // income / Einnahmen
             this.ProcessIncome(doc, out var totalIncome);
@@ -56,7 +65,7 @@ namespace lg2de.SimpleAccounting.Reports
             this.ProcessExpenses(doc, out var totalExpense);
 
             var saldoNode = doc.SelectSingleNode("//text[@ID=\"saldo\"]");
-            saldoNode.InnerText = ((totalIncome + totalExpense) / 100).ToString("0.00");
+            saldoNode.InnerText = ((totalIncome + totalExpense) / 100).ToString("0.00", this.culture);
 
             // receivables / Forderungen
             this.ProcessReceivables(doc, out double totalReceivable);
@@ -66,8 +75,11 @@ namespace lg2de.SimpleAccounting.Reports
 
             // asset / Vermögen
             this.ProcessAssets(doc, totalReceivable, totalLiability);
+        }
 
-            print.PrintDocument(DateTime.Now.ToString("yyyy-MM-dd") + " Jahresbilanz " + this.bookingYearName);
+        public void ShowPreview(string documentName)
+        {
+            this.printer.PrintDocument(documentName);
         }
 
         private void ProcessIncome(XmlDocument doc, out double totalIncome)
@@ -97,14 +109,14 @@ namespace lg2de.SimpleAccounting.Reports
 
                 dataLineNode.AppendChild(dataItemNode);
 
-                string accountText = account.ID.ToString().PadLeft(5, '0') + " " + account.Name;
+                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
 
                 dataItemNode = dataItemNode.Clone();
                 dataItemNode.InnerText = accountText;
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00");
+                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = doc.CreateElement("td");
@@ -114,7 +126,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
-            saldoElement.InnerText = (totalIncome / 100).ToString("0.00");
+            saldoElement.InnerText = (totalIncome / 100).ToString("0.00", this.culture);
         }
 
         private void ProcessExpenses(XmlDocument doc, out double totalExpense)
@@ -144,14 +156,14 @@ namespace lg2de.SimpleAccounting.Reports
 
                 dataLineNode.AppendChild(dataItemNode);
 
-                string accountText = account.ID.ToString().PadLeft(5, '0') + " " + account.Name;
+                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
 
                 dataItemNode = dataItemNode.Clone();
                 dataItemNode.InnerText = accountText;
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00");
+                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = doc.CreateElement("td");
@@ -161,7 +173,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
-            saldoElement.InnerText = (totalExpense / 100).ToString("0.00");
+            saldoElement.InnerText = (totalExpense / 100).ToString("0.00", this.culture);
         }
 
         private void ProcessReceivables(XmlDocument doc, out double totalReceivable)
@@ -191,14 +203,14 @@ namespace lg2de.SimpleAccounting.Reports
 
                 dataLineNode.AppendChild(dataItemNode);
 
-                string accountText = account.ID.ToString().PadLeft(5, '0') + " " + account.Name;
+                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
 
                 dataItemNode = dataItemNode.Clone();
                 dataItemNode.InnerText = accountText;
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00");
+                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = doc.CreateElement("td");
@@ -208,7 +220,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
-            saldoElement.InnerText = (totalReceivable / 100).ToString("0.00");
+            saldoElement.InnerText = (totalReceivable / 100).ToString("0.00", this.culture);
         }
 
         private void ProcessLiabilities(XmlDocument doc, out double totalLiability)
@@ -238,14 +250,14 @@ namespace lg2de.SimpleAccounting.Reports
 
                 dataLineNode.AppendChild(dataItemNode);
 
-                string accountText = account.ID.ToString().PadLeft(5, '0') + " " + account.Name;
+                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
 
                 dataItemNode = dataItemNode.Clone();
                 dataItemNode.InnerText = accountText;
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00");
+                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = doc.CreateElement("td");
@@ -255,7 +267,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
-            saldoElement.InnerText = (totalLiability / 100).ToString("0.00");
+            saldoElement.InnerText = (totalLiability / 100).ToString("0.00", this.culture);
         }
 
         private void ProcessAssets(XmlDocument doc, double totalReceivable, double totalLiability)
@@ -285,14 +297,14 @@ namespace lg2de.SimpleAccounting.Reports
 
                 dataLineNode.AppendChild(dataItemNode);
 
-                string accountText = account.ID.ToString().PadLeft(5, '0') + " " + account.Name;
+                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
 
                 dataItemNode = dataItemNode.Clone();
                 dataItemNode.InnerText = accountText;
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00");
+                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = doc.CreateElement("td");
@@ -313,7 +325,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (totalReceivable / 100).ToString("0.00");
+                dataItemNode.InnerText = (totalReceivable / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = doc.CreateElement("td");
@@ -336,7 +348,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (totalLiability / 100).ToString("0.00");
+                dataItemNode.InnerText = (totalLiability / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataItemNode = doc.CreateElement("td");
@@ -348,7 +360,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
-            saldoElement.InnerText = (totalAccount / 100).ToString("0.00");
+            saldoElement.InnerText = (totalAccount / 100).ToString("0.00", this.culture);
         }
     }
 }

@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace SimpleAccounting.UnitTests.Presentation
+namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Linq;

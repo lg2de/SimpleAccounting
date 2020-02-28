@@ -1,6 +1,7 @@
 # SimpleAccounting - Simple Accounting Software
 
 ![Build status](https://github.com/lg2de/SimpleAccounting/workflows/continous%20integration/badge.svg?branch=master)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=coverage)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=alert_status)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
@@ -42,14 +43,6 @@ Small changes can be made immediately via Pull Request. I will try to check and 
 Medium and large changes should be discussed first. Please open a new issue or participate in existing discussions.
 
 ## TODOs
-
-When I started the project in 2005, I saw no relevance for unit testing.
-So far the test coverage is not yet good:
-
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=coverage)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
-
-With the decision last year to publish it, I started to switch to Test Driven Development.
-I hope to increase coverage step by step. Maybe you want to help by creating component tests?
 
 I am German and have no experience with English names for the financial world.
 So I'm pretty sure that some of the words I use are confusing for native speakers.
