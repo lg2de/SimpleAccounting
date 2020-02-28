@@ -4,27 +4,22 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
-    using System.Xml.Linq;
     using lg2de.SimpleAccounting.Model;
 
 #pragma warning disable S4055 // string literals => pending translation
 
-    internal class AnnualBalanceReport
+    internal class AnnualBalanceReport : ReportBase
     {
         public const string ResourceName = "AnnualBalance.xml";
 
         private readonly AccountingDataJournal journal;
         private readonly List<AccountDefinition> allAccounts;
-        private readonly AccountingDataSetup setup;
         private readonly string bookingYearName;
         private readonly CultureInfo culture;
-
-        private XmlPrinter printer;
 
         public AnnualBalanceReport(
             AccountingDataJournal journal,
@@ -32,31 +27,22 @@ namespace lg2de.SimpleAccounting.Reports
             AccountingDataSetup setup,
             string bookingYearName,
             CultureInfo culture)
+            : base(ResourceName, setup, culture)
         {
             this.journal = journal;
             this.allAccounts = accounts.ToList();
-            this.setup = setup;
             this.bookingYearName = bookingYearName;
             this.culture = culture;
         }
 
-        internal XDocument Document => XDocument.Parse(this.printer.Document.OuterXml);
-
         public void CreateReport()
         {
-            this.printer = new XmlPrinter();
-            this.printer.LoadDocument(ResourceName);
+            this.PrepareDocument();
 
-            XmlDocument doc = this.printer.Document;
-
-            var firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = this.setup.Name;
+            XmlDocument doc = this.Printer.Document;
 
             var rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
             rangeNode.InnerText = this.bookingYearName;
-
-            var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToString("D", this.culture);
 
             // income / Einnahmen
             this.ProcessIncome(doc, out var totalIncome);
@@ -75,11 +61,6 @@ namespace lg2de.SimpleAccounting.Reports
 
             // asset / Vermögen
             this.ProcessAssets(doc, totalReceivable, totalLiability);
-        }
-
-        public void ShowPreview(string documentName)
-        {
-            this.printer.PrintDocument(documentName);
         }
 
         private void ProcessIncome(XmlDocument doc, out double totalIncome)

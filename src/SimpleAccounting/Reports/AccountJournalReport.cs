@@ -9,32 +9,28 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Globalization;
     using System.Linq;
     using System.Xml;
-    using System.Xml.Linq;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
 #pragma warning disable S4055 // string literals => pending translation
 
-    internal class AccountJournalReport : IAccountJournalReport
+    internal class AccountJournalReport : ReportBase, IAccountJournalReport
     {
         public const string ResourceName = "AccountJournal.xml";
 
         private readonly IEnumerable<AccountDefinition> accounts;
         private readonly AccountingDataJournal journal;
-        private readonly AccountingDataSetup setup;
         private readonly CultureInfo culture;
-
-        private XmlPrinter printer;
 
         public AccountJournalReport(
             IEnumerable<AccountDefinition> accounts,
             AccountingDataJournal journal,
             AccountingDataSetup setup,
             CultureInfo culture)
+            : base(ResourceName, setup, culture)
         {
             this.accounts = accounts.OrderBy(a => a.ID);
             this.journal = journal;
-            this.setup = setup;
             this.culture = culture;
         }
 
@@ -43,23 +39,15 @@ namespace lg2de.SimpleAccounting.Reports
         /// </summary>
         public bool PageBreakBetweenAccounts { get; set; }
 
-        internal XDocument Document => XDocument.Parse(this.printer.Document.OuterXml);
-
         public void CreateReport(DateTime dateStart, DateTime dateEnd)
         {
-            this.printer = new XmlPrinter();
-            this.printer.LoadDocument(ResourceName);
+            this.PrepareDocument();
 
-            XmlDocument doc = this.printer.Document;
+            XmlDocument doc = this.Printer.Document;
 
-            XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = this.setup.Name;
-
+            // TODO start and end should be read from model and should apply to all reports!?
             XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
             rangeNode.InnerText = dateStart.ToString("d", this.culture) + " - " + dateEnd.ToString("d", this.culture);
-
-            var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToString("D", this.culture);
 
             XmlNode tableNode = doc.SelectSingleNode("//table");
 
@@ -239,11 +227,6 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);
-        }
-
-        public void ShowPreview(string documentName)
-        {
-            this.printer.PrintDocument(documentName);
         }
     }
 }
