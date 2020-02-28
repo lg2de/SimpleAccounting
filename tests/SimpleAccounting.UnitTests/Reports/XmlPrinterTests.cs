@@ -557,7 +557,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CursorY = 8;
 
             var graphics = Substitute.For<IGraphics>();
-            sut.PrintNodes(null, graphics);
+            sut.PrintNodes(graphics);
 
             using (new AssertionScope())
             {
@@ -582,7 +582,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CursorY = 8;
 
             var graphics = Substitute.For<IGraphics>();
-            sut.PrintNodes(null, graphics);
+            sut.PrintNodes(graphics);
 
             using (new AssertionScope())
             {
@@ -613,18 +613,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CursorY = 8;
 
             var graphics = Substitute.For<IGraphics>();
-            sut.PrintNodes(null, graphics);
+            sut.PrintNodes(graphics);
 
-            using (new AssertionScope())
-            {
-                graphics.Received(1).DrawString(
-                    "The text.",
-                    Arg.Any<Font>(),
-                    Arg.Any<Brush>(),
-                    20, // 5*(100/25.4)
-                    31, // 8*(100/25.4)
-                    StringAlignment.Far);
-            }
+            graphics.Received(1).DrawString(
+                "The text.",
+                Arg.Any<Font>(),
+                Arg.Any<Brush>(),
+                20, // 5*(100/25.4)
+                31, // 8*(100/25.4)
+                StringAlignment.Far);
 
             sut.CleanupGraphics();
         }
@@ -642,17 +639,141 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CursorY = 8;
 
             var graphics = Substitute.For<IGraphics>();
-            sut.PrintNodes(null, graphics);
+            sut.PrintNodes(graphics);
+
+            graphics.Received(1).DrawString(
+                "The text.",
+                Arg.Any<Font>(),
+                Arg.Any<Brush>(),
+                59, // 15*(100/25.4)
+                110, // 28*(100/25.4)
+                StringAlignment.Center);
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_TextWithFontStack_TextPrintedWithFont()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml(
+                "<root>" +
+                "<text>text1</text>" +
+                "<font bold=\"1\"><text>text2</text></font>" +
+                "</root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            graphics.Received(1).DrawString(
+                "text1",
+                Arg.Is<Font>(x => x.Style == FontStyle.Regular),
+                Arg.Any<Brush>(),
+                Arg.Any<float>(),
+                Arg.Any<float>(),
+                Arg.Any<StringAlignment>());
+            graphics.Received(1).DrawString(
+                "text2",
+                Arg.Is<Font>(x => x.Style == FontStyle.Bold),
+                Arg.Any<Brush>(),
+                Arg.Any<float>(),
+                Arg.Any<float>(),
+                Arg.Any<StringAlignment>());
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_TextWithFontChange_TextPrintedWithFont()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml(
+                "<root>" +
+                "<text>text1</text>" +
+                "<font size=\"20\" />" +
+                "<text>text2</text>" +
+                "</root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            graphics.Received(1).DrawString(
+                "text1",
+                Arg.Is<Font>(x => x.SizeInPoints == 10),
+                Arg.Any<Brush>(),
+                Arg.Any<float>(),
+                Arg.Any<float>(),
+                Arg.Any<StringAlignment>());
+            graphics.Received(1).DrawString(
+                "text2",
+                Arg.Is<Font>(x => x.SizeInPoints == 20),
+                Arg.Any<Brush>(),
+                Arg.Any<float>(),
+                Arg.Any<float>(),
+                Arg.Any<StringAlignment>());
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_LineAbsolute_LinePrinted()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><line absFromX=\"10\" absFromY=\"20\" absToX=\"30\" absToY=\"40\" /></root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+            sut.CursorX = 12;
+            sut.CursorY = 14;
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
 
             using (new AssertionScope())
             {
-                graphics.Received(1).DrawString(
-                    "The text.",
-                    Arg.Any<Font>(),
-                    Arg.Any<Brush>(),
-                    59, // 15*(100/25.4)
-                    110, // 28*(100/25.4)
-                    StringAlignment.Center);
+                graphics.Received(1).DrawLine(
+                    Arg.Any<Pen>(),
+                    39, // 10*(100/25.4)
+                    79, // 20*(100/25.4)
+                    118, // 30*(100/25.4)
+                    157); // 40*(100/25.4)
+            }
+
+            sut.CleanupGraphics();
+        }
+
+        [Fact]
+        public void PrintNodes_LineRelative_LinePrinted()
+        {
+            var sut = new XmlPrinter();
+            sut.LoadXml("<root><line relFromX=\"10\" relFromY=\"20\" relToX=\"30\" relToY=\"40\" /></root>");
+            // TODO SetupDocument is required for print factor only
+            var document = new PrintDocument();
+            sut.SetupDocument(document, PaperSizes);
+            sut.SetupGraphics();
+            sut.CursorX = 12;
+            sut.CursorY = 14;
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.PrintNodes(graphics);
+
+            using (new AssertionScope())
+            {
+                graphics.Received(1).DrawLine(
+                    Arg.Any<Pen>(),
+                    87, // 22*(100/25.4)
+                    134, // 34*(100/25.4)
+                    165, // 52*(100/25.4)
+                    213); // 74*(100/25.4)
             }
 
             sut.CleanupGraphics();
@@ -668,7 +789,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CursorY = 8;
 
             var graphics = Substitute.For<IGraphics>();
-            sut.PrintNodes(null, graphics);
+            sut.PrintNodes(graphics);
 
             graphics.HasMorePages.Should().BeTrue();
 

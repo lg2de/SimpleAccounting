@@ -36,5 +36,10 @@ namespace lg2de.SimpleAccounting.Abstractions
             using var format = new StringFormat { Alignment = alignment };
             this.printPageEventArgs.Graphics.DrawString(s, font, brush, x, y, format);
         }
+
+        public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
+        {
+            this.printPageEventArgs.Graphics.DrawLine(pen, x1, y1, x2, y2);
+        }
     }
 }

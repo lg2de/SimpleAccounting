@@ -46,6 +46,11 @@ namespace lg2de.SimpleAccounting.Extensions
                 return (T)(object)Convert.ToInt32(attribute.Value, CultureInfo.InvariantCulture);
             }
 
+            if (returnType == typeof(float) || returnType == typeof(float?))
+            {
+                return (T)(object)Convert.ToSingle(attribute.Value, CultureInfo.InvariantCulture);
+            }
+
             if (returnType == typeof(bool) || returnType == typeof(bool?))
             {
                 return (T)(object)bool.Parse(attribute.Value);

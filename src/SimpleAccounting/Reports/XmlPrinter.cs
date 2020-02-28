@@ -108,7 +108,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.ProcessNewPage();
 
                 var graphics = new DrawingGraphics(printArgs);
-                this.PrintNodes(printArgs, graphics);
+                this.PrintNodes(graphics);
             };
 
             this.printFactor = (float)(100 / 25.4);
@@ -221,7 +221,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
         }
 
-        internal void PrintNodes(PrintPageEventArgs printArgs, IGraphics graphics)
+        internal void PrintNodes(IGraphics graphics)
         {
             while (this.currentNode != null)
             {
@@ -240,19 +240,11 @@ namespace lg2de.SimpleAccounting.Reports
                 }
                 else if (this.currentNode.Name == "line")
                 {
-                    this.PrintLineNode(printArgs);
-                }
-                else if (this.currentNode.Name == "circle")
-                {
-                    this.PrintCircleNode(printArgs);
+                    this.PrintLineNode(graphics);
                 }
                 else if (this.currentNode.Name == "font")
                 {
-                    this.PrintFontNode(printArgs, graphics);
-                }
-                else if (this.currentNode.Name == "color")
-                {
-                    this.PrintColorNode(printArgs, graphics);
+                    this.PrintFontNode(graphics);
                 }
                 else if (this.currentNode.Name == "newPage")
                 {
@@ -280,10 +272,10 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void TransformRectangle(XmlNode rectNode)
         {
-            float nX1 = Convert.ToSingle(rectNode.Attributes.GetNamedItem("relFromX").Value);
-            float nY1 = Convert.ToSingle(rectNode.Attributes.GetNamedItem("relFromY").Value);
-            float nX2 = Convert.ToSingle(rectNode.Attributes.GetNamedItem("relToX").Value);
-            float nY2 = Convert.ToSingle(rectNode.Attributes.GetNamedItem("relToY").Value);
+            var nX1 = rectNode.GetAttribute<float>("relFromX");
+            var nY1 = rectNode.GetAttribute<float>("relFromY");
+            var nX2 = rectNode.GetAttribute<float>("relToX");
+            var nY2 = rectNode.GetAttribute<float>("relToY");
 
             XmlNode lineNode = this.Document.CreateElement("line");
             lineNode.SetAttribute("relFromX", nX1.ToString());
@@ -370,7 +362,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void TransformTable(XmlNode tableNode)
         {
-            int tableLineHeight = tableNode.GetAttribute<int>("lineHeight", DefaultLineHeight);
+            int tableLineHeight = tableNode.GetAttribute("lineHeight", DefaultLineHeight);
 
             XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
             XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
@@ -423,8 +415,7 @@ namespace lg2de.SimpleAccounting.Reports
                     }
 
                     textNode.InnerText = strText;
-                    XmlNode widthNode = columnNode.Attributes.GetNamedItem("width");
-                    int colmnWidth = Convert.ToInt32(widthNode.Value);
+                    int colmnWidth = columnNode.GetAttribute<int>("width");
                     int xAdoption = 0;
                     var align = rowNode.Attributes.GetNamedItem("align")
                         ?? columnNode.Attributes.GetNamedItem("align");
@@ -628,20 +619,12 @@ namespace lg2de.SimpleAccounting.Reports
             nY += relY;
 
             string text = this.currentNode.InnerText;
-            StringAlignment alignment;
-            switch (align)
+            var alignment = align switch
             {
-            case "center":
-                alignment = StringAlignment.Center;
-                break;
-            case "right":
-                alignment = StringAlignment.Far;
-                break;
-            default:
-                alignment = StringAlignment.Near;
-                break;
-            }
-
+                "center" => StringAlignment.Center,
+                "right" => StringAlignment.Far,
+                _ => StringAlignment.Near,
+            };
             graphics.DrawString(
                 text,
                 drawFont,
@@ -651,63 +634,63 @@ namespace lg2de.SimpleAccounting.Reports
                 alignment);
         }
 
-        private void PrintLineNode(PrintPageEventArgs printArgs)
+        private void PrintLineNode(IGraphics graphics)
         {
             Pen drawPen = this.penStack.Peek();
 
-            XmlNode nodeAbsFromX = this.currentNode.Attributes.GetNamedItem("absFromX");
-            XmlNode nodeAbsFromY = this.currentNode.Attributes.GetNamedItem("absFromY");
-            XmlNode nodeRelFromX = this.currentNode.Attributes.GetNamedItem("relFromX");
-            XmlNode nodeRelFromY = this.currentNode.Attributes.GetNamedItem("relFromY");
-            XmlNode nodeAbsToX = this.currentNode.Attributes.GetNamedItem("absToX");
-            XmlNode nodeAbsToY = this.currentNode.Attributes.GetNamedItem("absToY");
-            XmlNode nodeRelToX = this.currentNode.Attributes.GetNamedItem("relToX");
-            XmlNode nodeRelToY = this.currentNode.Attributes.GetNamedItem("relToY");
+            var absFromX = this.currentNode.GetAttribute<int?>("absFromX");
+            var absFromY = this.currentNode.GetAttribute<int?>("absFromY");
+            var relFromX = this.currentNode.GetAttribute<int?>("relFromX");
+            var relFromY = this.currentNode.GetAttribute<int?>("relFromY");
+            var absToX = this.currentNode.GetAttribute<int?>("absToX");
+            var absToY = this.currentNode.GetAttribute<int?>("absToY");
+            var relToX = this.currentNode.GetAttribute<int?>("relToX");
+            var relToY = this.currentNode.GetAttribute<int?>("relToY");
             int x1 = this.CursorX;
             int y1 = this.CursorY;
             int x2 = this.CursorX;
             int y2 = this.CursorY;
-            if (nodeAbsFromX != null)
+            if (absFromX.HasValue)
             {
-                x1 = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsFromX.Value);
+                x1 = this.DocumentLeftMargin + absFromX.Value;
             }
 
-            if (nodeAbsFromY != null)
+            if (absFromY.HasValue)
             {
-                y1 = this.DocumentTopMargin + Convert.ToInt32(nodeAbsFromY.Value);
+                y1 = this.DocumentTopMargin + absFromY.Value;
             }
 
-            if (nodeRelFromX != null)
+            if (relFromX.HasValue)
             {
-                x1 += Convert.ToInt32(nodeRelFromX.Value);
+                x1 += relFromX.Value;
             }
 
-            if (nodeRelFromY != null)
+            if (relFromY.HasValue)
             {
-                y1 += Convert.ToInt32(nodeRelFromY.Value);
+                y1 += relFromY.Value;
             }
 
-            if (nodeAbsToX != null)
+            if (absToX.HasValue)
             {
-                x2 = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsToX.Value);
+                x2 = this.DocumentLeftMargin + absToX.Value;
             }
 
-            if (nodeAbsToY != null)
+            if (absToY.HasValue)
             {
-                y2 = this.DocumentTopMargin + Convert.ToInt32(nodeAbsToY.Value);
+                y2 = this.DocumentTopMargin + absToY.Value;
             }
 
-            if (nodeRelToX != null)
+            if (relToX.HasValue)
             {
-                x2 += Convert.ToInt32(nodeRelToX.Value);
+                x2 += relToX.Value;
             }
 
-            if (nodeRelToY != null)
+            if (relToY.HasValue)
             {
-                y2 += Convert.ToInt32(nodeRelToY.Value);
+                y2 += relToY.Value;
             }
 
-            printArgs.Graphics.DrawLine(
+            graphics.DrawLine(
                 drawPen,
                 this.ToPhysical(x1),
                 this.ToPhysical(y1),
@@ -715,71 +698,14 @@ namespace lg2de.SimpleAccounting.Reports
                 this.ToPhysical(y2));
         }
 
-        private void PrintCircleNode(PrintPageEventArgs printArgs)
-        {
-            Pen drawPen = this.penStack.Peek();
-
-            int x = this.CursorX;
-            int y = this.CursorY;
-
-            XmlNode nodeAbsX = this.currentNode.Attributes.GetNamedItem("absX");
-            XmlNode nodeAbsY = this.currentNode.Attributes.GetNamedItem("absY");
-            XmlNode nodeRelX = this.currentNode.Attributes.GetNamedItem("relX");
-            XmlNode nodeRelY = this.currentNode.Attributes.GetNamedItem("relY");
-            if (nodeAbsX != null)
-            {
-                x = this.DocumentLeftMargin + Convert.ToInt32(nodeAbsX.Value);
-            }
-
-            if (nodeAbsY != null)
-            {
-                y = this.DocumentTopMargin + Convert.ToInt32(nodeAbsY.Value);
-            }
-
-            if (nodeRelX != null)
-            {
-                x += Convert.ToInt32(nodeRelX.Value);
-            }
-
-            if (nodeRelY != null)
-            {
-                y += Convert.ToInt32(nodeRelY.Value);
-            }
-
-            int radX = this.currentNode.GetAttribute<int>("radX");
-            int radY = this.currentNode.GetAttribute<int>("radY");
-            x -= radX;
-            y -= radY;
-            radX *= 2;
-            radY *= 2;
-
-            printArgs.Graphics.DrawEllipse(
-                drawPen,
-                this.ToPhysical(x),
-                this.ToPhysical(y),
-                this.ToPhysical(radX),
-                this.ToPhysical(radY));
-        }
-
-        private void PrintFontNode(PrintPageEventArgs printArgs, IGraphics graphics)
+        private void PrintFontNode(IGraphics graphics)
         {
             Font drawFont = this.fontStack.Peek();
 
-            XmlNode nodeName = this.currentNode.Attributes.GetNamedItem("name");
-            XmlNode nodeSize = this.currentNode.Attributes.GetNamedItem("size");
             XmlNode nodeBold = this.currentNode.Attributes.GetNamedItem("bold");
-            string fontName = drawFont.Name;
-            float fontSize = drawFont.SizeInPoints;
+            string fontName = this.currentNode.GetAttribute<string>("name") ?? drawFont.Name;
+            float fontSize = this.currentNode.GetAttribute<float?>("size") ?? drawFont.SizeInPoints;
             FontStyle fontStyle = drawFont.Style;
-            if (nodeName != null)
-            {
-                fontName = nodeName.Value;
-            }
-
-            if (nodeSize != null)
-            {
-                fontSize = Convert.ToSingle(nodeSize.Value);
-            }
 
             if (nodeBold != null)
             {
@@ -803,7 +729,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.fontStack.Push(newFont);
                 var stackNode = this.currentNode;
                 this.currentNode = this.currentNode.FirstChild;
-                this.PrintNodes(printArgs, graphics);
+                this.PrintNodes(graphics);
                 this.currentNode = stackNode;
                 this.fontStack.Pop().Dispose();
             }
@@ -812,40 +738,6 @@ namespace lg2de.SimpleAccounting.Reports
                 // change current font
                 this.fontStack.Pop().Dispose();
                 this.fontStack.Push(newFont);
-            }
-        }
-
-        private void PrintColorNode(PrintPageEventArgs printArgs, IGraphics graphics)
-        {
-            Pen drawPen = this.penStack.Peek();
-            SolidBrush drawBrush = this.solidBrushStack.Peek();
-
-            XmlNode nodeName = this.currentNode.Attributes.GetNamedItem("name");
-            var newPen = (Pen)drawPen.Clone();
-            var newBrush = (SolidBrush)drawBrush.Clone();
-            if (nodeName != null)
-            {
-                newPen.Color = Color.FromName(nodeName.Value);
-                newBrush.Color = Color.FromName(nodeName.Value);
-            }
-
-            if (this.currentNode.ChildNodes.Count > 0)
-            {
-                this.penStack.Push(newPen);
-                this.solidBrushStack.Push(newBrush);
-                var stackNode = this.currentNode;
-                this.currentNode = this.currentNode.FirstChild;
-                this.PrintNodes(printArgs, graphics);
-                this.currentNode = stackNode;
-                this.penStack.Pop().Dispose();
-                this.solidBrushStack.Pop().Dispose();
-            }
-            else
-            {
-                this.penStack.Pop().Dispose();
-                this.penStack.Push(newPen);
-                this.solidBrushStack.Pop().Dispose();
-                this.solidBrushStack.Push(newBrush);
             }
         }
 
