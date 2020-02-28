@@ -35,6 +35,16 @@ Some screenshots for first impression:
 |-|-|
 |<img src="./samples/MainView.png" alt="Main view" width="250" />|<img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report" width="250" />|
 
+## Getting started
+
+The application is based on [.NET Core 3](https://dotnet.microsoft.com/download/dotnet-core/3.1).
+Please download and install the Runtime in version [3.1](https://dotnet.microsoft.com/download/dotnet-core/thank-you/runtime-desktop-3.1.2-windows-x64-installer) or above.
+
+Download the `SimpleAccounting` package from the [release page](https://github.com/lg2de/SimpleAccounting/releases).
+Extract the ZIP archive into your preferred destination directory.
+
+Start `SimpleAccounting.exe`.
+
 ## Contribution
 
 Contributions are welcome!
