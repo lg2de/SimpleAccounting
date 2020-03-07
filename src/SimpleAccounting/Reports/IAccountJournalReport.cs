@@ -4,13 +4,11 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    using System;
-
     internal interface IAccountJournalReport
     {
         bool PageBreakBetweenAccounts { get; set; }
 
-        void CreateReport(DateTime dateStart, DateTime dateEnd);
+        void CreateReport();
 
         void ShowPreview(string documentName);
     }

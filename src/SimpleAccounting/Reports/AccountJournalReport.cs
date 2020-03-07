@@ -19,18 +19,16 @@ namespace lg2de.SimpleAccounting.Reports
         public const string ResourceName = "AccountJournal.xml";
 
         private readonly IEnumerable<AccountDefinition> accounts;
-        private readonly AccountingDataJournal journal;
         private readonly CultureInfo culture;
 
         public AccountJournalReport(
             IEnumerable<AccountDefinition> accounts,
-            AccountingDataJournal journal,
+            AccountingDataJournal yearData,
             AccountingDataSetup setup,
             CultureInfo culture)
-            : base(ResourceName, setup, culture)
+            : base(ResourceName, setup, yearData, culture)
         {
             this.accounts = accounts.OrderBy(a => a.ID);
-            this.journal = journal;
             this.culture = culture;
         }
 
@@ -39,23 +37,17 @@ namespace lg2de.SimpleAccounting.Reports
         /// </summary>
         public bool PageBreakBetweenAccounts { get; set; }
 
-        public void CreateReport(DateTime dateStart, DateTime dateEnd)
+        public void CreateReport()
         {
-            this.PrepareDocument();
+            this.PreparePrintDocument();
 
-            XmlDocument doc = this.Printer.Document;
-
-            // TODO start and end should be read from model and should apply to all reports!?
-            XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            rangeNode.InnerText = dateStart.ToString("d", this.culture) + " - " + dateEnd.ToString("d", this.culture);
-
-            XmlNode tableNode = doc.SelectSingleNode("//table");
+            XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table");
 
             bool firstAccount = true;
 
             foreach (var account in this.accounts)
             {
-                var accountEntries = this.journal.Booking
+                var accountEntries = this.YearData.Booking
                     .Where(x => x.Debit.Any(a => a.Account == account.ID) || x.Credit.Any(a => a.Account == account.ID))
                     .OrderBy(x => x.Date)
                     .ToList();
@@ -71,27 +63,27 @@ namespace lg2de.SimpleAccounting.Reports
                     XmlNode separatorNode;
                     if (this.PageBreakBetweenAccounts)
                     {
-                        separatorNode = doc.CreateElement("newPage");
+                        separatorNode = this.PrintDocument.CreateElement("newPage");
                     }
                     else
                     {
-                        separatorNode = doc.CreateElement("move");
+                        separatorNode = this.PrintDocument.CreateElement("move");
                         separatorNode.SetAttribute("relY", "5");
                     }
 
                     tableNode.ParentNode.InsertBefore(separatorNode, tableNode);
                 }
 
-                var titleFont = doc.CreateElement("font");
+                var titleFont = this.PrintDocument.CreateElement("font");
                 titleFont.SetAttribute("size", 10);
                 titleFont.SetAttribute("bold", 1);
                 tableNode.ParentNode.InsertBefore(titleFont, tableNode);
 
-                var titleNode = doc.CreateElement("text");
+                var titleNode = this.PrintDocument.CreateElement("text");
                 titleNode.InnerText = account.FormatName();
                 titleFont.AppendChild(titleNode);
 
-                var moveNode = doc.CreateElement("move");
+                var moveNode = this.PrintDocument.CreateElement("move");
                 moveNode.SetAttribute("relY", "5");
                 tableNode.ParentNode.InsertBefore(moveNode, tableNode);
 
@@ -105,10 +97,10 @@ namespace lg2de.SimpleAccounting.Reports
 
                 foreach (var entry in accountEntries)
                 {
-                    XmlNode dataLineNode = doc.CreateElement("tr");
+                    XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
                     dataLineNode.SetAttribute("topLine", true);
                     dataNode.AppendChild(dataLineNode);
-                    XmlNode dataItemNode = doc.CreateElement("td");
+                    XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
                     dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d", this.culture);
                     dataLineNode.AppendChild(dataItemNode);
                     dataItemNode = dataItemNode.Clone();
@@ -128,7 +120,7 @@ namespace lg2de.SimpleAccounting.Reports
                         dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
                         dataLineNode.AppendChild(dataItemNode);
 
-                        dataItemNode = doc.CreateElement("td");
+                        dataItemNode = this.PrintDocument.CreateElement("td");
                         dataLineNode.AppendChild(dataItemNode);
 
                         dataItemNode = dataItemNode.Clone();
@@ -151,7 +143,7 @@ namespace lg2de.SimpleAccounting.Reports
                         dataItemNode.InnerText = creditEntry.Text;
                         dataLineNode.AppendChild(dataItemNode);
 
-                        dataItemNode = doc.CreateElement("td");
+                        dataItemNode = this.PrintDocument.CreateElement("td");
                         dataLineNode.AppendChild(dataItemNode);
 
                         double nValue = Convert.ToDouble(creditEntry.Value) / 100;
@@ -177,51 +169,51 @@ namespace lg2de.SimpleAccounting.Reports
                 // sum
                 if (nDebitSum > 0 && nCreditSum > 0)
                 {
-                    XmlNode sumLineNode = doc.CreateElement("tr");
+                    XmlNode sumLineNode = this.PrintDocument.CreateElement("tr");
                     sumLineNode.SetAttribute("topLine", true);
                     dataNode.AppendChild(sumLineNode);
-                    XmlNode sumItemNode = doc.CreateElement("td");
+                    XmlNode sumItemNode = this.PrintDocument.CreateElement("td");
                     sumItemNode.InnerText = "Summen";
                     sumItemNode.SetAttribute("align", "right");
                     sumLineNode.AppendChild(sumItemNode);
-                    sumLineNode.AppendChild(doc.CreateElement("td")); // id
-                    sumLineNode.AppendChild(doc.CreateElement("td")); // text
-                    sumItemNode = doc.CreateElement("td");
+                    sumLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // id
+                    sumLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // text
+                    sumItemNode = this.PrintDocument.CreateElement("td");
                     sumItemNode.InnerText = nDebitSum.ToString("0.00", this.culture);
                     sumLineNode.AppendChild(sumItemNode);
                     sumItemNode = sumItemNode.Clone();
                     sumItemNode.InnerText = nCreditSum.ToString("0.00", this.culture);
                     sumLineNode.AppendChild(sumItemNode);
-                    sumLineNode.AppendChild(doc.CreateElement("td")); // remote
+                    sumLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // remote
                 }
 
                 // saldo
-                XmlNode saldoLineNode = doc.CreateElement("tr");
+                XmlNode saldoLineNode = this.PrintDocument.CreateElement("tr");
                 saldoLineNode.SetAttribute("topLine", true);
                 dataNode.AppendChild(saldoLineNode);
-                XmlNode saldoItemNode = doc.CreateElement("td");
+                XmlNode saldoItemNode = this.PrintDocument.CreateElement("td");
                 saldoItemNode.InnerText = "Saldo";
                 saldoItemNode.SetAttribute("align", "right");
                 saldoLineNode.AppendChild(saldoItemNode);
-                saldoLineNode.AppendChild(doc.CreateElement("td")); // id
-                saldoLineNode.AppendChild(doc.CreateElement("td")); // text
+                saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // id
+                saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // text
                 if (nDebitSum > nCreditSum)
                 {
-                    saldoItemNode = doc.CreateElement("td");
+                    saldoItemNode = this.PrintDocument.CreateElement("td");
                     saldoItemNode.InnerText = (nDebitSum - nCreditSum).ToString("0.00", this.culture);
                     saldoLineNode.AppendChild(saldoItemNode);
-                    saldoLineNode.AppendChild(doc.CreateElement("td"));
+                    saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td"));
                 }
                 else
                 {
-                    saldoLineNode.AppendChild(doc.CreateElement("td"));
-                    saldoItemNode = doc.CreateElement("td");
+                    saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td"));
+                    saldoItemNode = this.PrintDocument.CreateElement("td");
                     saldoItemNode.InnerText = (nCreditSum - nDebitSum).ToString("0.00", this.culture);
                     saldoLineNode.AppendChild(saldoItemNode);
                 }
 
                 // empty remote account column
-                saldoLineNode.AppendChild(doc.CreateElement("td"));
+                saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td"));
 
                 firstAccount = false;
             }

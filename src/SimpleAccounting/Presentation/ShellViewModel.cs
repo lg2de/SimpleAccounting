@@ -205,8 +205,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentModelJournal,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
-                report.CreateReport(this.currentModelJournal.DateStart.ToDateTime(), this.currentModelJournal.DateEnd.ToDateTime());
-                report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Journal {this.currentModelJournal.Year}");
+                report.CreateReport();
+                report.ShowPreview("Journal");
             },
             _ => this.FullJournal.Any());
 
@@ -219,8 +219,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
                 report.PageBreakBetweenAccounts = this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
-                report.CreateReport(this.currentModelJournal.DateStart.ToDateTime(), this.currentModelJournal.DateEnd.ToDateTime());
-                report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Kontoblätter {this.currentModelJournal.Year}");
+                report.CreateReport();
+                report.ShowPreview("Kontoblätter");
             },
             _ => this.FullJournal.Any());
 
@@ -232,8 +232,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.accountingData.Accounts,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
-                report.CreateReport(this.currentModelJournal.DateStart.ToDateTime(), this.currentModelJournal.DateEnd.ToDateTime());
-                report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Summen und Salden {this.currentModelJournal.Year}");
+                report.CreateReport();
+                report.ShowPreview("Summen und Salden");
             },
             _ => this.FullJournal.Any());
 
@@ -264,8 +264,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
                 this.accountingData.Setup.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
-                report.CreateReport(this.currentModelJournal.DateStart.ToDateTime(), this.currentModelJournal.DateEnd.ToDateTime());
-                report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Bestandskontosalden {this.currentModelJournal.Year}");
+                report.CreateReport();
+                report.ShowPreview("Bestandskontosalden");
             },
             _ => this.FullJournal.Any());
 
@@ -276,10 +276,9 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentModelJournal,
                     this.accountingData.AllAccounts,
                     this.accountingData.Setup,
-                    this.currentModelJournal.Year,
                     CultureInfo.CurrentUICulture);
                 report.CreateReport();
-                report.ShowPreview($"{DateTime.Now:yyyy-MM-dd} Jahresbilanz {this.currentModelJournal.Year}");
+                report.ShowPreview("Jahresbilanz");
             },
             _ => this.FullJournal.Any());
 

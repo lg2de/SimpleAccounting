@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
-    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -32,6 +31,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var journal = new AccountingDataJournal
             {
                 Year = "2019",
+                DateStart = 20190101,
+                DateEnd = 20191231,
                 Booking = new List<AccountingDataJournalBooking>
                 {
                     new AccountingDataJournalBooking
@@ -84,7 +85,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var sut = new AccountJournalReport(accounts, journal, setup, new CultureInfo("en-us"));
             sut.PageBreakBetweenAccounts = pageBreakBetweenAccounts;
 
-            sut.CreateReport(new DateTime(2019, 1, 1), new DateTime(2019, 12, 31));
+            sut.CreateReport();
 
             var expectedMoney = @"
 <data>
@@ -168,7 +169,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     </tr>
 </data>";
 
-            var rootElements = sut.Document.Element("xEport").Elements().Select(e => e.Name).Should().Equal(
+            var rootElements = sut.DocumentForTests.Element("xEport").Elements().Select(e => e.Name).Should().Equal(
                 "pageTexts",
                 "font", // header
                 "text",
@@ -193,7 +194,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 "move", // footer
                 "text");
 
-            var actual = sut.Document.XPathSelectElements("//table/data").ToArray();
+            var actual = sut.DocumentForTests.XPathSelectElements("//table/data").ToArray();
             actual.Should().HaveCount(3);
             using (new AssertionScope())
             {

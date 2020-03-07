@@ -8,6 +8,7 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Globalization;
     using System.Xml;
     using System.Xml.Linq;
+    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
     internal abstract class ReportBase
@@ -15,9 +16,14 @@ namespace lg2de.SimpleAccounting.Reports
         private readonly AccountingDataSetup setup;
         private readonly CultureInfo culture;
 
-        protected ReportBase(string resourceName, AccountingDataSetup setup, CultureInfo culture)
+        protected ReportBase(
+            string resourceName,
+            AccountingDataSetup setup,
+            AccountingDataJournal yearData,
+            CultureInfo culture)
         {
             this.setup = setup;
+            this.YearData = yearData;
             this.culture = culture;
 
             this.Printer.LoadDocument(resourceName);
@@ -25,22 +31,38 @@ namespace lg2de.SimpleAccounting.Reports
 
         protected XmlPrinter Printer { get; } = new XmlPrinter();
 
-        internal XDocument Document => XDocument.Parse(this.Printer.Document.OuterXml);
+        protected AccountingDataJournal YearData { get; private set; }
+
+        protected XmlDocument PrintDocument => this.Printer.Document;
+
+        internal XDocument DocumentForTests => XDocument.Parse(this.Printer.Document.OuterXml);
 
         public void ShowPreview(string documentName)
         {
-            this.Printer.PrintDocument(documentName);
+            this.Printer.PrintDocument($"{DateTime.Now:yyyy-MM-dd} {documentName} {this.YearData.Year}");
         }
 
-        protected void PrepareDocument()
+        protected void PreparePrintDocument()
         {
-            XmlDocument doc = this.Printer.Document;
+            var textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"firm\"]");
+            textNode.InnerText = this.setup.Name;
 
-            XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = this.setup.Name;
+            textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"yearName\"]");
+            if (textNode != null)
+            {
+                textNode.InnerText = this.YearData.Year;
+            }
 
-            var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToString("D", this.culture);
+            textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"range\"]");
+            if (textNode != null)
+            {
+                string startDate = this.YearData.DateStart.ToDateTime().ToString("d", this.culture);
+                string endDate = this.YearData.DateEnd.ToDateTime().ToString("d", this.culture);
+                textNode.InnerText = $"{startDate} - {endDate}";
+            }
+
+            textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"date\"]");
+            textNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToString("D", this.culture);
         }
     }
 }

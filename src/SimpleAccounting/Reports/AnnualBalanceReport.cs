@@ -16,64 +16,54 @@ namespace lg2de.SimpleAccounting.Reports
     {
         public const string ResourceName = "AnnualBalance.xml";
 
-        private readonly AccountingDataJournal journal;
         private readonly List<AccountDefinition> allAccounts;
-        private readonly string bookingYearName;
         private readonly CultureInfo culture;
 
         public AnnualBalanceReport(
-            AccountingDataJournal journal,
+            AccountingDataJournal yearData,
             IEnumerable<AccountDefinition> accounts,
             AccountingDataSetup setup,
-            string bookingYearName,
             CultureInfo culture)
-            : base(ResourceName, setup, culture)
+            : base(ResourceName, setup, yearData, culture)
         {
-            this.journal = journal;
             this.allAccounts = accounts.ToList();
-            this.bookingYearName = bookingYearName;
             this.culture = culture;
         }
 
         public void CreateReport()
         {
-            this.PrepareDocument();
-
-            XmlDocument doc = this.Printer.Document;
-
-            var rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            rangeNode.InnerText = this.bookingYearName;
+            this.PreparePrintDocument();
 
             // income / Einnahmen
-            this.ProcessIncome(doc, out var totalIncome);
+            this.ProcessIncome(out var totalIncome);
 
             // expense / Ausgaben
-            this.ProcessExpenses(doc, out var totalExpense);
+            this.ProcessExpenses(out var totalExpense);
 
-            var saldoNode = doc.SelectSingleNode("//text[@ID=\"saldo\"]");
+            var saldoNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"saldo\"]");
             saldoNode.InnerText = ((totalIncome + totalExpense) / 100).ToString("0.00", this.culture);
 
             // receivables / Forderungen
-            this.ProcessReceivables(doc, out double totalReceivable);
+            this.ProcessReceivables(out double totalReceivable);
 
             // liabilities / Verbindlichkeiten
-            this.ProcessLiabilities(doc, out double totalLiability);
+            this.ProcessLiabilities(out double totalLiability);
 
             // asset / Vermögen
-            this.ProcessAssets(doc, totalReceivable, totalLiability);
+            this.ProcessAssets(totalReceivable, totalLiability);
         }
 
-        private void ProcessIncome(XmlDocument doc, out double totalIncome)
+        private void ProcessIncome(out double totalIncome)
         {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='income']");
+            var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='income']");
             totalIncome = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Income);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.journal.Booking
+                double saldoCredit = this.YearData.Booking
                     .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
+                double saldoDebit = this.YearData.Booking
                     .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
 
@@ -85,8 +75,8 @@ namespace lg2de.SimpleAccounting.Reports
 
                 totalIncome += balance;
 
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
+                XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+                XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
 
                 dataLineNode.AppendChild(dataItemNode);
 
@@ -100,7 +90,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
-                dataItemNode = doc.CreateElement("td");
+                dataItemNode = this.PrintDocument.CreateElement("td");
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataNode.AppendChild(dataLineNode);
@@ -110,17 +100,17 @@ namespace lg2de.SimpleAccounting.Reports
             saldoElement.InnerText = (totalIncome / 100).ToString("0.00", this.culture);
         }
 
-        private void ProcessExpenses(XmlDocument doc, out double totalExpense)
+        private void ProcessExpenses(out double totalExpense)
         {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='expense']");
+            var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='expense']");
             totalExpense = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Expense);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.journal.Booking
+                double saldoCredit = this.YearData.Booking
                     .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
+                double saldoDebit = this.YearData.Booking
                     .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
 
@@ -132,8 +122,8 @@ namespace lg2de.SimpleAccounting.Reports
 
                 totalExpense += balance;
 
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
+                XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+                XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
 
                 dataLineNode.AppendChild(dataItemNode);
 
@@ -147,7 +137,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
-                dataItemNode = doc.CreateElement("td");
+                dataItemNode = this.PrintDocument.CreateElement("td");
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataNode.AppendChild(dataLineNode);
@@ -157,17 +147,17 @@ namespace lg2de.SimpleAccounting.Reports
             saldoElement.InnerText = (totalExpense / 100).ToString("0.00", this.culture);
         }
 
-        private void ProcessReceivables(XmlDocument doc, out double totalReceivable)
+        private void ProcessReceivables(out double totalReceivable)
         {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='receivable']");
+            var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='receivable']");
             totalReceivable = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.journal.Booking
+                double saldoCredit = this.YearData.Booking
                     .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
+                double saldoDebit = this.YearData.Booking
                     .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
 
@@ -179,8 +169,8 @@ namespace lg2de.SimpleAccounting.Reports
 
                 totalReceivable += balance;
 
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
+                XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+                XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
 
                 dataLineNode.AppendChild(dataItemNode);
 
@@ -194,7 +184,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
-                dataItemNode = doc.CreateElement("td");
+                dataItemNode = this.PrintDocument.CreateElement("td");
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataNode.AppendChild(dataLineNode);
@@ -204,17 +194,17 @@ namespace lg2de.SimpleAccounting.Reports
             saldoElement.InnerText = (totalReceivable / 100).ToString("0.00", this.culture);
         }
 
-        private void ProcessLiabilities(XmlDocument doc, out double totalLiability)
+        private void ProcessLiabilities(out double totalLiability)
         {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='liability']");
+            var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='liability']");
             totalLiability = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.journal.Booking
+                double saldoCredit = this.YearData.Booking
                     .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
+                double saldoDebit = this.YearData.Booking
                     .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
 
@@ -226,8 +216,8 @@ namespace lg2de.SimpleAccounting.Reports
 
                 totalLiability += balance;
 
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
+                XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+                XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
 
                 dataLineNode.AppendChild(dataItemNode);
 
@@ -241,7 +231,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
-                dataItemNode = doc.CreateElement("td");
+                dataItemNode = this.PrintDocument.CreateElement("td");
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataNode.AppendChild(dataLineNode);
@@ -251,17 +241,17 @@ namespace lg2de.SimpleAccounting.Reports
             saldoElement.InnerText = (totalLiability / 100).ToString("0.00", this.culture);
         }
 
-        private void ProcessAssets(XmlDocument doc, double totalReceivable, double totalLiability)
+        private void ProcessAssets(double totalReceivable, double totalLiability)
         {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='asset']");
+            var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='asset']");
             double totalAccount = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Asset);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.journal.Booking
+                double saldoCredit = this.YearData.Booking
                     .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
+                double saldoDebit = this.YearData.Booking
                     .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                     .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
 
@@ -273,8 +263,8 @@ namespace lg2de.SimpleAccounting.Reports
 
                 totalAccount += balance;
 
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
+                XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+                XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
 
                 dataLineNode.AppendChild(dataItemNode);
 
@@ -288,7 +278,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
-                dataItemNode = doc.CreateElement("td");
+                dataItemNode = this.PrintDocument.CreateElement("td");
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataNode.AppendChild(dataLineNode);
@@ -296,8 +286,8 @@ namespace lg2de.SimpleAccounting.Reports
 
             if (totalReceivable > 0)
             {
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
+                XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+                XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
 
                 dataLineNode.AppendChild(dataItemNode);
 
@@ -309,7 +299,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode.InnerText = (totalReceivable / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
-                dataItemNode = doc.CreateElement("td");
+                dataItemNode = this.PrintDocument.CreateElement("td");
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataNode.AppendChild(dataLineNode);
@@ -319,8 +309,8 @@ namespace lg2de.SimpleAccounting.Reports
 
             if (totalLiability < 0)
             {
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
+                XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+                XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
 
                 dataLineNode.AppendChild(dataItemNode);
 
@@ -332,7 +322,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode.InnerText = (totalLiability / 100).ToString("0.00", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
 
-                dataItemNode = doc.CreateElement("td");
+                dataItemNode = this.PrintDocument.CreateElement("td");
                 dataLineNode.AppendChild(dataItemNode);
 
                 dataNode.AppendChild(dataLineNode);
