@@ -20,6 +20,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         private readonly IEnumerable<AccountDefinition> accounts;
         private readonly CultureInfo culture;
+        private bool firstAccount;
         private double creditSum;
         private double debitSum;
 
@@ -45,7 +46,7 @@ namespace lg2de.SimpleAccounting.Reports
 
             XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table");
 
-            bool firstAccount = true;
+            this.firstAccount = true;
 
             foreach (var account in this.accounts)
             {
@@ -60,21 +61,7 @@ namespace lg2de.SimpleAccounting.Reports
                     continue;
                 }
 
-                if (!firstAccount)
-                {
-                    XmlNode separatorNode;
-                    if (this.PageBreakBetweenAccounts)
-                    {
-                        separatorNode = this.PrintDocument.CreateElement("newPage");
-                    }
-                    else
-                    {
-                        separatorNode = this.PrintDocument.CreateElement("move");
-                        separatorNode.SetAttribute("relY", "5");
-                    }
-
-                    tableNode.ParentNode.InsertBefore(separatorNode, tableNode);
-                }
+                this.AddAccountSeparator(tableNode);
 
                 var titleFont = this.PrintDocument.CreateElement("font");
                 titleFont.SetAttribute("size", 10);
@@ -150,11 +137,32 @@ namespace lg2de.SimpleAccounting.Reports
 
                 // empty remote account column
                 saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td"));
-
-                firstAccount = false;
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);
+        }
+
+        private void AddAccountSeparator(XmlNode tableNode)
+        {
+            if (this.firstAccount)
+            {
+                // skip separator for (before) first account
+                this.firstAccount = false;
+                return;
+            }
+
+            XmlNode separatorNode;
+            if (this.PageBreakBetweenAccounts)
+            {
+                separatorNode = this.PrintDocument.CreateElement("newPage");
+            }
+            else
+            {
+                separatorNode = this.PrintDocument.CreateElement("move");
+                separatorNode.SetAttribute("relY", "5");
+            }
+
+            tableNode.ParentNode.InsertBefore(separatorNode, tableNode);
         }
 
         private XmlNode CreateBookingEntry(AccountingDataJournalBooking entry, ulong accountIdentifier)
