@@ -4,99 +4,61 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
-    using System.Xml.Linq;
     using lg2de.SimpleAccounting.Model;
 
 #pragma warning disable S4055 // string literals => pending translation
 
-    internal class AnnualBalanceReport
+    internal class AnnualBalanceReport : ReportBase
     {
         public const string ResourceName = "AnnualBalance.xml";
 
-        private readonly AccountingDataJournal journal;
         private readonly List<AccountDefinition> allAccounts;
-        private readonly AccountingDataSetup setup;
-        private readonly string bookingYearName;
         private readonly CultureInfo culture;
 
-        private XmlPrinter printer;
-
         public AnnualBalanceReport(
-            AccountingDataJournal journal,
+            AccountingDataJournal yearData,
             IEnumerable<AccountDefinition> accounts,
             AccountingDataSetup setup,
-            string bookingYearName,
             CultureInfo culture)
+            : base(ResourceName, setup, yearData, culture)
         {
-            this.journal = journal;
             this.allAccounts = accounts.ToList();
-            this.setup = setup;
-            this.bookingYearName = bookingYearName;
             this.culture = culture;
         }
 
-        internal XDocument Document => XDocument.Parse(this.printer.Document.OuterXml);
-
         public void CreateReport()
         {
-            this.printer = new XmlPrinter();
-            this.printer.LoadDocument(ResourceName);
-
-            XmlDocument doc = this.printer.Document;
-
-            var firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = this.setup.Name;
-
-            var rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            rangeNode.InnerText = this.bookingYearName;
-
-            var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToString("D", this.culture);
+            this.PreparePrintDocument();
 
             // income / Einnahmen
-            this.ProcessIncome(doc, out var totalIncome);
+            this.ProcessIncome(out var totalIncome);
 
             // expense / Ausgaben
-            this.ProcessExpenses(doc, out var totalExpense);
+            this.ProcessExpenses(out var totalExpense);
 
-            var saldoNode = doc.SelectSingleNode("//text[@ID=\"saldo\"]");
+            var saldoNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"saldo\"]");
             saldoNode.InnerText = ((totalIncome + totalExpense) / 100).ToString("0.00", this.culture);
 
             // receivables / Forderungen
-            this.ProcessReceivables(doc, out double totalReceivable);
-
             // liabilities / Verbindlichkeiten
-            this.ProcessLiabilities(doc, out double totalLiability);
+            this.ProcessReceivablesAndLiabilities(out double totalReceivable, out double totalLiability);
 
             // asset / Vermögen
-            this.ProcessAssets(doc, totalReceivable, totalLiability);
+            this.ProcessAssets(totalReceivable, totalLiability);
         }
 
-        public void ShowPreview(string documentName)
+        private void ProcessIncome(out double totalIncome)
         {
-            this.printer.PrintDocument(documentName);
-        }
-
-        private void ProcessIncome(XmlDocument doc, out double totalIncome)
-        {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='income']");
+            var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='income']");
             totalIncome = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Income);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.journal.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoCredit - saldoDebit;
+                double balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
                     continue;
@@ -104,46 +66,21 @@ namespace lg2de.SimpleAccounting.Reports
 
                 totalIncome += balance;
 
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
-
-                dataLineNode.AppendChild(dataItemNode);
-
-                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = accountText;
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = doc.CreateElement("td");
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataNode.AppendChild(dataLineNode);
+                dataNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
             }
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalIncome / 100).ToString("0.00", this.culture);
         }
 
-        private void ProcessExpenses(XmlDocument doc, out double totalExpense)
+        private void ProcessExpenses(out double totalExpense)
         {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='expense']");
+            var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='expense']");
             totalExpense = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Expense);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.journal.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoCredit - saldoDebit;
+                double balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
                     continue;
@@ -151,140 +88,49 @@ namespace lg2de.SimpleAccounting.Reports
 
                 totalExpense += balance;
 
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
-
-                dataLineNode.AppendChild(dataItemNode);
-
-                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = accountText;
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = doc.CreateElement("td");
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataNode.AppendChild(dataLineNode);
+                dataNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
             }
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalExpense / 100).ToString("0.00", this.culture);
         }
 
-        private void ProcessReceivables(XmlDocument doc, out double totalReceivable)
+        private void ProcessReceivablesAndLiabilities(out double totalReceivable, out double totalLiability)
         {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='receivable']");
+            var receivableNode = this.PrintDocument.SelectSingleNode("//table/data[@target='receivable']");
+            var liabilityNode = this.PrintDocument.SelectSingleNode("//table/data[@target='liability']");
             totalReceivable = 0;
-            var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
-            foreach (var account in accounts)
-            {
-                double saldoCredit = this.journal.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoDebit - saldoCredit;
-                if (balance <= 0)
-                {
-                    continue;
-                }
-
-                totalReceivable += balance;
-
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
-
-                dataLineNode.AppendChild(dataItemNode);
-
-                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = accountText;
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = doc.CreateElement("td");
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataNode.AppendChild(dataLineNode);
-            }
-
-            var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
-            saldoElement.InnerText = (totalReceivable / 100).ToString("0.00", this.culture);
-        }
-
-        private void ProcessLiabilities(XmlDocument doc, out double totalLiability)
-        {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='liability']");
             totalLiability = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.journal.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoDebit - saldoCredit;
-                if (balance >= 0)
+                double balance = this.GetAccountBalance(account, creditFromDebit: false);
+                if (balance > 0)
                 {
-                    continue;
+                    totalReceivable += balance;
+                    receivableNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
                 }
-
-                totalLiability += balance;
-
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
-
-                dataLineNode.AppendChild(dataItemNode);
-
-                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = accountText;
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = doc.CreateElement("td");
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataNode.AppendChild(dataLineNode);
+                else if (balance < 0)
+                {
+                    totalLiability += balance;
+                    liabilityNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
+                }
             }
 
-            var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
+            var saldoElement = receivableNode.SelectSingleNode("../columns/column[position()=4]");
+            saldoElement.InnerText = (totalReceivable / 100).ToString("0.00", this.culture);
+            saldoElement = liabilityNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalLiability / 100).ToString("0.00", this.culture);
         }
 
-        private void ProcessAssets(XmlDocument doc, double totalReceivable, double totalLiability)
+        private void ProcessAssets(double totalReceivable, double totalLiability)
         {
-            var dataNode = doc.SelectSingleNode("//table/data[@target='asset']");
+            var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='asset']");
             double totalAccount = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Asset);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.journal.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.journal.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoDebit - saldoCredit;
+                double balance = this.GetAccountBalance(account, creditFromDebit: false);
                 if (balance == 0)
                 {
                     continue;
@@ -292,75 +138,65 @@ namespace lg2de.SimpleAccounting.Reports
 
                 totalAccount += balance;
 
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
-
-                dataLineNode.AppendChild(dataItemNode);
-
-                string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = accountText;
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = doc.CreateElement("td");
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataNode.AppendChild(dataLineNode);
+                dataNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
             }
 
             if (totalReceivable > 0)
             {
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
-
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = "Forderungen";
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (totalReceivable / 100).ToString("0.00", this.culture);
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = doc.CreateElement("td");
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataNode.AppendChild(dataLineNode);
-
+                dataNode.AppendChild(this.CreateBalanceNode("Forderungen", totalReceivable));
                 totalAccount += totalReceivable;
             }
 
             if (totalLiability < 0)
             {
-                XmlNode dataLineNode = doc.CreateElement("tr");
-                XmlNode dataItemNode = doc.CreateElement("td");
-
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = "Verbindlichkeiten";
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = (totalLiability / 100).ToString("0.00", this.culture);
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataItemNode = doc.CreateElement("td");
-                dataLineNode.AppendChild(dataItemNode);
-
-                dataNode.AppendChild(dataLineNode);
-
+                dataNode.AppendChild(this.CreateBalanceNode("Verbindlichkeiten", totalLiability));
                 totalAccount += totalLiability;
             }
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalAccount / 100).ToString("0.00", this.culture);
+        }
+
+        private double GetAccountBalance(AccountDefinition account, bool creditFromDebit)
+        {
+            double saldoCredit = this.YearData.Booking
+                .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
+                .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
+            double saldoDebit = this.YearData.Booking
+                .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
+                .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
+
+            if (creditFromDebit)
+            {
+                return saldoCredit - saldoDebit;
+            }
+
+            return saldoDebit - saldoCredit;
+        }
+
+        private XmlNode CreateAccountBalanceNode(AccountDefinition account, double balance)
+        {
+            string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
+
+            return this.CreateBalanceNode(accountText, balance);
+        }
+
+        private XmlNode CreateBalanceNode(string balanceText, double balance)
+        {
+            XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+            XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
+
+            dataLineNode.AppendChild(dataItemNode);
+
+            dataItemNode = dataItemNode.Clone();
+            dataItemNode.InnerText = balanceText;
+            dataLineNode.AppendChild(dataItemNode);
+
+            dataItemNode = dataItemNode.Clone();
+            dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
+            dataLineNode.AppendChild(dataItemNode);
+
+            return dataLineNode;
         }
     }
 }

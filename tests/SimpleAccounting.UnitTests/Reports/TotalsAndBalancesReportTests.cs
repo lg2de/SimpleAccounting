@@ -9,7 +9,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     using System.Xml.Linq;
     using System.Xml.XPath;
     using FluentAssertions;
-    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Reports;
     using lg2de.SimpleAccounting.UnitTests.Presentation;
@@ -26,7 +25,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             AccountingDataJournal journal = project.Journal.Last();
             var sut = new TotalsAndBalancesReport(journal, project.Accounts, setup, new CultureInfo("en-us"));
 
-            sut.CreateReport(journal.DateStart.ToDateTime(), journal.DateEnd.ToDateTime());
+            sut.CreateReport();
 
             var expected = @"
 <data>
@@ -130,7 +129,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>2800.00</td>
   </tr>
 </data>";
-            sut.Document.XPathSelectElement("//table/data")
+            sut.DocumentForTests.XPathSelectElement("//table/data")
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
         }
 
@@ -143,9 +142,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var sut = new TotalsAndBalancesReport(journal, project.Accounts, setup, new CultureInfo("en-us"));
             sut.Signatures.Add("The Name");
 
-            sut.CreateReport(journal.DateStart.ToDateTime(), journal.DateEnd.ToDateTime());
+            sut.CreateReport();
 
-            sut.Document.XPathSelectElements("//text[@tag='signature']")
+            sut.DocumentForTests.XPathSelectElements("//text[@tag='signature']")
                 .Select(x => x.Value).Should().Equal("The Name");
         }
     }

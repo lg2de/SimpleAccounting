@@ -4,26 +4,21 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
-    using System.Xml.Linq;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
 #pragma warning disable S4055 // string literals => pending translation
 
-    internal class TotalsAndBalancesReport
+    internal class TotalsAndBalancesReport : ReportBase
     {
         public const string ResourceName = "TotalsAndBalances.xml";
 
-        private readonly AccountingDataJournal journal;
         private readonly List<AccountingDataAccountGroup> accountGroups;
-        private readonly AccountingDataSetup setup;
         private readonly CultureInfo culture;
-        private readonly IXmlPrinter printer = new XmlPrinter();
 
         private double totalOpeningCredit, totalOpeningDebit;
         private double totalSumCredit, totalSumDebit;
@@ -34,37 +29,23 @@ namespace lg2de.SimpleAccounting.Reports
         private int accountsPerGroup;
 
         public TotalsAndBalancesReport(
-            AccountingDataJournal journal,
+            AccountingDataJournal yearData,
             List<AccountingDataAccountGroup> accountGroups,
             AccountingDataSetup setup,
             CultureInfo culture)
+            : base(ResourceName, setup, yearData, culture)
         {
-            this.journal = journal;
             this.accountGroups = accountGroups;
-            this.setup = setup;
             this.culture = culture;
         }
 
         public List<string> Signatures { get; } = new List<string>();
 
-        internal XDocument Document => XDocument.Parse(this.printer.Document.OuterXml);
-
-        public void CreateReport(DateTime dateStart, DateTime dateEnd)
+        public void CreateReport()
         {
-            this.printer.LoadDocument(ResourceName);
+            this.PreparePrintDocument();
 
-            XmlDocument doc = this.printer.Document;
-
-            XmlNode firmNode = doc.SelectSingleNode("//text[@ID=\"firm\"]");
-            firmNode.InnerText = this.setup.Name;
-
-            XmlNode rangeNode = doc.SelectSingleNode("//text[@ID=\"range\"]");
-            rangeNode.InnerText = dateStart.ToString("d", this.culture) + " - " + dateEnd.ToString("d", this.culture);
-
-            var dateNode = doc.SelectSingleNode("//text[@ID=\"date\"]");
-            dateNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToLongDateString();
-
-            XmlNode dataNode = doc.SelectSingleNode("//table/data");
+            XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data");
 
             this.totalOpeningCredit = 0;
             this.totalOpeningDebit = 0;
@@ -92,8 +73,8 @@ namespace lg2de.SimpleAccounting.Reports
                     continue;
                 }
 
-                XmlNode groupLineNode = doc.CreateElement("tr");
-                XmlNode groupItemNode = doc.CreateElement("td");
+                XmlNode groupLineNode = this.PrintDocument.CreateElement("tr");
+                XmlNode groupItemNode = this.PrintDocument.CreateElement("td");
                 groupLineNode.SetAttribute("topLine", true);
                 groupLineNode.SetAttribute("lineHeight", 6);
 
@@ -133,8 +114,8 @@ namespace lg2de.SimpleAccounting.Reports
                 dataNode.AppendChild(groupLineNode);
             }
 
-            XmlNode totalLineNode = doc.CreateElement("tr");
-            XmlNode totalItemNode = doc.CreateElement("td");
+            XmlNode totalLineNode = this.PrintDocument.CreateElement("tr");
+            XmlNode totalItemNode = this.PrintDocument.CreateElement("td");
             totalLineNode.SetAttribute("topLine", true);
 
             totalItemNode.InnerText = string.Empty;
@@ -172,18 +153,18 @@ namespace lg2de.SimpleAccounting.Reports
             totalLineNode.ChildNodes[1].SetAttribute("align", "right");
             dataNode.AppendChild(totalLineNode);
 
-            var signatures = doc.SelectSingleNode("//signatures");
+            var signatures = this.PrintDocument.SelectSingleNode("//signatures");
             foreach (var signature in this.Signatures)
             {
-                var move = doc.CreateElement("move");
+                var move = this.PrintDocument.CreateElement("move");
                 move.SetAttribute("relY", "20");
                 signatures.ParentNode.InsertBefore(move, signatures);
 
-                var line = doc.CreateElement("line");
+                var line = this.PrintDocument.CreateElement("line");
                 line.SetAttribute("relToX", "100");
                 signatures.ParentNode.InsertBefore(line, signatures);
 
-                var text = doc.CreateElement("text");
+                var text = this.PrintDocument.CreateElement("text");
                 text.InnerText = signature;
                 text.SetAttribute("tag", "signature");
                 signatures.ParentNode.InsertBefore(text, signatures);
@@ -194,34 +175,34 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void ProcessAccount(XmlNode dataNode, AccountDefinition account)
         {
-            if (this.journal.Booking.All(b => b.Debit.All(x => x.Account != account.ID) && b.Credit.All(x => x.Account != account.ID)))
+            if (this.YearData.Booking.All(b => b.Debit.All(x => x.Account != account.ID) && b.Credit.All(x => x.Account != account.ID)))
             {
                 return;
             }
 
             this.accountsPerGroup++;
-            var lastBookingDate = this.journal.Booking
+            var lastBookingDate = this.YearData.Booking
                 .Where(x => x.Debit.Any(a => a.Account == account.ID) || x.Credit.Any(a => a.Account == account.ID))
                 .Select(x => x.Date).DefaultIfEmpty().Max();
-            double saldoCredit = this.journal.Booking
+            double saldoCredit = this.YearData.Booking
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double saldoDebit = this.journal.Booking
+            double saldoDebit = this.YearData.Booking
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double openingCredit = this.journal.Booking
+            double openingCredit = this.YearData.Booking
                 .Where(b => b.Opening)
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double openingDebit = this.journal.Booking
+            double openingDebit = this.YearData.Booking
                 .Where(b => b.Opening)
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double sumCredit = this.journal.Booking
+            double sumCredit = this.YearData.Booking
                 .Where(b => !b.Opening)
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double sumDebit = this.journal.Booking
+            double sumDebit = this.YearData.Booking
                 .Where(b => !b.Opening)
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
@@ -248,8 +229,8 @@ namespace lg2de.SimpleAccounting.Reports
                 saldoCredit = 0;
             }
 
-            XmlNode dataLineNode = this.printer.Document.CreateElement("tr");
-            XmlNode dataItemNode = this.printer.Document.CreateElement("td");
+            XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+            XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
             dataLineNode.SetAttribute("topLine", true);
 
             dataItemNode.InnerText = account.ID.ToString(CultureInfo.InvariantCulture);
@@ -299,11 +280,6 @@ namespace lg2de.SimpleAccounting.Reports
             this.totalSumDebit += sumDebit;
             this.totalSaldoCredit += saldoCredit;
             this.totalSaldoDebit += saldoDebit;
-        }
-
-        public void ShowPreview(string documentName)
-        {
-            this.printer.PrintDocument(documentName);
         }
 
         private string FormatValue(double value)

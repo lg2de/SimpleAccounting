@@ -28,14 +28,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 journal,
                 project.AllAccounts,
                 setup,
-                project.Journal.Last().Year,
                 new CultureInfo("en-us"));
 
             sut.CreateReport();
 
             var _ = new AssertionScope();
 
-            sut.Document.XPathSelectElement("//text[@ID='saldo']")?.Value.Should().Be("150.00");
+            sut.DocumentForTests.XPathSelectElement("//text[@ID='saldo']")?.Value.Should().Be("150.00");
 
             var expected = @"
 <data target=""income"">
@@ -43,10 +42,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td>00400 Salary</td>
     <td>200.00</td>
-    <td />
   </tr>
 </data>";
-            sut.Document.XPathSelectElement("//table/data[@target='income']")
+            sut.DocumentForTests.XPathSelectElement("//table/data[@target='income']")
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
 
             expected = @"
@@ -55,15 +53,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td>00600 Shoes</td>
     <td>-50.00</td>
-    <td />
   </tr>
 </data>";
-            sut.Document.XPathSelectElement("//table/data[@target='expense']")
+            sut.DocumentForTests.XPathSelectElement("//table/data[@target='expense']")
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
 
             expected = @"
 <data target=""receivable"" />";
-            sut.Document.XPathSelectElement("//table/data[@target='receivable']")
+            sut.DocumentForTests.XPathSelectElement("//table/data[@target='receivable']")
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
 
             expected = @"
@@ -72,10 +69,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td>05000 Bank credit</td>
     <td>-2600.00</td>
-    <td />
   </tr>
 </data>";
-            sut.Document.XPathSelectElement("//table/data[@target='liability']")
+            sut.DocumentForTests.XPathSelectElement("//table/data[@target='liability']")
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
 
             expected = @"
@@ -84,16 +80,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td>00100 Bank account</td>
     <td>750.00</td>
-    <td />
   </tr>
   <tr>
     <td />
     <td>Verbindlichkeiten</td>
     <td>-2600.00</td>
-    <td />
   </tr>
 </data>";
-            sut.Document.XPathSelectElement("//table/data[@target='asset']")
+            sut.DocumentForTests.XPathSelectElement("//table/data[@target='asset']")
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
         }
     }

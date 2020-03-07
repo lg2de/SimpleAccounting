@@ -308,6 +308,31 @@ namespace lg2de.SimpleAccounting.Reports
             rectNode.ParentNode.RemoveChild(rectNode);
         }
 
+        private void TransformTable(XmlNode tableNode)
+        {
+            int tableLineHeight = tableNode.GetAttribute("lineHeight", DefaultLineHeight);
+
+            XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
+            XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
+
+            // if table can not be started on page - create new one
+            if (this.CursorY + tableLineHeight * 2 > this.DocumentHeight - this.DocumentBottomMargin)
+            {
+                XmlNode newPage = this.Document.CreateElement("newPage");
+                tableNode.ParentNode.InsertBefore(newPage, tableNode);
+                this.CursorY = this.DocumentTopMargin;
+            }
+
+            this.TransformTableHeader(tableNode);
+
+            for (int nodeIndex = 0; nodeIndex < dataNodes.Count; nodeIndex++)
+            {
+                this.TransformTableRow(tableNode, tableLineHeight, columnNodes, dataNodes, nodeIndex);
+            }
+
+            tableNode.ParentNode.RemoveChild(tableNode);
+        }
+
         private void TransformTableHeader(XmlNode tableNode)
         {
             XmlNode columnsRoot =
@@ -360,108 +385,90 @@ namespace lg2de.SimpleAccounting.Reports
             this.CursorY += headerLineHeight;
         }
 
-        private void TransformTable(XmlNode tableNode)
+        private void TransformTableRow(XmlNode tableNode, int tableLineHeight, XmlNodeList columnNodes, XmlNodeList dataNodes, int nodeIndex)
         {
-            int tableLineHeight = tableNode.GetAttribute("lineHeight", DefaultLineHeight);
+            var dataNode = dataNodes[nodeIndex];
 
-            XmlNodeList columnNodes = tableNode.SelectNodes("columns/column");
-            XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
-
-            // if table can not be started on page - create new one
-            if (this.CursorY + tableLineHeight * 2 > this.DocumentHeight - this.DocumentBottomMargin)
+            XmlNodeList rowNodes = dataNode.SelectNodes("td");
+            int nInnerLineCount = 1;
+            for (int i = 0; i < rowNodes.Count; i++)
             {
+                XmlNode rowNode = rowNodes[i];
+                string strText = rowNode.InnerText;
+                nInnerLineCount += strText.Length / 40;
+            }
+
+            var lineHeight = dataNode.GetAttribute("lineHeight", tableLineHeight * nInnerLineCount);
+
+            // check whether oversized line still fits into page
+            if (this.CursorY + lineHeight > this.DocumentHeight - this.DocumentBottomMargin)
+            {
+                StartNewPage();
+            }
+
+            int xPosition = 0;
+            for (int columnIndex = 0; columnIndex < rowNodes.Count; columnIndex++)
+            {
+                XmlNode columnNode = columnNodes[columnIndex];
+                XmlNode rowNode = rowNodes[columnIndex];
+                XmlNode textNode = this.Document.CreateElement("text");
+                string strText = rowNode.InnerText;
+
+                // line break
+                for (int j = 40; j < strText.Length; j += 41)
+                {
+                    strText = strText.Insert(j, "\n");
+                }
+
+                textNode.InnerText = strText;
+                int colmnWidth = columnNode.GetAttribute<int>("width");
+                int xAdoption = 0;
+                var align = rowNode.Attributes.GetNamedItem("align")
+                    ?? columnNode.Attributes.GetNamedItem("align");
+                if (align != null)
+                {
+                    textNode.SetAttribute("align", align.Value);
+                    if (align.Value == "right")
+                    {
+                        xAdoption = colmnWidth;
+                    }
+                    else if (align.Value == "center")
+                    {
+                        xAdoption = colmnWidth / 2;
+                    }
+                }
+
+                textNode.SetAttribute("relX", (xPosition + xAdoption).ToString());
+                tableNode.ParentNode.InsertBefore(textNode, tableNode);
+                this.CreateFrame(columnNode, textNode, xPosition, 0, xPosition + colmnWidth, lineHeight);
+                xPosition += colmnWidth;
+            }
+
+            this.CreateFrame(dataNode, tableNode, 0, 0, xPosition, lineHeight);
+
+            this.CursorY += lineHeight;
+
+            // check whether next line exists and fits into page
+            if (nodeIndex + 1 < dataNodes.Count
+                && this.CursorY + tableLineHeight > this.DocumentHeight - this.DocumentBottomMargin)
+            {
+                StartNewPage();
+                return;
+            }
+
+            // move cursor to next line
+            XmlNode moveNode = this.Document.CreateElement("move");
+            moveNode.SetAttribute("relY", lineHeight);
+            tableNode.ParentNode.InsertBefore(moveNode, tableNode);
+
+            void StartNewPage()
+            {
+                // start new page with table header
                 XmlNode newPage = this.Document.CreateElement("newPage");
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
                 this.CursorY = this.DocumentTopMargin;
+                this.TransformTableHeader(tableNode);
             }
-
-            this.TransformTableHeader(tableNode);
-
-            for (int nodeIndex = 0; nodeIndex < dataNodes.Count; nodeIndex++)
-            {
-                var dataNode = dataNodes[nodeIndex];
-                XmlNodeList rowNodes = dataNode.SelectNodes("td");
-                int nInnerLineCount = 1;
-                for (int i = 0; i < rowNodes.Count; i++)
-                {
-                    XmlNode rowNode = rowNodes[i];
-                    string strText = rowNode.InnerText;
-                    nInnerLineCount += strText.Length / 40;
-                }
-
-                var lineHeight = dataNode.GetAttribute("lineHeight", tableLineHeight * nInnerLineCount);
-
-                // check whether oversized line still fits into page
-                if (this.CursorY + lineHeight > this.DocumentHeight - this.DocumentBottomMargin)
-                {
-                    XmlNode newPage = this.Document.CreateElement("newPage");
-                    tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                    this.CursorY = this.DocumentTopMargin;
-                    this.TransformTableHeader(tableNode);
-                }
-
-                int xPosition = 0;
-                for (int i = 0; i < rowNodes.Count; i++)
-                {
-                    XmlNode columnNode = columnNodes[i];
-                    XmlNode rowNode = rowNodes[i];
-                    XmlNode textNode = this.Document.CreateElement("text");
-                    string strText = rowNode.InnerText;
-
-                    // line break
-                    for (int j = 40; j < strText.Length; j += 41)
-                    {
-                        strText = strText.Insert(j, "\n");
-                    }
-
-                    textNode.InnerText = strText;
-                    int colmnWidth = columnNode.GetAttribute<int>("width");
-                    int xAdoption = 0;
-                    var align = rowNode.Attributes.GetNamedItem("align")
-                        ?? columnNode.Attributes.GetNamedItem("align");
-                    if (align != null)
-                    {
-                        textNode.SetAttribute("align", align.Value);
-                        if (align.Value == "right")
-                        {
-                            xAdoption = colmnWidth;
-                        }
-                        else if (align.Value == "center")
-                        {
-                            xAdoption = colmnWidth / 2;
-                        }
-                    }
-
-                    textNode.SetAttribute("relX", (xPosition + xAdoption).ToString());
-                    tableNode.ParentNode.InsertBefore(textNode, tableNode);
-                    this.CreateFrame(columnNode, textNode, xPosition, 0, xPosition + colmnWidth, lineHeight);
-                    xPosition += colmnWidth;
-                }
-
-                this.CreateFrame(dataNode, tableNode, 0, 0, xPosition, lineHeight);
-
-                this.CursorY += lineHeight;
-
-                // check whether next line exists and fits into page
-                if (nodeIndex + 1 < dataNodes.Count
-                    && this.CursorY + tableLineHeight > this.DocumentHeight - this.DocumentBottomMargin)
-                {
-                    // start new page with table header
-                    XmlNode newPage = this.Document.CreateElement("newPage");
-                    tableNode.ParentNode.InsertBefore(newPage, tableNode);
-                    this.CursorY = this.DocumentTopMargin;
-                    this.TransformTableHeader(tableNode);
-                }
-                else
-                {
-                    // move cursor to next line
-                    XmlNode moveNode = this.Document.CreateElement("move");
-                    moveNode.SetAttribute("relY", lineHeight);
-                    tableNode.ParentNode.InsertBefore(moveNode, tableNode);
-                }
-            }
-
-            tableNode.ParentNode.RemoveChild(tableNode);
         }
 
         private void ProcessMoveNode(XmlNode node)
