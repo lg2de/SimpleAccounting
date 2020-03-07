@@ -42,7 +42,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td>00400 Salary</td>
     <td>200.00</td>
-    <td />
   </tr>
 </data>";
             sut.DocumentForTests.XPathSelectElement("//table/data[@target='income']")
@@ -54,7 +53,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td>00600 Shoes</td>
     <td>-50.00</td>
-    <td />
   </tr>
 </data>";
             sut.DocumentForTests.XPathSelectElement("//table/data[@target='expense']")
@@ -71,7 +69,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td>05000 Bank credit</td>
     <td>-2600.00</td>
-    <td />
   </tr>
 </data>";
             sut.DocumentForTests.XPathSelectElement("//table/data[@target='liability']")
@@ -83,13 +80,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td>00100 Bank account</td>
     <td>750.00</td>
-    <td />
   </tr>
   <tr>
     <td />
     <td>Verbindlichkeiten</td>
     <td>-2600.00</td>
-    <td />
   </tr>
 </data>";
             sut.DocumentForTests.XPathSelectElement("//table/data[@target='asset']")
