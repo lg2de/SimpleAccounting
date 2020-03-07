@@ -60,14 +60,7 @@ namespace lg2de.SimpleAccounting.Reports
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Income);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.YearData.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.YearData.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoCredit - saldoDebit;
+                double balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
                     continue;
@@ -89,14 +82,7 @@ namespace lg2de.SimpleAccounting.Reports
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Expense);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.YearData.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.YearData.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoCredit - saldoDebit;
+                double balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
                     continue;
@@ -118,14 +104,7 @@ namespace lg2de.SimpleAccounting.Reports
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.YearData.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.YearData.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoDebit - saldoCredit;
+                double balance = this.GetAccountBalance(account, creditFromDebit: false);
                 if (balance <= 0)
                 {
                     continue;
@@ -147,14 +126,7 @@ namespace lg2de.SimpleAccounting.Reports
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.YearData.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.YearData.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoDebit - saldoCredit;
+                double balance = this.GetAccountBalance(account, creditFromDebit: false);
                 if (balance >= 0)
                 {
                     continue;
@@ -176,14 +148,7 @@ namespace lg2de.SimpleAccounting.Reports
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Asset);
             foreach (var account in accounts)
             {
-                double saldoCredit = this.YearData.Booking
-                    .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-                double saldoDebit = this.YearData.Booking
-                    .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
-                    .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-
-                double balance = saldoDebit - saldoCredit;
+                double balance = this.GetAccountBalance(account, creditFromDebit: false);
                 if (balance == 0)
                 {
                     continue;
@@ -242,6 +207,23 @@ namespace lg2de.SimpleAccounting.Reports
 
             var saldoElement = dataNode.SelectSingleNode("../columns/column[position()=4]");
             saldoElement.InnerText = (totalAccount / 100).ToString("0.00", this.culture);
+        }
+
+        private double GetAccountBalance(AccountDefinition account, bool creditFromDebit)
+        {
+            double saldoCredit = this.YearData.Booking
+                .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
+                .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
+            double saldoDebit = this.YearData.Booking
+                .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
+                .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
+
+            if (creditFromDebit)
+            {
+                return saldoCredit - saldoDebit;
+            }
+
+            return saldoDebit - saldoCredit;
         }
 
         private XmlNode CreateAccountBalanceNode(AccountDefinition account, double balance)
