@@ -20,6 +20,8 @@ namespace lg2de.SimpleAccounting.Reports
 
         private readonly IEnumerable<AccountDefinition> accounts;
         private readonly CultureInfo culture;
+        private double creditSum;
+        private double debitSum;
 
         public AccountJournalReport(
             IEnumerable<AccountDefinition> accounts,
@@ -92,82 +94,16 @@ namespace lg2de.SimpleAccounting.Reports
 
                 var dataNode = newTable.SelectSingleNode("data");
 
-                double nCreditSum = 0;
-                double nDebitSum = 0;
+                this.creditSum = 0;
+                this.debitSum = 0;
 
                 foreach (var entry in accountEntries)
                 {
-                    XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
-                    dataLineNode.SetAttribute("topLine", true);
-                    dataNode.AppendChild(dataLineNode);
-                    XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
-                    dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d", this.culture);
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = entry.ID.ToString();
-                    dataLineNode.AppendChild(dataItemNode);
-
-                    var debitEntry = entry.Debit.FirstOrDefault(x => x.Account == account.ID);
-                    if (debitEntry != null)
-                    {
-                        dataItemNode = dataItemNode.Clone();
-                        dataItemNode.InnerText = debitEntry.Text;
-                        dataLineNode.AppendChild(dataItemNode);
-
-                        double nValue = Convert.ToDouble(debitEntry.Value) / 100;
-                        nDebitSum += nValue;
-                        dataItemNode = dataItemNode.Clone();
-                        dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
-                        dataLineNode.AppendChild(dataItemNode);
-
-                        dataItemNode = this.PrintDocument.CreateElement("td");
-                        dataLineNode.AppendChild(dataItemNode);
-
-                        dataItemNode = dataItemNode.Clone();
-                        dataLineNode.AppendChild(dataItemNode);
-
-                        if (entry.Credit.Count == 1)
-                        {
-                            dataItemNode.InnerText = entry.Credit[0].Account.ToString();
-                        }
-                        else
-                        {
-                            dataItemNode.InnerText = "Diverse";
-                        }
-                    }
-                    else
-                    {
-                        var creditEntry = entry.Credit.FirstOrDefault(x => x.Account == account.ID);
-
-                        dataItemNode = dataItemNode.Clone();
-                        dataItemNode.InnerText = creditEntry.Text;
-                        dataLineNode.AppendChild(dataItemNode);
-
-                        dataItemNode = this.PrintDocument.CreateElement("td");
-                        dataLineNode.AppendChild(dataItemNode);
-
-                        double nValue = Convert.ToDouble(creditEntry.Value) / 100;
-                        nCreditSum += nValue;
-                        dataItemNode = dataItemNode.Clone();
-                        dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
-                        dataLineNode.AppendChild(dataItemNode);
-
-                        dataItemNode = dataItemNode.Clone();
-                        dataLineNode.AppendChild(dataItemNode);
-
-                        if (entry.Credit.Count == 1)
-                        {
-                            dataItemNode.InnerText = entry.Debit[0].Account.ToString();
-                        }
-                        else
-                        {
-                            dataItemNode.InnerText = "Diverse";
-                        }
-                    }
+                    dataNode.AppendChild(this.CreateBookingEntry(entry, account.ID));
                 }
 
                 // sum
-                if (nDebitSum > 0 && nCreditSum > 0)
+                if (this.debitSum > 0 && this.creditSum > 0)
                 {
                     XmlNode sumLineNode = this.PrintDocument.CreateElement("tr");
                     sumLineNode.SetAttribute("topLine", true);
@@ -179,10 +115,10 @@ namespace lg2de.SimpleAccounting.Reports
                     sumLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // id
                     sumLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // text
                     sumItemNode = this.PrintDocument.CreateElement("td");
-                    sumItemNode.InnerText = nDebitSum.ToString("0.00", this.culture);
+                    sumItemNode.InnerText = this.debitSum.ToString("0.00", this.culture);
                     sumLineNode.AppendChild(sumItemNode);
                     sumItemNode = sumItemNode.Clone();
-                    sumItemNode.InnerText = nCreditSum.ToString("0.00", this.culture);
+                    sumItemNode.InnerText = this.creditSum.ToString("0.00", this.culture);
                     sumLineNode.AppendChild(sumItemNode);
                     sumLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // remote
                 }
@@ -197,10 +133,10 @@ namespace lg2de.SimpleAccounting.Reports
                 saldoLineNode.AppendChild(saldoItemNode);
                 saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // id
                 saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // text
-                if (nDebitSum > nCreditSum)
+                if (this.debitSum > this.creditSum)
                 {
                     saldoItemNode = this.PrintDocument.CreateElement("td");
-                    saldoItemNode.InnerText = (nDebitSum - nCreditSum).ToString("0.00", this.culture);
+                    saldoItemNode.InnerText = (this.debitSum - this.creditSum).ToString("0.00", this.culture);
                     saldoLineNode.AppendChild(saldoItemNode);
                     saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td"));
                 }
@@ -208,7 +144,7 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td"));
                     saldoItemNode = this.PrintDocument.CreateElement("td");
-                    saldoItemNode.InnerText = (nCreditSum - nDebitSum).ToString("0.00", this.culture);
+                    saldoItemNode.InnerText = (this.creditSum - this.debitSum).ToString("0.00", this.culture);
                     saldoLineNode.AppendChild(saldoItemNode);
                 }
 
@@ -219,6 +155,78 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);
+        }
+
+        private XmlNode CreateBookingEntry(AccountingDataJournalBooking entry, ulong accountIdentifier)
+        {
+            XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
+            dataLineNode.SetAttribute("topLine", true);
+            XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
+            dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d", this.culture);
+            dataLineNode.AppendChild(dataItemNode);
+            dataItemNode = dataItemNode.Clone();
+            dataItemNode.InnerText = entry.ID.ToString();
+            dataLineNode.AppendChild(dataItemNode);
+
+            var debitEntry = entry.Debit.FirstOrDefault(x => x.Account == accountIdentifier);
+            if (debitEntry != null)
+            {
+                dataItemNode = dataItemNode.Clone();
+                dataItemNode.InnerText = debitEntry.Text;
+                dataLineNode.AppendChild(dataItemNode);
+
+                double debitValue = Convert.ToDouble(debitEntry.Value) / 100;
+                this.debitSum += debitValue;
+                dataItemNode = dataItemNode.Clone();
+                dataItemNode.InnerText = debitValue.ToString("0.00", this.culture);
+                dataLineNode.AppendChild(dataItemNode);
+
+                dataItemNode = this.PrintDocument.CreateElement("td");
+                dataLineNode.AppendChild(dataItemNode);
+
+                dataItemNode = dataItemNode.Clone();
+                dataLineNode.AppendChild(dataItemNode);
+
+                if (entry.Credit.Count == 1)
+                {
+                    dataItemNode.InnerText = entry.Credit[0].Account.ToString();
+                }
+                else
+                {
+                    dataItemNode.InnerText = "Diverse";
+                }
+
+                return dataLineNode;
+            }
+
+            var creditEntry = entry.Credit.FirstOrDefault(x => x.Account == accountIdentifier);
+
+            dataItemNode = dataItemNode.Clone();
+            dataItemNode.InnerText = creditEntry.Text;
+            dataLineNode.AppendChild(dataItemNode);
+
+            dataItemNode = this.PrintDocument.CreateElement("td");
+            dataLineNode.AppendChild(dataItemNode);
+
+            double creditValue = Convert.ToDouble(creditEntry.Value) / 100;
+            this.creditSum += creditValue;
+            dataItemNode = dataItemNode.Clone();
+            dataItemNode.InnerText = creditValue.ToString("0.00", this.culture);
+            dataLineNode.AppendChild(dataItemNode);
+
+            dataItemNode = dataItemNode.Clone();
+            dataLineNode.AppendChild(dataItemNode);
+
+            if (entry.Credit.Count == 1)
+            {
+                dataItemNode.InnerText = entry.Debit[0].Account.ToString();
+            }
+            else
+            {
+                dataItemNode.InnerText = "Diverse";
+            }
+
+            return dataLineNode;
         }
     }
 }
