@@ -29,9 +29,11 @@ namespace lg2de.SimpleAccounting.Reports
             this.Printer.LoadDocument(resourceName);
         }
 
-        protected XmlPrinter Printer { get; } = new XmlPrinter();
+        protected IXmlPrinter Printer { get; set; } = new XmlPrinter();
 
         protected AccountingDataJournal YearData { get; private set; }
+
+        protected DateTime PrintingDate { get; set; } = DateTime.Now;
 
         protected XmlDocument PrintDocument => this.Printer.Document;
 
@@ -39,7 +41,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         public void ShowPreview(string documentName)
         {
-            this.Printer.PrintDocument($"{DateTime.Now:yyyy-MM-dd} {documentName} {this.YearData.Year}");
+            this.Printer.PrintDocument($"{this.PrintingDate:yyyy-MM-dd} {documentName} {this.YearData.Year}");
         }
 
         protected void PreparePrintDocument()
