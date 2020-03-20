@@ -24,7 +24,7 @@ The software focuses on journal and balance sheet reporting.
 
 ## Features
 
-* Data management for double-entry accounting, stored as XML (see [example](./samples/sample.bxml)) and defined using [XSD](./docs/AccountingData.xsd)
+* Data management for double-entry accounting, stored as XML (see [example](./samples/sample.acml)) and defined using [XSD](./docs/AccountingData.xsd)
 * User interface for the management of accounts, the creation of entries, the listing of account journals
 * Import of booking entries from CSV files incl. semi-automatic assignment of offsetting accounts
 * Printable reports for full journal, account journal, accounts and balances, and annual financial statements

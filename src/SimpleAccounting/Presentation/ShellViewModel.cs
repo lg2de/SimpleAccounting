@@ -138,7 +138,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Filter = "Acconting project files (*.bxml)|*.bxml",
+                Filter = "Accounting project files (*.acml)|*.acml",
                 RestoreDirectory = true
             };
 
@@ -425,7 +425,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnInitialize();
 
-            this.DisplayName = $"SimpleAccounting {this.version}";
+            this.UpdateDisplayName();
         }
 
         protected override void OnActivate()
@@ -703,10 +703,22 @@ namespace lg2de.SimpleAccounting.Presentation
             return account.FormatName();
         }
 
+        private void UpdateDisplayName()
+        {
+            if (string.IsNullOrEmpty(this.fileName) || this.currentModelJournal == null)
+            {
+                this.DisplayName = $"SimpleAccounting {this.version}";
+            }
+            else
+            {
+                this.DisplayName = $"SimpleAccounting {this.version} - {this.fileName} - {this.currentModelJournal.Year}";
+            }
+        }
+
         private void SelectBookingYear(string newYearName)
         {
             this.currentModelJournal = this.accountingData.Journal.Single(y => y.Year == newYearName);
-            this.DisplayName = $"SimpleAccounting {this.version} - {this.fileName} - {this.currentModelJournal.Year}";
+            this.UpdateDisplayName();
             this.RefreshFullJournal();
             var firstBooking = this.currentModelJournal.Booking.FirstOrDefault();
             if (firstBooking != null)
@@ -882,7 +894,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Acconting project files (*.bxml)|*.bxml",
+                    Filter = "Accounting project files (*.acml)|*.acml",
                     RestoreDirectory = true
                 };
 
