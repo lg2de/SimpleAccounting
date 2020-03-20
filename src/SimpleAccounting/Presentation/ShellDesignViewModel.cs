@@ -12,7 +12,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ShellDesignViewModel()
             : base(null, null, null, null)
         {
-            var menuItem = new MenuViewModel("c:\\Test.bxml", null);
+            var menuItem = new MenuViewModel("c:\\Test.acml", null);
             this.RecentProjects.Add(menuItem);
 
             var accountItem = new AccountViewModel

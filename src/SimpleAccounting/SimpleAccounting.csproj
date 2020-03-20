@@ -28,9 +28,9 @@
     <!-- license is MIT -->
     <PackageReference Include="CurrencyTextBox" Version="2.0.2" />
     <!-- license is MIT -->
-    <PackageReference Include="Octokit" Version="0.40.0" />
+    <PackageReference Include="Octokit" Version="0.45.0" />
     <!-- license is LGPL -->
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.3.0.14607">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.5.0.15942">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
