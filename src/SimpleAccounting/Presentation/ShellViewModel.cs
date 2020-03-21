@@ -617,10 +617,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            this.currentModelJournal.Closed = true;
+            var carryForwardAccount = viewModel.RemoteAccount;
 
-            var carryForwardAccount =
-                this.accountingData.AllAccounts.Single(a => a.Type == AccountDefinitionType.Carryforward && a.Active);
+            this.currentModelJournal.Closed = true;
 
             var newYearJournal = new AccountingDataJournal
             {

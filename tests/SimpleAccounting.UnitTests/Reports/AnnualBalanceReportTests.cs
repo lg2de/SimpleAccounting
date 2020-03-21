@@ -32,7 +32,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 
             sut.CreateReport();
 
-            var _ = new AssertionScope();
+            using var _ = new AssertionScope();
 
             sut.DocumentForTests.XPathSelectElement("//text[@ID='saldo']")?.Value.Should().Be("150.00");
 
@@ -59,7 +59,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
 
             expected = @"
-<data target=""receivable"" />";
+<data target=""receivable"">
+  <tr>
+    <td />
+    <td>06000 Friends debit</td>
+    <td>99.00</td>
+  </tr>
+</data>";
             sut.DocumentForTests.XPathSelectElement("//table/data[@target='receivable']")
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
 
@@ -75,11 +81,16 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
 
             expected = @"
-<data target=""asset"">
+ <data target=""asset"">
   <tr>
     <td />
     <td>00100 Bank account</td>
-    <td>750.00</td>
+    <td>651.00</td>
+  </tr>
+  <tr>
+    <td />
+    <td>Forderungen</td>
+    <td>99.00</td>
   </tr>
   <tr>
     <td />

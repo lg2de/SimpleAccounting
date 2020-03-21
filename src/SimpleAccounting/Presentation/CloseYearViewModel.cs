@@ -26,7 +26,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public AccountDefinition RemoteAccount { get; set; }
 
-        public ICommand CloseYearCommand => new RelayCommand(_ => this.TryClose(true));
+        public ICommand CloseYearCommand => new RelayCommand(
+            _ => this.TryClose(true),
+            _ => this.RemoteAccount != null);
 
         protected override void OnInitialize()
         {
