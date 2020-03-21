@@ -17,7 +17,9 @@
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
         </DockPanel.Resources>
-        <TextBlock DockPanel.Dock="Top" Padding="5">
+        <TextBlock
+            DockPanel.Dock="Top"
+            Padding="5">
             Hinweise:<LineBreak/>
             Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.<LineBreak/>
             (Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)<LineBreak/>
