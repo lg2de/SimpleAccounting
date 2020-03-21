@@ -16,11 +16,6 @@
                 <Setter Property="Height" Value="30" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
-            <Style TargetType="ComboBox">
-                <Setter Property="Margin" Value="5" />
-                <Setter Property="Height" Value="30" />
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-            </Style>
         </DockPanel.Resources>
         <TextBlock DockPanel.Dock="Top">
             Hinweise:<LineBreak/>

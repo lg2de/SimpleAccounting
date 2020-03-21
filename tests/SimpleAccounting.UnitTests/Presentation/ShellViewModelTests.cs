@@ -120,17 +120,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
-            messageBox.Show(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No).Returns(MessageBoxResult.Yes);
             var fileSystem = Substitute.For<IFileSystem>();
             var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
-
-            sut.CloseYearCommand.Execute(null);
+            sut.IsDocumentModified = true;
 
             sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
         }
@@ -338,12 +331,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
-            messageBox.Show(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No).Returns(MessageBoxResult.Yes);
+            windowManager.ShowDialog(
+                Arg.Any<CloseYearViewModel>(),
+                Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>()).Returns(true);
             var fileSystem = Substitute.For<IFileSystem>();
             var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             AccountingData project = Samples.SampleProject;
@@ -352,12 +343,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.CloseYearCommand.Execute(null);
 
-            messageBox.Received(1).Show(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No);
+            windowManager.Received(1).ShowDialog(
+                Arg.Any<CloseYearViewModel>(),
+                Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
             var thisYear = DateTime.Now.Year;
             var _ = new AssertionScope();
             sut.BookingYears.Select(x => x.Header).Should()

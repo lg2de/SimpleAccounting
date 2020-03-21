@@ -40,5 +40,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             Action action = () => new ImportBookingsDesignViewModel();
             action.Should().NotThrow();
         }
+
+        [Fact]
+        public void CloseYearDesignViewModel_ConstructorSucceed()
+        {
+            Action action = () => new CloseYearDesignViewModel();
+            action.Should().NotThrow();
+        }
     }
 }
