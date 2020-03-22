@@ -16,13 +16,10 @@
                 <Setter Property="Height" Value="30" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
-            <Style TargetType="ComboBox">
-                <Setter Property="Margin" Value="5" />
-                <Setter Property="Height" Value="30" />
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-            </Style>
         </DockPanel.Resources>
-        <TextBlock DockPanel.Dock="Top">
+        <TextBlock
+            DockPanel.Dock="Top"
+            Padding="5">
             Hinweise:<LineBreak/>
             Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.<LineBreak/>
             (Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)<LineBreak/>
@@ -53,6 +50,8 @@
                 Width="100"
                 Content="Alles Buchen"
                 Command="{Binding BookAllCommand}" />
+
+            <Button Content="CloseDummy" IsCancel="True" Width="0" Height="0" />
         </StackPanel>
         <DataGrid
             ItemsSource="{Binding ImportData}"

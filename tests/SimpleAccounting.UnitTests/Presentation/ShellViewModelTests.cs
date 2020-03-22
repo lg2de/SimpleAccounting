@@ -120,17 +120,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
-            messageBox.Show(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No).Returns(MessageBoxResult.Yes);
             var fileSystem = Substitute.For<IFileSystem>();
             var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
-
-            sut.CloseYearCommand.Execute(null);
+            sut.IsDocumentModified = true;
 
             sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
         }
@@ -338,12 +331,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
-            messageBox.Show(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No).Returns(MessageBoxResult.Yes);
+            windowManager.ShowDialog(
+                Arg.Any<CloseYearViewModel>(),
+                Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>()).Returns(info =>
+            {
+                var vm = info.Arg<CloseYearViewModel>();
+                vm.RemoteAccount = vm.Accounts.First();
+                return true;
+            });
             var fileSystem = Substitute.For<IFileSystem>();
             var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             AccountingData project = Samples.SampleProject;
@@ -352,14 +348,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.CloseYearCommand.Execute(null);
 
-            messageBox.Received(1).Show(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No);
+            windowManager.Received(1).ShowDialog(
+                Arg.Any<CloseYearViewModel>(),
+                Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
             var thisYear = DateTime.Now.Year;
-            var _ = new AssertionScope();
+            using var _ = new AssertionScope();
             sut.BookingYears.Select(x => x.Header).Should()
                 .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
             sut.FullJournal.Should().BeEquivalentTo(
@@ -368,7 +362,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Identifier = 1,
                     Date = new DateTime(thisYear + 1, 1, 1),
                     Text = "Eröffnungsbetrag 1",
-                    Value = 750,
+                    Value = 651,
                     CreditAccount = "990 (Carryforward)",
                     DebitAccount = "100 (Bank account)"
                 },
@@ -380,6 +374,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Value = 2600,
                     CreditAccount = "5000 (Bank credit)",
                     DebitAccount = "990 (Carryforward)"
+                },
+                new
+                {
+                    Identifier = 3,
+                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Text = "Eröffnungsbetrag 3",
+                    Value = 99,
+                    CreditAccount = "990 (Carryforward)",
+                    DebitAccount = "6000 (Friends debit)"
                 });
             sut.AccountJournal.Should().BeEquivalentTo(
                 new
@@ -387,7 +390,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Identifier = 1,
                     Date = new DateTime(thisYear + 1, 1, 1),
                     Text = "Eröffnungsbetrag 1",
-                    DebitValue = 750,
+                    DebitValue = 651,
                     CreditValue = 0,
                     RemoteAccount = "990 (Carryforward)"
                 },
@@ -395,14 +398,103 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Text = "Summe",
                     IsSummary = true,
-                    DebitValue = 750,
+                    DebitValue = 651,
                     CreditValue = 0
                 },
                 new
                 {
                     Text = "Saldo",
                     IsSummary = true,
-                    DebitValue = 750,
+                    DebitValue = 651,
+                    CreditValue = 0
+                });
+        }
+
+        [Fact]
+        public void CloseYearCommand_SecondCarryForwardAccount_OpeningsWithSelectedAccount()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            windowManager.ShowDialog(
+                Arg.Any<CloseYearViewModel>(),
+                Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>()).Returns(info =>
+            {
+                var vm = info.Arg<CloseYearViewModel>();
+                vm.RemoteAccount = vm.Accounts.Last();
+                return true;
+            });
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            project.Accounts.First().Account.Add(new AccountDefinition
+            {
+                ID = 999, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward
+            });
+            sut.LoadProjectData(project);
+
+            sut.CloseYearCommand.Execute(null);
+
+            windowManager.Received(1).ShowDialog(
+                Arg.Any<CloseYearViewModel>(),
+                Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
+            var thisYear = DateTime.Now.Year;
+            using var _ = new AssertionScope();
+            sut.BookingYears.Select(x => x.Header).Should()
+                .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
+            sut.FullJournal.Should().BeEquivalentTo(
+                new
+                {
+                    Identifier = 1,
+                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Text = "Eröffnungsbetrag 1",
+                    Value = 651,
+                    CreditAccount = "999 (MyCarryForward)",
+                    DebitAccount = "100 (Bank account)"
+                },
+                new
+                {
+                    Identifier = 2,
+                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Text = "Eröffnungsbetrag 2",
+                    Value = 2600,
+                    CreditAccount = "5000 (Bank credit)",
+                    DebitAccount = "999 (MyCarryForward)"
+                },
+                new
+                {
+                    Identifier = 3,
+                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Text = "Eröffnungsbetrag 3",
+                    Value = 99,
+                    CreditAccount = "999 (MyCarryForward)",
+                    DebitAccount = "6000 (Friends debit)"
+                });
+            sut.AccountJournal.Should().BeEquivalentTo(
+                new
+                {
+                    Identifier = 1,
+                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Text = "Eröffnungsbetrag 1",
+                    DebitValue = 651,
+                    CreditValue = 0,
+                    RemoteAccount = "999 (MyCarryForward)"
+                },
+                new
+                {
+                    Text = "Summe",
+                    IsSummary = true,
+                    DebitValue = 651,
+                    CreditValue = 0
+                },
+                new
+                {
+                    Text = "Saldo",
+                    IsSummary = true,
+                    DebitValue = 651,
                     CreditValue = 0
                 });
         }

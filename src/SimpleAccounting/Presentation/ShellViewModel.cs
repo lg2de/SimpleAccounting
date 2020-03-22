@@ -152,7 +152,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand SaveProjectCommand => new RelayCommand(
             _ => this.SaveProject(),
-            _ => this.IsDocumentChanged);
+            _ => this.IsDocumentModified);
 
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
@@ -329,7 +329,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.AllAccounts.Add(accountVm);
             this.RefreshAccountList();
 
-            this.IsDocumentChanged = true;
+            this.IsDocumentModified = true;
         });
 
         public ICommand EditAccountCommand => new RelayCommand(o =>
@@ -377,7 +377,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.RefreshFullJournal();
             this.RefreshAccountJournal();
 
-            this.IsDocumentChanged = true;
+            this.IsDocumentModified = true;
 
             static void UpdateAccount(BookingValue entry, ulong oldIdentifier, ulong newIdentifier)
             {
@@ -390,7 +390,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal Settings Settings { get; set; } = Settings.Default;
 
-        private bool IsDocumentChanged { get; set; }
+        internal bool IsDocumentModified { get; set; }
 
         private bool IsCurrentYearOpen
         {
@@ -454,7 +454,7 @@ namespace lg2de.SimpleAccounting.Presentation
         internal void AddBooking(AccountingDataJournalBooking booking, bool refreshJournal = true)
         {
             this.currentModelJournal.Booking.Add(booking);
-            this.IsDocumentChanged = true;
+            this.IsDocumentModified = true;
 
             if (refreshJournal)
             {
@@ -542,7 +542,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             // The user was asked whether saving the project.
             // We do not want to ask again.
-            this.IsDocumentChanged = false;
+            this.IsDocumentModified = false;
 
             this.TryClose();
         }
@@ -607,21 +607,19 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void CloseYear()
         {
-            var result = this.messageBox.Show(
-                $"Wollen Sie das Jahr {this.currentModelJournal.Year} abschließen?",
-                "Jahresabschluss",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No);
-            if (result != MessageBoxResult.Yes)
+            var viewModel = new CloseYearViewModel(this.currentModelJournal);
+            viewModel.Accounts.AddRange(
+                this.accountingData.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward));
+
+            var result = this.windowManager.ShowDialog(viewModel);
+            if (result != true)
             {
                 return;
             }
 
-            this.currentModelJournal.Closed = true;
+            var carryForwardAccount = viewModel.RemoteAccount;
 
-            var carryForwardAccount =
-                this.accountingData.AllAccounts.Single(a => a.Type == AccountDefinitionType.Carryforward && a.Active);
+            this.currentModelJournal.Closed = true;
 
             var newYearJournal = new AccountingDataJournal
             {
@@ -691,7 +689,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 bookingId++;
             }
 
-            this.IsDocumentChanged = true;
+            this.IsDocumentModified = true;
             this.SelectBookingYear(newYearJournal.Year);
 
             this.UpdateBookingYears();
@@ -748,7 +746,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            this.IsDocumentChanged = false;
+            this.IsDocumentModified = false;
             this.fileName = projectFileName;
 
             try
@@ -756,7 +754,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var projectData = AccountingData.LoadFromFile(this.fileName);
                 if (projectData.Migrate())
                 {
-                    this.IsDocumentChanged = true;
+                    this.IsDocumentModified = true;
                 }
 
                 this.LoadProjectData(projectData);
@@ -863,7 +861,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private bool CheckSaveProject()
         {
-            if (!this.IsDocumentChanged)
+            if (!this.IsDocumentModified)
             {
                 // no need to save the project
                 return true;
@@ -918,7 +916,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.accountingData.SaveToFile(this.fileName);
-            this.IsDocumentChanged = false;
+            this.IsDocumentModified = false;
         }
 
         private void RefreshFullJournal()
