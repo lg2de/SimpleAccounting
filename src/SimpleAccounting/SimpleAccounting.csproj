@@ -26,8 +26,6 @@
     <!-- license is MS-PL -->
     <PackageReference Include="CsvHelper" Version="12.2.3" />
     <!-- license is MIT -->
-    <PackageReference Include="CurrencyTextBox" Version="2.0.2" />
-    <!-- license is MIT -->
     <PackageReference Include="Octokit" Version="0.45.0" />
     <!-- license is LGPL -->
     <PackageReference Include="SonarAnalyzer.CSharp" Version="8.5.0.15942">

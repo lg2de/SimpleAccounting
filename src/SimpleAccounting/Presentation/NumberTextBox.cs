@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Controls;
@@ -16,27 +17,72 @@ namespace lg2de.SimpleAccounting.Presentation
     [ExcludeFromCodeCoverage]
     internal class NumberTextBox : TextBox
     {
-        private static Regex numberExpression = new Regex("^[0-9]*$", RegexOptions.Compiled);
+        private Regex numberExpression;
 
         public NumberTextBox()
         {
             this.GotFocus += (s, e) => this.SelectAll();
             this.GotMouseCapture += (s, e) => this.SelectAll();
-            this.PreviewKeyDown += this.OnPreviewKeyDown;
+            this.PreviewKeyDown += OnPreviewKeyDown;
             this.PreviewTextInput += this.OnPreviewTextInput;
             DataObject.AddPastingHandler(this, this.OnPasteText);
+            this.UpdateExpression();
         }
 
-        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        public static readonly DependencyProperty ScaleProperty =
+            DependencyProperty.Register("Scale", typeof(uint),
+                typeof(NumberTextBox),
+                new FrameworkPropertyMetadata((uint)0, OnScaleChanged));
+
+        public uint Scale
         {
-            // the space character is NOT routed throgh PreviewTextInput
+            get => (uint)this.GetValue(ScaleProperty);
+            set
+            {
+                this.SetValue(ScaleProperty, value);
+                this.UpdateExpression();
+            }
+        }
+
+        private static void OnScaleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (!(d is NumberTextBox numberTextBox) || !(e.NewValue is uint))
+            {
+                return;
+            }
+
+            numberTextBox.Scale = (uint)e.NewValue;
+        }
+
+        private static void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // The space character is NOT routed through PreviewTextInput.
+            // We need this hook only to remove SPACE from input.
             e.Handled = e.Key == Key.Space;
+        }
+
+        private void UpdateExpression()
+        {
+            if (this.Scale == 0)
+            {
+                this.numberExpression = new Regex("^[0-9]*$", RegexOptions.Compiled);
+                return;
+            }
+
+            var decimalSeparator = CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator;
+            this.numberExpression = new Regex(
+                $"^[0-9]*({decimalSeparator}[0-9]{{0,{this.Scale}}})?$", RegexOptions.Compiled);
         }
 
         private void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            // only numbers are accepted
-            var isValid = numberExpression.IsMatch(e.Text);
+            // Build resulting text from current text, current selection and new text.
+            // Accept the new input only if result matches the number expression.
+            var newText =
+                this.Text.Substring(0, this.SelectionStart)
+                + e.Text
+                + this.Text.Substring(this.SelectionStart + this.SelectionLength);
+            var isValid = this.numberExpression.IsMatch(newText);
             e.Handled = !isValid;
         }
 
@@ -49,7 +95,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             var text = (string)e.DataObject.GetData(typeof(string));
-            if (!numberExpression.IsMatch(text))
+            if (text == null || !this.numberExpression.IsMatch(text))
             {
                 e.CancelCommand();
             }
