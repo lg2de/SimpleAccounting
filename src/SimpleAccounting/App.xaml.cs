@@ -12,14 +12,15 @@ namespace lg2de.SimpleAccounting
     using lg2de.SimpleAccounting.Properties;
 
     [ExcludeFromCodeCoverage]
-    public partial class App : Application
+    public partial class App
     {
         public App()
         {
-            Settings.Default.Upgrade();
-            if (Settings.Default.RecentProjects == null)
+            var settings = Settings.Default;
+            settings.Upgrade();
+            if (settings.RecentProjects == null)
             {
-                Settings.Default.RecentProjects = new StringCollection();
+                settings.RecentProjects = new StringCollection();
             }
         }
 

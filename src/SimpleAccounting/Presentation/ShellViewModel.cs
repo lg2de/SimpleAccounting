@@ -14,6 +14,8 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Input;
@@ -44,6 +46,8 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly IFileSystem fileSystem;
         private readonly string version;
 
+        private Task autoSaveTask;
+        private CancellationTokenSource cancellationTokenSource;
         private AccountingData accountingData;
         private AccountingDataJournal currentModelJournal;
         private string fileName = "";
@@ -392,6 +396,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal bool IsDocumentModified { get; set; }
 
+        private string AutoSaveFileName => this.fileName + "~";
+
         private bool IsCurrentYearOpen
         {
             get
@@ -449,6 +455,19 @@ namespace lg2de.SimpleAccounting.Presentation
                     new RelayCommand(_ => this.LoadProjectFromFile(project)));
                 this.RecentProjects.Add(item);
             }
+
+            this.cancellationTokenSource = new CancellationTokenSource();
+            this.autoSaveTask = Task.Run(this.AutoSaveAsync);
+        }
+
+        protected override void OnDeactivate(bool close)
+        {
+            this.cancellationTokenSource.Cancel();
+            this.autoSaveTask.Wait();
+            this.cancellationTokenSource.Dispose();
+            this.cancellationTokenSource = null;
+
+            base.OnDeactivate(close);
         }
 
         internal void AddBooking(AccountingDataJournalBooking booking, bool refreshJournal = true)
@@ -463,8 +482,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.SelectedFullJournalEntry = this.FullJournal.FirstOrDefault(x => x.Identifier == booking.ID);
 
-            if (!booking.Debit.Any(x => x.Account == this.SelectedAccount?.Identifier)
-                && !booking.Credit.Any(x => x.Account == this.SelectedAccount?.Identifier))
+            if (booking.Debit.All(x => x.Account != this.SelectedAccount?.Identifier)
+                && booking.Credit.All(x => x.Account != this.SelectedAccount?.Identifier))
             {
                 return;
             }
@@ -478,7 +497,7 @@ namespace lg2de.SimpleAccounting.Presentation
         internal async void OnCheckForUpdate(object _)
 #pragma warning restore S3168
         {
-            const string Caption = "Update-Prüfung";
+            const string caption = "Update-Prüfung";
             IEnumerable<Release> releases;
             try
             {
@@ -489,7 +508,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.messageBox.Show(
                     $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
-                    Caption,
+                    caption,
                     icon: MessageBoxImage.Error);
                 return;
             }
@@ -497,13 +516,13 @@ namespace lg2de.SimpleAccounting.Presentation
             var newRelease = this.GetNewRelease(this.version, releases);
             if (newRelease == null)
             {
-                this.messageBox.Show("Sie verwenden die neueste Version.", Caption);
+                this.messageBox.Show("Sie verwenden die neueste Version.", caption);
                 return;
             }
 
             var result = this.messageBox.Show(
                 $"Wollen Sie auf die neue Version {newRelease.TagName} aktualisieren?",
-                Caption,
+                caption,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question,
                 MessageBoxResult.No);
@@ -572,7 +591,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var currentMain = currentElements[0];
                 var currentBeta = currentElements.Length > 1 ? currentElements[1] : string.Empty;
 
-                if (tagMain.CompareTo(currentMain) > 0)
+                if (string.Compare(tagMain, currentMain, StringComparison.Ordinal) > 0)
                 {
                     // new release
                     return true;
@@ -587,11 +606,33 @@ namespace lg2de.SimpleAccounting.Presentation
                         return !string.IsNullOrEmpty(currentBeta);
                     }
 
-                    return tagBeta.CompareTo(currentBeta) > 0;
+                    return string.Compare(tagBeta, currentBeta, StringComparison.Ordinal) > 0;
                 }
 
                 // older release version
                 return false;
+            }
+        }
+
+        private async Task AutoSaveAsync()
+        {
+            try
+            {
+                while (true)
+                {
+                    await Task.Delay(TimeSpan.FromMinutes(1), this.cancellationTokenSource.Token);
+                    if (!this.IsDocumentModified)
+                    {
+                        continue;
+                    }
+
+                    string autoSaveFileName = this.AutoSaveFileName;
+                    this.accountingData.SaveToFile(autoSaveFileName, out _);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // expected behavior
             }
         }
 
@@ -917,6 +958,11 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.accountingData.SaveToFile(this.fileName);
             this.IsDocumentModified = false;
+
+            if (File.Exists(this.AutoSaveFileName))
+            {
+                File.Delete(this.AutoSaveFileName);
+            }
         }
 
         private void RefreshFullJournal()
