@@ -29,7 +29,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
 #pragma warning disable S4055 // string literals => pending translation
 
-    [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies", Justification = "<Pending>")]
+    [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies",
+        Justification = "<Pending>")]
     internal class ShellViewModel : Conductor<IScreen>
     {
         private const string GithubDomain = "github.com";
@@ -50,7 +51,6 @@ namespace lg2de.SimpleAccounting.Presentation
         private CancellationTokenSource cancellationTokenSource;
         private AccountingData accountingData;
         private AccountingDataJournal currentModelJournal;
-        private string fileName = "";
         private bool showInactiveAccounts;
         private FullJournalViewModel selectedFullJournalEntry;
         private AccountJournalViewModel selectedAccountJournalEntry;
@@ -78,6 +78,7 @@ namespace lg2de.SimpleAccounting.Presentation
             = new ObservableCollection<MenuViewModel>();
 
         public List<AccountViewModel> AllAccounts { get; } = new List<AccountViewModel>();
+
         public ObservableCollection<AccountViewModel> AccountList { get; }
             = new ObservableCollection<AccountViewModel>();
 
@@ -134,7 +135,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            this.fileName = "<new>";
+            this.FileName = "<new>";
             this.LoadProjectData(GetTemplateProject());
         });
 
@@ -171,11 +172,14 @@ namespace lg2de.SimpleAccounting.Presentation
             };
             bookingModel.Accounts.AddRange(
                 this.ShowInactiveAccounts
-                ? this.accountingData.AllAccounts
-                : this.accountingData.AllAccounts.Where(x => x.Active));
+                    ? this.accountingData.AllAccounts
+                    : this.accountingData.AllAccounts.Where(x => x.Active));
 
             this.accountingData.Setup?.BookingTemplates?.Template
-                .Select(t => new BookingTemplate { Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor })
+                .Select(t => new BookingTemplate
+                {
+                    Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor
+                })
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
             this.windowManager.ShowDialog(bookingModel);
         }, _ => this.IsCurrentYearOpen);
@@ -222,7 +226,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentModelJournal,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
-                report.PageBreakBetweenAccounts = this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
+                report.PageBreakBetweenAccounts =
+                    this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
                 report.CreateReport();
                 report.ShowPreview("Kontoblätter");
             },
@@ -394,9 +399,13 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal Settings Settings { get; set; } = Settings.Default;
 
+        internal string FileName { get; set; } = string.Empty;
+
         internal bool IsDocumentModified { get; set; }
 
-        private string AutoSaveFileName => this.fileName + "~";
+        internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
+
+        private string AutoSaveFileName => this.FileName + "~";
 
         private bool IsCurrentYearOpen
         {
@@ -620,14 +629,13 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 while (true)
                 {
-                    await Task.Delay(TimeSpan.FromMinutes(1), this.cancellationTokenSource.Token);
+                    await Task.Delay(this.AutoSaveInterval, this.cancellationTokenSource.Token);
                     if (!this.IsDocumentModified)
                     {
                         continue;
                     }
 
-                    string autoSaveFileName = this.AutoSaveFileName;
-                    this.accountingData.SaveToFile(autoSaveFileName, out _);
+                    this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.accountingData.Serialize());
                 }
             }
             catch (OperationCanceledException)
@@ -674,7 +682,10 @@ namespace lg2de.SimpleAccounting.Presentation
             ulong bookingId = 1;
 
             // Asset Accounts (Bestandskonten), Credit and Debit Accounts
-            var accounts = this.accountingData.AllAccounts.Where(a => a.Type == AccountDefinitionType.Asset || a.Type == AccountDefinitionType.Credit || a.Type == AccountDefinitionType.Debit);
+            var accounts = this.accountingData.AllAccounts.Where(a =>
+                a.Type == AccountDefinitionType.Asset
+                || a.Type == AccountDefinitionType.Credit
+                || a.Type == AccountDefinitionType.Debit);
             foreach (var account in accounts)
             {
                 if (this.currentModelJournal.Booking == null)
@@ -744,13 +755,14 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void UpdateDisplayName()
         {
-            if (string.IsNullOrEmpty(this.fileName) || this.currentModelJournal == null)
+            if (string.IsNullOrEmpty(this.FileName) || this.currentModelJournal == null)
             {
                 this.DisplayName = $"SimpleAccounting {this.version}";
             }
             else
             {
-                this.DisplayName = $"SimpleAccounting {this.version} - {this.fileName} - {this.currentModelJournal.Year}";
+                this.DisplayName =
+                    $"SimpleAccounting {this.version} - {this.FileName} - {this.currentModelJournal.Year}";
             }
         }
 
@@ -764,8 +776,8 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 var firstAccount =
                     firstBooking.Credit.Select(x => x.Account)
-                    .Concat(firstBooking.Debit.Select(x => x.Account))
-                    .Min();
+                        .Concat(firstBooking.Debit.Select(x => x.Account))
+                        .Min();
                 this.SelectedAccount = this.AccountList.Single(x => x.Identifier == firstAccount);
                 this.RefreshAccountJournal();
             }
@@ -788,11 +800,11 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.IsDocumentModified = false;
-            this.fileName = projectFileName;
+            this.FileName = projectFileName;
 
             try
             {
-                var projectData = AccountingData.LoadFromFile(this.fileName);
+                var projectData = AccountingData.LoadFromFile(this.FileName);
                 if (projectData.Migrate())
                 {
                     this.IsDocumentModified = true;
@@ -800,19 +812,20 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 this.LoadProjectData(projectData);
 
-                Settings.Default.RecentProject = this.fileName;
-                Settings.Default.RecentProjects.Remove(this.fileName);
-                Settings.Default.RecentProjects.Insert(0, this.fileName);
-                while (Settings.Default.RecentProjects.Count > MaxRecentProjects)
+                var settings = Settings.Default;
+                settings.RecentProject = this.FileName;
+                settings.RecentProjects.Remove(this.FileName);
+                settings.RecentProjects.Insert(0, this.FileName);
+                while (settings.RecentProjects.Count > MaxRecentProjects)
                 {
-                    Settings.Default.RecentProjects.RemoveAt(MaxRecentProjects);
+                    settings.RecentProjects.RemoveAt(MaxRecentProjects);
                 }
 
-                Settings.Default.Save();
+                settings.Save();
             }
             catch (InvalidOperationException e)
             {
-                this.messageBox.Show($"Failed to load file '{this.fileName}':\n{e.Message}", "Load");
+                this.messageBox.Show($"Failed to load file '{this.FileName}':\n{e.Message}", "Load");
             }
         }
 
@@ -900,7 +913,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        private bool CheckSaveProject()
+        internal bool CheckSaveProject()
         {
             if (!this.IsDocumentModified)
             {
@@ -916,25 +929,23 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 return false;
             }
-            else if (result == MessageBoxResult.Yes)
+
+            if (result == MessageBoxResult.Yes)
             {
                 this.SaveProject();
                 return true;
             }
-            else
-            {
-                return true;
-            }
+
+            return true;
         }
 
-        private void SaveProject()
+        internal void SaveProject()
         {
-            if (this.fileName == "<new>")
+            if (this.FileName == "<new>")
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml",
-                    RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -942,26 +953,22 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                this.fileName = saveFileDialog.FileName;
+                this.FileName = saveFileDialog.FileName;
             }
 
-            DateTime fileDate = File.GetLastWriteTime(this.fileName);
-            string backupFileName = $"{this.fileName}.{fileDate:yyyyMMddHHmmss}";
-            try
+            DateTime fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
+            string backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
+            if (this.fileSystem.FileExists(this.FileName))
             {
-                File.Move(this.fileName, backupFileName);
-            }
-            catch (FileNotFoundException)
-            {
-                // ignored
+                this.fileSystem.FileMove(this.FileName, backupFileName);
             }
 
-            this.accountingData.SaveToFile(this.fileName);
+            this.fileSystem.WriteAllTextIntoFile(this.FileName, this.accountingData.Serialize());
             this.IsDocumentModified = false;
 
-            if (File.Exists(this.AutoSaveFileName))
+            if (this.fileSystem.FileExists(this.AutoSaveFileName))
             {
-                File.Delete(this.AutoSaveFileName);
+                this.fileSystem.FileDelete(this.AutoSaveFileName);
             }
         }
 
@@ -1036,7 +1043,7 @@ namespace lg2de.SimpleAccounting.Presentation
             double debitSum = 0;
             var entries =
                 this.currentModelJournal.Booking.Where(b => b.Credit.Any(x => x.Account == accountNumber))
-                .Concat(this.currentModelJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)));
+                    .Concat(this.currentModelJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)));
             foreach (var entry in entries.OrderBy(x => x.Date).ThenBy(x => x.ID))
             {
                 var item = new AccountJournalViewModel { Date = entry.Date.ToDateTime() };

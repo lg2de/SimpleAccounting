@@ -9,10 +9,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Collections.Specialized;
     using System.Globalization;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using Caliburn.Micro;
     using FluentAssertions;
     using FluentAssertions.Execution;
+    using FluentAssertions.Extensions;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
@@ -82,7 +84,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Text = "Shoes1", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
                 new { Text = "Shoes2", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
                 new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = (string)null },
-                new { Text = "Rent to friend", CreditAccount = "100 (Bank account)", DebitAccount = "6000 (Friends debit)" });
+                new
+                {
+                    Text = "Rent to friend",
+                    CreditAccount = "100 (Bank account)",
+                    DebitAccount = "6000 (Friends debit)"
+                });
             sut.AccountJournal.Should().BeEquivalentTo(
                 new { Text = "Open 1", RemoteAccount = "990 (Carryforward)" },
                 new { Text = "Salary", RemoteAccount = "Diverse" },
@@ -91,6 +98,17 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)" },
                 new { Text = "Summe" },
                 new { Text = "Saldo" });
+        }
+
+        [Fact]
+        public void OnDeactivate_HappyPath_Completes()
+        {
+            var sut = CreateSut();
+            ((IActivate)sut).Activate();
+
+            var task = Task.Run(() => ((IDeactivate)sut).Deactivate(close: true));
+
+            task.Awaiting(x => x).Should().CompleteWithin(1.Seconds());
         }
 
         [Fact]
@@ -165,7 +183,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Text = "Salary", RemoteAccount = "Diverse", CreditValue = 0, DebitValue = 200 },
                 new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", CreditValue = 400, DebitValue = 0 },
                 new { Text = "Shoes", RemoteAccount = "Diverse", CreditValue = 50, DebitValue = 0 },
-                new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)", CreditValue = 99, DebitValue = 0 },
+                new
+                {
+                    Text = "Rent to friend",
+                    RemoteAccount = "6000 (Friends debit)",
+                    CreditValue = 99,
+                    DebitValue = 0
+                },
                 new { Text = "Summe", RemoteAccount = (string)null, CreditValue = 549, DebitValue = 1200 },
                 new { Text = "Saldo", RemoteAccount = (string)null, CreditValue = 0, DebitValue = 651 });
         }
@@ -431,7 +455,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             project.Accounts.First().Account.Add(new AccountDefinition
             {
-                ID = 999, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward
+                ID = 999,
+                Name = "MyCarryForward",
+                Type = AccountDefinitionType.Carryforward
             });
             sut.LoadProjectData(project);
 
@@ -754,6 +780,157 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 });
             monitor.Should().RaisePropertyChangeFor(x => x.SelectedAccountJournalEntry);
             sut.SelectedAccountJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
+        }
+
+        [Fact]
+        public void CheckSaveProject_NotModified_ReturnsTrue()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+
+            sut.CheckSaveProject().Should().BeTrue();
+
+            messageBox.DidNotReceive().Show(Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+        }
+
+        [Fact]
+        public void CheckSaveProject_AnswerYes_SavedAndReturnsTrue()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.Yes);
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            {
+                IsDocumentModified = true
+            };
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.CheckSaveProject().Should().BeTrue();
+
+            messageBox.Received(1).Show(Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+        }
+
+        [Fact]
+        public void CheckSaveProject_AnswerNo_NotSavedAndReturnsTrue()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.No);
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            {
+                IsDocumentModified = true
+            };
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.CheckSaveProject().Should().BeTrue();
+
+            messageBox.Received(1).Show(Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+        }
+
+        [Fact]
+        public void CheckSaveProject_Cancel_NotSavedAndReturnsFalse()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.Cancel);
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            {
+                IsDocumentModified = true
+            };
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.CheckSaveProject().Should().BeFalse();
+
+            messageBox.Received(1).Show(Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+        }
+
+        [Fact]
+        public void SaveProject_NotExisting_JustSaved()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.SaveProject();
+
+            fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
+            fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+            fileSystem.DidNotReceive().FileDelete(Arg.Any<string>());
+        }
+
+        [Fact]
+        public void SaveProject_ProjectExisting_SavedAfterBackup()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
+            string fileName = "project.name";
+            fileSystem.FileExists(fileName).Returns(true);
+            sut.LoadProjectData(Samples.SampleProject);
+            sut.FileName = fileName;
+
+            sut.SaveProject();
+
+            fileSystem.Received(1).FileMove(fileName, fileName + ".20200229184556");
+            fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());
+            fileSystem.DidNotReceive().FileDelete(Arg.Any<string>());
+        }
+
+        [Fact]
+        public void SaveProject_AutoSaveExisting_AutoSaveFileDeleted()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
+            string fileName = "project.name";
+            fileSystem.FileExists(fileName + "~").Returns(true);
+            sut.LoadProjectData(Samples.SampleProject);
+            sut.FileName = fileName;
+
+            sut.SaveProject();
+
+            fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
+            fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());
+            fileSystem.Received(1).FileDelete(fileName + "~");
         }
 
         [Theory]
