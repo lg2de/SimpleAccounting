@@ -43,5 +43,10 @@ namespace lg2de.SimpleAccounting.Abstractions
         {
             File.WriteAllText(path, content, Encoding.UTF8);
         }
+
+        public string ReadAllTextFromFile(string path)
+        {
+            return File.ReadAllText(path);
+        }
     }
 }

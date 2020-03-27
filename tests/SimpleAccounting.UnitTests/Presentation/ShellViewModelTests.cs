@@ -40,14 +40,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void OnActivate_TwoRecentProjectsOneExisting_ExistingProjectListed()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
-            {
-                Settings = new Settings { RecentProjects = new StringCollection { "file1", "file2" } }
-            };
+            var sut = CreateSut(out IFileSystem fileSystem);
+            sut.Settings = new Settings { RecentProjects = new StringCollection { "file1", "file2" } };
             fileSystem.FileExists(Arg.Is("file1")).Returns(true);
 
             ((IActivate)sut).Activate();
@@ -135,11 +129,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SaveProjectCommand_DocumentModified_CanExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            var sut = CreateSut();
             sut.LoadProjectData(Samples.SampleProject);
             sut.IsDocumentModified = true;
 
@@ -225,13 +215,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddBookingsCommand_ShowInactiveAccounts_DialogInitialized()
         {
-            var windowManager = Substitute.For<IWindowManager>();
+            ShellViewModel sut = CreateSut(out IWindowManager windowManager);
             AddBookingViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
             sut.ShowInactiveAccounts = true;
 
@@ -245,13 +231,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddBookingsCommand_HideInactiveAccounts_DialogInitialized()
         {
-            var windowManager = Substitute.For<IWindowManager>();
+            var sut = CreateSut(out IWindowManager windowManager);
             AddBookingViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
             sut.ShowInactiveAccounts = false;
 
@@ -293,13 +275,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookingsCommand_BookingNumberInitialized()
         {
-            var windowManager = Substitute.For<IWindowManager>();
+            var sut = CreateSut(out IWindowManager windowManager);
             ImportBookingsViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as ImportBookingsViewModel));
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.ImportBookingsCommand.Execute(null);
@@ -336,13 +314,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CloseYearCommand_CurrentYearClosed_CannotExecute()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
+            ShellViewModel sut = CreateSut(out IMessageBox messageBox);
             messageBox.Show(Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
             sut.BookingYears.First().Command.Execute(null);
 
@@ -352,9 +326,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CloseYearCommand_HappyPath_YearClosedAndNewAdded()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
+            var sut = CreateSut(out IWindowManager windowManager);
             windowManager.ShowDialog(
                 Arg.Any<CloseYearViewModel>(),
                 Arg.Any<object>(),
@@ -364,8 +336,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 vm.RemoteAccount = vm.Accounts.First();
                 return true;
             });
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             AccountingData project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
@@ -437,9 +407,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CloseYearCommand_SecondCarryForwardAccount_OpeningsWithSelectedAccount()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
+            var sut = CreateSut(out IWindowManager windowManager);
             windowManager.ShowDialog(
                 Arg.Any<CloseYearViewModel>(),
                 Arg.Any<object>(),
@@ -449,8 +417,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 vm.RemoteAccount = vm.Accounts.Last();
                 return true;
             });
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             AccountingData project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             project.Accounts.First().Account.Add(new AccountDefinition
@@ -528,17 +494,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CloseYearCommand_ActionAborted_YearsUnchanged()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
+            var sut = CreateSut(out IMessageBox messageBox);
             messageBox.Show(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question,
                 MessageBoxResult.No).Returns(MessageBoxResult.No);
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.CloseYearCommand.Execute(null);
@@ -584,17 +546,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AccountJournalReportCommand_HappyPath_Completed()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
+            ShellViewModel sut = CreateSut(out IReportFactory reportFactory);
             var accountJournalReport = Substitute.For<IAccountJournalReport>();
             reportFactory.CreateAccountJournal(
                 Arg.Any<IEnumerable<AccountDefinition>>(),
                 Arg.Any<AccountingDataJournal>(),
                 Arg.Any<AccountingDataSetup>(),
                 Arg.Any<CultureInfo>()).Returns(accountJournalReport);
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AccountJournalReportCommand.Execute(null);
@@ -657,17 +615,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void NewAccountCommand_AccountCreatedAndSorted()
         {
-            var windowManager = Substitute.For<IWindowManager>();
+            var sut = CreateSut(out IWindowManager windowManager);
             windowManager.ShowDialog(Arg.Do<object>(model =>
             {
                 var vm = model as AccountViewModel;
                 vm.Name = "New Account";
                 vm.Identifier = 500;
             })).Returns(true);
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.NewAccountCommand.Execute(null);
@@ -679,16 +633,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void EditAccountCommand_AllDataUpdated()
         {
-            var windowManager = Substitute.For<IWindowManager>();
+            var sut = CreateSut(out IWindowManager windowManager);
             windowManager.ShowDialog(Arg.Do<object>(model =>
             {
                 var vm = model as AccountViewModel;
                 vm.Identifier += 1000;
             })).Returns(true);
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
             sut.LoadProjectData(Samples.SampleProject);
             var booking = new AccountingDataJournalBooking
             {
@@ -783,13 +733,95 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void LoadProjectFromFile_HappyPath_FileLoaded()
+        {
+            var sut = CreateSut(out IFileSystem fileSystem);
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+
+            sut.LoadProjectFromFile("the.fileName");
+
+            using var _ = new AssertionScope();
+            sut.FileName.Should().Be("the.fileName");
+            sut.IsDocumentModified.Should().BeFalse();
+            sut.Settings.RecentProject.Should().Be("the.fileName");
+            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
+            fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
+        }
+
+        [Fact]
+        public void LoadProjectFromFile_AutoSaveFileExistsYes_AutoSaveFileLoaded()
+        {
+            var sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
+            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+                    MessageBoxButton.YesNo, MessageBoxImage.Question,
+                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.Yes);
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+            fileSystem.FileExists("the.fileName~").Returns(true);
+
+            sut.LoadProjectFromFile("the.fileName");
+
+            using var _ = new AssertionScope();
+            sut.FileName.Should().Be("the.fileName");
+            sut.IsDocumentModified.Should().BeFalse();
+            sut.Settings.RecentProject.Should().Be("the.fileName");
+            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
+            fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
+        }
+
+        [Fact]
+        public void LoadProjectFromFile_AutoSaveFileExistsNo_AutoSaveFileLoaded()
+        {
+            var sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
+            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+                    MessageBoxButton.YesNo, MessageBoxImage.Question,
+                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.No);
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+            fileSystem.FileExists("the.fileName~").Returns(true);
+
+            sut.LoadProjectFromFile("the.fileName");
+
+            using var _ = new AssertionScope();
+            sut.FileName.Should().Be("the.fileName");
+            sut.IsDocumentModified.Should().BeFalse();
+            sut.Settings.RecentProject.Should().Be("the.fileName");
+            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
+            fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
+        }
+
+        [Fact]
+        public void LoadProjectFromFile_FullRecentList_NewFileOnTop()
+        {
+            var sut = CreateSut(out IFileSystem fileSystem);
+            sut.Settings.RecentProjects = new StringCollection { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+
+            sut.LoadProjectFromFile("the.fileName");
+
+            sut.Settings.RecentProjects.OfType<string>().Should()
+                .Equal("the.fileName", "A", "B", "C", "D", "E", "F", "G", "H", "I");
+        }
+
+        [Fact]
+        public void LoadProjectFromFile_MigrationRequired_ProjectModified()
+        {
+            var sut = CreateSut(out IFileSystem fileSystem);
+            var accountingData = new AccountingData
+            {
+                Years = new List<AccountingDataYear> { new AccountingDataYear { Name = 2020 } }
+            };
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
+
+            sut.LoadProjectFromFile("the.fileName");
+
+            sut.IsDocumentModified.Should().BeTrue();
+        }
+
+        [Fact]
         public void CheckSaveProject_NotModified_ReturnsTrue()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            var sut = CreateSut(out IMessageBox messageBox);
 
             sut.CheckSaveProject().Should().BeTrue();
 
@@ -801,18 +833,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CheckSaveProject_AnswerYes_SavedAndReturnsTrue()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
+            ShellViewModel sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
+            sut.IsDocumentModified = true;
             messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
-            {
-                IsDocumentModified = true
-            };
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.CheckSaveProject().Should().BeTrue();
@@ -826,18 +852,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CheckSaveProject_AnswerNo_NotSavedAndReturnsTrue()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
+            sut.IsDocumentModified = true;
             messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
-            {
-                IsDocumentModified = true
-            };
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.CheckSaveProject().Should().BeTrue();
@@ -861,6 +881,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Returns(MessageBoxResult.Cancel);
             var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
             {
+                Settings = new Settings(),
                 IsDocumentModified = true
             };
             sut.LoadProjectData(Samples.SampleProject);
@@ -876,11 +897,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SaveProject_NotExisting_JustSaved()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            var sut = CreateSut(out IFileSystem fileSystem);
             fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
             sut.LoadProjectData(Samples.SampleProject);
 
@@ -894,11 +911,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SaveProject_ProjectExisting_SavedAfterBackup()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            var sut = CreateSut(out IFileSystem fileSystem);
             fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
             string fileName = "project.name";
             fileSystem.FileExists(fileName).Returns(true);
@@ -915,11 +928,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SaveProject_AutoSaveExisting_AutoSaveFileDeleted()
         {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            var sut = CreateSut(out IFileSystem fileSystem);
             fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
             string fileName = "project.name";
             fileSystem.FileExists(fileName + "~").Returns(true);
@@ -970,7 +979,75 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            {
+                Settings = new Settings()
+            };
+            return sut;
+        }
+
+        private static ShellViewModel CreateSut(out IWindowManager windowManager)
+        {
+            windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            {
+                Settings = new Settings()
+            };
+            return sut;
+        }
+
+        private static ShellViewModel CreateSut(out IReportFactory reportFactory)
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            {
+                Settings = new Settings()
+            };
+            return sut;
+        }
+
+        private static ShellViewModel CreateSut(out IMessageBox messageBox)
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            {
+                Settings = new Settings()
+            };
+            return sut;
+        }
+
+        private static ShellViewModel CreateSut(out IFileSystem fileSystem)
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            {
+                Settings = new Settings()
+            };
+            return sut;
+        }
+
+        private static ShellViewModel CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem)
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            messageBox = Substitute.For<IMessageBox>();
+            fileSystem = Substitute.For<IFileSystem>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            {
+                Settings = new Settings()
+            };
             return sut;
         }
 

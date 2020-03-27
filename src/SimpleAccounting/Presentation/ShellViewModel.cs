@@ -476,6 +476,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.cancellationTokenSource.Dispose();
             this.cancellationTokenSource = null;
 
+            this.Settings.Save();
+
             base.OnDeactivate(close);
         }
 
@@ -771,7 +773,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.currentModelJournal = this.accountingData.Journal.Single(y => y.Year == newYearName);
             this.UpdateDisplayName();
             this.RefreshFullJournal();
-            var firstBooking = this.currentModelJournal.Booking.FirstOrDefault();
+            var firstBooking = this.currentModelJournal.Booking?.FirstOrDefault();
             if (firstBooking != null)
             {
                 var firstAccount =
@@ -804,7 +806,24 @@ namespace lg2de.SimpleAccounting.Presentation
 
             try
             {
-                var projectData = AccountingData.LoadFromFile(this.FileName);
+                var result = MessageBoxResult.No;
+                if (this.fileSystem.FileExists(this.AutoSaveFileName))
+                {
+                    result = this.messageBox.Show(
+                        "Es existiert eine automatische Sicherung der Projektdatei\n"
+                        + $"{this.FileName}.\n"
+                        + "Soll diese geöffnet werden?",
+                        "Projekt öffnen",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+                }
+
+                var projectXml = this.fileSystem.ReadAllTextFromFile(
+                    result == MessageBoxResult.Yes
+                        ? this.AutoSaveFileName
+                        : this.FileName);
+                var projectData = AccountingData.Deserialize(projectXml);
+
                 if (projectData.Migrate())
                 {
                     this.IsDocumentModified = true;
@@ -812,16 +831,19 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 this.LoadProjectData(projectData);
 
-                var settings = Settings.Default;
-                settings.RecentProject = this.FileName;
-                settings.RecentProjects.Remove(this.FileName);
-                settings.RecentProjects.Insert(0, this.FileName);
-                while (settings.RecentProjects.Count > MaxRecentProjects)
+                this.Settings.RecentProject = this.FileName;
+
+                if (this.Settings.RecentProjects == null)
                 {
-                    settings.RecentProjects.RemoveAt(MaxRecentProjects);
+                    this.Settings.RecentProjects = new StringCollection();
                 }
 
-                settings.Save();
+                this.Settings.RecentProjects.Remove(this.FileName);
+                this.Settings.RecentProjects.Insert(0, this.FileName);
+                while (this.Settings.RecentProjects.Count > MaxRecentProjects)
+                {
+                    this.Settings.RecentProjects.RemoveAt(MaxRecentProjects);
+                }
             }
             catch (InvalidOperationException e)
             {
@@ -855,7 +877,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.RefreshAccountList();
 
             // select last booking year after loading
-            this.BookingYears.Last().Command.Execute(null);
+            this.BookingYears.LastOrDefault()?.Command.Execute(null);
         }
 
         private static AccountingData GetTemplateProject()
