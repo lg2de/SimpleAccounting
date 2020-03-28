@@ -19,6 +19,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Windows;
     using System.Windows.Forms;
     using System.Windows.Input;
+    using System.Windows.Threading;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
@@ -29,7 +30,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
 #pragma warning disable S4055 // string literals => pending translation
 
-    [SuppressMessage("Critical Code Smell", "S2365:Properties should not make collection or array copies",
+    [SuppressMessage(
+        "Critical Code Smell",
+        "S2365:Properties should not make collection or array copies",
         Justification = "<Pending>")]
     internal class ShellViewModel : Conductor<IScreen>
     {
@@ -47,7 +50,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly IFileSystem fileSystem;
         private readonly string version;
 
-        private Task autoSaveTask;
+        private Task autoSaveTask = Task.CompletedTask;
         private CancellationTokenSource cancellationTokenSource;
         private AccountingData accountingData;
         private AccountingDataJournal currentModelJournal;
@@ -447,11 +450,6 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnActivate();
 
-            if (this.fileSystem.FileExists(this.Settings.RecentProject))
-            {
-                this.LoadProjectFromFile(this.Settings.RecentProject);
-            }
-
             foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
             {
                 if (!this.fileSystem.FileExists(project))
@@ -465,8 +463,24 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.RecentProjects.Add(item);
             }
 
+            var dispatcher = Dispatcher.CurrentDispatcher;
             this.cancellationTokenSource = new CancellationTokenSource();
-            this.autoSaveTask = Task.Run(this.AutoSaveAsync);
+            if (this.fileSystem.FileExists(this.Settings.RecentProject))
+            {
+                // We move execution into thread pool thread.
+                // In case there is an auto-save file, the dialog should be shown on top of main window.
+                // Therefore OnActivate needs to completed.
+                Task.Run(() =>
+                {
+                    // re-invoke onto UI thread
+                    dispatcher.Invoke(() => this.LoadProjectFromFile(this.Settings.RecentProject));
+                    this.autoSaveTask = this.AutoSaveAsync();
+                });
+            }
+            else
+            {
+                this.autoSaveTask = Task.Run(this.AutoSaveAsync);
+            }
         }
 
         protected override void OnDeactivate(bool close)
@@ -776,10 +790,10 @@ namespace lg2de.SimpleAccounting.Presentation
             var firstBooking = this.currentModelJournal.Booking?.FirstOrDefault();
             if (firstBooking != null)
             {
-                var firstAccount =
-                    firstBooking.Credit.Select(x => x.Account)
-                        .Concat(firstBooking.Debit.Select(x => x.Account))
-                        .Min();
+                var firstAccount = firstBooking
+                    .Credit.Select(x => x.Account)
+                    .Concat(firstBooking.Debit.Select(x => x.Account))
+                    .Min();
                 this.SelectedAccount = this.AccountList.Single(x => x.Identifier == firstAccount);
                 this.RefreshAccountJournal();
             }
@@ -824,7 +838,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         : this.FileName);
                 var projectData = AccountingData.Deserialize(projectXml);
 
-                if (projectData.Migrate())
+                if (projectData.Migrate() || result == MessageBoxResult.Yes)
                 {
                     this.IsDocumentModified = true;
                 }
@@ -967,7 +981,8 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml",
+                    RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -1063,9 +1078,9 @@ namespace lg2de.SimpleAccounting.Presentation
             var accountNumber = this.SelectedAccount.Identifier;
             double creditSum = 0;
             double debitSum = 0;
-            var entries =
-                this.currentModelJournal.Booking.Where(b => b.Credit.Any(x => x.Account == accountNumber))
-                    .Concat(this.currentModelJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)));
+            var entries = this.currentModelJournal
+                .Booking.Where(b => b.Credit.Any(x => x.Account == accountNumber))
+                .Concat(this.currentModelJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)));
             foreach (var entry in entries.OrderBy(x => x.Date).ThenBy(x => x.ID))
             {
                 var item = new AccountJournalViewModel { Date = entry.Date.ToDateTime() };

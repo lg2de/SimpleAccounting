@@ -53,7 +53,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void OnActivate_SampleProject_JournalsUpdates()
         {
             var sut = CreateSut();
-            AccountingData project = Samples.SampleProject;
+            var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
@@ -140,7 +140,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void ShowInactiveAccounts_SetTrue_InactiveAccountsGetVisible()
         {
             var sut = CreateSut();
-            AccountingData project = Samples.SampleProject;
+            var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
@@ -162,7 +162,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AccountSelectionCommand_SampleBookings_AccountJournalUpdated()
         {
             var sut = CreateSut();
-            AccountingData project = Samples.SampleProject;
+            var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
@@ -215,7 +215,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddBookingsCommand_ShowInactiveAccounts_DialogInitialized()
         {
-            ShellViewModel sut = CreateSut(out IWindowManager windowManager);
+            var sut = CreateSut(out IWindowManager windowManager);
             AddBookingViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
             sut.LoadProjectData(Samples.SampleProject);
@@ -314,7 +314,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CloseYearCommand_CurrentYearClosed_CannotExecute()
         {
-            ShellViewModel sut = CreateSut(out IMessageBox messageBox);
+            var sut = CreateSut(out IMessageBox messageBox);
             messageBox.Show(Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
             sut.LoadProjectData(Samples.SampleProject);
@@ -336,7 +336,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 vm.RemoteAccount = vm.Accounts.First();
                 return true;
             });
-            AccountingData project = Samples.SampleProject;
+            var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
@@ -417,7 +417,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 vm.RemoteAccount = vm.Accounts.Last();
                 return true;
             });
-            AccountingData project = Samples.SampleProject;
+            var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             project.Accounts.First().Account.Add(new AccountDefinition
             {
@@ -546,7 +546,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AccountJournalReportCommand_HappyPath_Completed()
         {
-            ShellViewModel sut = CreateSut(out IReportFactory reportFactory);
+            var sut = CreateSut(out IReportFactory reportFactory);
             var accountJournalReport = Substitute.For<IAccountJournalReport>();
             reportFactory.CreateAccountJournal(
                 Arg.Any<IEnumerable<AccountDefinition>>(),
@@ -751,7 +751,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void LoadProjectFromFile_AutoSaveFileExistsYes_AutoSaveFileLoaded()
         {
-            var sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
+            var sut = CreateSut(out var messageBox, out var fileSystem);
             messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -763,7 +763,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
-            sut.IsDocumentModified.Should().BeFalse();
+            sut.IsDocumentModified.Should().BeTrue("changes are (still) not yet saved");
             sut.Settings.RecentProject.Should().Be("the.fileName");
             sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
@@ -772,7 +772,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void LoadProjectFromFile_AutoSaveFileExistsNo_AutoSaveFileLoaded()
         {
-            var sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
+            var sut = CreateSut(out var messageBox, out var fileSystem);
             messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -833,7 +833,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CheckSaveProject_AnswerYes_SavedAndReturnsTrue()
         {
-            ShellViewModel sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
+            var sut = CreateSut(out var messageBox, out var fileSystem);
             sut.IsDocumentModified = true;
             messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
@@ -852,7 +852,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CheckSaveProject_AnswerNo_NotSavedAndReturnsTrue()
         {
-            var sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
+            var sut = CreateSut(out var messageBox, out var fileSystem);
             sut.IsDocumentModified = true;
             messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
@@ -913,7 +913,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IFileSystem fileSystem);
             fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
-            string fileName = "project.name";
+            var fileName = "project.name";
             fileSystem.FileExists(fileName).Returns(true);
             sut.LoadProjectData(Samples.SampleProject);
             sut.FileName = fileName;
@@ -930,7 +930,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IFileSystem fileSystem);
             fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
-            string fileName = "project.name";
+            var fileName = "project.name";
             fileSystem.FileExists(fileName + "~").Returns(true);
             sut.LoadProjectData(Samples.SampleProject);
             sut.FileName = fileName;
