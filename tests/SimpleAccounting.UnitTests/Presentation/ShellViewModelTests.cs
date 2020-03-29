@@ -21,6 +21,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
+    using lg2de.SimpleAccounting.UnitTests.Extensions;
     using NSubstitute;
     using Octokit;
     using Xunit;
@@ -47,6 +48,65 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
 
             sut.RecentProjects?.Select(x => x.Header).Should().Equal("file1");
+        }
+
+        [WpfFact]
+        public async Task OnActivate_NewProject_ProjectLoadedAndAutoSaveActive()
+        {
+            var sut = CreateSut(out IFileSystem fileSystem);
+            sut.AutoSaveInterval = 100.Milliseconds();
+            sut.FileName = "new.project";
+            var fileSaved = new TaskCompletionSource<bool>();
+            fileSystem
+                .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
+                .Do(x => fileSaved.SetResult(true));
+
+            ((IActivate)sut).Activate();
+            sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
+            sut.LoadProjectData(new AccountingData());
+            sut.IsDocumentModified = true;
+            await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
+
+            using var _ = new AssertionScope();
+            sut.IsDocumentModified.Should().BeTrue();
+            fileSystem.Received(1).WriteAllTextIntoFile("new.project~", Arg.Any<string>());
+        }
+
+        [WpfFact]
+        public async Task OnActivate_RecentProject_ProjectLoadedAndAutoSaveActive()
+        {
+            var sut = CreateSut(out IFileSystem fileSystem);
+            sut.AutoSaveInterval = 100.Milliseconds();
+            sut.Settings.RecentProject = "recent.project";
+            fileSystem.FileExists("recent.project").Returns(true);
+            var sample = new AccountingData
+            {
+                Accounts = new List<AccountingDataAccountGroup>
+                {
+                    new AccountingDataAccountGroup
+                    {
+                        Account = new List<AccountDefinition>
+                        {
+                            new AccountDefinition { ID = 1, Name = "TheAccount" }
+                        }
+                    }
+                }
+            };
+            fileSystem.ReadAllTextFromFile("recent.project").Returns(sample.Serialize());
+            var fileSaved = new TaskCompletionSource<bool>();
+            fileSystem
+                .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
+                .Do(x => fileSaved.SetResult(true));
+
+            ((IActivate)sut).Activate();
+            await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
+            sut.IsDocumentModified = true;
+            await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
+
+            using var _ = new AssertionScope();
+            sut.IsDocumentModified.Should().BeTrue();
+            sut.AccountList.Should().BeEquivalentTo(new { Name = "TheAccount" });
+            fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
         }
 
         [Fact]

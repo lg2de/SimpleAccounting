@@ -181,7 +181,10 @@ namespace lg2de.SimpleAccounting.Presentation
             this.accountingData.Setup?.BookingTemplates?.Template
                 .Select(t => new BookingTemplate
                 {
-                    Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor
+                    Text = t.Text,
+                    Credit = t.Credit,
+                    Debit = t.Debit,
+                    Value = t.Value / CentFactor
                 })
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
             this.windowManager.ShowDialog(bookingModel);
@@ -406,6 +409,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal bool IsDocumentModified { get; set; }
 
+        internal Task LoadingTask { get; private set; } = Task.CompletedTask;
+
         internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
 
         private string AutoSaveFileName => this.FileName + "~";
@@ -470,7 +475,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 // We move execution into thread pool thread.
                 // In case there is an auto-save file, the dialog should be shown on top of main window.
                 // Therefore OnActivate needs to completed.
-                Task.Run(() =>
+                this.LoadingTask = Task.Run(() =>
                 {
                     // re-invoke onto UI thread
                     dispatcher.Invoke(() => this.LoadProjectFromFile(this.Settings.RecentProject));
@@ -485,6 +490,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         protected override void OnDeactivate(bool close)
         {
+            this.LoadingTask.Wait();
             this.cancellationTokenSource.Cancel();
             this.autoSaveTask.Wait();
             this.cancellationTokenSource.Dispose();
@@ -871,7 +877,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.UpdateBookingYears();
 
             this.AllAccounts.Clear();
-            foreach (var accountGroup in this.accountingData.Accounts)
+            foreach (var accountGroup in this.accountingData.Accounts ?? new List<AccountingDataAccountGroup>())
             {
                 foreach (var account in accountGroup.Account)
                 {
@@ -940,6 +946,11 @@ namespace lg2de.SimpleAccounting.Presentation
         private void UpdateBookingYears()
         {
             this.BookingYears.Clear();
+            if (this.accountingData?.Journal == null)
+            {
+                return;
+            }
+
             foreach (var year in this.accountingData.Journal)
             {
                 var menu = new MenuViewModel(
