@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting
 {
-    using System.Collections.Specialized;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Windows;
@@ -12,15 +11,12 @@ namespace lg2de.SimpleAccounting
     using lg2de.SimpleAccounting.Properties;
 
     [ExcludeFromCodeCoverage]
-    public partial class App : Application
+    public partial class App
     {
         public App()
         {
-            Settings.Default.Upgrade();
-            if (Settings.Default.RecentProjects == null)
-            {
-                Settings.Default.RecentProjects = new StringCollection();
-            }
+            var settings = Settings.Default;
+            settings.Upgrade();
         }
 
         private void ApplicationStartup(object sender, StartupEventArgs e)

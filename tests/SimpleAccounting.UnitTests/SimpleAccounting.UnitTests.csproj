@@ -28,6 +28,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <!-- license is MS.PL -->
+    <PackageReference Include="Xunit.StaFact" Version="0.3.18" />
   </ItemGroup>
 
   <ItemGroup>
