@@ -22,9 +22,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
     internal class ImportBookingsViewModel : Screen
     {
+        private readonly List<AccountDefinition> accounts;
         private readonly IMessageBox messageBox;
         private readonly ShellViewModel parent;
-        private readonly List<AccountDefinition> accounts;
         private ulong selectedAccountNumber;
 
         public ImportBookingsViewModel(
@@ -42,7 +42,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
             .Where(a =>
                 a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) == true
-                && a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) == true);
+                && a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) ==
+                true);
 
         public DateTime RangeMin { get; internal set; }
 
@@ -79,8 +80,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
-                    Filter = "Booking data files (*.csv)|*.csv",
-                    RestoreDirectory = true
+                    Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
                 };
 
                 if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
@@ -91,7 +91,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.ImportData.Clear();
 
                 // note, the stream is disposed by the reader
-                var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read,
+                    FileShare.ReadWrite);
                 var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
                 using (var reader = new StreamReader(stream, enc1252))
                 {
@@ -133,7 +134,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source;
 
             var lastEntry = this.Journal?.Booking?
-                .Where(x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) || x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
+                .Where(x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) ||
+                            x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
                 .OrderBy(x => x.Date)
                 .LastOrDefault();
             if (lastEntry != null)
@@ -233,13 +235,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var newBooking = new AccountingDataJournalBooking
                 {
-                    Date = importing.Date.ToAccountingDate(),
-                    ID = importing.Identifier
+                    Date = importing.Date.ToAccountingDate(), ID = importing.Identifier
                 };
-                var creditValue = new BookingValue
-                {
-                    Value = (long)Math.Abs(Math.Round(importing.Value * 100))
-                };
+                var creditValue = new BookingValue { Value = (long)Math.Abs(Math.Round(importing.Value * 100)) };
 
                 // build booking text from name and/or text
                 if (string.IsNullOrWhiteSpace(importing.Text))

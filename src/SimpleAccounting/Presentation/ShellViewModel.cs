@@ -43,21 +43,21 @@ namespace lg2de.SimpleAccounting.Presentation
         private const double CentFactor = 100.0;
         private static readonly string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
         private static readonly string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
+        private readonly IFileSystem fileSystem;
+        private readonly IMessageBox messageBox;
+        private readonly IReportFactory reportFactory;
+        private readonly string version;
 
         private readonly IWindowManager windowManager;
-        private readonly IReportFactory reportFactory;
-        private readonly IMessageBox messageBox;
-        private readonly IFileSystem fileSystem;
-        private readonly string version;
+        private AccountingData accountingData;
 
         private Task autoSaveTask = Task.CompletedTask;
         private CancellationTokenSource cancellationTokenSource;
-        private AccountingData accountingData;
         private AccountingDataJournal currentModelJournal;
-        private bool showInactiveAccounts;
-        private FullJournalViewModel selectedFullJournalEntry;
-        private AccountJournalViewModel selectedAccountJournalEntry;
         private AccountViewModel selectedAccount;
+        private AccountJournalViewModel selectedAccountJournalEntry;
+        private FullJournalViewModel selectedFullJournalEntry;
+        private bool showInactiveAccounts;
 
         public ShellViewModel(
             IWindowManager windowManager,
@@ -146,8 +146,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Filter = "Accounting project files (*.acml)|*.acml",
-                RestoreDirectory = true
+                Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
             };
 
             if (openFileDialog.ShowDialog() != DialogResult.OK)
@@ -169,10 +168,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var bookingModel = new AddBookingViewModel(
                 this,
                 this.currentModelJournal.DateStart.ToDateTime(),
-                this.currentModelJournal.DateEnd.ToDateTime())
-            {
-                BookingNumber = this.GetMaxBookIdent() + 1
-            };
+                this.currentModelJournal.DateEnd.ToDateTime()) { BookingNumber = this.GetMaxBookIdent() + 1 };
             bookingModel.Accounts.AddRange(
                 this.ShowInactiveAccounts
                     ? this.accountingData.AllAccounts
@@ -181,10 +177,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.accountingData.Setup?.BookingTemplates?.Template
                 .Select(t => new BookingTemplate
                 {
-                    Text = t.Text,
-                    Credit = t.Credit,
-                    Debit = t.Debit,
-                    Value = t.Value / CentFactor
+                    Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor
                 })
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
             this.windowManager.ShowDialog(bookingModel);
@@ -266,11 +259,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         continue;
                     }
 
-                    accountGroups.Add(new AccountingDataAccountGroup
-                    {
-                        Name = group.Name,
-                        Account = assertAccounts
-                    });
+                    accountGroups.Add(new AccountingDataAccountGroup { Name = group.Name, Account = assertAccounts });
                 }
 
                 var report = new TotalsAndBalancesReport(
@@ -679,8 +668,8 @@ namespace lg2de.SimpleAccounting.Presentation
         private void CloseYear()
         {
             var viewModel = new CloseYearViewModel(this.currentModelJournal);
-            viewModel.Accounts.AddRange(
-                this.accountingData.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward));
+            this.accountingData.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward)
+                .ToList().ForEach(viewModel.Accounts.Add);
 
             var result = this.windowManager.ShowDialog(viewModel);
             if (result != true)
@@ -739,15 +728,10 @@ namespace lg2de.SimpleAccounting.Presentation
                 newYearJournal.Booking.Add(newBooking);
                 var newDebit = new BookingValue
                 {
-                    Value = Math.Abs(creditAmount - debitAmount),
-                    Text = $"Eröffnungsbetrag {bookingId}"
+                    Value = Math.Abs(creditAmount - debitAmount), Text = $"Eröffnungsbetrag {bookingId}"
                 };
                 newBooking.Debit.Add(newDebit);
-                var newCredit = new BookingValue
-                {
-                    Value = newDebit.Value,
-                    Text = newDebit.Text
-                };
+                var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };
                 newBooking.Credit.Add(newCredit);
                 if (creditAmount > debitAmount)
                 {
@@ -905,22 +889,10 @@ namespace lg2de.SimpleAccounting.Presentation
             var year = (ushort)DateTime.Now.Year;
             var defaultAccounts = new List<AccountDefinition>
             {
-                new AccountDefinition
-                {
-                    ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset
-                },
-                new AccountDefinition
-                {
-                    ID = 400, Name = "Salary", Type = AccountDefinitionType.Income
-                },
-                new AccountDefinition
-                {
-                    ID = 600, Name = "Food", Type = AccountDefinitionType.Expense
-                },
-                new AccountDefinition
-                {
-                    ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
-                }
+                new AccountDefinition { ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset },
+                new AccountDefinition { ID = 400, Name = "Salary", Type = AccountDefinitionType.Income },
+                new AccountDefinition { ID = 600, Name = "Food", Type = AccountDefinitionType.Expense },
+                new AccountDefinition { ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward }
             };
             var accountJournal = new AccountingDataJournal
             {
@@ -933,11 +905,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 Accounts = new List<AccountingDataAccountGroup>
                 {
-                    new AccountingDataAccountGroup
-                    {
-                        Name = "Default",
-                        Account = defaultAccounts
-                    }
+                    new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }
                 },
                 Journal = new List<AccountingDataJournal> { accountJournal }
             };
@@ -992,8 +960,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml",
-                    RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)

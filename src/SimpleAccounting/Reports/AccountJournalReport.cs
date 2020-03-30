@@ -20,9 +20,9 @@ namespace lg2de.SimpleAccounting.Reports
 
         private readonly IEnumerable<AccountDefinition> accounts;
         private readonly CultureInfo culture;
-        private bool firstAccount;
         private double creditSum;
         private double debitSum;
+        private bool firstAccount;
 
         public AccountJournalReport(
             IEnumerable<AccountDefinition> accounts,
@@ -195,14 +195,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode = dataItemNode.Clone();
                 dataLineNode.AppendChild(dataItemNode);
 
-                if (entry.Credit.Count == 1)
-                {
-                    dataItemNode.InnerText = entry.Credit[0].Account.ToString();
-                }
-                else
-                {
-                    dataItemNode.InnerText = "Diverse";
-                }
+                dataItemNode.InnerText = entry.Credit.Count == 1 ? entry.Credit[0].Account.ToString() : "Diverse";
 
                 return dataLineNode;
             }
@@ -225,14 +218,7 @@ namespace lg2de.SimpleAccounting.Reports
             dataItemNode = dataItemNode.Clone();
             dataLineNode.AppendChild(dataItemNode);
 
-            if (entry.Credit.Count == 1)
-            {
-                dataItemNode.InnerText = entry.Debit[0].Account.ToString();
-            }
-            else
-            {
-                dataItemNode.InnerText = "Diverse";
-            }
+            dataItemNode.InnerText = entry.Credit.Count == 1 ? entry.Debit[0].Account.ToString() : "Diverse";
 
             return dataLineNode;
         }

@@ -9,8 +9,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
     public class RelayCommand : ICommand
     {
-        private readonly Action<object> execute;
         private readonly Predicate<object> canExecute;
+        private readonly Action<object> execute;
 
         public RelayCommand(Action<object> execute)
         {

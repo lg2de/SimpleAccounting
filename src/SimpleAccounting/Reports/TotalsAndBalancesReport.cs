@@ -19,14 +19,20 @@ namespace lg2de.SimpleAccounting.Reports
 
         private readonly List<AccountingDataAccountGroup> accountGroups;
         private readonly CultureInfo culture;
-
-        private double totalOpeningCredit, totalOpeningDebit;
-        private double totalSumCredit, totalSumDebit;
-        private double totalSaldoCredit, totalSaldoDebit;
-        private double groupOpeningCredit, groupOpeningDebit;
-        private double groupSumCredit, groupSumDebit;
-        private double groupSaldoCredit, groupSaldoDebit;
         private int accountsPerGroup;
+        private double groupOpeningCredit;
+        private double groupOpeningDebit;
+        private double groupSaldoCredit;
+        private double groupSaldoDebit;
+        private double groupSumCredit;
+        private double groupSumDebit;
+
+        private double totalOpeningCredit;
+        private double totalOpeningDebit;
+        private double totalSaldoCredit;
+        private double totalSaldoDebit;
+        private double totalSumCredit;
+        private double totalSumDebit;
 
         public TotalsAndBalancesReport(
             AccountingDataJournal yearData,
@@ -175,7 +181,8 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void ProcessAccount(XmlNode dataNode, AccountDefinition account)
         {
-            if (this.YearData.Booking.All(b => b.Debit.All(x => x.Account != account.ID) && b.Credit.All(x => x.Account != account.ID)))
+            if (this.YearData.Booking.All(b =>
+                b.Debit.All(x => x.Account != account.ID) && b.Credit.All(x => x.Account != account.ID)))
             {
                 return;
             }

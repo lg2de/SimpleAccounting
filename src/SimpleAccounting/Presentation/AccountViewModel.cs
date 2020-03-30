@@ -21,7 +21,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        public static List<AccountDefinitionType> Types { get; } = new List<AccountDefinitionType>();
+        public static IList<AccountDefinitionType> Types { get; } = new List<AccountDefinitionType>();
 
         public ulong Identifier { get; set; }
 
@@ -41,7 +41,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand SaveCommand => new RelayCommand(
             _ => this.TryClose(true),
             _ => !string.IsNullOrWhiteSpace(this.Name)
-            && (this.IsAvalidIdentifierFunc?.Invoke(this.Identifier) ?? true));
+                 && (this.IsAvalidIdentifierFunc?.Invoke(this.Identifier) ?? true));
 
         internal AccountViewModel Clone()
         {

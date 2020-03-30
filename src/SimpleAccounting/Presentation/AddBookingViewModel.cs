@@ -121,8 +121,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 var newBooking = new AccountingDataJournalBooking
                 {
-                    Date = this.Date.ToAccountingDate(),
-                    ID = this.BookingNumber
+                    Date = this.Date.ToAccountingDate(), ID = this.BookingNumber
                 };
                 var creditValue = new BookingValue
                 {
@@ -141,13 +140,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.NotifyOfPropertyChange(nameof(this.BookingNumber));
             },
             _ => this.Date >= this.DateStart
-            && this.Date <= this.DateEnd
-            && this.BookingNumber > 0
-            && this.BookingValue > 0
-            && this.CreditIndex >= 0
-            && this.DebitIndex >= 0
-            && this.CreditIndex != this.DebitIndex
-            && !string.IsNullOrWhiteSpace(this.BookingText));
+                 && this.Date <= this.DateEnd
+                 && this.BookingNumber > 0
+                 && this.BookingValue > 0
+                 && this.CreditIndex >= 0
+                 && this.DebitIndex >= 0
+                 && this.CreditIndex != this.DebitIndex
+                 && !string.IsNullOrWhiteSpace(this.BookingText));
 
         internal DateTime DateStart { get; }
 

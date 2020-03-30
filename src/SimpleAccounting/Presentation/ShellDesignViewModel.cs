@@ -5,8 +5,13 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using lg2de.SimpleAccounting.Model;
 
+    [SuppressMessage("Major Code Smell", "S109:Magic numbers should not be used",
+        Justification = "Design view model defines useful values")]
+    [SuppressMessage("Major Code Smell", "S4055:Literals should not be passed as localized parameters",
+        Justification = "Design view model defines useful values")]
     internal class ShellDesignViewModel : ShellViewModel
     {
         public ShellDesignViewModel()
@@ -29,7 +34,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 Identifier = 42,
                 Date = DateTime.Now,
-                Text = "Booking",
+                Text = "Booking1",
                 Value = 123.4,
                 CreditAccount = "100",
                 DebitAccount = "400"
@@ -39,7 +44,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 Identifier = 42,
                 Date = DateTime.Now,
-                Text = "Booking",
+                Text = "Booking2",
                 Value = 1.444,
                 CreditAccount = "101",
                 DebitAccount = "401"
@@ -50,7 +55,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 Identifier = 42,
                 Date = DateTime.Now,
-                Text = "Booking",
+                Text = "Booking1",
                 CreditValue = 123.4,
                 RemoteAccount = "Div."
             };
@@ -66,10 +71,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.AccountJournal.Add(accountJournalItem);
             accountJournalItem = new AccountJournalViewModel
             {
-                IsSummary = true,
-                Text = "Summe",
-                CreditValue = 123.4,
-                RemoteAccount = "Div."
+                IsSummary = true, Text = "Summe", CreditValue = 123.4, RemoteAccount = "Div."
             };
             this.AccountJournal.Add(accountJournalItem);
         }

@@ -17,6 +17,11 @@ namespace lg2de.SimpleAccounting.Presentation
     [ExcludeFromCodeCoverage]
     internal class NumberTextBox : TextBox
     {
+        public static readonly DependencyProperty ScaleProperty =
+            DependencyProperty.Register("Scale", typeof(uint),
+                typeof(NumberTextBox),
+                new FrameworkPropertyMetadata((uint)0, OnScaleChanged));
+
         private Regex numberExpression;
 
         public NumberTextBox()
@@ -28,11 +33,6 @@ namespace lg2de.SimpleAccounting.Presentation
             DataObject.AddPastingHandler(this, this.OnPasteText);
             this.UpdateExpression();
         }
-
-        public static readonly DependencyProperty ScaleProperty =
-            DependencyProperty.Register("Scale", typeof(uint),
-                typeof(NumberTextBox),
-                new FrameworkPropertyMetadata((uint)0, OnScaleChanged));
 
         public uint Scale
         {

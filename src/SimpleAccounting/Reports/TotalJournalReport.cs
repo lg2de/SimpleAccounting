@@ -23,7 +23,7 @@ namespace lg2de.SimpleAccounting.Reports
             AccountingDataJournal yearData,
             AccountingDataSetup setup,
             CultureInfo culture)
-            : base (ResourceName, setup, yearData, culture)
+            : base(ResourceName, setup, yearData, culture)
         {
             this.culture = culture;
         }
@@ -43,7 +43,7 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d", this.culture);
                 dataLineNode.AppendChild(dataItemNode);
                 dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = entry.ID.ToString();
+                dataItemNode.InnerText = entry.ID.ToString(CultureInfo.InvariantCulture);
                 dataLineNode.AppendChild(dataItemNode);
 
                 if (entry.Debit.Count == 1
@@ -55,7 +55,7 @@ namespace lg2de.SimpleAccounting.Reports
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = debit.Text;
                     dataLineNode.AppendChild(dataItemNode);
-                    string strAccountNumber = debit.Account.ToString();
+                    string strAccountNumber = debit.Account.ToString(CultureInfo.InvariantCulture);
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = strAccountNumber;
                     dataLineNode.AppendChild(dataItemNode);
@@ -63,7 +63,7 @@ namespace lg2de.SimpleAccounting.Reports
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
                     dataLineNode.AppendChild(dataItemNode);
-                    strAccountNumber = credit.Account.ToString();
+                    strAccountNumber = credit.Account.ToString(CultureInfo.InvariantCulture);
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = strAccountNumber;
                     dataLineNode.AppendChild(dataItemNode);
@@ -80,7 +80,7 @@ namespace lg2de.SimpleAccounting.Reports
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = debitEntry.Text;
                     dataLineNode.AppendChild(dataItemNode);
-                    string strAccountNumber = debitEntry.Account.ToString();
+                    string strAccountNumber = debitEntry.Account.ToString(CultureInfo.InvariantCulture);
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = strAccountNumber;
                     dataLineNode.AppendChild(dataItemNode);
@@ -107,7 +107,7 @@ namespace lg2de.SimpleAccounting.Reports
                     dataItemNode = this.PrintDocument.CreateElement("td");
                     dataLineNode.AppendChild(dataItemNode);
                     dataLineNode.AppendChild(dataItemNode.Clone());
-                    string strAccountNumber = creditEntry.Account.ToString();
+                    string strAccountNumber = creditEntry.Account.ToString(CultureInfo.InvariantCulture);
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = strAccountNumber;
                     dataLineNode.AppendChild(dataItemNode);

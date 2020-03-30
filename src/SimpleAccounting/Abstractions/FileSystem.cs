@@ -10,7 +10,7 @@ namespace lg2de.SimpleAccounting.Abstractions
     using System.Text;
 
     /// <summary>
-    ///     Redirects <see cref="IFileSystem"/> into real implementations from .NET framework.
+    ///     Redirects <see cref="IFileSystem" /> into real implementations from .NET framework.
     /// </summary>
     /// <remarks>
     ///     The reason for this class is testability.

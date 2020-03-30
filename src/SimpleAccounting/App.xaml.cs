@@ -19,6 +19,7 @@ namespace lg2de.SimpleAccounting
             settings.Upgrade();
         }
 
+        [SuppressMessage("Minor Code Smell", "S2325:Methods and properties that don't access instance data should be static", Justification = "FP")]
         private void ApplicationStartup(object sender, StartupEventArgs e)
         {
             FrameworkElement.LanguageProperty.OverrideMetadata(

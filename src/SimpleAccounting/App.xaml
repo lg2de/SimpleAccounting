@@ -13,8 +13,8 @@
                     <DataTemplate x:Key="AccountSelectionTemplate">
                         <Grid VerticalAlignment="Stretch" Margin="5">
                             <TextBlock VerticalAlignment="Center">
-                            <Run Text="{Binding Name}" />
-                            <Run Text="{Binding ID, StringFormat=({0})}" />
+                                <Run Text="{Binding Name}" />
+                                <Run Text="{Binding ID, StringFormat=({0})}" />
                             </TextBlock>
                         </Grid>
                     </DataTemplate>

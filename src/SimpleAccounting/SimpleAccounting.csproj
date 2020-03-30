@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <!-- ProjectGuid is required for SonarQube -->
@@ -27,11 +28,6 @@
     <PackageReference Include="CsvHelper" Version="12.2.3" />
     <!-- license is MIT -->
     <PackageReference Include="Octokit" Version="0.45.0" />
-    <!-- license is LGPL -->
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.5.0.15942">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <!-- license is MIT -->
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.0" />
   </ItemGroup>

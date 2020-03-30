@@ -48,8 +48,7 @@ namespace lg2de.SimpleAccounting
         {
             var settings = new Dictionary<string, object>
             {
-                { "SizeToContent", SizeToContent.Manual },
-                { "WindowState", WindowState.Maximized }
+                { "SizeToContent", SizeToContent.Manual }, { "WindowState", WindowState.Maximized }
             };
             this.DisplayRootViewFor<ShellViewModel>(settings);
         }

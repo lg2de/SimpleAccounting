@@ -11,10 +11,10 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-    internal abstract class ReportBase
+    internal class ReportBase
     {
-        private readonly AccountingDataSetup setup;
         private readonly CultureInfo culture;
+        private readonly AccountingDataSetup setup;
 
         protected ReportBase(
             string resourceName,

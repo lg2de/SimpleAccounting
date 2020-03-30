@@ -4,8 +4,13 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System.Diagnostics.CodeAnalysis;
     using lg2de.SimpleAccounting.Model;
 
+    [SuppressMessage("Major Code Smell", "S109:Magic numbers should not be used",
+        Justification = "Design view model defines useful values")]
+    [SuppressMessage("Major Code Smell", "S4055:Literals should not be passed as localized parameters",
+        Justification = "Design view model defines useful values")]
     internal sealed class CloseYearDesignViewModel : CloseYearViewModel
     {
         public CloseYearDesignViewModel()

@@ -11,6 +11,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
     internal class Samples
     {
+        public static uint BaseDate = (uint)DateTime.Now.Year * 10000;
+
         public static AccountingData SampleProject
         {
             get
@@ -34,24 +36,44 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                                     {
                                         Columns = new List<AccountDefinitionImportMappingColumn>
                                         {
-                                            new AccountDefinitionImportMappingColumn { Source = "Date", Target = AccountDefinitionImportMappingColumnTarget.Date },
-                                            new AccountDefinitionImportMappingColumn { Source = "Name", Target = AccountDefinitionImportMappingColumnTarget.Name },
-                                            new AccountDefinitionImportMappingColumn { Source = "Text", Target = AccountDefinitionImportMappingColumnTarget.Text },
-                                            new AccountDefinitionImportMappingColumn { Source = "Value", Target = AccountDefinitionImportMappingColumnTarget.Value }
+                                            new AccountDefinitionImportMappingColumn
+                                            {
+                                                Source = "Date",
+                                                Target =
+                                                    AccountDefinitionImportMappingColumnTarget
+                                                        .Date
+                                            },
+                                            new AccountDefinitionImportMappingColumn
+                                            {
+                                                Source = "Name",
+                                                Target =
+                                                    AccountDefinitionImportMappingColumnTarget
+                                                        .Name
+                                            },
+                                            new AccountDefinitionImportMappingColumn
+                                            {
+                                                Source = "Text",
+                                                Target =
+                                                    AccountDefinitionImportMappingColumnTarget
+                                                        .Text
+                                            },
+                                            new AccountDefinitionImportMappingColumn
+                                            {
+                                                Source = "Value",
+                                                Target =
+                                                    AccountDefinitionImportMappingColumnTarget
+                                                        .Value
+                                            }
                                         }
                                     }
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 400,
-                                    Name = "Salary",
-                                    Type = AccountDefinitionType.Income
+                                    ID = 400, Name = "Salary", Type = AccountDefinitionType.Income
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 600,
-                                    Name = "Shoes",
-                                    Type = AccountDefinitionType.Expense
+                                    ID = 600, Name = "Shoes", Type = AccountDefinitionType.Expense
                                 },
                                 new AccountDefinition
                                 {
@@ -78,12 +100,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                                     Name = "Friends debit",
                                     Type = AccountDefinitionType.Debit
                                 },
-                                new AccountDefinition
-                                {
-                                    ID = 9999,
-                                    Name = "Inactive",
-                                    Active = false
-                                }
+                                new AccountDefinition { ID = 9999, Name = "Inactive", Active = false }
                             }
                         }
                     },
@@ -108,8 +125,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 };
             }
         }
-
-        public static uint BaseDate = (uint)DateTime.Now.Year * 10000;
 
         public static IEnumerable<AccountingDataJournalBooking> SampleBookings
         {
