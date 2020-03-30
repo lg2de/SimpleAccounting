@@ -21,7 +21,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
-    using lg2de.SimpleAccounting.UnitTests.Extensions;
     using NSubstitute;
     using Octokit;
     using Xunit;
