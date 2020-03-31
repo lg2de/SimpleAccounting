@@ -34,7 +34,7 @@ namespace lg2de.SimpleAccounting.Presentation
         "Critical Code Smell",
         "S2365:Properties should not make collection or array copies",
         Justification = "<Pending>")]
-    internal class ShellViewModel : Conductor<IScreen>
+    internal class ShellViewModel : Conductor<IScreen>, IDisposable
     {
         private const string GithubDomain = "github.com";
         private const string OrganizationName = "lg2de";
@@ -310,7 +310,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 DisplayName = "Account erstellen",
                 Group = this.accountingData.Accounts.FirstOrDefault(),
                 Groups = this.accountingData.Accounts,
-                IsAvalidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
+                IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
             };
             var result = this.windowManager.ShowDialog(accountVm);
             if (result != true)
@@ -346,7 +346,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var vm = account.Clone();
             vm.DisplayName = "Account bearbeiten";
             var invalidIds = this.AllAccounts.Select(x => x.Identifier).Where(x => x != account.Identifier).ToList();
-            vm.IsAvalidIdentifierFunc = id => !invalidIds.Contains(id);
+            vm.IsValidIdentifierFunc = id => !invalidIds.Contains(id);
             var result = this.windowManager.ShowDialog(vm);
             if (result != true)
             {
@@ -415,6 +415,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 return !this.currentModelJournal.Closed;
             }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public override void CanClose(Action<bool> callback)
@@ -488,6 +494,14 @@ namespace lg2de.SimpleAccounting.Presentation
             this.Settings.Save();
 
             base.OnDeactivate(close);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.cancellationTokenSource?.Dispose();
+            }
         }
 
         internal void AddBooking(AccountingDataJournalBooking booking, bool refreshJournal = true)
@@ -632,6 +646,175 @@ namespace lg2de.SimpleAccounting.Presentation
                 // older release version
                 return false;
             }
+        }
+
+        internal void LoadProjectFromFile(string projectFileName)
+        {
+            if (!this.CheckSaveProject())
+            {
+                return;
+            }
+
+            this.IsDocumentModified = false;
+            this.FileName = projectFileName;
+
+            try
+            {
+                var result = MessageBoxResult.No;
+                if (this.fileSystem.FileExists(this.AutoSaveFileName))
+                {
+                    result = this.messageBox.Show(
+                        "Es existiert eine automatische Sicherung der Projektdatei\n"
+                        + $"{this.FileName}.\n"
+                        + "Soll diese geöffnet werden?",
+                        "Projekt öffnen",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+                }
+
+                var projectXml = this.fileSystem.ReadAllTextFromFile(
+                    result == MessageBoxResult.Yes
+                        ? this.AutoSaveFileName
+                        : this.FileName);
+                var projectData = AccountingData.Deserialize(projectXml);
+
+                if (projectData.Migrate() || result == MessageBoxResult.Yes)
+                {
+                    this.IsDocumentModified = true;
+                }
+
+                this.LoadProjectData(projectData);
+
+                this.Settings.RecentProject = this.FileName;
+
+                this.Settings.RecentProjects ??= new StringCollection();
+
+                this.Settings.RecentProjects.Remove(this.FileName);
+                this.Settings.RecentProjects.Insert(0, this.FileName);
+                while (this.Settings.RecentProjects.Count > MaxRecentProjects)
+                {
+                    this.Settings.RecentProjects.RemoveAt(MaxRecentProjects);
+                }
+            }
+            catch (InvalidOperationException e)
+            {
+                this.messageBox.Show($"Failed to load file '{this.FileName}':\n{e.Message}", "Load");
+            }
+        }
+
+        internal void LoadProjectData(AccountingData projectData)
+        {
+            this.accountingData = projectData;
+            this.UpdateBookingYears();
+
+            this.AllAccounts.Clear();
+            foreach (var accountGroup in this.accountingData.Accounts ?? new List<AccountingDataAccountGroup>())
+            {
+                foreach (var account in accountGroup.Account)
+                {
+                    var accountModel = new AccountViewModel
+                    {
+                        Identifier = account.ID,
+                        Name = account.Name,
+                        Group = accountGroup,
+                        Groups = this.accountingData.Accounts,
+                        Type = account.Type,
+                        IsActivated = account.Active
+                    };
+                    this.AllAccounts.Add(accountModel);
+                }
+            }
+
+            this.RefreshAccountList();
+
+            // select last booking year after loading
+            this.BookingYears.LastOrDefault()?.Command.Execute(null);
+        }
+
+        internal bool CheckSaveProject()
+        {
+            if (!this.IsDocumentModified)
+            {
+                // no need to save the project
+                return true;
+            }
+
+            var result = this.messageBox.Show(
+                "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
+                "Programm beenden",
+                MessageBoxButton.YesNoCancel);
+            if (result == MessageBoxResult.Cancel)
+            {
+                return false;
+            }
+
+            if (result == MessageBoxResult.Yes)
+            {
+                this.SaveProject();
+                return true;
+            }
+
+            return true;
+        }
+
+        internal void SaveProject()
+        {
+            if (this.FileName == "<new>")
+            {
+                using var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
+                };
+
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                this.FileName = saveFileDialog.FileName;
+            }
+
+            DateTime fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
+            string backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
+            if (this.fileSystem.FileExists(this.FileName))
+            {
+                this.fileSystem.FileMove(this.FileName, backupFileName);
+            }
+
+            this.fileSystem.WriteAllTextIntoFile(this.FileName, this.accountingData.Serialize());
+            this.IsDocumentModified = false;
+
+            if (this.fileSystem.FileExists(this.AutoSaveFileName))
+            {
+                this.fileSystem.FileDelete(this.AutoSaveFileName);
+            }
+        }
+
+        private static AccountingData GetTemplateProject()
+        {
+            var year = (ushort)DateTime.Now.Year;
+            var defaultAccounts = new List<AccountDefinition>
+            {
+                new AccountDefinition { ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset },
+                new AccountDefinition { ID = 400, Name = "Salary", Type = AccountDefinitionType.Income },
+                new AccountDefinition { ID = 600, Name = "Food", Type = AccountDefinitionType.Expense },
+                new AccountDefinition { ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward }
+            };
+            var accountJournal = new AccountingDataJournal
+            {
+                Year = year.ToString(CultureInfo.InvariantCulture),
+                DateStart = (uint)year * 10000 + 101,
+                DateEnd = (uint)year * 10000 + 1231,
+                Booking = new List<AccountingDataJournalBooking>()
+            };
+            return new AccountingData
+            {
+                Accounts = new List<AccountingDataAccountGroup>
+                {
+                    new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }
+                },
+                Journal = new List<AccountingDataJournal> { accountJournal }
+            };
         }
 
         private async Task AutoSaveAsync()
@@ -798,119 +981,6 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        internal void LoadProjectFromFile(string projectFileName)
-        {
-            if (!this.CheckSaveProject())
-            {
-                return;
-            }
-
-            this.IsDocumentModified = false;
-            this.FileName = projectFileName;
-
-            try
-            {
-                var result = MessageBoxResult.No;
-                if (this.fileSystem.FileExists(this.AutoSaveFileName))
-                {
-                    result = this.messageBox.Show(
-                        "Es existiert eine automatische Sicherung der Projektdatei\n"
-                        + $"{this.FileName}.\n"
-                        + "Soll diese geöffnet werden?",
-                        "Projekt öffnen",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
-                }
-
-                var projectXml = this.fileSystem.ReadAllTextFromFile(
-                    result == MessageBoxResult.Yes
-                        ? this.AutoSaveFileName
-                        : this.FileName);
-                var projectData = AccountingData.Deserialize(projectXml);
-
-                if (projectData.Migrate() || result == MessageBoxResult.Yes)
-                {
-                    this.IsDocumentModified = true;
-                }
-
-                this.LoadProjectData(projectData);
-
-                this.Settings.RecentProject = this.FileName;
-
-                if (this.Settings.RecentProjects == null)
-                {
-                    this.Settings.RecentProjects = new StringCollection();
-                }
-
-                this.Settings.RecentProjects.Remove(this.FileName);
-                this.Settings.RecentProjects.Insert(0, this.FileName);
-                while (this.Settings.RecentProjects.Count > MaxRecentProjects)
-                {
-                    this.Settings.RecentProjects.RemoveAt(MaxRecentProjects);
-                }
-            }
-            catch (InvalidOperationException e)
-            {
-                this.messageBox.Show($"Failed to load file '{this.FileName}':\n{e.Message}", "Load");
-            }
-        }
-
-        internal void LoadProjectData(AccountingData projectData)
-        {
-            this.accountingData = projectData;
-            this.UpdateBookingYears();
-
-            this.AllAccounts.Clear();
-            foreach (var accountGroup in this.accountingData.Accounts ?? new List<AccountingDataAccountGroup>())
-            {
-                foreach (var account in accountGroup.Account)
-                {
-                    var accountModel = new AccountViewModel
-                    {
-                        Identifier = account.ID,
-                        Name = account.Name,
-                        Group = accountGroup,
-                        Groups = this.accountingData.Accounts,
-                        Type = account.Type,
-                        IsActivated = account.Active
-                    };
-                    this.AllAccounts.Add(accountModel);
-                }
-            }
-
-            this.RefreshAccountList();
-
-            // select last booking year after loading
-            this.BookingYears.LastOrDefault()?.Command.Execute(null);
-        }
-
-        private static AccountingData GetTemplateProject()
-        {
-            var year = (ushort)DateTime.Now.Year;
-            var defaultAccounts = new List<AccountDefinition>
-            {
-                new AccountDefinition { ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset },
-                new AccountDefinition { ID = 400, Name = "Salary", Type = AccountDefinitionType.Income },
-                new AccountDefinition { ID = 600, Name = "Food", Type = AccountDefinitionType.Expense },
-                new AccountDefinition { ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward }
-            };
-            var accountJournal = new AccountingDataJournal
-            {
-                Year = year.ToString(CultureInfo.InvariantCulture),
-                DateStart = (uint)year * 10000 + 101,
-                DateEnd = (uint)year * 10000 + 1231,
-                Booking = new List<AccountingDataJournalBooking>()
-            };
-            return new AccountingData
-            {
-                Accounts = new List<AccountingDataAccountGroup>
-                {
-                    new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }
-                },
-                Journal = new List<AccountingDataJournal> { accountJournal }
-            };
-        }
-
         private void UpdateBookingYears()
         {
             this.BookingYears.Clear();
@@ -925,65 +995,6 @@ namespace lg2de.SimpleAccounting.Presentation
                     year.Year.ToString(CultureInfo.InvariantCulture),
                     new RelayCommand(_ => this.SelectBookingYear(year.Year)));
                 this.BookingYears.Add(menu);
-            }
-        }
-
-        internal bool CheckSaveProject()
-        {
-            if (!this.IsDocumentModified)
-            {
-                // no need to save the project
-                return true;
-            }
-
-            var result = this.messageBox.Show(
-                "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
-                "Programm beenden",
-                MessageBoxButton.YesNoCancel);
-            if (result == MessageBoxResult.Cancel)
-            {
-                return false;
-            }
-
-            if (result == MessageBoxResult.Yes)
-            {
-                this.SaveProject();
-                return true;
-            }
-
-            return true;
-        }
-
-        internal void SaveProject()
-        {
-            if (this.FileName == "<new>")
-            {
-                using var saveFileDialog = new SaveFileDialog
-                {
-                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
-                };
-
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-
-                this.FileName = saveFileDialog.FileName;
-            }
-
-            DateTime fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
-            string backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
-            if (this.fileSystem.FileExists(this.FileName))
-            {
-                this.fileSystem.FileMove(this.FileName, backupFileName);
-            }
-
-            this.fileSystem.WriteAllTextIntoFile(this.FileName, this.accountingData.Serialize());
-            this.IsDocumentModified = false;
-
-            if (this.fileSystem.FileExists(this.AutoSaveFileName))
-            {
-                this.fileSystem.FileDelete(this.AutoSaveFileName);
             }
         }
 

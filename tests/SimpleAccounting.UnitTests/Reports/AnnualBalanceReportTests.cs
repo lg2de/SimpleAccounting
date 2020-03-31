@@ -32,7 +32,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 
             sut.CreateReport();
 
-            using var _ = new AssertionScope();
+            //using var _ = new AssertionScope();
 
             sut.DocumentForTests.XPathSelectElement("//text[@ID='saldo']")?.Value.Should().Be("150.00");
 

@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    using System;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
@@ -59,17 +58,15 @@ namespace lg2de.SimpleAccounting.Reports
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = strAccountNumber;
                     dataLineNode.AppendChild(dataItemNode);
-                    double nValue = Convert.ToDouble(debit.Value) / 100;
                     dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
+                    dataItemNode.InnerText = debit.Value.FormatCurrency(this.culture);
                     dataLineNode.AppendChild(dataItemNode);
                     strAccountNumber = credit.Account.ToString(CultureInfo.InvariantCulture);
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = strAccountNumber;
                     dataLineNode.AppendChild(dataItemNode);
-                    nValue = Convert.ToDouble(credit.Value) / 100;
                     dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
+                    dataItemNode.InnerText = credit.Value.FormatCurrency(this.culture);
                     dataLineNode.AppendChild(dataItemNode);
                     dataNode.AppendChild(dataLineNode);
                     continue;
@@ -84,9 +81,8 @@ namespace lg2de.SimpleAccounting.Reports
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = strAccountNumber;
                     dataLineNode.AppendChild(dataItemNode);
-                    double nValue = Convert.ToDouble(debitEntry.Value) / 100;
                     dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
+                    dataItemNode.InnerText = debitEntry.Value.FormatCurrency(this.culture);
                     dataLineNode.AppendChild(dataItemNode);
                     dataItemNode = this.PrintDocument.CreateElement("td");
                     dataLineNode.AppendChild(dataItemNode);
@@ -111,9 +107,8 @@ namespace lg2de.SimpleAccounting.Reports
                     dataItemNode = dataItemNode.Clone();
                     dataItemNode.InnerText = strAccountNumber;
                     dataLineNode.AppendChild(dataItemNode);
-                    double nValue = Convert.ToDouble(creditEntry.Value) / 100;
                     dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
+                    dataItemNode.InnerText = creditEntry.Value.FormatCurrency(this.culture);
                     dataLineNode.AppendChild(dataItemNode);
                     dataNode.AppendChild(dataLineNode);
 

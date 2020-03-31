@@ -13,7 +13,10 @@ namespace lg2de.SimpleAccounting.Extensions
 
         public static DateTime ToDateTime(this uint date)
         {
-            return new DateTime((int)date / YearFactor, (int)(date / MonthFactor) % MonthFactor, (int)date % MonthFactor);
+            return new DateTime(
+                (int)date / YearFactor,
+                (int)(date / MonthFactor) % MonthFactor,
+                (int)date % MonthFactor);
         }
 
         public static uint ToAccountingDate(this DateTime date)

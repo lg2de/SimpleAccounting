@@ -36,12 +36,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool IsActivated { get; set; } = true;
 
-        internal Func<ulong, bool> IsAvalidIdentifierFunc { get; set; }
-
         public ICommand SaveCommand => new RelayCommand(
             _ => this.TryClose(true),
             _ => !string.IsNullOrWhiteSpace(this.Name)
-                 && (this.IsAvalidIdentifierFunc?.Invoke(this.Identifier) ?? true));
+                 && (this.IsValidIdentifierFunc?.Invoke(this.Identifier) ?? true));
+
+        internal Func<ulong, bool> IsValidIdentifierFunc { get; set; }
 
         internal AccountViewModel Clone()
         {

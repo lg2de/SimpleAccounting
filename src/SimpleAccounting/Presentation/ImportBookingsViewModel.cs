@@ -158,7 +158,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        private void ImportBooking(
+        internal void ImportBooking(
             CsvReader csv,
             string dateField,
             string nameField,

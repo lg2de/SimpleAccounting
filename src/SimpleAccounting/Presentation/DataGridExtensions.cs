@@ -12,9 +12,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
     internal static class DataGridExtensions
     {
-        public static void ResetDataGridColumnSizes(this FrameworkElement frameworkElement)
+        public static void ResetDataGridColumnSizes(this DependencyObject dependencyObject)
         {
-            var dataGrids = FindVisualChildren<DataGrid>(frameworkElement);
+            var dataGrids = FindVisualChildren<DataGrid>(dependencyObject);
             foreach (var dataGrid in dataGrids)
             {
                 foreach (DataGridColumn column in dataGrid.Columns.Where(x => !x.Width.IsAuto))

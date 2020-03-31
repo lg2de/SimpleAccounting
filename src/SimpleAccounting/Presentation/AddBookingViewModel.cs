@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
@@ -116,6 +117,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public int DebitIndex { get; set; } = -1;
 
+        [SuppressMessage(
+            "Critical Code Smell", "S1067:Expressions should not be too complex", Justification = "Ok for CanExecute")]
         public ICommand BookCommand => new RelayCommand(
             _ =>
             {
@@ -131,8 +134,14 @@ namespace lg2de.SimpleAccounting.Presentation
                 };
                 var debitValue = creditValue.Clone();
                 debitValue.Account = this.DebitAccount;
-                newBooking.Credit = new List<BookingValue> { creditValue };
-                newBooking.Debit = new List<BookingValue> { debitValue };
+                newBooking.Credit = new List<BookingValue>
+                {
+                    creditValue
+                };
+                newBooking.Debit = new List<BookingValue>
+                {
+                    debitValue
+                };
                 this.parent.AddBooking(newBooking);
 
                 // update for next booking

@@ -5,13 +5,17 @@
 namespace lg2de.SimpleAccounting.Reports
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
+    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
 #pragma warning disable S4055 // string literals => pending translation
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "CommentTypo")]
     internal class AnnualBalanceReport : ReportBase
     {
         public const string ResourceName = "AnnualBalance.xml";
@@ -42,24 +46,24 @@ namespace lg2de.SimpleAccounting.Reports
             this.ProcessExpenses(out var totalExpense);
 
             var saldoNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"saldo\"]");
-            saldoNode.InnerText = ((totalIncome + totalExpense) / 100).ToString("0.00", this.culture);
+            saldoNode.InnerText = (totalIncome + totalExpense).FormatCurrency(this.culture);
 
             // receivables / Forderungen
             // liabilities / Verbindlichkeiten
-            this.ProcessReceivablesAndLiabilities(out double totalReceivable, out double totalLiability);
+            this.ProcessReceivablesAndLiabilities(out var totalReceivable, out var totalLiability);
 
             // asset / Vermögen
             this.ProcessAssets(totalReceivable, totalLiability);
         }
 
-        private void ProcessIncome(out double totalIncome)
+        private void ProcessIncome(out long totalIncome)
         {
             var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='income']");
             totalIncome = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Income);
             foreach (var account in accounts)
             {
-                double balance = this.GetAccountBalance(account, creditFromDebit: true);
+                long balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
                     continue;
@@ -71,17 +75,17 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var saldoElement = dataNode.SelectSingleNode(FourthColumnExpression);
-            saldoElement.InnerText = (totalIncome / 100).ToString("0.00", this.culture);
+            saldoElement.InnerText = totalIncome.FormatCurrency(this.culture);
         }
 
-        private void ProcessExpenses(out double totalExpense)
+        private void ProcessExpenses(out long totalExpense)
         {
             var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='expense']");
             totalExpense = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Expense);
             foreach (var account in accounts)
             {
-                double balance = this.GetAccountBalance(account, creditFromDebit: true);
+                long balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
                     continue;
@@ -93,10 +97,10 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var saldoElement = dataNode.SelectSingleNode(FourthColumnExpression);
-            saldoElement.InnerText = (totalExpense / 100).ToString("0.00", this.culture);
+            saldoElement.InnerText = totalExpense.FormatCurrency(this.culture);
         }
 
-        private void ProcessReceivablesAndLiabilities(out double totalReceivable, out double totalLiability)
+        private void ProcessReceivablesAndLiabilities(out long totalReceivable, out long totalLiability)
         {
             var receivableNode = this.PrintDocument.SelectSingleNode("//table/data[@target='receivable']");
             var liabilityNode = this.PrintDocument.SelectSingleNode("//table/data[@target='liability']");
@@ -106,7 +110,7 @@ namespace lg2de.SimpleAccounting.Reports
                 a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
-                double balance = this.GetAccountBalance(account, creditFromDebit: false);
+                long balance = this.GetAccountBalance(account, creditFromDebit: false);
                 if (balance > 0)
                 {
                     totalReceivable += balance;
@@ -120,19 +124,19 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var saldoElement = receivableNode.SelectSingleNode(FourthColumnExpression);
-            saldoElement.InnerText = (totalReceivable / 100).ToString("0.00", this.culture);
+            saldoElement.InnerText = totalReceivable.FormatCurrency(this.culture);
             saldoElement = liabilityNode.SelectSingleNode(FourthColumnExpression);
-            saldoElement.InnerText = (totalLiability / 100).ToString("0.00", this.culture);
+            saldoElement.InnerText = totalLiability.FormatCurrency(this.culture);
         }
 
-        private void ProcessAssets(double totalReceivable, double totalLiability)
+        private void ProcessAssets(long totalReceivable, long totalLiability)
         {
             var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='asset']");
-            double totalAccount = 0;
+            long totalAccount = 0;
             var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Asset);
             foreach (var account in accounts)
             {
-                double balance = this.GetAccountBalance(account, creditFromDebit: false);
+                long balance = this.GetAccountBalance(account, creditFromDebit: false);
                 if (balance == 0)
                 {
                     continue;
@@ -156,15 +160,15 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var saldoElement = dataNode.SelectSingleNode(FourthColumnExpression);
-            saldoElement.InnerText = (totalAccount / 100).ToString("0.00", this.culture);
+            saldoElement.InnerText = totalAccount.FormatCurrency(this.culture);
         }
 
-        private double GetAccountBalance(AccountDefinition account, bool creditFromDebit)
+        private long GetAccountBalance(AccountDefinition account, bool creditFromDebit)
         {
-            double saldoCredit = this.YearData.Booking
+            long saldoCredit = this.YearData.Booking
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double saldoDebit = this.YearData.Booking
+            long saldoDebit = this.YearData.Booking
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
 
@@ -176,14 +180,14 @@ namespace lg2de.SimpleAccounting.Reports
             return saldoDebit - saldoCredit;
         }
 
-        private XmlNode CreateAccountBalanceNode(AccountDefinition account, double balance)
+        private XmlNode CreateAccountBalanceNode(AccountDefinition account, long balance)
         {
             string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
 
             return this.CreateBalanceNode(accountText, balance);
         }
 
-        private XmlNode CreateBalanceNode(string balanceText, double balance)
+        private XmlNode CreateBalanceNode(string balanceText, long balance)
         {
             XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
             XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
@@ -195,7 +199,7 @@ namespace lg2de.SimpleAccounting.Reports
             dataLineNode.AppendChild(dataItemNode);
 
             dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = (balance / 100).ToString("0.00", this.culture);
+            dataItemNode.InnerText = balance.FormatCurrency(this.culture);
             dataLineNode.AppendChild(dataItemNode);
 
             return dataLineNode;

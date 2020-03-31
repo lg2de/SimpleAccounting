@@ -20,19 +20,19 @@ namespace lg2de.SimpleAccounting.Reports
         private readonly List<AccountingDataAccountGroup> accountGroups;
         private readonly CultureInfo culture;
         private int accountsPerGroup;
-        private double groupOpeningCredit;
-        private double groupOpeningDebit;
-        private double groupSaldoCredit;
-        private double groupSaldoDebit;
-        private double groupSumCredit;
-        private double groupSumDebit;
+        private long groupOpeningCredit;
+        private long groupOpeningDebit;
+        private long groupSaldoCredit;
+        private long groupSaldoDebit;
+        private long groupSumCredit;
+        private long groupSumDebit;
 
-        private double totalOpeningCredit;
-        private double totalOpeningDebit;
-        private double totalSaldoCredit;
-        private double totalSaldoDebit;
-        private double totalSumCredit;
-        private double totalSumDebit;
+        private long totalOpeningCredit;
+        private long totalOpeningDebit;
+        private long totalSaldoCredit;
+        private long totalSaldoDebit;
+        private long totalSumCredit;
+        private long totalSumDebit;
 
         public TotalsAndBalancesReport(
             AccountingDataJournal yearData,
@@ -191,25 +191,25 @@ namespace lg2de.SimpleAccounting.Reports
             var lastBookingDate = this.YearData.Booking
                 .Where(x => x.Debit.Any(a => a.Account == account.ID) || x.Credit.Any(a => a.Account == account.ID))
                 .Select(x => x.Date).DefaultIfEmpty().Max();
-            double saldoCredit = this.YearData.Booking
+            long saldoCredit = this.YearData.Booking
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double saldoDebit = this.YearData.Booking
+            long saldoDebit = this.YearData.Booking
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double openingCredit = this.YearData.Booking
+            long openingCredit = this.YearData.Booking
                 .Where(b => b.Opening)
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double openingDebit = this.YearData.Booking
+            long openingDebit = this.YearData.Booking
                 .Where(b => b.Opening)
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double sumCredit = this.YearData.Booking
+            long sumCredit = this.YearData.Booking
                 .Where(b => !b.Opening)
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double sumDebit = this.YearData.Booking
+            long sumDebit = this.YearData.Booking
                 .Where(b => !b.Opening)
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
@@ -289,14 +289,14 @@ namespace lg2de.SimpleAccounting.Reports
             this.totalSaldoDebit += saldoDebit;
         }
 
-        private string FormatValue(double value)
+        private string FormatValue(long value)
         {
             if (value <= 0)
             {
                 return string.Empty;
             }
 
-            return (value / 100).ToString("0.00", this.culture);
+            return value.FormatCurrency(this.culture);
         }
     }
 }
