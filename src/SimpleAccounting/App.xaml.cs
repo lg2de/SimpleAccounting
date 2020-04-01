@@ -15,6 +15,7 @@ namespace lg2de.SimpleAccounting
     {
         public App()
         {
+            // upgrade settings from older versions
             var settings = Settings.Default;
             settings.Upgrade();
         }
@@ -25,6 +26,8 @@ namespace lg2de.SimpleAccounting
             Justification = "FP")]
         private void ApplicationStartup(object sender, StartupEventArgs e)
         {
+            // set control culture according to system culture
+            // https://stackoverflow.com/questions/4041197/how-to-set-and-change-the-culture-in-wpf
             FrameworkElement.LanguageProperty.OverrideMetadata(
                 typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));

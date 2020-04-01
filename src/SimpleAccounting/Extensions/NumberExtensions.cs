@@ -12,6 +12,7 @@ namespace lg2de.SimpleAccounting.Extensions
 
         public static string FormatCurrency(this double value, IFormatProvider formatProvider)
         {
+            // formats the specified value as currency (without currency symbol)
             return value.ToString("0.00", formatProvider);
         }
 
