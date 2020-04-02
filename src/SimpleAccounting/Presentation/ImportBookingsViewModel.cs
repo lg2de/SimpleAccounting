@@ -36,6 +36,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.parent = parent;
             this.accounts = accounts.ToList();
 
+            // ReSharper disable once VirtualMemberCallInConstructor
             this.DisplayName = "Import von Kontodaten";
         }
 
@@ -143,18 +144,16 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
             }
 
-            using (var csv = new CsvReader(reader, configuration))
+            using var csv = new CsvReader(reader, configuration);
+            csv.Read();
+            if (!csv.ReadHeader())
             {
-                csv.Read();
-                if (!csv.ReadHeader())
-                {
-                    return;
-                }
+                return;
+            }
 
-                while (csv.Read())
-                {
-                    this.ImportBooking(csv, dateField, nameField, textField, valueField);
-                }
+            while (csv.Read())
+            {
+                this.ImportBooking(csv, dateField, nameField, textField, valueField);
             }
         }
 
@@ -178,15 +177,15 @@ namespace lg2de.SimpleAccounting.Presentation
             string text = string.Empty;
             if (nameField != null)
             {
-                csv.TryGetField<string>(nameField, out name);
+                csv.TryGetField(nameField, out name);
             }
 
             if (textField != null)
             {
-                csv.TryGetField<string>(textField.Source, out text);
+                csv.TryGetField(textField.Source, out text);
                 if (!string.IsNullOrEmpty(textField.IgnorePattern))
                 {
-                    text = Regex.Replace(text, textField?.IgnorePattern, string.Empty);
+                    text = Regex.Replace(text, textField.IgnorePattern, string.Empty);
                 }
             }
 

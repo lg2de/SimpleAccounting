@@ -609,7 +609,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 candidates = candidates.Where(x => !x.Prerelease);
             }
 
-            return candidates.SingleOrDefault(x => IsGreater(x.TagName, currentVersion));
+            return candidates.SingleOrDefault(
+                x => x.Assets != null && x.Assets.Any() && IsGreater(x.TagName, currentVersion));
 
             static bool IsGreater(string tag, string current)
             {

@@ -195,15 +195,22 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             return sut;
         }
 
-        private static IReadOnlyList<Release> CreateRelease(string tag)
+        private static IReadOnlyList<Release> CreateRelease(string tag, bool addAsset = true)
         {
-            var tagProperty = typeof(Release).GetProperty(nameof(Release.TagName));
-            var prereleaseProperty = typeof(Release).GetProperty(nameof(Release.Prerelease));
+            Type releaseType = typeof(Release);
+            var tagProperty = releaseType.GetProperty(nameof(Release.TagName));
+            var prereleaseProperty = releaseType.GetProperty(nameof(Release.Prerelease));
+            var assetsProperty = releaseType.GetProperty(nameof(Release.Assets));
             var release = new Release();
             tagProperty.SetValue(release, tag);
             if (tag.Contains("beta"))
             {
                 prereleaseProperty.SetValue(release, true);
+            }
+
+            if (addAsset)
+            {
+                assetsProperty.SetValue(release, new List<ReleaseAsset> { new ReleaseAsset() });
             }
 
             return new List<Release> { release };
@@ -414,7 +421,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             sut.IsDocumentModified = true;
-            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+            messageBox.Show(
+                    Arg.Any<string>(), Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
@@ -422,7 +430,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.CheckSaveProject().Should().BeTrue();
 
-            messageBox.Received(1).Show(Arg.Any<string>(), Arg.Any<string>(),
+            messageBox.Received(1).Show(
+                Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
             fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
@@ -433,7 +442,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             sut.IsDocumentModified = true;
-            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+            messageBox.Show(
+                    Arg.Any<string>(), Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
@@ -441,7 +451,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.CheckSaveProject().Should().BeTrue();
 
-            messageBox.Received(1).Show(Arg.Any<string>(), Arg.Any<string>(),
+            messageBox.Received(1).Show(
+                Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
             fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
@@ -454,7 +465,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
-            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+            messageBox.Show(
+                    Arg.Any<string>(), Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);
@@ -466,7 +478,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.CheckSaveProject().Should().BeFalse();
 
-            messageBox.Received(1).Show(Arg.Any<string>(), Arg.Any<string>(),
+            messageBox.Received(1).Show(
+                Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
             fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
@@ -479,7 +492,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.CheckSaveProject().Should().BeTrue();
 
-            messageBox.DidNotReceive().Show(Arg.Any<string>(), Arg.Any<string>(),
+            messageBox.DidNotReceive().Show(
+                Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
         }
@@ -506,7 +520,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void CloseYearCommand_CurrentYearClosed_CannotExecute()
         {
             var sut = CreateSut(out IMessageBox messageBox);
-            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
+            messageBox.Show(
+                Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
             sut.LoadProjectData(Samples.SampleProject);
             sut.BookingYears.First().Command.Execute(null);
@@ -538,12 +553,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             windowManager.ShowDialog(
                 Arg.Any<CloseYearViewModel>(),
                 Arg.Any<object>(),
-                Arg.Any<IDictionary<string, object>>()).Returns(info =>
-            {
-                var vm = info.Arg<CloseYearViewModel>();
-                vm.RemoteAccount = vm.Accounts.First();
-                return true;
-            });
+                Arg.Any<IDictionary<string, object>>()).Returns(
+                info =>
+                {
+                    var vm = info.Arg<CloseYearViewModel>();
+                    vm.RemoteAccount = vm.Accounts.First();
+                    return true;
+                });
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
@@ -607,18 +623,17 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             windowManager.ShowDialog(
                 Arg.Any<CloseYearViewModel>(),
                 Arg.Any<object>(),
-                Arg.Any<IDictionary<string, object>>()).Returns(info =>
-            {
-                var vm = info.Arg<CloseYearViewModel>();
-                vm.RemoteAccount = vm.Accounts.Last();
-                return true;
-            });
+                Arg.Any<IDictionary<string, object>>()).Returns(
+                info =>
+                {
+                    var vm = info.Arg<CloseYearViewModel>();
+                    vm.RemoteAccount = vm.Accounts.Last();
+                    return true;
+                });
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            project.Accounts.First().Account.Add(new AccountDefinition
-            {
-                ID = 999, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward
-            });
+            project.Accounts.First().Account.Add(
+                new AccountDefinition { ID = 999, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward });
             sut.LoadProjectData(project);
 
             sut.CloseYearCommand.Execute(null);
@@ -677,11 +692,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void EditAccountCommand_AllDataUpdated()
         {
             var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(Arg.Do<object>(model =>
-            {
-                var vm = model as AccountViewModel;
-                vm.Identifier += 1000;
-            })).Returns(true);
+            windowManager.ShowDialog(
+                Arg.Do<object>(
+                    model =>
+                    {
+                        var vm = model as AccountViewModel;
+                        vm.Identifier += 1000;
+                    })).Returns(true);
             sut.LoadProjectData(Samples.SampleProject);
             var booking = new AccountingDataJournalBooking
             {
@@ -719,6 +736,17 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void GetNewRelease_AssetNotAvailable_VersionIgnored()
+        {
+            var sut = CreateSut();
+
+            var releases = CreateRelease("2.1.0", addAsset: false);
+            var result = sut.GetNewRelease("2.0.0", releases);
+
+            result.Should().BeNull();
+        }
+
+        [Fact]
         public void ImportBookingsCommand_BookingNumberInitialized()
         {
             var sut = CreateSut(out IWindowManager windowManager);
@@ -730,12 +758,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using (new AssertionScope())
             {
-                vm.Should().BeEquivalentTo(new
-                {
-                    BookingNumber = 1,
-                    RangeMin = new DateTime(DateTime.Now.Year, 1, 1),
-                    RangMax = new DateTime(DateTime.Now.Year, 12, 31)
-                });
+                vm.Should().BeEquivalentTo(
+                    new
+                    {
+                        BookingNumber = 1,
+                        RangeMin = new DateTime(DateTime.Now.Year, 1, 1),
+                        RangMax = new DateTime(DateTime.Now.Year, 12, 31)
+                    });
                 vm.ImportAccounts.Should().NotBeEmpty();
             }
         }
@@ -772,7 +801,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void LoadProjectFromFile_AutoSaveFileExistsNo_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
-            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+            messageBox.Show(
+                    Arg.Any<string>(), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
@@ -793,7 +823,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void LoadProjectFromFile_AutoSaveFileExistsYes_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
-            messageBox.Show(Arg.Any<string>(), Arg.Any<string>(),
+            messageBox.Show(
+                    Arg.Any<string>(), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
@@ -870,12 +901,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void NewAccountCommand_AccountCreatedAndSorted()
         {
             var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(Arg.Do<object>(model =>
-            {
-                var vm = model as AccountViewModel;
-                vm.Name = "New Account";
-                vm.Identifier = 500;
-            })).Returns(true);
+            windowManager.ShowDialog(
+                Arg.Do<object>(
+                    model =>
+                    {
+                        var vm = model as AccountViewModel;
+                        vm.Name = "New Account";
+                        vm.Identifier = 500;
+                    })).Returns(true);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.NewAccountCommand.Execute(null);
