@@ -10,6 +10,13 @@ namespace lg2de.SimpleAccounting.Extensions
 
     internal static class XmlExtensions
     {
+        public static void AddTableNode(this XmlNode parent, string text)
+        {
+            var node = parent.OwnerDocument.CreateElement("td");
+            node.InnerText = text;
+            parent.AppendChild(node);
+        }
+
         public static void SetAttribute(this XmlNode node, string name, object value)
         {
             if (node?.OwnerDocument == null)

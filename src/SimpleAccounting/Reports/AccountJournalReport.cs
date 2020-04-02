@@ -64,7 +64,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.AddAccountSeparator(tableNode);
 
                 var titleFont = this.PrintDocument.CreateElement("font");
-                titleFont.SetAttribute("size", 10);
+                titleFont.SetAttribute("size", TitleSize);
                 titleFont.SetAttribute("bold", 1);
                 tableNode.ParentNode.InsertBefore(titleFont, tableNode);
 

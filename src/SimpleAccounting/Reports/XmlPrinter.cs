@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.Drawing.Printing;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Windows.Forms;
@@ -19,9 +20,13 @@ namespace lg2de.SimpleAccounting.Reports
     [SuppressMessage("Minor Code Smell", "S1192:String literals should not be duplicated", Justification = "<Pending>")]
     internal class XmlPrinter : IXmlPrinter
     {
+        private const int A4Width = 210;
+        private const int A4Height = 297;
+        private const double DefaultPrintFactor = 100 / 25.4; // mm > inch
         public const int DefaultLineHeight = 4;
-        private readonly Stack<Font> fontStack;
+        private const int Two = 2;
 
+        private readonly Stack<Font> fontStack;
         private readonly Stack<Pen> penStack;
         private readonly Stack<SolidBrush> solidBrushStack;
 
@@ -86,7 +91,8 @@ namespace lg2de.SimpleAccounting.Reports
 
             using (var dialog = new PrintPreviewDialog
             {
-                Document = printDocument, WindowState = FormWindowState.Maximized,
+                Document = printDocument,
+                WindowState = FormWindowState.Maximized,
             })
             {
                 dialog.ShowDialog();
@@ -108,7 +114,7 @@ namespace lg2de.SimpleAccounting.Reports
                 this.PrintNodes(graphics);
             };
 
-            this.printFactor = (float)(100 / 25.4);
+            this.printFactor = DefaultPrintFactor;
             string documentPaperSize = this.Document.DocumentElement.GetAttribute<string>("paperSize", "A4");
             var paperSize = paperSizes.FirstOrDefault(
                 s => s.PaperName.StartsWith(documentPaperSize, StringComparison.CurrentCultureIgnoreCase));
@@ -120,8 +126,8 @@ namespace lg2de.SimpleAccounting.Reports
             }
             else
             {
-                this.DocumentWidth = this.Document.DocumentElement.GetAttribute("width", 210);
-                this.DocumentHeight = this.Document.DocumentElement.GetAttribute("height", 297);
+                this.DocumentWidth = this.Document.DocumentElement.GetAttribute("width", A4Width);
+                this.DocumentHeight = this.Document.DocumentElement.GetAttribute("height", A4Height);
                 var documentScale = this.Document.DocumentElement.GetAttribute("scale", 1.0);
                 this.printFactor *= documentScale;
                 int width = this.ToPhysical(this.DocumentWidth);
@@ -146,7 +152,8 @@ namespace lg2de.SimpleAccounting.Reports
             this.ProcessNewPage();
         }
 
-        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope",
+        [SuppressMessage(
+            "Reliability", "CA2000:Dispose objects before losing scope",
             Justification = "Stack items will be disposed explicitely.")]
         internal void SetupGraphics()
         {
@@ -314,7 +321,7 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNodeList dataNodes = tableNode.SelectNodes("data/tr");
 
             // if table can not be started on page - create new one
-            if (this.CursorY + tableLineHeight * 2 > this.DocumentHeight - this.DocumentBottomMargin)
+            if (this.CursorY + tableLineHeight * Two > this.DocumentHeight - this.DocumentBottomMargin)
             {
                 XmlNode newPage = this.Document.CreateElement("newPage");
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
@@ -363,7 +370,7 @@ namespace lg2de.SimpleAccounting.Reports
                     }
                     else if (align == "center")
                     {
-                        xAdoption = columnWidth / 2;
+                        xAdoption = columnWidth / Two;
                     }
                 }
 
@@ -383,9 +390,12 @@ namespace lg2de.SimpleAccounting.Reports
             this.CursorY += headerLineHeight;
         }
 
-        private void TransformTableRow(XmlNode tableNode, int tableLineHeight, XmlNodeList columnNodes,
+        private void TransformTableRow(
+            XmlNode tableNode, int tableLineHeight, XmlNodeList columnNodes,
             XmlNodeList dataNodes, int nodeIndex)
         {
+            const int maxLength = 40;
+
             var dataNode = dataNodes[nodeIndex];
 
             XmlNodeList rowNodes = dataNode.SelectNodes("td");
@@ -394,7 +404,7 @@ namespace lg2de.SimpleAccounting.Reports
             {
                 XmlNode rowNode = rowNodes[i];
                 string strText = rowNode.InnerText;
-                nInnerLineCount += strText.Length / 40;
+                nInnerLineCount += strText.Length / maxLength;
             }
 
             var lineHeight = dataNode.GetAttribute("lineHeight", tableLineHeight * nInnerLineCount);
@@ -414,7 +424,7 @@ namespace lg2de.SimpleAccounting.Reports
                 string strText = rowNode.InnerText;
 
                 // line break
-                for (int j = 40; j < strText.Length; j += 41)
+                for (int j = maxLength; j < strText.Length; j += maxLength + 1)
                 {
                     strText = strText.Insert(j, "\n");
                 }
@@ -433,7 +443,7 @@ namespace lg2de.SimpleAccounting.Reports
                     }
                     else if (align.Value == "center")
                     {
-                        xAdoption = colmnWidth / 2;
+                        xAdoption = colmnWidth / Two;
                     }
                 }
 
@@ -522,9 +532,11 @@ namespace lg2de.SimpleAccounting.Reports
             {
                 var copiedChild = insertParent.OwnerDocument.ImportNode(child, deep: true);
                 var textElements = copiedChild.SelectNodes("//text");
+                string pageNumberText = pageNumber.ToString(CultureInfo.InvariantCulture);
                 foreach (XmlElement element in textElements)
                 {
-                    element.InnerText = element.InnerText.Replace("{page}", pageNumber.ToString());
+                    element.InnerText = element.InnerText.Replace(
+                        "{page}", pageNumberText, StringComparison.InvariantCultureIgnoreCase);
                 }
 
                 insertParent.ParentNode.InsertAfter(copiedChild, insertParent);

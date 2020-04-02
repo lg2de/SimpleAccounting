@@ -105,7 +105,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
 
-            var result = sut.GetNewRelease(currentVersion, CreateRelease(availableVersion));
+            var result = ShellViewModel.GetNewRelease(currentVersion, CreateRelease(availableVersion));
 
             if (string.IsNullOrEmpty(expectedVersion))
             {
@@ -741,7 +741,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut();
 
             var releases = CreateRelease("2.1.0", addAsset: false);
-            var result = sut.GetNewRelease("2.0.0", releases);
+            var result = ShellViewModel.GetNewRelease("2.0.0", releases);
 
             result.Should().BeNull();
         }

@@ -16,6 +16,8 @@ namespace lg2de.SimpleAccounting.Reports
         private readonly CultureInfo culture;
         private readonly AccountingDataSetup setup;
 
+        protected const int TitleSize = 10;
+
         protected ReportBase(
             string resourceName,
             AccountingDataSetup setup,

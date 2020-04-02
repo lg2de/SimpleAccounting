@@ -59,6 +59,7 @@ namespace lg2de.SimpleAccounting.Reports
             this.totalSumDebit = 0;
             this.totalSaldoCredit = 0;
             this.totalSaldoDebit = 0;
+
             foreach (var accountGroup in this.accountGroups)
             {
                 this.groupOpeningCredit = 0;
@@ -80,81 +81,46 @@ namespace lg2de.SimpleAccounting.Reports
                 }
 
                 XmlNode groupLineNode = this.PrintDocument.CreateElement("tr");
-                XmlNode groupItemNode = this.PrintDocument.CreateElement("td");
                 groupLineNode.SetAttribute("topLine", true);
-                groupLineNode.SetAttribute("lineHeight", 6);
+                const int summaryLineHeight = 6;
+                groupLineNode.SetAttribute("lineHeight", summaryLineHeight);
 
-                groupItemNode.InnerText = string.Empty;
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(string.Empty);
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = accountGroup.Name;
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(accountGroup.Name);
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = string.Empty;
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(string.Empty);
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupOpeningDebit);
-                groupLineNode.AppendChild(groupItemNode);
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupOpeningCredit);
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningDebit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningCredit));
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupSumDebit);
-                groupLineNode.AppendChild(groupItemNode);
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupSumCredit);
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(this.FormatValue(this.groupSumDebit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupSumCredit));
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupSaldoDebit);
-                groupLineNode.AppendChild(groupItemNode);
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupSaldoCredit);
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(this.FormatValue(this.groupSaldoDebit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupSaldoCredit));
 
                 groupLineNode.ChildNodes[1].SetAttribute("align", "right");
                 dataNode.AppendChild(groupLineNode);
             }
 
             XmlNode totalLineNode = this.PrintDocument.CreateElement("tr");
-            XmlNode totalItemNode = this.PrintDocument.CreateElement("td");
             totalLineNode.SetAttribute("topLine", true);
 
-            totalItemNode.InnerText = string.Empty;
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(string.Empty);
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = "Total";
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode("Total");
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = string.Empty;
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(string.Empty);
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalOpeningDebit);
-            totalLineNode.AppendChild(totalItemNode);
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalOpeningCredit);
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(this.FormatValue(this.totalOpeningDebit));
+            totalLineNode.AddTableNode(this.FormatValue(this.totalOpeningCredit));
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalSumDebit);
-            totalLineNode.AppendChild(totalItemNode);
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalSumCredit);
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(this.FormatValue(this.totalSumDebit));
+            totalLineNode.AddTableNode(this.FormatValue(this.totalSumCredit));
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalSaldoDebit);
-            totalLineNode.AppendChild(totalItemNode);
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalSaldoCredit);
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(this.FormatValue(this.totalSaldoDebit));
+            totalLineNode.AddTableNode(this.FormatValue(this.totalSaldoCredit));
 
             totalLineNode.ChildNodes[1].SetAttribute("align", "right");
             dataNode.AppendChild(totalLineNode);
@@ -237,40 +203,22 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
-            XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
             dataLineNode.SetAttribute("topLine", true);
 
-            dataItemNode.InnerText = account.ID.ToString(CultureInfo.InvariantCulture);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(account.ID.ToString(CultureInfo.InvariantCulture));
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = account.Name;
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(account.Name);
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = lastBookingDate.ToDateTime().ToString("d", this.culture);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(lastBookingDate.ToDateTime().ToString("d", this.culture));
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(openingDebit);
-            dataLineNode.AppendChild(dataItemNode);
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(openingCredit);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(this.FormatValue(openingDebit));
+            dataLineNode.AddTableNode(this.FormatValue(openingCredit));
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(sumDebit);
-            dataLineNode.AppendChild(dataItemNode);
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(sumCredit);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(this.FormatValue(sumDebit));
+            dataLineNode.AddTableNode(this.FormatValue(sumCredit));
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(saldoDebit);
-            dataLineNode.AppendChild(dataItemNode);
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(saldoCredit);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(this.FormatValue(saldoDebit));
+            dataLineNode.AddTableNode(this.FormatValue(saldoCredit));
 
             dataNode.AppendChild(dataLineNode);
 

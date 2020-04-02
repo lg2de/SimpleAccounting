@@ -21,6 +21,15 @@
         </Parameter>
       </Parameters>
     </Rule>
+    <Rule>
+      <Key>S1541</Key>
+      <Parameters>
+        <Parameter>
+          <Key>maximumFunctionComplexityThreshold</Key>
+          <Value>20</Value>
+        </Parameter>
+      </Parameters>
+    </Rule>
   </Rules>
   <Files>
   </Files>

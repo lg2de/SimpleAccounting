@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -74,6 +75,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<ImportEntryViewModel> ImportData { get; }
             = new ObservableCollection<ImportEntryViewModel>();
 
+        [SuppressMessage("Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
         public ICommand LoadDataCommand => new RelayCommand(_ =>
         {
             System.Windows.Forms.OpenFileDialog openFileDialog = null;
