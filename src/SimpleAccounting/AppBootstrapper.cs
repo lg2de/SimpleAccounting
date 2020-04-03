@@ -22,6 +22,7 @@ namespace lg2de.SimpleAccounting
         {
             this.Initialize();
 
+            // register default implementations for our interfaces
             this.container.Singleton<IWindowManager, WindowManager>();
             this.container.Singleton<IReportFactory, ReportFactory>();
             this.container.Singleton<IMessageBox, MessageBoxWrapper>();
@@ -46,10 +47,11 @@ namespace lg2de.SimpleAccounting
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
+            // configure default behavior of root window
+            // works of ShellView is Window or UserControl
             var settings = new Dictionary<string, object>
             {
-                { "SizeToContent", SizeToContent.Manual },
-                { "WindowState", WindowState.Maximized }
+                { "SizeToContent", SizeToContent.Manual }, { "WindowState", WindowState.Maximized }
             };
             this.DisplayRootViewFor<ShellViewModel>(settings);
         }

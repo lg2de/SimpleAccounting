@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
@@ -116,13 +117,14 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public int DebitIndex { get; set; } = -1;
 
+        [SuppressMessage(
+            "Critical Code Smell", "S1067:Expressions should not be too complex", Justification = "Ok for CanExecute")]
         public ICommand BookCommand => new RelayCommand(
             _ =>
             {
                 var newBooking = new AccountingDataJournalBooking
                 {
-                    Date = this.Date.ToAccountingDate(),
-                    ID = this.BookingNumber
+                    Date = this.Date.ToAccountingDate(), ID = this.BookingNumber
                 };
                 var creditValue = new BookingValue
                 {
@@ -141,13 +143,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.NotifyOfPropertyChange(nameof(this.BookingNumber));
             },
             _ => this.Date >= this.DateStart
-            && this.Date <= this.DateEnd
-            && this.BookingNumber > 0
-            && this.BookingValue > 0
-            && this.CreditIndex >= 0
-            && this.DebitIndex >= 0
-            && this.CreditIndex != this.DebitIndex
-            && !string.IsNullOrWhiteSpace(this.BookingText));
+                 && this.Date <= this.DateEnd
+                 && this.BookingNumber > 0
+                 && this.BookingValue > 0
+                 && this.CreditIndex >= 0
+                 && this.DebitIndex >= 0
+                 && this.CreditIndex != this.DebitIndex
+                 && !string.IsNullOrWhiteSpace(this.BookingText));
 
         internal DateTime DateStart { get; }
 

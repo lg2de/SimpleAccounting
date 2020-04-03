@@ -22,7 +22,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public string InstructionText { get; private set; }
 
-        public List<AccountDefinition> Accounts { get; } = new List<AccountDefinition>();
+        public IList<AccountDefinition> Accounts { get; } = new List<AccountDefinition>();
 
         public AccountDefinition RemoteAccount { get; set; }
 

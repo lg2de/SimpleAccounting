@@ -4,15 +4,17 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-#pragma warning disable S4055 // string literals => pending translation
-
+    [SuppressMessage(
+        "Major Code Smell",
+        "S4055:Literals should not be passed as localized parameters",
+        Justification = "pending translation")]
     internal class TotalJournalReport : ReportBase
     {
         public const string ResourceName = "TotalJournal.xml";
@@ -23,7 +25,7 @@ namespace lg2de.SimpleAccounting.Reports
             AccountingDataJournal yearData,
             AccountingDataSetup setup,
             CultureInfo culture)
-            : base (ResourceName, setup, yearData, culture)
+            : base(ResourceName, setup, yearData, culture)
         {
             this.culture = culture;
         }
@@ -38,13 +40,9 @@ namespace lg2de.SimpleAccounting.Reports
             foreach (var entry in journalEntries)
             {
                 XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
-                XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
                 dataLineNode.SetAttribute("topLine", true);
-                dataItemNode.InnerText = entry.Date.ToDateTime().ToString("d", this.culture);
-                dataLineNode.AppendChild(dataItemNode);
-                dataItemNode = dataItemNode.Clone();
-                dataItemNode.InnerText = entry.ID.ToString();
-                dataLineNode.AppendChild(dataItemNode);
+                dataLineNode.AddTableNode(entry.Date.ToDateTime().ToString("d", this.culture));
+                dataLineNode.AddTableNode(entry.ID.ToString(CultureInfo.InvariantCulture));
 
                 if (entry.Debit.Count == 1
                     && entry.Credit.Count == 1
@@ -52,75 +50,45 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     var credit = entry.Credit.Single();
                     var debit = entry.Debit.Single();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = debit.Text;
-                    dataLineNode.AppendChild(dataItemNode);
-                    string strAccountNumber = debit.Account.ToString();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = strAccountNumber;
-                    dataLineNode.AppendChild(dataItemNode);
-                    double nValue = Convert.ToDouble(debit.Value) / 100;
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
-                    dataLineNode.AppendChild(dataItemNode);
-                    strAccountNumber = credit.Account.ToString();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = strAccountNumber;
-                    dataLineNode.AppendChild(dataItemNode);
-                    nValue = Convert.ToDouble(credit.Value) / 100;
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
-                    dataLineNode.AppendChild(dataItemNode);
+                    dataLineNode.AddTableNode(debit.Text);
+                    string strAccountNumber = debit.Account.ToString(CultureInfo.InvariantCulture);
+                    dataLineNode.AddTableNode(strAccountNumber);
+                    dataLineNode.AddTableNode(debit.Value.FormatCurrency(this.culture));
+                    strAccountNumber = credit.Account.ToString(CultureInfo.InvariantCulture);
+                    dataLineNode.AddTableNode(strAccountNumber);
+                    dataLineNode.AddTableNode(credit.Value.FormatCurrency(this.culture));
                     dataNode.AppendChild(dataLineNode);
                     continue;
                 }
 
                 foreach (var debitEntry in entry.Debit)
                 {
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = debitEntry.Text;
-                    dataLineNode.AppendChild(dataItemNode);
-                    string strAccountNumber = debitEntry.Account.ToString();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = strAccountNumber;
-                    dataLineNode.AppendChild(dataItemNode);
-                    double nValue = Convert.ToDouble(debitEntry.Value) / 100;
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataItemNode = this.PrintDocument.CreateElement("td");
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataLineNode.AppendChild(dataItemNode.Clone());
+                    dataLineNode.AddTableNode(debitEntry.Text);
+                    string strAccountNumber = debitEntry.Account.ToString(CultureInfo.InvariantCulture);
+                    dataLineNode.AddTableNode(strAccountNumber);
+                    dataLineNode.AddTableNode(debitEntry.Value.FormatCurrency(this.culture));
+                    dataLineNode.AddTableNode(string.Empty);
+                    dataLineNode.AddTableNode(string.Empty);
                     dataNode.AppendChild(dataLineNode);
 
                     dataLineNode = this.PrintDocument.CreateElement("tr");
-                    dataItemNode = this.PrintDocument.CreateElement("td");
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataLineNode.AppendChild(dataItemNode.Clone());
+                    dataLineNode.AddTableNode(string.Empty);
+                    dataLineNode.AddTableNode(string.Empty);
                 }
 
                 foreach (var creditEntry in entry.Credit)
                 {
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = creditEntry.Text;
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataItemNode = this.PrintDocument.CreateElement("td");
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataLineNode.AppendChild(dataItemNode.Clone());
-                    string strAccountNumber = creditEntry.Account.ToString();
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = strAccountNumber;
-                    dataLineNode.AppendChild(dataItemNode);
-                    double nValue = Convert.ToDouble(creditEntry.Value) / 100;
-                    dataItemNode = dataItemNode.Clone();
-                    dataItemNode.InnerText = nValue.ToString("0.00", this.culture);
-                    dataLineNode.AppendChild(dataItemNode);
+                    dataLineNode.AddTableNode(creditEntry.Text);
+                    dataLineNode.AddTableNode(string.Empty);
+                    dataLineNode.AddTableNode(string.Empty);
+                    string strAccountNumber = creditEntry.Account.ToString(CultureInfo.InvariantCulture);
+                    dataLineNode.AddTableNode(strAccountNumber);
+                    dataLineNode.AddTableNode(creditEntry.Value.FormatCurrency(this.culture));
                     dataNode.AppendChild(dataLineNode);
 
                     dataLineNode = this.PrintDocument.CreateElement("tr");
-                    dataItemNode = this.PrintDocument.CreateElement("td");
-                    dataLineNode.AppendChild(dataItemNode);
-                    dataLineNode.AppendChild(dataItemNode.Clone());
+                    dataLineNode.AddTableNode(string.Empty);
+                    dataLineNode.AddTableNode(string.Empty);
                 }
             }
         }

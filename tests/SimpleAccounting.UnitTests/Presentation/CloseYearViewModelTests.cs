@@ -14,6 +14,23 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     public class CloseYearViewModelTests
     {
         [Fact]
+        public void CloseYearCommand_AccountSelected_CanExecute()
+        {
+            var sut = new CloseYearViewModel(new AccountingDataJournal());
+            sut.RemoteAccount = new AccountDefinition();
+
+            sut.CloseYearCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CloseYearCommand_NoAccountSelected_CannotExecute()
+        {
+            var sut = new CloseYearViewModel(new AccountingDataJournal());
+
+            sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
         public void OnInitialize_AccountsAvailable_AccountSelected()
         {
             var sut = new CloseYearViewModel(new AccountingDataJournal());
@@ -32,23 +49,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
 
             sut.RemoteAccount.Should().BeNull();
-        }
-
-        [Fact]
-        public void CloseYearCommand_NoAccountSelected_CannotExecute()
-        {
-            var sut = new CloseYearViewModel(new AccountingDataJournal());
-
-            sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void CloseYearCommand_AccountSelected_CanExecute()
-        {
-            var sut = new CloseYearViewModel(new AccountingDataJournal());
-            sut.RemoteAccount = new AccountDefinition();
-
-            sut.CloseYearCommand.CanExecute(null).Should().BeTrue();
         }
     }
 }

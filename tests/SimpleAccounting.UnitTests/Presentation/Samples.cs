@@ -11,6 +11,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
     internal class Samples
     {
+        public static uint BaseDate = (uint)DateTime.Now.Year * 10000;
+
         public static AccountingData SampleProject
         {
             get
@@ -34,30 +36,48 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                                     {
                                         Columns = new List<AccountDefinitionImportMappingColumn>
                                         {
-                                            new AccountDefinitionImportMappingColumn { Source = "Date", Target = AccountDefinitionImportMappingColumnTarget.Date },
-                                            new AccountDefinitionImportMappingColumn { Source = "Name", Target = AccountDefinitionImportMappingColumnTarget.Name },
-                                            new AccountDefinitionImportMappingColumn { Source = "Text", Target = AccountDefinitionImportMappingColumnTarget.Text },
-                                            new AccountDefinitionImportMappingColumn { Source = "Value", Target = AccountDefinitionImportMappingColumnTarget.Value }
+                                            new AccountDefinitionImportMappingColumn
+                                            {
+                                                Source = "Date",
+                                                Target =
+                                                    AccountDefinitionImportMappingColumnTarget
+                                                        .Date
+                                            },
+                                            new AccountDefinitionImportMappingColumn
+                                            {
+                                                Source = "Name",
+                                                Target =
+                                                    AccountDefinitionImportMappingColumnTarget
+                                                        .Name
+                                            },
+                                            new AccountDefinitionImportMappingColumn
+                                            {
+                                                Source = "Text",
+                                                Target =
+                                                    AccountDefinitionImportMappingColumnTarget
+                                                        .Text
+                                            },
+                                            new AccountDefinitionImportMappingColumn
+                                            {
+                                                Source = "Value",
+                                                Target =
+                                                    AccountDefinitionImportMappingColumnTarget
+                                                        .Value
+                                            }
                                         }
                                     }
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 400,
-                                    Name = "Salary",
-                                    Type = AccountDefinitionType.Income
+                                    ID = 400, Name = "Salary", Type = AccountDefinitionType.Income
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 600,
-                                    Name = "Shoes",
-                                    Type = AccountDefinitionType.Expense
+                                    ID = 600, Name = "Shoes", Type = AccountDefinitionType.Expense
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 990,
-                                    Name = "Carryforward",
-                                    Type = AccountDefinitionType.Carryforward
+                                    ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
                                 }
                             }
                         },
@@ -68,22 +88,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                             {
                                 new AccountDefinition
                                 {
-                                    ID = 5000,
-                                    Name = "Bank credit",
-                                    Type = AccountDefinitionType.Credit
+                                    ID = 5000, Name = "Bank credit", Type = AccountDefinitionType.Credit
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 6000,
-                                    Name = "Friends debit",
-                                    Type = AccountDefinitionType.Debit
+                                    ID = 6000, Name = "Friends debit", Type = AccountDefinitionType.Debit
                                 },
-                                new AccountDefinition
-                                {
-                                    ID = 9999,
-                                    Name = "Inactive",
-                                    Active = false
-                                }
+                                new AccountDefinition { ID = 9999, Name = "Inactive", Active = false }
                             }
                         }
                     },
@@ -108,8 +119,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 };
             }
         }
-
-        public static uint BaseDate = (uint)DateTime.Now.Year * 10000;
 
         public static IEnumerable<AccountingDataJournalBooking> SampleBookings
         {

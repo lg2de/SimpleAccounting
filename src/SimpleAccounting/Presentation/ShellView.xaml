@@ -26,8 +26,8 @@
         <Menu DockPanel.Dock="Top">
             <Menu.Resources>
                 <Style x:Key="CommandMenuStyle" TargetType="{x:Type MenuItem}">
-                    <Setter Property="Header" Value="{Binding Header}"/>
-                    <Setter Property="Command" Value="{Binding Command}"/>
+                    <Setter Property="Header" Value="{Binding Header}" />
+                    <Setter Property="Command" Value="{Binding Command}" />
                 </Style>
             </Menu.Resources>
             <MenuItem Header="Projekt">
@@ -44,7 +44,8 @@
             </MenuItem>
             <MenuItem Header="Aktionen">
                 <MenuItem Header="Buchen" Command="{Binding AddBookingsCommand}" InputGestureText="STRG+B" />
-                <MenuItem Header="Buchungen importieren" Command="{Binding ImportBookingsCommand}" InputGestureText="STRG-I" />
+                <MenuItem Header="Buchungen importieren" Command="{Binding ImportBookingsCommand}"
+                          InputGestureText="STRG-I" />
                 <MenuItem Header="Buchungsjahr abschließen" Command="{Binding CloseYearCommand}" />
                 <MenuItem
                     Header="Buchungsjahr wählen"
@@ -56,9 +57,9 @@
             <MenuItem Header="Berichte">
                 <MenuItem Header="Journal" Command="{Binding TotalJournalReportCommand}" />
                 <MenuItem Header="Kontenblätter" Command="{Binding AccountJournalReportCommand}" />
-                <MenuItem Header="Summen und Salden"  Command="{Binding TotalsAndBalancesReportCommand}" />
-                <MenuItem Header="Bestandskontosalden"  Command="{Binding AssetBalancesReportCommand}" />
-                <MenuItem Header="Jahresbilanz"  Command="{Binding AnnualBalanceReportCommand}" />
+                <MenuItem Header="Summen und Salden" Command="{Binding TotalsAndBalancesReportCommand}" />
+                <MenuItem Header="Bestandskontosalden" Command="{Binding AssetBalancesReportCommand}" />
+                <MenuItem Header="Jahresbilanz" Command="{Binding AnnualBalanceReportCommand}" />
             </MenuItem>
             <MenuItem Header="Hilfe">
                 <MenuItem Header="Über" Command="{Binding HelpAboutCommand}" />
@@ -69,7 +70,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -78,13 +79,13 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White" />
                 <Style x:Key="GridRowStyle" TargetType="{x:Type DataGridRow}">
                     <Setter Property="FontSize" Value="11" />
                 </Style>
                 <Style TargetType="DataGridCell">
-                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=Content.Text}"/>
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=Content.Text}" />
                 </Style>
                 <Style x:Key="SummaryGridStyle" TargetType="DataGridCell">
                     <Style.Triggers>
@@ -109,7 +110,9 @@
                         <DataGridTextColumn Header="Datum" Width="60" Binding="{Binding Date, StringFormat=\{0:d\}}" />
                         <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}" />
                         <DataGridTextColumn Header="Buchungstext" Width="200" Binding="{Binding Text}" />
-                        <DataGridTextColumn Header="Betrag" Width="70" Binding="{Binding Value, StringFormat=\{0:0.00\}}" ElementStyle="{StaticResource ValueGridStyle}" />
+                        <DataGridTextColumn Header="Betrag" Width="70"
+                                            Binding="{Binding Value, StringFormat=\{0:0.00\}}"
+                                            ElementStyle="{StaticResource ValueGridStyle}" />
                         <DataGridTextColumn Header="Sollkonto" Width="100" Binding="{Binding DebitAccount}" />
                         <DataGridTextColumn Header="Habenkonto" Width="100" Binding="{Binding CreditAccount}" />
                     </DataGrid.Columns>
@@ -129,11 +132,17 @@
                     AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                     SelectionChanged="OnGridSelectionChanged">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Datum" Width="60" Binding="{Binding Date, StringFormat=\{0:d\}}" CellStyle="{StaticResource SummaryGridStyle}" />
-                        <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}" CellStyle="{StaticResource SummaryGridStyle}" />
+                        <DataGridTextColumn Header="Datum" Width="60" Binding="{Binding Date, StringFormat=\{0:d\}}"
+                                            CellStyle="{StaticResource SummaryGridStyle}" />
+                        <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}"
+                                            CellStyle="{StaticResource SummaryGridStyle}" />
                         <DataGridTextColumn Header="Buchungstext" Width="200" Binding="{Binding Text}" />
-                        <DataGridTextColumn Header="Sollwert" Width="70" Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}" ElementStyle="{StaticResource ValueGridStyle}" />
-                        <DataGridTextColumn Header="Habenwert" Width="70" Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}" ElementStyle="{StaticResource ValueGridStyle}" />
+                        <DataGridTextColumn Header="Sollwert" Width="70"
+                                            Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}"
+                                            ElementStyle="{StaticResource ValueGridStyle}" />
+                        <DataGridTextColumn Header="Habenwert" Width="70"
+                                            Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}"
+                                            ElementStyle="{StaticResource ValueGridStyle}" />
                         <DataGridTextColumn Header="Gegenkonto" Width="100" Binding="{Binding RemoteAccount}" />
                     </DataGrid.Columns>
                     <DataGrid.RowStyle>
@@ -154,7 +163,7 @@
                     Text="Konten"
                     VerticalAlignment="Center">
                     <TextBlock.LayoutTransform>
-                        <RotateTransform Angle="-90"/>
+                        <RotateTransform Angle="-90" />
                     </TextBlock.LayoutTransform>
                 </TextBlock>
                 <DataGrid

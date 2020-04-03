@@ -5,28 +5,37 @@
 namespace lg2de.SimpleAccounting.Reports
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-#pragma warning disable S4055 // string literals => pending translation
-
+    [SuppressMessage(
+        "Major Code Smell",
+        "S4055:Literals should not be passed as localized parameters",
+        Justification = "pending translation")]
     internal class TotalsAndBalancesReport : ReportBase
     {
         public const string ResourceName = "TotalsAndBalances.xml";
 
         private readonly List<AccountingDataAccountGroup> accountGroups;
         private readonly CultureInfo culture;
-
-        private double totalOpeningCredit, totalOpeningDebit;
-        private double totalSumCredit, totalSumDebit;
-        private double totalSaldoCredit, totalSaldoDebit;
-        private double groupOpeningCredit, groupOpeningDebit;
-        private double groupSumCredit, groupSumDebit;
-        private double groupSaldoCredit, groupSaldoDebit;
         private int accountsPerGroup;
+        private long groupOpeningCredit;
+        private long groupOpeningDebit;
+        private long groupSaldoCredit;
+        private long groupSaldoDebit;
+        private long groupSumCredit;
+        private long groupSumDebit;
+
+        private long totalOpeningCredit;
+        private long totalOpeningDebit;
+        private long totalSaldoCredit;
+        private long totalSaldoDebit;
+        private long totalSumCredit;
+        private long totalSumDebit;
 
         public TotalsAndBalancesReport(
             AccountingDataJournal yearData,
@@ -53,6 +62,7 @@ namespace lg2de.SimpleAccounting.Reports
             this.totalSumDebit = 0;
             this.totalSaldoCredit = 0;
             this.totalSaldoDebit = 0;
+
             foreach (var accountGroup in this.accountGroups)
             {
                 this.groupOpeningCredit = 0;
@@ -74,81 +84,46 @@ namespace lg2de.SimpleAccounting.Reports
                 }
 
                 XmlNode groupLineNode = this.PrintDocument.CreateElement("tr");
-                XmlNode groupItemNode = this.PrintDocument.CreateElement("td");
                 groupLineNode.SetAttribute("topLine", true);
-                groupLineNode.SetAttribute("lineHeight", 6);
+                const int summaryLineHeight = 6;
+                groupLineNode.SetAttribute("lineHeight", summaryLineHeight);
 
-                groupItemNode.InnerText = string.Empty;
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(string.Empty);
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = accountGroup.Name;
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(accountGroup.Name);
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = string.Empty;
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(string.Empty);
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupOpeningDebit);
-                groupLineNode.AppendChild(groupItemNode);
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupOpeningCredit);
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningDebit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningCredit));
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupSumDebit);
-                groupLineNode.AppendChild(groupItemNode);
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupSumCredit);
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(this.FormatValue(this.groupSumDebit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupSumCredit));
 
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupSaldoDebit);
-                groupLineNode.AppendChild(groupItemNode);
-                groupItemNode = groupItemNode.Clone();
-                groupItemNode.InnerText = this.FormatValue(this.groupSaldoCredit);
-                groupLineNode.AppendChild(groupItemNode);
+                groupLineNode.AddTableNode(this.FormatValue(this.groupSaldoDebit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupSaldoCredit));
 
                 groupLineNode.ChildNodes[1].SetAttribute("align", "right");
                 dataNode.AppendChild(groupLineNode);
             }
 
             XmlNode totalLineNode = this.PrintDocument.CreateElement("tr");
-            XmlNode totalItemNode = this.PrintDocument.CreateElement("td");
             totalLineNode.SetAttribute("topLine", true);
 
-            totalItemNode.InnerText = string.Empty;
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(string.Empty);
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = "Total";
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode("Total");
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = string.Empty;
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(string.Empty);
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalOpeningDebit);
-            totalLineNode.AppendChild(totalItemNode);
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalOpeningCredit);
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(this.FormatValue(this.totalOpeningDebit));
+            totalLineNode.AddTableNode(this.FormatValue(this.totalOpeningCredit));
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalSumDebit);
-            totalLineNode.AppendChild(totalItemNode);
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalSumCredit);
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(this.FormatValue(this.totalSumDebit));
+            totalLineNode.AddTableNode(this.FormatValue(this.totalSumCredit));
 
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalSaldoDebit);
-            totalLineNode.AppendChild(totalItemNode);
-            totalItemNode = totalItemNode.Clone();
-            totalItemNode.InnerText = this.FormatValue(this.totalSaldoCredit);
-            totalLineNode.AppendChild(totalItemNode);
+            totalLineNode.AddTableNode(this.FormatValue(this.totalSaldoDebit));
+            totalLineNode.AddTableNode(this.FormatValue(this.totalSaldoCredit));
 
             totalLineNode.ChildNodes[1].SetAttribute("align", "right");
             dataNode.AppendChild(totalLineNode);
@@ -175,7 +150,9 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void ProcessAccount(XmlNode dataNode, AccountDefinition account)
         {
-            if (this.YearData.Booking.All(b => b.Debit.All(x => x.Account != account.ID) && b.Credit.All(x => x.Account != account.ID)))
+            if (this.YearData.Booking.All(
+                b =>
+                    b.Debit.All(x => x.Account != account.ID) && b.Credit.All(x => x.Account != account.ID)))
             {
                 return;
             }
@@ -184,25 +161,25 @@ namespace lg2de.SimpleAccounting.Reports
             var lastBookingDate = this.YearData.Booking
                 .Where(x => x.Debit.Any(a => a.Account == account.ID) || x.Credit.Any(a => a.Account == account.ID))
                 .Select(x => x.Date).DefaultIfEmpty().Max();
-            double saldoCredit = this.YearData.Booking
+            long saldoCredit = this.YearData.Booking
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double saldoDebit = this.YearData.Booking
+            long saldoDebit = this.YearData.Booking
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double openingCredit = this.YearData.Booking
+            long openingCredit = this.YearData.Booking
                 .Where(b => b.Opening)
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double openingDebit = this.YearData.Booking
+            long openingDebit = this.YearData.Booking
                 .Where(b => b.Opening)
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double sumCredit = this.YearData.Booking
+            long sumCredit = this.YearData.Booking
                 .Where(b => !b.Opening)
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            double sumDebit = this.YearData.Booking
+            long sumDebit = this.YearData.Booking
                 .Where(b => !b.Opening)
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
@@ -230,40 +207,22 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
-            XmlNode dataItemNode = this.PrintDocument.CreateElement("td");
             dataLineNode.SetAttribute("topLine", true);
 
-            dataItemNode.InnerText = account.ID.ToString(CultureInfo.InvariantCulture);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(account.ID.ToString(CultureInfo.InvariantCulture));
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = account.Name;
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(account.Name);
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = lastBookingDate.ToDateTime().ToString("d", this.culture);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(lastBookingDate.ToDateTime().ToString("d", this.culture));
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(openingDebit);
-            dataLineNode.AppendChild(dataItemNode);
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(openingCredit);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(this.FormatValue(openingDebit));
+            dataLineNode.AddTableNode(this.FormatValue(openingCredit));
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(sumDebit);
-            dataLineNode.AppendChild(dataItemNode);
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(sumCredit);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(this.FormatValue(sumDebit));
+            dataLineNode.AddTableNode(this.FormatValue(sumCredit));
 
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(saldoDebit);
-            dataLineNode.AppendChild(dataItemNode);
-            dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = this.FormatValue(saldoCredit);
-            dataLineNode.AppendChild(dataItemNode);
+            dataLineNode.AddTableNode(this.FormatValue(saldoDebit));
+            dataLineNode.AddTableNode(this.FormatValue(saldoCredit));
 
             dataNode.AppendChild(dataLineNode);
 
@@ -282,14 +241,14 @@ namespace lg2de.SimpleAccounting.Reports
             this.totalSaldoDebit += saldoDebit;
         }
 
-        private string FormatValue(double value)
+        private string FormatValue(long value)
         {
             if (value <= 0)
             {
                 return string.Empty;
             }
 
-            return (value / 100).ToString("0.00", this.culture);
+            return value.FormatCurrency(this.culture);
         }
     }
 }

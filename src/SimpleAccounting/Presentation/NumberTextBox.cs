@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Text.RegularExpressions;
@@ -17,6 +18,12 @@ namespace lg2de.SimpleAccounting.Presentation
     [ExcludeFromCodeCoverage]
     internal class NumberTextBox : TextBox
     {
+        public static readonly DependencyProperty ScaleProperty =
+            DependencyProperty.Register(
+                "Scale", typeof(uint),
+                typeof(NumberTextBox),
+                new FrameworkPropertyMetadata((uint)0, OnScaleChanged));
+
         private Regex numberExpression;
 
         public NumberTextBox()
@@ -25,14 +32,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.GotMouseCapture += (s, e) => this.SelectAll();
             this.PreviewKeyDown += OnPreviewKeyDown;
             this.PreviewTextInput += this.OnPreviewTextInput;
-            DataObject.AddPastingHandler(this, this.OnPasteText);
             this.UpdateExpression();
         }
-
-        public static readonly DependencyProperty ScaleProperty =
-            DependencyProperty.Register("Scale", typeof(uint),
-                typeof(NumberTextBox),
-                new FrameworkPropertyMetadata((uint)0, OnScaleChanged));
 
         public uint Scale
         {
@@ -42,6 +43,12 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.SetValue(ScaleProperty, value);
                 this.UpdateExpression();
             }
+        }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+            DataObject.AddPastingHandler(this, this.OnPasteText);
         }
 
         private static void OnScaleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

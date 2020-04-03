@@ -14,13 +14,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     public class DesignViewModelTests
     {
         [Fact]
-        public void ShellDesignViewModel_ConstructorSucceed()
-        {
-            Action action = () => new ShellDesignViewModel();
-            action.Should().NotThrow();
-        }
-
-        [Fact]
         public void AccountDesignViewModel_ConstructorSucceed()
         {
             Action action = () => new AccountDesignViewModel();
@@ -35,6 +28,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void CloseYearDesignViewModel_ConstructorSucceed()
+        {
+            Action action = () => new CloseYearDesignViewModel();
+            action.Should().NotThrow();
+        }
+
+        [Fact]
         public void ImportBookingsDesignViewModel_ConstructorSucceed()
         {
             Action action = () => new ImportBookingsDesignViewModel();
@@ -42,9 +42,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void CloseYearDesignViewModel_ConstructorSucceed()
+        public void ShellDesignViewModel_ConstructorSucceed()
         {
-            Action action = () => new CloseYearDesignViewModel();
+            Action action = () => new ShellDesignViewModel();
             action.Should().NotThrow();
         }
     }

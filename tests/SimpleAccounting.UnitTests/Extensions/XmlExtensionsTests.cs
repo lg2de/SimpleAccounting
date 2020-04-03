@@ -13,34 +13,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
     public class XmlExtensionsTests
     {
         [Fact]
-        public void SetAttribute_NullNode_ExceptionThrown()
-        {
-            XmlNode node = null;
-            node.Invoking(n => n.SetAttribute("name", "value")).Should().Throw<ArgumentNullException>();
-        }
-
-        [Fact]
-        public void SetAttribute_NullName_ExceptionThrown()
-        {
-            var doc = new XmlDocument();
-            doc.LoadXml("<root><element/></root>");
-
-            doc.DocumentElement.FirstChild.Invoking(node => node.SetAttribute(null, "value"))
-                .Should().Throw<ArgumentNullException>();
-        }
-
-        [Fact]
-        public void SetAttribute_HappyPath_ExceptionThrown()
-        {
-            var doc = new XmlDocument();
-            doc.LoadXml("<root><element/></root>");
-
-            doc.DocumentElement.FirstChild.SetAttribute("name", "value");
-
-            doc.DocumentElement.FirstChild.OuterXml.Should().Be("<element name=\"value\" />");
-        }
-
-        [Fact]
         public void GetAttribute_IntNotExisting_ReturnsZero()
         {
             var doc = new XmlDocument();
@@ -65,6 +37,34 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
             doc.LoadXml("<root attr=\"X\"/>");
 
             doc.DocumentElement.Invoking(x => x.GetAttribute<int>("attr")).Should().Throw<FormatException>();
+        }
+
+        [Fact]
+        public void SetAttribute_HappyPath_ExceptionThrown()
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml("<root><element/></root>");
+
+            doc.DocumentElement.FirstChild.SetAttribute("name", "value");
+
+            doc.DocumentElement.FirstChild.OuterXml.Should().Be("<element name=\"value\" />");
+        }
+
+        [Fact]
+        public void SetAttribute_NullName_ExceptionThrown()
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml("<root><element/></root>");
+
+            doc.DocumentElement.FirstChild.Invoking(node => node.SetAttribute(null, "value"))
+                .Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void SetAttribute_NullNode_ExceptionThrown()
+        {
+            XmlNode node = null;
+            node.Invoking(n => n.SetAttribute("name", "value")).Should().Throw<ArgumentNullException>();
         }
     }
 }

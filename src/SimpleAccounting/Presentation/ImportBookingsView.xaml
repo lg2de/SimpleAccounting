@@ -20,9 +20,9 @@
         <TextBlock
             DockPanel.Dock="Top"
             Padding="5">
-            Hinweise:<LineBreak/>
-            Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.<LineBreak/>
-            (Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)<LineBreak/>
+            Hinweise:<LineBreak />
+            Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.<LineBreak />
+            (Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)<LineBreak />
             Die importierten Empfängernamen und Buchungstexte können korrigiert werden.
         </TextBlock>
         <StackPanel
@@ -76,11 +76,11 @@
                                 ItemsSource="{Binding Accounts}"
                                 SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                                TextSearch.TextPath="Name"/>
+                                TextSearch.TextPath="Name" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn >
+                <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button

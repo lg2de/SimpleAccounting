@@ -11,10 +11,11 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-    internal abstract class ReportBase
+    internal class ReportBase
     {
-        private readonly AccountingDataSetup setup;
+        protected const int TitleSize = 10;
         private readonly CultureInfo culture;
+        private readonly AccountingDataSetup setup;
 
         protected ReportBase(
             string resourceName,

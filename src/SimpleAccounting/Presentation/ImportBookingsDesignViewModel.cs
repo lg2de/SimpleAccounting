@@ -7,9 +7,16 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using lg2de.SimpleAccounting.Model;
 
+    [SuppressMessage(
+        "Major Code Smell", "S109:Magic numbers should not be used",
+        Justification = "Design view model defines useful values")]
+    [SuppressMessage(
+        "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
+        Justification = "Design view model defines useful values")]
     internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     {
         private static readonly List<AccountDefinition> SampleAccounts = new List<AccountDefinition>
@@ -22,16 +29,18 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     Columns = new List<AccountDefinitionImportMappingColumn>
                     {
-                        new AccountDefinitionImportMappingColumn { Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date },
-                        new AccountDefinitionImportMappingColumn { Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value }
+                        new AccountDefinitionImportMappingColumn
+                        {
+                            Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date
+                        },
+                        new AccountDefinitionImportMappingColumn
+                        {
+                            Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value
+                        }
                     }
                 }
             },
-            new AccountDefinition
-            {
-                ID = 600,
-                Name = "Shopping"
-            }
+            new AccountDefinition { ID = 600, Name = "Shopping" }
         };
 
         public ImportBookingsDesignViewModel()

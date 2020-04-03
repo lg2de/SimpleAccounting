@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Model
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Xml.Serialization;
@@ -19,6 +20,10 @@ namespace lg2de.SimpleAccounting.Model
         private string schema = DefaultXsiSchemaLocation;
 
         [XmlAttribute("schemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
+        [SuppressMessage(
+            "Minor Code Smell",
+            "S100:Methods and properties should be named in PascalCase",
+            Justification = "fixed name")]
         public string xsiSchemaLocation
         {
             get => this.schema;
@@ -37,10 +42,10 @@ namespace lg2de.SimpleAccounting.Model
         internal AccountingData Clone()
         {
             var xml = this.Serialize();
-            return AccountingData.Deserialize(xml);
+            return Deserialize(xml);
         }
 
-        public bool Migrate()
+        internal bool Migrate()
         {
             var result = false;
             result |= this.MergeYearsIntoJournal();
@@ -58,13 +63,10 @@ namespace lg2de.SimpleAccounting.Model
             var result = false;
             foreach (var year in this.Years)
             {
-                if (this.Journal == null)
-                {
-                    this.Journal = new List<AccountingDataJournal>();
-                }
+                this.Journal ??= new List<AccountingDataJournal>();
 
                 string oldYearName = year.Name.ToString(CultureInfo.InvariantCulture);
-                var journal = this.Journal.SingleOrDefault(x =>x.Year == oldYearName);
+                var journal = this.Journal.SingleOrDefault(x => x.Year == oldYearName);
                 if (journal == null)
                 {
                     journal = new AccountingDataJournal { Year = oldYearName };
@@ -90,26 +92,21 @@ namespace lg2de.SimpleAccounting.Model
                 return false;
             }
 
-            var result = false;
-            foreach (var group in this.Accounts)
+            var anyAccountFixed = false;
+            var accountsWithMapping = this.Accounts.SelectMany(x => x.Account).Where(x => x.ImportMapping != null);
+            foreach (var account in accountsWithMapping)
             {
-                foreach (var account in group.Account)
+                if ((account.ImportMapping.Columns?.Any() ?? false)
+                    || (account.ImportMapping.Patterns?.Any() ?? false))
                 {
-                    if (account.ImportMapping == null)
-                    {
-                        continue;
-                    }
-
-                    if (!(account.ImportMapping.Columns?.Any() ?? false)
-                        && !(account.ImportMapping.Patterns?.Any() ?? false))
-                    {
-                        account.ImportMapping = null;
-                        result = true;
-                    }
+                    continue;
                 }
+
+                account.ImportMapping = null;
+                anyAccountFixed = true;
             }
 
-            return result;
+            return anyAccountFixed;
         }
     }
 

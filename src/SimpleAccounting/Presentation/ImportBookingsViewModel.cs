@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -18,13 +19,15 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-#pragma warning disable S4055 // string literals => pending translation
-
+    [SuppressMessage(
+        "Major Code Smell",
+        "S4055:Literals should not be passed as localized parameters",
+        Justification = "pending translation")]
     internal class ImportBookingsViewModel : Screen
     {
+        private readonly List<AccountDefinition> accounts;
         private readonly IMessageBox messageBox;
         private readonly ShellViewModel parent;
-        private readonly List<AccountDefinition> accounts;
         private ulong selectedAccountNumber;
 
         public ImportBookingsViewModel(
@@ -36,13 +39,18 @@ namespace lg2de.SimpleAccounting.Presentation
             this.parent = parent;
             this.accounts = accounts.ToList();
 
+            // ReSharper disable once VirtualMemberCallInConstructor
             this.DisplayName = "Import von Kontodaten";
         }
 
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
-            .Where(a =>
-                a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) == true
-                && a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) == true);
+            .Where(
+                a =>
+                    a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) ==
+                    true
+                    && a.ImportMapping?.Columns.Any(
+                        x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) ==
+                    true);
 
         public DateTime RangeMin { get; internal set; }
 
@@ -72,46 +80,50 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<ImportEntryViewModel> ImportData { get; }
             = new ObservableCollection<ImportEntryViewModel>();
 
-        public ICommand LoadDataCommand => new RelayCommand(_ =>
-        {
-            System.Windows.Forms.OpenFileDialog openFileDialog = null;
-            try
+        [SuppressMessage(
+            "Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
+        public ICommand LoadDataCommand => new RelayCommand(
+            _ =>
             {
-                openFileDialog = new System.Windows.Forms.OpenFileDialog
+                System.Windows.Forms.OpenFileDialog openFileDialog = null;
+                try
                 {
-                    Filter = "Booking data files (*.csv)|*.csv",
-                    RestoreDirectory = true
-                };
+                    openFileDialog = new System.Windows.Forms.OpenFileDialog
+                    {
+                        Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
+                    };
 
-                if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                {
-                    return;
+                    if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    this.ImportData.Clear();
+
+                    // note, the stream is disposed by the reader
+                    var stream = new FileStream(
+                        openFileDialog.FileName, FileMode.Open, FileAccess.Read,
+                        FileShare.ReadWrite);
+                    var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
+                    using (var reader = new StreamReader(stream, enc1252))
+                    {
+                        this.ImportBookings(reader, new Configuration());
+                    }
+
+                    if (!this.ImportData.Any())
+                    {
+                        this.messageBox.Show($"No relevant data found in {openFileDialog.FileName}.", "Import");
+                    }
                 }
-
-                this.ImportData.Clear();
-
-                // note, the stream is disposed by the reader
-                var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-                using (var reader = new StreamReader(stream, enc1252))
+                catch (IOException e)
                 {
-                    this.ImportBookings(reader, new Configuration());
+                    this.messageBox.Show($"Failed to load file '{openFileDialog.FileName}':\n{e.Message}", "Import");
                 }
-
-                if (!this.ImportData.Any())
+                finally
                 {
-                    this.messageBox.Show($"No relevant data found in {openFileDialog.FileName}.", "Import");
+                    openFileDialog?.Dispose();
                 }
-            }
-            catch (IOException e)
-            {
-                this.messageBox.Show($"Failed to load file '{openFileDialog.FileName}':\n{e.Message}", "Import");
-            }
-            finally
-            {
-                openFileDialog?.Dispose();
-            }
-        }, _ => this.SelectedAccount != null);
+            }, _ => this.SelectedAccount != null);
 
         public ICommand BookAllCommand => new RelayCommand(
             _ => this.ProcessData(),
@@ -133,7 +145,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source;
 
             var lastEntry = this.Journal?.Booking?
-                .Where(x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) || x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
+                .Where(
+                    x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) ||
+                         x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
                 .OrderBy(x => x.Date)
                 .LastOrDefault();
             if (lastEntry != null)
@@ -141,22 +155,20 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
             }
 
-            using (var csv = new CsvReader(reader, configuration))
+            using var csv = new CsvReader(reader, configuration);
+            csv.Read();
+            if (!csv.ReadHeader())
             {
-                csv.Read();
-                if (!csv.ReadHeader())
-                {
-                    return;
-                }
+                return;
+            }
 
-                while (csv.Read())
-                {
-                    this.ImportBooking(csv, dateField, nameField, textField, valueField);
-                }
+            while (csv.Read())
+            {
+                this.ImportBooking(csv, dateField, nameField, textField, valueField);
             }
         }
 
-        private void ImportBooking(
+        internal void ImportBooking(
             CsvReader csv,
             string dateField,
             string nameField,
@@ -176,15 +188,15 @@ namespace lg2de.SimpleAccounting.Presentation
             string text = string.Empty;
             if (nameField != null)
             {
-                csv.TryGetField<string>(nameField, out name);
+                csv.TryGetField(nameField, out name);
             }
 
             if (textField != null)
             {
-                csv.TryGetField<string>(textField.Source, out text);
+                csv.TryGetField(textField.Source, out text);
                 if (!string.IsNullOrEmpty(textField.IgnorePattern))
                 {
-                    text = Regex.Replace(text, textField?.IgnorePattern, string.Empty);
+                    text = Regex.Replace(text, textField.IgnorePattern, string.Empty);
                 }
             }
 
@@ -233,13 +245,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var newBooking = new AccountingDataJournalBooking
                 {
-                    Date = importing.Date.ToAccountingDate(),
-                    ID = importing.Identifier
+                    Date = importing.Date.ToAccountingDate(), ID = importing.Identifier
                 };
-                var creditValue = new BookingValue
-                {
-                    Value = (long)Math.Abs(Math.Round(importing.Value * 100))
-                };
+                var creditValue = new BookingValue { Value = (long)Math.Abs(Math.Round(importing.Value * 100)) };
 
                 // build booking text from name and/or text
                 if (string.IsNullOrWhiteSpace(importing.Text))
