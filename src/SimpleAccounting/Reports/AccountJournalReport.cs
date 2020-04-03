@@ -6,14 +6,17 @@ namespace lg2de.SimpleAccounting.Reports
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-#pragma warning disable S4055 // string literals => pending translation
-
+    [SuppressMessage(
+        "Major Code Smell",
+        "S4055:Literals should not be passed as localized parameters",
+        Justification = "pending translation")]
     internal class AccountJournalReport : ReportBase, IAccountJournalReport
     {
         public const string ResourceName = "AccountJournal.xml";

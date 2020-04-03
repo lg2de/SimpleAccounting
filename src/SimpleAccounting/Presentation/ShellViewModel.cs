@@ -28,12 +28,14 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Reports;
     using Octokit;
 
-#pragma warning disable S4055 // string literals => pending translation
-
     [SuppressMessage(
         "Critical Code Smell",
         "S2365:Properties should not make collection or array copies",
         Justification = "<Pending>")]
+    [SuppressMessage(
+        "Major Code Smell",
+        "S4055:Literals should not be passed as localized parameters",
+        Justification = "pending translation")]
     internal class ShellViewModel : Conductor<IScreen>, IDisposable
     {
         private const string GithubDomain = "github.com";
@@ -148,7 +150,8 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var openFileDialog = new OpenFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml",
+                    RestoreDirectory = true
                 };
 
                 if (openFileDialog.ShowDialog() != DialogResult.OK)
@@ -171,7 +174,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 var bookingModel = new AddBookingViewModel(
                     this,
                     this.currentModelJournal.DateStart.ToDateTime(),
-                    this.currentModelJournal.DateEnd.ToDateTime()) { BookingNumber = this.GetMaxBookIdent() + 1 };
+                    this.currentModelJournal.DateEnd.ToDateTime())
+                { BookingNumber = this.GetMaxBookIdent() + 1 };
                 bookingModel.Accounts.AddRange(
                     this.ShowInactiveAccounts
                         ? this.accountingData.AllAccounts
@@ -181,7 +185,10 @@ namespace lg2de.SimpleAccounting.Presentation
                     .Select(
                         t => new BookingTemplate
                         {
-                            Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor
+                            Text = t.Text,
+                            Credit = t.Credit,
+                            Debit = t.Debit,
+                            Value = t.Value / CentFactor
                         })
                     .ToList().ForEach(bookingModel.BindingTemplates.Add);
                 this.windowManager.ShowDialog(bookingModel);
@@ -786,7 +793,8 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml",
+                    RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -935,7 +943,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 newYearJournal.Booking.Add(newBooking);
                 var newDebit = new BookingValue
                 {
-                    Value = Math.Abs(creditAmount - debitAmount), Text = $"Eröffnungsbetrag {bookingId}"
+                    Value = Math.Abs(creditAmount - debitAmount),
+                    Text = $"Eröffnungsbetrag {bookingId}"
                 };
                 newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };

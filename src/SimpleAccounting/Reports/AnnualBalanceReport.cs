@@ -12,8 +12,10 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-#pragma warning disable S4055 // string literals => pending translation
-
+    [SuppressMessage(
+        "Major Code Smell",
+        "S4055:Literals should not be passed as localized parameters",
+        Justification = "pending translation")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     [SuppressMessage("ReSharper", "CommentTypo")]
     internal class AnnualBalanceReport : ReportBase
