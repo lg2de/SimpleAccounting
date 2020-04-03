@@ -8,6 +8,10 @@
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=security_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 
+**SimpleAccounting** is a simple software for accounting.
+It supports double-entry accounting including different reports.
+Bookings can be imported from text files.
+
 I started `SimpleAccounting` around 2005, only for my personal use to manage accounts and balances of a small club.
 In 2019, I met a colleague from another small club who was looking for a simple solution to get an overview of the balances of several logical and real accounts.
 
@@ -63,7 +67,7 @@ Maybe you want to help with the introduction of a localized user interface?
 
 ## Roadmap
 
-The first public release is [available](https://github.com/lg2de/SimpleAccounting/releases).
+The public releases are [available](https://github.com/lg2de/SimpleAccounting/releases).
 Please download, test and send feedback.
 
 The roadmap is defined by issues and milestones.
