@@ -150,8 +150,9 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void ProcessAccount(XmlNode dataNode, AccountDefinition account)
         {
-            if (this.YearData.Booking.All(b =>
-                b.Debit.All(x => x.Account != account.ID) && b.Credit.All(x => x.Account != account.ID)))
+            if (this.YearData.Booking.All(
+                b =>
+                    b.Debit.All(x => x.Account != account.ID) && b.Credit.All(x => x.Account != account.ID)))
             {
                 return;
             }

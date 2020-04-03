@@ -198,7 +198,9 @@ namespace lg2de.SimpleAccounting.Reports
                 dataItemNode = dataItemNode.Clone();
                 dataLineNode.AppendChild(dataItemNode);
 
-                dataItemNode.InnerText = entry.Credit.Count == 1 ? entry.Credit[0].Account.ToString(CultureInfo.InvariantCulture) : "Diverse";
+                dataItemNode.InnerText = entry.Credit.Count == 1
+                    ? entry.Credit[0].Account.ToString(CultureInfo.InvariantCulture)
+                    : "Diverse";
 
                 return dataLineNode;
             }
@@ -221,7 +223,9 @@ namespace lg2de.SimpleAccounting.Reports
             dataItemNode = dataItemNode.Clone();
             dataLineNode.AppendChild(dataItemNode);
 
-            dataItemNode.InnerText = entry.Credit.Count == 1 ? entry.Debit[0].Account.ToString(CultureInfo.InvariantCulture) : "Diverse";
+            dataItemNode.InnerText = entry.Credit.Count == 1
+                ? entry.Debit[0].Account.ToString(CultureInfo.InvariantCulture)
+                : "Diverse";
 
             return dataLineNode;
         }

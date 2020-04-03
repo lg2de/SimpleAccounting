@@ -94,10 +94,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                                 {
                                     ID = 6000, Name = "Friends debit", Type = AccountDefinitionType.Debit
                                 },
-                                new AccountDefinition
-                                {
-                                    ID = 9999, Name = "Inactive", Active = false
-                                }
+                                new AccountDefinition { ID = 9999, Name = "Inactive", Active = false }
                             }
                         }
                     },
@@ -133,17 +130,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 101,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 990, Text = "Open 1", Value = 100000
-                        }
+                        new BookingValue { Account = 990, Text = "Open 1", Value = 100000 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 100, Text = "Open 1", Value = 100000
-                        }
+                        new BookingValue { Account = 100, Text = "Open 1", Value = 100000 }
                     },
                     Opening = true
                 };
@@ -154,17 +145,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 101,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 5000, Text = "Open 2", Value = 300000
-                        }
+                        new BookingValue { Account = 5000, Text = "Open 2", Value = 300000 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 990, Text = "Open 2", Value = 300000
-                        }
+                        new BookingValue { Account = 990, Text = "Open 2", Value = 300000 }
                     },
                     Opening = true
                 };
@@ -175,21 +160,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 128,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 400, Text = "Salary1", Value = 10000
-                        },
-                        new BookingValue
-                        {
-                            Account = 400, Text = "Salary2", Value = 10000
-                        }
+                        new BookingValue { Account = 400, Text = "Salary1", Value = 10000 },
+                        new BookingValue { Account = 400, Text = "Salary2", Value = 10000 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 100, Text = "Salary", Value = 20000
-                        }
+                        new BookingValue { Account = 100, Text = "Salary", Value = 20000 }
                     }
                 };
                 yield return new AccountingDataJournalBooking
@@ -198,17 +174,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 129,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 100, Text = "Credit rate", Value = 40000
-                        },
+                        new BookingValue { Account = 100, Text = "Credit rate", Value = 40000 },
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 5000, Text = "Credit rate", Value = 40000
-                        }
+                        new BookingValue { Account = 5000, Text = "Credit rate", Value = 40000 }
                     }
                 };
 
@@ -218,21 +188,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 201,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 100, Text = "Shoes", Value = 5000
-                        }
+                        new BookingValue { Account = 100, Text = "Shoes", Value = 5000 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 600, Text = "Shoes1", Value = 2000
-                        },
-                        new BookingValue
-                        {
-                            Account = 600, Text = "Shoes2", Value = 3000
-                        }
+                        new BookingValue { Account = 600, Text = "Shoes1", Value = 2000 },
+                        new BookingValue { Account = 600, Text = "Shoes2", Value = 3000 }
                     }
                 };
 
@@ -242,17 +203,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 205,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 100, Text = "Rent to friend", Value = 9900
-                        }
+                        new BookingValue { Account = 100, Text = "Rent to friend", Value = 9900 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue
-                        {
-                            Account = 6000, Text = "Rent to friend", Value = 9900
-                        }
+                        new BookingValue { Account = 6000, Text = "Rent to friend", Value = 9900 }
                     }
                 };
             }

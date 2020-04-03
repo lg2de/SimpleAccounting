@@ -91,8 +91,7 @@ namespace lg2de.SimpleAccounting.Reports
 
             using (var dialog = new PrintPreviewDialog
             {
-                Document = printDocument,
-                WindowState = FormWindowState.Maximized,
+                Document = printDocument, WindowState = FormWindowState.Maximized,
             })
             {
                 dialog.ShowDialog();

@@ -51,8 +51,7 @@ namespace lg2de.SimpleAccounting
             // works of ShellView is Window or UserControl
             var settings = new Dictionary<string, object>
             {
-                { "SizeToContent", SizeToContent.Manual },
-                { "WindowState", WindowState.Maximized }
+                { "SizeToContent", SizeToContent.Manual }, { "WindowState", WindowState.Maximized }
             };
             this.DisplayRootViewFor<ShellViewModel>(settings);
         }

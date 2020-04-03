@@ -108,8 +108,9 @@ namespace lg2de.SimpleAccounting.Reports
             var liabilityNode = this.PrintDocument.SelectSingleNode("//table/data[@target='liability']");
             totalReceivable = 0;
             totalLiability = 0;
-            var accounts = this.allAccounts.Where(a =>
-                a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
+            var accounts = this.allAccounts.Where(
+                a =>
+                    a.Type == AccountDefinitionType.Debit || a.Type == AccountDefinitionType.Credit);
             foreach (var account in accounts)
             {
                 long balance = this.GetAccountBalance(account, creditFromDebit: false);

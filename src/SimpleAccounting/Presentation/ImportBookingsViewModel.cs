@@ -44,10 +44,13 @@ namespace lg2de.SimpleAccounting.Presentation
         }
 
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
-            .Where(a =>
-                a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) == true
-                && a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) ==
-                true);
+            .Where(
+                a =>
+                    a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) ==
+                    true
+                    && a.ImportMapping?.Columns.Any(
+                        x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) ==
+                    true);
 
         public DateTime RangeMin { get; internal set; }
 
@@ -77,47 +80,50 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<ImportEntryViewModel> ImportData { get; }
             = new ObservableCollection<ImportEntryViewModel>();
 
-        [SuppressMessage("Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
-        public ICommand LoadDataCommand => new RelayCommand(_ =>
-        {
-            System.Windows.Forms.OpenFileDialog openFileDialog = null;
-            try
+        [SuppressMessage(
+            "Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
+        public ICommand LoadDataCommand => new RelayCommand(
+            _ =>
             {
-                openFileDialog = new System.Windows.Forms.OpenFileDialog
+                System.Windows.Forms.OpenFileDialog openFileDialog = null;
+                try
                 {
-                    Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
-                };
+                    openFileDialog = new System.Windows.Forms.OpenFileDialog
+                    {
+                        Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
+                    };
 
-                if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                {
-                    return;
+                    if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    this.ImportData.Clear();
+
+                    // note, the stream is disposed by the reader
+                    var stream = new FileStream(
+                        openFileDialog.FileName, FileMode.Open, FileAccess.Read,
+                        FileShare.ReadWrite);
+                    var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
+                    using (var reader = new StreamReader(stream, enc1252))
+                    {
+                        this.ImportBookings(reader, new Configuration());
+                    }
+
+                    if (!this.ImportData.Any())
+                    {
+                        this.messageBox.Show($"No relevant data found in {openFileDialog.FileName}.", "Import");
+                    }
                 }
-
-                this.ImportData.Clear();
-
-                // note, the stream is disposed by the reader
-                var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read,
-                    FileShare.ReadWrite);
-                var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-                using (var reader = new StreamReader(stream, enc1252))
+                catch (IOException e)
                 {
-                    this.ImportBookings(reader, new Configuration());
+                    this.messageBox.Show($"Failed to load file '{openFileDialog.FileName}':\n{e.Message}", "Import");
                 }
-
-                if (!this.ImportData.Any())
+                finally
                 {
-                    this.messageBox.Show($"No relevant data found in {openFileDialog.FileName}.", "Import");
+                    openFileDialog?.Dispose();
                 }
-            }
-            catch (IOException e)
-            {
-                this.messageBox.Show($"Failed to load file '{openFileDialog.FileName}':\n{e.Message}", "Import");
-            }
-            finally
-            {
-                openFileDialog?.Dispose();
-            }
-        }, _ => this.SelectedAccount != null);
+            }, _ => this.SelectedAccount != null);
 
         public ICommand BookAllCommand => new RelayCommand(
             _ => this.ProcessData(),
@@ -139,8 +145,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source;
 
             var lastEntry = this.Journal?.Booking?
-                .Where(x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) ||
-                            x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
+                .Where(
+                    x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) ||
+                         x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
                 .OrderBy(x => x.Date)
                 .LastOrDefault();
             if (lastEntry != null)

@@ -52,7 +52,8 @@ Date;Name;Text;Value
 2020-01-01;Name2;Text2;-42.42";
             using (var inputStream = new StringReader(input))
             {
-                sut.ImportBookings(inputStream,
+                sut.ImportBookings(
+                    inputStream,
                     new Configuration { Delimiter = ";", CultureInfo = new CultureInfo("en-us") });
             }
 
@@ -81,39 +82,43 @@ Date;Name;Text;Value
             sut.SelectedAccount = accounts.Single(x => x.Name == "Bank account");
             sut.SelectedAccountNumber = sut.SelectedAccount.ID;
             var remoteAccount = accounts.Single(x => x.ID == 600);
-            sut.ImportData.Add(new ImportEntryViewModel
-            {
-                Date = new DateTime(2020, 1, 1),
-                Identifier = 101,
-                Name = "Name",
-                Text = "Text",
-                Value = 1,
-                RemoteAccount = remoteAccount
-            });
-            sut.ImportData.Add(new ImportEntryViewModel
-            {
-                Date = new DateTime(2020, 1, 2),
-                Identifier = 102,
-                Text = "Text",
-                Value = 2,
-                RemoteAccount = remoteAccount
-            });
-            sut.ImportData.Add(new ImportEntryViewModel
-            {
-                Date = new DateTime(2020, 1, 3),
-                Identifier = 103,
-                Name = "Name",
-                Value = -1,
-                RemoteAccount = remoteAccount
-            });
-            sut.ImportData.Add(new ImportEntryViewModel
-            {
-                Date = new DateTime(2020, 1, 3),
-                Identifier = 104,
-                Name = "Ignore",
-                Value = -2,
-                RemoteAccount = null
-            });
+            sut.ImportData.Add(
+                new ImportEntryViewModel
+                {
+                    Date = new DateTime(2020, 1, 1),
+                    Identifier = 101,
+                    Name = "Name",
+                    Text = "Text",
+                    Value = 1,
+                    RemoteAccount = remoteAccount
+                });
+            sut.ImportData.Add(
+                new ImportEntryViewModel
+                {
+                    Date = new DateTime(2020, 1, 2),
+                    Identifier = 102,
+                    Text = "Text",
+                    Value = 2,
+                    RemoteAccount = remoteAccount
+                });
+            sut.ImportData.Add(
+                new ImportEntryViewModel
+                {
+                    Date = new DateTime(2020, 1, 3),
+                    Identifier = 103,
+                    Name = "Name",
+                    Value = -1,
+                    RemoteAccount = remoteAccount
+                });
+            sut.ImportData.Add(
+                new ImportEntryViewModel
+                {
+                    Date = new DateTime(2020, 1, 3),
+                    Identifier = 104,
+                    Name = "Ignore",
+                    Value = -2,
+                    RemoteAccount = null
+                });
 
             sut.ProcessData();
 

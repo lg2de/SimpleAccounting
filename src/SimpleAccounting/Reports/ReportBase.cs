@@ -13,10 +13,9 @@ namespace lg2de.SimpleAccounting.Reports
 
     internal class ReportBase
     {
+        protected const int TitleSize = 10;
         private readonly CultureInfo culture;
         private readonly AccountingDataSetup setup;
-
-        protected const int TitleSize = 10;
 
         protected ReportBase(
             string resourceName,

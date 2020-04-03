@@ -134,14 +134,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 };
                 var debitValue = creditValue.Clone();
                 debitValue.Account = this.DebitAccount;
-                newBooking.Credit = new List<BookingValue>
-                {
-                    creditValue
-                };
-                newBooking.Debit = new List<BookingValue>
-                {
-                    debitValue
-                };
+                newBooking.Credit = new List<BookingValue> { creditValue };
+                newBooking.Debit = new List<BookingValue> { debitValue };
                 this.parent.AddBooking(newBooking);
 
                 // update for next booking

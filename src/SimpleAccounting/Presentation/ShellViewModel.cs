@@ -150,8 +150,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var openFileDialog = new OpenFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml",
-                    RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
                 };
 
                 if (openFileDialog.ShowDialog() != DialogResult.OK)
@@ -174,8 +173,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var bookingModel = new AddBookingViewModel(
                     this,
                     this.currentModelJournal.DateStart.ToDateTime(),
-                    this.currentModelJournal.DateEnd.ToDateTime())
-                { BookingNumber = this.GetMaxBookIdent() + 1 };
+                    this.currentModelJournal.DateEnd.ToDateTime()) { BookingNumber = this.GetMaxBookIdent() + 1 };
                 bookingModel.Accounts.AddRange(
                     this.ShowInactiveAccounts
                         ? this.accountingData.AllAccounts
@@ -185,10 +183,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     .Select(
                         t => new BookingTemplate
                         {
-                            Text = t.Text,
-                            Credit = t.Credit,
-                            Debit = t.Debit,
-                            Value = t.Value / CentFactor
+                            Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor
                         })
                     .ToList().ForEach(bookingModel.BindingTemplates.Add);
                 this.windowManager.ShowDialog(bookingModel);
@@ -793,8 +788,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml",
-                    RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -943,8 +937,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 newYearJournal.Booking.Add(newBooking);
                 var newDebit = new BookingValue
                 {
-                    Value = Math.Abs(creditAmount - debitAmount),
-                    Text = $"Eröffnungsbetrag {bookingId}"
+                    Value = Math.Abs(creditAmount - debitAmount), Text = $"Eröffnungsbetrag {bookingId}"
                 };
                 newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };

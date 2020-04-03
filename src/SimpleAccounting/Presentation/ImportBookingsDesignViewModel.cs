@@ -11,9 +11,11 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Linq;
     using lg2de.SimpleAccounting.Model;
 
-    [SuppressMessage("Major Code Smell", "S109:Magic numbers should not be used",
+    [SuppressMessage(
+        "Major Code Smell", "S109:Magic numbers should not be used",
         Justification = "Design view model defines useful values")]
-    [SuppressMessage("Major Code Smell", "S4055:Literals should not be passed as localized parameters",
+    [SuppressMessage(
+        "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
         Justification = "Design view model defines useful values")]
     internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     {
