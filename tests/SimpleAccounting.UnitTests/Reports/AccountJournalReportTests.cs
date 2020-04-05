@@ -82,7 +82,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 }
             };
             var setup = new AccountingDataSetup();
-            var sut = new AccountJournalReport(accounts, journal, setup, new CultureInfo("en-us"))
+            var sut = new AccountJournalReport(journal, accounts, setup, new CultureInfo("en-us"))
             {
                 PageBreakBetweenAccounts = pageBreakBetweenAccounts
             };

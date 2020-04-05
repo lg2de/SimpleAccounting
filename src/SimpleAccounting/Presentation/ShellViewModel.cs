@@ -230,10 +230,9 @@ namespace lg2de.SimpleAccounting.Presentation
             _ =>
             {
                 var report = this.reportFactory.CreateAccountJournal(
-                    this.accountingData.Accounts.SelectMany(a => a.Account),
                     this.currentModelJournal,
-                    this.accountingData.Setup,
-                    CultureInfo.CurrentUICulture);
+                    this.accountingData.Accounts.SelectMany(a => a.Account),
+                    this.accountingData.Setup, CultureInfo.CurrentUICulture);
                 report.PageBreakBetweenAccounts =
                     this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
                 const string title = "Kontoblätter";
@@ -288,7 +287,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand AnnualBalanceReportCommand => new RelayCommand(
             _ =>
             {
-                var report = new AnnualBalanceReport(
+                var report = this.reportFactory.CreateAnnualBalance(
                     this.currentModelJournal,
                     this.accountingData.AllAccounts,
                     this.accountingData.Setup,

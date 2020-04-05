@@ -222,10 +222,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IReportFactory reportFactory);
             var accountJournalReport = Substitute.For<IAccountJournalReport>();
             reportFactory.CreateAccountJournal(
-                Arg.Any<IEnumerable<AccountDefinition>>(),
                 Arg.Any<AccountingDataJournal>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(accountJournalReport);
+                Arg.Any<IEnumerable<AccountDefinition>>(),
+                Arg.Any<AccountingDataSetup>(), Arg.Any<CultureInfo>()).Returns(accountJournalReport);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AccountJournalReportCommand.Execute(null);
@@ -380,6 +379,24 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var _ = new AssertionScope();
             vm.BookingNumber.Should().Be(1);
             vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts);
+        }
+
+        [Fact]
+        public void AnnualBalanceReportCommand_HappyPath_Completed()
+        {
+            var sut = CreateSut(out IReportFactory reportFactory);
+            var annualBalanceReport = Substitute.For<IAnnualBalanceReport>();
+            reportFactory.CreateAnnualBalance(
+                Arg.Any<AccountingDataJournal>(),
+                Arg.Any<IEnumerable<AccountDefinition>>(),
+                Arg.Any<AccountingDataSetup>(),
+                Arg.Any<CultureInfo>()).Returns(annualBalanceReport);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.AnnualBalanceReportCommand.Execute(null);
+
+            annualBalanceReport.Received(1)
+                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
         }
 
         [Fact]

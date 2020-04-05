@@ -11,8 +11,14 @@ namespace lg2de.SimpleAccounting.Reports
     internal interface IReportFactory
     {
         IAccountJournalReport CreateAccountJournal(
-            IEnumerable<AccountDefinition> accounts,
             AccountingDataJournal journal,
+            IEnumerable<AccountDefinition> accounts,
+            AccountingDataSetup setup,
+            CultureInfo culture);
+
+        IAnnualBalanceReport CreateAnnualBalance(
+            AccountingDataJournal journal,
+            IEnumerable<AccountDefinition> accounts,
             AccountingDataSetup setup,
             CultureInfo culture);
     }

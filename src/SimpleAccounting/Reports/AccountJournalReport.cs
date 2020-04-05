@@ -28,8 +28,8 @@ namespace lg2de.SimpleAccounting.Reports
         private bool firstAccount;
 
         public AccountJournalReport(
-            IEnumerable<AccountDefinition> accounts,
             AccountingDataJournal yearData,
+            IEnumerable<AccountDefinition> accounts,
             AccountingDataSetup setup,
             CultureInfo culture)
             : base(ResourceName, setup, yearData, culture)

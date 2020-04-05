@@ -13,12 +13,21 @@ namespace lg2de.SimpleAccounting.Reports
     internal class ReportFactory : IReportFactory
     {
         public IAccountJournalReport CreateAccountJournal(
-            IEnumerable<AccountDefinition> accounts,
             AccountingDataJournal journal,
+            IEnumerable<AccountDefinition> accounts,
             AccountingDataSetup setup,
             CultureInfo culture)
         {
-            return new AccountJournalReport(accounts, journal, setup, culture);
+            return new AccountJournalReport(journal, accounts, setup, culture);
+        }
+
+        public IAnnualBalanceReport CreateAnnualBalance(
+            AccountingDataJournal journal,
+            IEnumerable<AccountDefinition> accounts,
+            AccountingDataSetup setup,
+            CultureInfo culture)
+        {
+            return new AnnualBalanceReport(journal, accounts, setup, culture);
         }
     }
 }
