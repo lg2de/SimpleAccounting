@@ -29,5 +29,14 @@ namespace lg2de.SimpleAccounting.Reports
         {
             return new AnnualBalanceReport(journal, accounts, setup, culture);
         }
+
+        public ITotalsAndBalancesReport CreateTotalsAndBalances(
+            AccountingDataJournal journal,
+            IEnumerable<AccountingDataAccountGroup> accounts,
+            AccountingDataSetup setup,
+            CultureInfo culture)
+        {
+            return new TotalsAndBalancesReport(journal, accounts, setup, culture);
+        }
     }
 }

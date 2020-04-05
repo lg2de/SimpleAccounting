@@ -60,7 +60,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"firm\"]");
-            textNode.InnerText = this.setup.Name;
+            textNode.InnerText = this.setup?.Name;
 
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"yearName\"]");
             if (textNode != null)
@@ -77,7 +77,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"date\"]");
-            textNode.InnerText = this.setup.Location + ", " + DateTime.Now.ToString("D", this.culture);
+            textNode.InnerText = this.setup?.Location + ", " + DateTime.Now.ToString("D", this.culture);
         }
     }
 }

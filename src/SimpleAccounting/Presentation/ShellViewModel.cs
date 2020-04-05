@@ -244,7 +244,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand TotalsAndBalancesReportCommand => new RelayCommand(
             _ =>
             {
-                var report = new TotalsAndBalancesReport(
+                var report = this.reportFactory.CreateTotalsAndBalances(
                     this.currentModelJournal,
                     this.accountingData.Accounts,
                     this.accountingData.Setup,
@@ -272,12 +272,12 @@ namespace lg2de.SimpleAccounting.Presentation
                     accountGroups.Add(new AccountingDataAccountGroup { Name = group.Name, Account = assertAccounts });
                 }
 
-                var report = new TotalsAndBalancesReport(
+                var report = this.reportFactory.CreateTotalsAndBalances(
                     this.currentModelJournal,
                     accountGroups,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
-                this.accountingData.Setup.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
+                this.accountingData.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
                 const string title = "Bestandskontosalden";
                 report.CreateReport(title);
                 report.ShowPreview(title);

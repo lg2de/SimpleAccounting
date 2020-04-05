@@ -16,7 +16,7 @@ namespace lg2de.SimpleAccounting.Reports
         "Major Code Smell",
         "S4055:Literals should not be passed as localized parameters",
         Justification = "pending translation")]
-    internal class TotalsAndBalancesReport : ReportBase
+    internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
     {
         public const string ResourceName = "TotalsAndBalances.xml";
 
@@ -39,12 +39,12 @@ namespace lg2de.SimpleAccounting.Reports
 
         public TotalsAndBalancesReport(
             AccountingDataJournal yearData,
-            List<AccountingDataAccountGroup> accountGroups,
+            IEnumerable<AccountingDataAccountGroup> accountGroups,
             AccountingDataSetup setup,
             CultureInfo culture)
             : base(ResourceName, setup, yearData, culture)
         {
-            this.accountGroups = accountGroups;
+            this.accountGroups = accountGroups.ToList();
             this.culture = culture;
         }
 

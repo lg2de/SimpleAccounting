@@ -417,6 +417,24 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void AssetBalancesReportCommand_HappyPath_Completed()
+        {
+            var sut = CreateSut(out IReportFactory reportFactory);
+            var assetBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
+            reportFactory.CreateTotalsAndBalances(
+                Arg.Any<AccountingDataJournal>(),
+                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
+                Arg.Any<AccountingDataSetup>(),
+                Arg.Any<CultureInfo>()).Returns(assetBalancesReport);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.AssetBalancesReportCommand.Execute(null);
+
+            assetBalancesReport.Received(1)
+                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
+        }
+
+        [Fact]
         public void AssetBalancesReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
@@ -1111,6 +1129,24 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Name = "Bank credit" },
                 new { Name = "Friends debit" },
                 new { Name = "Inactive" });
+        }
+
+        [Fact]
+        public void TotalsAndBalancesReportCommand_HappyPath_Completed()
+        {
+            var sut = CreateSut(out IReportFactory reportFactory);
+            var totalsAndBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
+            reportFactory.CreateTotalsAndBalances(
+                Arg.Any<AccountingDataJournal>(),
+                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
+                Arg.Any<AccountingDataSetup>(),
+                Arg.Any<CultureInfo>()).Returns(totalsAndBalancesReport);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.TotalsAndBalancesReportCommand.Execute(null);
+
+            totalsAndBalancesReport.Received(1)
+                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
         }
 
         [Fact]

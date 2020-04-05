@@ -21,5 +21,11 @@ namespace lg2de.SimpleAccounting.Reports
             IEnumerable<AccountDefinition> accounts,
             AccountingDataSetup setup,
             CultureInfo culture);
+
+        ITotalsAndBalancesReport CreateTotalsAndBalances(
+            AccountingDataJournal journal,
+            IEnumerable<AccountingDataAccountGroup> accounts,
+            AccountingDataSetup setup,
+            CultureInfo culture);
     }
 }
