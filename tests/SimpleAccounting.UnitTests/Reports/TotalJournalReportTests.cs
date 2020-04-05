@@ -25,7 +25,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             AccountingDataJournal journal = project.Journal.Last();
             var sut = new TotalJournalReport(journal, setup, new CultureInfo("en-us"));
 
-            sut.CreateReport();
+            sut.CreateReport("dummy");
 
             var expected = @"
 <data>

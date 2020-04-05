@@ -82,10 +82,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 }
             };
             var setup = new AccountingDataSetup();
-            var sut = new AccountJournalReport(accounts, journal, setup, new CultureInfo("en-us"));
-            sut.PageBreakBetweenAccounts = pageBreakBetweenAccounts;
+            var sut = new AccountJournalReport(accounts, journal, setup, new CultureInfo("en-us"))
+            {
+                PageBreakBetweenAccounts = pageBreakBetweenAccounts
+            };
 
-            sut.CreateReport();
+            sut.CreateReport("dummy");
 
             var expectedMoney = @"
 <data>
@@ -169,7 +171,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     </tr>
 </data>";
 
-            var rootElements = sut.DocumentForTests.Element("xEport").Elements().Select(e => e.Name).Should().Equal(
+            sut.DocumentForTests.Element("xEport").Elements().Select(e => e.Name).Should().Equal(
                 "pageTexts",
                 "font", // header
                 "text",

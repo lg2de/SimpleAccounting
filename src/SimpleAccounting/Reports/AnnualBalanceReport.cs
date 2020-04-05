@@ -37,9 +37,9 @@ namespace lg2de.SimpleAccounting.Reports
             this.culture = culture;
         }
 
-        public void CreateReport()
+        public void CreateReport(string title)
         {
-            this.PreparePrintDocument();
+            this.PreparePrintDocument(title);
 
             // income / Einnahmen
             this.ProcessIncome(out var totalIncome);

@@ -29,7 +29,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 setup,
                 new CultureInfo("en-us"));
 
-            sut.CreateReport();
+            sut.CreateReport("dummy");
 
             //using var _ = new AssertionScope();
 

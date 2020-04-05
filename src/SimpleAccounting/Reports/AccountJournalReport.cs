@@ -43,9 +43,9 @@ namespace lg2de.SimpleAccounting.Reports
         /// </summary>
         public bool PageBreakBetweenAccounts { get; set; }
 
-        public void CreateReport()
+        public void CreateReport(string title)
         {
-            this.PreparePrintDocument();
+            this.PreparePrintDocument(title);
 
             XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table");
 

@@ -45,9 +45,21 @@ namespace lg2de.SimpleAccounting.Reports
             this.Printer.PrintDocument($"{this.PrintingDate:yyyy-MM-dd} {documentName} {this.YearData.Year}");
         }
 
-        protected void PreparePrintDocument()
+        protected void PreparePrintDocument(string title)
         {
-            var textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"firm\"]");
+            var textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"title\"]");
+            if (textNode != null)
+            {
+                textNode.InnerText = title;
+            }
+
+            textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"pageTitle\"]");
+            if (textNode != null)
+            {
+                textNode.InnerText = $"- {title} -";
+            }
+
+            textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"firm\"]");
             textNode.InnerText = this.setup.Name;
 
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"yearName\"]");

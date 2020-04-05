@@ -8,7 +8,7 @@ namespace lg2de.SimpleAccounting.Reports
     {
         bool PageBreakBetweenAccounts { get; set; }
 
-        void CreateReport();
+        void CreateReport(string title);
 
         void ShowPreview(string documentName);
     }

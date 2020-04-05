@@ -25,7 +25,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             AccountingDataJournal journal = project.Journal.Last();
             var sut = new TotalsAndBalancesReport(journal, project.Accounts, setup, new CultureInfo("en-us"));
 
-            sut.CreateReport();
+            sut.CreateReport("dummy");
 
             var expected = @"
 <data>
@@ -142,7 +142,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var sut = new TotalsAndBalancesReport(journal, project.Accounts, setup, new CultureInfo("en-us"));
             sut.Signatures.Add("The Name");
 
-            sut.CreateReport();
+            sut.CreateReport("dummy");
 
             sut.DocumentForTests.XPathSelectElements("//text[@tag='signature']")
                 .Select(x => x.Value).Should().Equal("The Name");

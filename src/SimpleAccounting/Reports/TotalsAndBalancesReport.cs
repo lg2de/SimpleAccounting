@@ -50,9 +50,9 @@ namespace lg2de.SimpleAccounting.Reports
 
         public List<string> Signatures { get; } = new List<string>();
 
-        public void CreateReport()
+        public void CreateReport(string title)
         {
-            this.PreparePrintDocument();
+            this.PreparePrintDocument(title);
 
             XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data");
 
