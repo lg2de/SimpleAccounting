@@ -18,7 +18,7 @@ namespace lg2de.SimpleAccounting.Reports
         Justification = "pending translation")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     [SuppressMessage("ReSharper", "CommentTypo")]
-    internal class AnnualBalanceReport : ReportBase
+    internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
     {
         public const string ResourceName = "AnnualBalance.xml";
         private const string FourthColumnExpression = "../columns/column[position()=4]";
@@ -37,9 +37,9 @@ namespace lg2de.SimpleAccounting.Reports
             this.culture = culture;
         }
 
-        public void CreateReport()
+        public void CreateReport(string title)
         {
-            this.PreparePrintDocument();
+            this.PreparePrintDocument(title);
 
             // income / Einnahmen
             this.ProcessIncome(out var totalIncome);

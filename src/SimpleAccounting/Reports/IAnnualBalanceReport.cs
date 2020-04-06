@@ -4,10 +4,8 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    internal interface IAccountJournalReport
+    internal interface IAnnualBalanceReport
     {
-        bool PageBreakBetweenAccounts { get; set; }
-
         void CreateReport(string title);
 
         void ShowPreview(string documentName);

@@ -28,8 +28,8 @@ namespace lg2de.SimpleAccounting.Reports
         private bool firstAccount;
 
         public AccountJournalReport(
-            IEnumerable<AccountDefinition> accounts,
             AccountingDataJournal yearData,
+            IEnumerable<AccountDefinition> accounts,
             AccountingDataSetup setup,
             CultureInfo culture)
             : base(ResourceName, setup, yearData, culture)
@@ -43,9 +43,9 @@ namespace lg2de.SimpleAccounting.Reports
         /// </summary>
         public bool PageBreakBetweenAccounts { get; set; }
 
-        public void CreateReport()
+        public void CreateReport(string title)
         {
-            this.PreparePrintDocument();
+            this.PreparePrintDocument(title);
 
             XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table");
 

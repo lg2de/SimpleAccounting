@@ -222,10 +222,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IReportFactory reportFactory);
             var accountJournalReport = Substitute.For<IAccountJournalReport>();
             reportFactory.CreateAccountJournal(
-                Arg.Any<IEnumerable<AccountDefinition>>(),
                 Arg.Any<AccountingDataJournal>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(accountJournalReport);
+                Arg.Any<IEnumerable<AccountDefinition>>(),
+                Arg.Any<AccountingDataSetup>(), Arg.Any<CultureInfo>()).Returns(accountJournalReport);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AccountJournalReportCommand.Execute(null);
@@ -383,6 +382,24 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void AnnualBalanceReportCommand_HappyPath_Completed()
+        {
+            var sut = CreateSut(out IReportFactory reportFactory);
+            var annualBalanceReport = Substitute.For<IAnnualBalanceReport>();
+            reportFactory.CreateAnnualBalance(
+                Arg.Any<AccountingDataJournal>(),
+                Arg.Any<IEnumerable<AccountDefinition>>(),
+                Arg.Any<AccountingDataSetup>(),
+                Arg.Any<CultureInfo>()).Returns(annualBalanceReport);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.AnnualBalanceReportCommand.Execute(null);
+
+            annualBalanceReport.Received(1)
+                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
+        }
+
+        [Fact]
         public void AnnualBalanceReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
@@ -397,6 +414,24 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut();
 
             sut.AnnualBalanceReportCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AssetBalancesReportCommand_HappyPath_Completed()
+        {
+            var sut = CreateSut(out IReportFactory reportFactory);
+            var assetBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
+            reportFactory.CreateTotalsAndBalances(
+                Arg.Any<AccountingDataJournal>(),
+                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
+                Arg.Any<AccountingDataSetup>(),
+                Arg.Any<CultureInfo>()).Returns(assetBalancesReport);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.AssetBalancesReportCommand.Execute(null);
+
+            assetBalancesReport.Received(1)
+                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
         }
 
         [Fact]
@@ -1097,6 +1132,23 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void TotalJournalReportCommand_HappyPath_Completed()
+        {
+            var sut = CreateSut(out IReportFactory reportFactory);
+            var totalJournalReport = Substitute.For<ITotalJournalReport>();
+            reportFactory.CreateTotalJournal(
+                Arg.Any<AccountingDataJournal>(),
+                Arg.Any<AccountingDataSetup>(),
+                Arg.Any<CultureInfo>()).Returns(totalJournalReport);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.TotalJournalReportCommand.Execute(null);
+
+            totalJournalReport.Received(1)
+                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
+        }
+
+        [Fact]
         public void TotalJournalReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
@@ -1111,6 +1163,24 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut();
 
             sut.TotalJournalReportCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void TotalsAndBalancesReportCommand_HappyPath_Completed()
+        {
+            var sut = CreateSut(out IReportFactory reportFactory);
+            var totalsAndBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
+            reportFactory.CreateTotalsAndBalances(
+                Arg.Any<AccountingDataJournal>(),
+                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
+                Arg.Any<AccountingDataSetup>(),
+                Arg.Any<CultureInfo>()).Returns(totalsAndBalancesReport);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.TotalsAndBalancesReportCommand.Execute(null);
+
+            totalsAndBalancesReport.Received(1)
+                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
         }
 
         [Fact]

@@ -36,6 +36,7 @@ namespace lg2de.SimpleAccounting.Presentation
         "Major Code Smell",
         "S4055:Literals should not be passed as localized parameters",
         Justification = "pending translation")]
+    [SuppressMessage("ReSharper", "LocalizableElement")]
     internal class ShellViewModel : Conductor<IScreen>, IDisposable
     {
         private const string GithubDomain = "github.com";
@@ -215,12 +216,13 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand TotalJournalReportCommand => new RelayCommand(
             _ =>
             {
-                var report = new TotalJournalReport(
+                var report = this.reportFactory.CreateTotalJournal(
                     this.currentModelJournal,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
-                report.CreateReport();
-                report.ShowPreview("Journal");
+                const string title = "Journal";
+                report.CreateReport(title);
+                report.ShowPreview(title);
             },
             _ => this.FullJournal.Any());
 
@@ -228,27 +230,28 @@ namespace lg2de.SimpleAccounting.Presentation
             _ =>
             {
                 var report = this.reportFactory.CreateAccountJournal(
-                    this.accountingData.Accounts.SelectMany(a => a.Account),
                     this.currentModelJournal,
-                    this.accountingData.Setup,
-                    CultureInfo.CurrentUICulture);
+                    this.accountingData.Accounts.SelectMany(a => a.Account),
+                    this.accountingData.Setup, CultureInfo.CurrentUICulture);
                 report.PageBreakBetweenAccounts =
                     this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
-                report.CreateReport();
-                report.ShowPreview("Kontoblätter");
+                const string title = "Kontoblätter";
+                report.CreateReport(title);
+                report.ShowPreview(title);
             },
             _ => this.FullJournal.Any());
 
         public ICommand TotalsAndBalancesReportCommand => new RelayCommand(
             _ =>
             {
-                var report = new TotalsAndBalancesReport(
+                var report = this.reportFactory.CreateTotalsAndBalances(
                     this.currentModelJournal,
                     this.accountingData.Accounts,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
-                report.CreateReport();
-                report.ShowPreview("Summen und Salden");
+                const string title = "Summen und Salden";
+                report.CreateReport(title);
+                report.ShowPreview(title);
             },
             _ => this.FullJournal.Any());
 
@@ -269,27 +272,29 @@ namespace lg2de.SimpleAccounting.Presentation
                     accountGroups.Add(new AccountingDataAccountGroup { Name = group.Name, Account = assertAccounts });
                 }
 
-                var report = new TotalsAndBalancesReport(
+                var report = this.reportFactory.CreateTotalsAndBalances(
                     this.currentModelJournal,
                     accountGroups,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
-                this.accountingData.Setup.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
-                report.CreateReport();
-                report.ShowPreview("Bestandskontosalden");
+                this.accountingData.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
+                const string title = "Bestandskontosalden";
+                report.CreateReport(title);
+                report.ShowPreview(title);
             },
             _ => this.FullJournal.Any());
 
         public ICommand AnnualBalanceReportCommand => new RelayCommand(
             _ =>
             {
-                var report = new AnnualBalanceReport(
+                var report = this.reportFactory.CreateAnnualBalance(
                     this.currentModelJournal,
                     this.accountingData.AllAccounts,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);
-                report.CreateReport();
-                report.ShowPreview("Jahresbilanz");
+                const string title = "Jahresbilanz";
+                report.CreateReport(title);
+                report.ShowPreview(title);
             },
             _ => this.FullJournal.Any());
 
@@ -645,6 +650,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
             var stream = this.GetType().Assembly.GetManifestResourceStream(
                 "lg2de.SimpleAccounting.UpdateApplication.ps1");
+            if (stream == null)
+            {
+                // script not found :(
+                return;
+            }
+
             using var reader = new StreamReader(stream);
             var script = reader.ReadToEnd();
             string scriptPath = Path.Combine(Path.GetTempPath(), "UpdateApplication.ps1");

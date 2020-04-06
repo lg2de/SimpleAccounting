@@ -4,9 +4,11 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    internal interface IAccountJournalReport
+    using System.Collections.Generic;
+
+    internal interface ITotalsAndBalancesReport
     {
-        bool PageBreakBetweenAccounts { get; set; }
+        List<string> Signatures { get; }
 
         void CreateReport(string title);
 
