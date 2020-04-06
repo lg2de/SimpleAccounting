@@ -45,6 +45,9 @@ jobs:
     - name: Complete SonarScanner
       run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
+    - name: Prepare artifact
+      run: Get-ChildItem .\src\SimpleAccounting\bin\Release\netcoreapp3.1 -Filter *.json | % { if ($_.FullName.EndsWith("runtimeconfig.json") -eq $false) { Remove-Item $_.FullName } }
+      shell: pwsh
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
       with:
