@@ -216,7 +216,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand TotalJournalReportCommand => new RelayCommand(
             _ =>
             {
-                var report = new TotalJournalReport(
+                var report = this.reportFactory.CreateTotalJournal(
                     this.currentModelJournal,
                     this.accountingData.Setup,
                     CultureInfo.CurrentUICulture);

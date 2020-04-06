@@ -15,7 +15,7 @@ namespace lg2de.SimpleAccounting.Reports
         "Major Code Smell",
         "S4055:Literals should not be passed as localized parameters",
         Justification = "pending translation")]
-    internal class TotalJournalReport : ReportBase
+    internal class TotalJournalReport : ReportBase, ITotalJournalReport
     {
         public const string ResourceName = "TotalJournal.xml";
 

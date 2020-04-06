@@ -1132,20 +1132,19 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void TotalsAndBalancesReportCommand_HappyPath_Completed()
+        public void TotalJournalReportCommand_HappyPath_Completed()
         {
             var sut = CreateSut(out IReportFactory reportFactory);
-            var totalsAndBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
-            reportFactory.CreateTotalsAndBalances(
+            var totalJournalReport = Substitute.For<ITotalJournalReport>();
+            reportFactory.CreateTotalJournal(
                 Arg.Any<AccountingDataJournal>(),
-                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
                 Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(totalsAndBalancesReport);
+                Arg.Any<CultureInfo>()).Returns(totalJournalReport);
             sut.LoadProjectData(Samples.SampleProject);
 
-            sut.TotalsAndBalancesReportCommand.Execute(null);
+            sut.TotalJournalReportCommand.Execute(null);
 
-            totalsAndBalancesReport.Received(1)
+            totalJournalReport.Received(1)
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
         }
 
@@ -1164,6 +1163,24 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut();
 
             sut.TotalJournalReportCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void TotalsAndBalancesReportCommand_HappyPath_Completed()
+        {
+            var sut = CreateSut(out IReportFactory reportFactory);
+            var totalsAndBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
+            reportFactory.CreateTotalsAndBalances(
+                Arg.Any<AccountingDataJournal>(),
+                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
+                Arg.Any<AccountingDataSetup>(),
+                Arg.Any<CultureInfo>()).Returns(totalsAndBalancesReport);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.TotalsAndBalancesReportCommand.Execute(null);
+
+            totalsAndBalancesReport.Received(1)
+                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
         }
 
         [Fact]
