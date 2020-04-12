@@ -151,7 +151,8 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var openFileDialog = new OpenFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml",
+                    RestoreDirectory = true
                 };
 
                 if (openFileDialog.ShowDialog() != DialogResult.OK)
@@ -159,7 +160,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                this.LoadProjectFromFile(openFileDialog.FileName);
+                this.LoadProjectFromFileAsync(openFileDialog.FileName);
             });
 
         public ICommand SaveProjectCommand => new RelayCommand(
@@ -174,7 +175,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 var bookingModel = new AddBookingViewModel(
                     this,
                     this.currentModelJournal.DateStart.ToDateTime(),
-                    this.currentModelJournal.DateEnd.ToDateTime()) { BookingNumber = this.GetMaxBookIdent() + 1 };
+                    this.currentModelJournal.DateEnd.ToDateTime())
+                { BookingNumber = this.GetMaxBookIdent() + 1 };
                 bookingModel.Accounts.AddRange(
                     this.ShowInactiveAccounts
                         ? this.accountingData.AllAccounts
@@ -184,7 +186,10 @@ namespace lg2de.SimpleAccounting.Presentation
                     .Select(
                         t => new BookingTemplate
                         {
-                            Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor
+                            Text = t.Text,
+                            Credit = t.Credit,
+                            Debit = t.Debit,
+                            Value = t.Value / CentFactor
                         })
                     .ToList().ForEach(bookingModel.BindingTemplates.Add);
                 this.windowManager.ShowDialog(bookingModel);
@@ -477,7 +482,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var item = new MenuViewModel(
                     project,
-                    new RelayCommand(_ => this.LoadProjectFromFile(project)));
+                    new RelayCommand(_ => this.LoadProjectFromFileAsync(project)));
                 this.RecentProjects.Add(item);
             }
 
@@ -492,7 +497,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     () =>
                     {
                         // re-invoke onto UI thread
-                        dispatcher.Invoke(() => this.LoadProjectFromFile(this.Settings.RecentProject));
+                        dispatcher.Invoke(() => this.LoadProjectFromFileAsync(this.Settings.RecentProject));
                         this.autoSaveTask = this.AutoSaveAsync();
                     });
             }
@@ -684,7 +689,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.TryClose();
         }
 
-        internal void LoadProjectFromFile(string projectFileName)
+        internal async Task LoadProjectFromFileAsync(string projectFileName)
         {
             if (!this.CheckSaveProject())
             {
@@ -692,11 +697,39 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.IsDocumentModified = false;
-            this.FileName = projectFileName;
+            this.Settings.RecentProjects ??= new StringCollection();
+            this.Settings.SecuredDrives ??= new StringCollection();
 
             try
             {
-                var result = MessageBoxResult.No;
+                MessageBoxResult result;
+                if (!this.fileSystem.FileExists(projectFileName)
+                    && this.Settings.SecuredDrives.OfType<string>().Any(
+                        drive => projectFileName.StartsWith(
+                            drive, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    result = this.messageBox.Show(
+                        $"Das Projekt {projectFileName} scheint auf einem gesicherten Laufwerk gespeichert zu sein.\n"
+                        + "(Cryptomator)\n"
+                        + "Dieses Laufwerk ist nicht verfügbar.\n"
+                        + "Soll 'Cryptomator' gestartet werden?",
+                        "Projekt laden",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question,
+                        MessageBoxResult.Yes);
+                    if (result != MessageBoxResult.Yes)
+                    {
+                        return;
+                    }
+
+                    if (!await this.StartCryptomatorAsync())
+                    {
+                        return;
+                    }
+                }
+
+                this.FileName = projectFileName;
+                result = MessageBoxResult.No;
                 if (this.fileSystem.FileExists(this.AutoSaveFileName))
                 {
                     result = this.messageBox.Show(
@@ -723,7 +756,16 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 this.Settings.RecentProject = this.FileName;
 
-                this.Settings.RecentProjects ??= new StringCollection();
+                // TODO IFileSystem
+                var info = DriveInfo.GetDrives().SingleOrDefault(
+                    x => this.FileName.StartsWith(
+                        x.RootDirectory.FullName, StringComparison.InvariantCultureIgnoreCase));
+                if (info != null
+                    && info.DriveFormat.Contains("cryptomator", StringComparison.InvariantCultureIgnoreCase)
+                    && !this.Settings.SecuredDrives.Contains(info.RootDirectory.FullName))
+                {
+                    this.Settings.SecuredDrives.Add(info.RootDirectory.FullName);
+                }
 
                 this.Settings.RecentProjects.Remove(this.FileName);
                 this.Settings.RecentProjects.Insert(0, this.FileName);
@@ -736,6 +778,11 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.messageBox.Show($"Failed to load file '{this.FileName}':\n{e.Message}", "Load");
             }
+        }
+
+        internal async Task<bool> StartCryptomatorAsync()
+        {
+            return true;
         }
 
         internal void LoadProjectData(AccountingData projectData)
@@ -799,7 +846,8 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml",
+                    RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -948,7 +996,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 newYearJournal.Booking.Add(newBooking);
                 var newDebit = new BookingValue
                 {
-                    Value = Math.Abs(creditAmount - debitAmount), Text = $"Eröffnungsbetrag {bookingId}"
+                    Value = Math.Abs(creditAmount - debitAmount),
+                    Text = $"Eröffnungsbetrag {bookingId}"
                 };
                 newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };

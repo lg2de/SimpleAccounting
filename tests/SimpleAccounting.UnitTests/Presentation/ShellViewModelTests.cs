@@ -833,7 +833,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void LoadProjectFromFile_AutoSaveFileExistsNo_AutoSaveFileLoaded()
+        public async Task LoadProjectFromFileAsync_AutoSaveFileExistsNo_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             messageBox.Show(
@@ -844,7 +844,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
             fileSystem.FileExists("the.fileName~").Returns(true);
 
-            sut.LoadProjectFromFile("the.fileName");
+            await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+                .CompleteWithinAsync(1.Seconds());
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
@@ -866,7 +867,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
             fileSystem.FileExists("the.fileName~").Returns(true);
 
-            sut.LoadProjectFromFile("the.fileName");
+            sut.LoadProjectFromFileAsync("the.fileName");
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
@@ -895,7 +896,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             };
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            sut.LoadProjectFromFile("the.fileName");
+            sut.LoadProjectFromFileAsync("the.fileName");
 
             sut.Settings.RecentProjects.OfType<string>().Should()
                 .Equal("the.fileName", "A", "B", "C", "D", "E", "F", "G", "H", "I");
@@ -907,7 +908,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IFileSystem fileSystem);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            sut.LoadProjectFromFile("the.fileName");
+            sut.LoadProjectFromFileAsync("the.fileName");
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
@@ -927,7 +928,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             };
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 
-            sut.LoadProjectFromFile("the.fileName");
+            sut.LoadProjectFromFileAsync("the.fileName");
 
             sut.IsDocumentModified.Should().BeTrue();
         }
