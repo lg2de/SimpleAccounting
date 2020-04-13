@@ -534,6 +534,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        // TODO move to extenstion
         internal static Release GetNewRelease(string currentVersion, IEnumerable<Release> releases)
         {
             bool isPreRelease = currentVersion.Contains("beta", StringComparison.InvariantCultureIgnoreCase);
@@ -605,6 +606,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.SelectedAccountJournalEntry = this.AccountJournal.FirstOrDefault(x => x.Identifier == booking.ID);
         }
 
+        // TODO move to separate class?
         [ExcludeFromCodeCoverage]
         [SuppressMessage(
             "Major Bug", "S3168:\"async\" methods should not return \"void\"",
@@ -689,6 +691,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.TryClose();
         }
 
+        // TODO move to project loader?
         internal async Task LoadProjectFromFileAsync(string projectFileName)
         {
             if (!this.CheckSaveProject())
@@ -756,8 +759,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 this.Settings.RecentProject = this.FileName;
 
-                // TODO IFileSystem
-                var info = DriveInfo.GetDrives().SingleOrDefault(
+                var info = this.fileSystem.GetDrives().SingleOrDefault(
                     x => this.FileName.StartsWith(
                         x.RootDirectory.FullName, StringComparison.InvariantCultureIgnoreCase));
                 if (info != null
@@ -874,6 +876,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        // TODO move to extension class
         private static AccountingData GetTemplateProject()
         {
             var year = (ushort)DateTime.Now.Year;
@@ -932,6 +935,7 @@ namespace lg2de.SimpleAccounting.Presentation
             return this.currentModelJournal.Booking.Max(b => b.ID);
         }
 
+        // TODO move to separate class
         private void CloseYear()
         {
             var viewModel = new CloseYearViewModel(this.currentModelJournal);
@@ -1078,6 +1082,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        // TODO move to FullJournalViewModel
         private void RefreshFullJournal()
         {
             this.FullJournal.Clear();
@@ -1136,6 +1141,7 @@ namespace lg2de.SimpleAccounting.Presentation
             sorted.ForEach(this.AccountList.Add);
         }
 
+        // TODO move to AccountJournalViewModel
         private void RefreshAccountJournal()
         {
             this.AccountJournal.Clear();
