@@ -55,7 +55,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IFileSystem fileSystem);
             sut.AutoSaveInterval = 100.Milliseconds();
             sut.Settings.RecentProject = "recent.project";
-            fileSystem.FileExists("recent.project").Returns(true);
             var sample = new AccountingData
             {
                 Accounts = new List<AccountingDataAccountGroup>
@@ -214,6 +213,30 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             }
 
             return new List<Release> { release };
+        }
+
+        [WpfFact]
+        public async Task OnActivate_TwoRecentProjectsOneOnSecuredDrive_AllProjectListed()
+        {
+            var sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
+            sut.Settings = new Settings
+            {
+                RecentProject = "k:\\file2",
+                RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
+                SecuredDrives = new StringCollection { "K:\\" }
+            };
+            fileSystem.FileExists(Arg.Is("c:\\file1")).Returns(true);
+            bool securedFileAvailable = false;
+            fileSystem.FileExists(Arg.Is("k:\\file2")).Returns(info => securedFileAvailable);
+
+            ((IActivate)sut).Activate();
+            await sut.LoadingTask;
+
+            sut.RecentProjects?.Select(x => x.Header).Should().Equal("c:\\file1", "k:\\file2");
+            messageBox.Received(1).Show(
+                Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
         }
 
         [Fact]
@@ -833,29 +856,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public async Task LoadProjectFromFileAsync_AutoSaveFileExistsNo_AutoSaveFileLoaded()
-        {
-            var sut = CreateSut(out var messageBox, out var fileSystem);
-            messageBox.Show(
-                    Arg.Any<string>(), Arg.Any<string>(),
-                    MessageBoxButton.YesNo, MessageBoxImage.Question,
-                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-                .Returns(MessageBoxResult.No);
-            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-            fileSystem.FileExists("the.fileName~").Returns(true);
-
-            await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds());
-
-            using var _ = new AssertionScope();
-            sut.FileName.Should().Be("the.fileName");
-            sut.IsDocumentModified.Should().BeFalse();
-            sut.Settings.RecentProject.Should().Be("the.fileName");
-            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
-            fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
-        }
-
-        [Fact]
         public void LoadProjectFromFile_AutoSaveFileExistsYes_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
@@ -931,6 +931,29 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.LoadProjectFromFileAsync("the.fileName");
 
             sut.IsDocumentModified.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task LoadProjectFromFileAsync_AutoSaveFileExistsNo_AutoSaveFileLoaded()
+        {
+            var sut = CreateSut(out var messageBox, out var fileSystem);
+            messageBox.Show(
+                    Arg.Any<string>(), Arg.Any<string>(),
+                    MessageBoxButton.YesNo, MessageBoxImage.Question,
+                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.No);
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+            fileSystem.FileExists("the.fileName~").Returns(true);
+
+            await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+                .CompleteWithinAsync(1.Seconds());
+
+            using var _ = new AssertionScope();
+            sut.FileName.Should().Be("the.fileName");
+            sut.IsDocumentModified.Should().BeFalse();
+            sut.Settings.RecentProject.Should().Be("the.fileName");
+            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
+            fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
         }
 
         [Fact]

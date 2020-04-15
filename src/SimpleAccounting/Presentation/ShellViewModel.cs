@@ -26,17 +26,16 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
+    using Microsoft.Win32;
     using Octokit;
+    using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
+    using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
-    [SuppressMessage(
-        "Critical Code Smell",
-        "S2365:Properties should not make collection or array copies",
-        Justification = "<Pending>")]
-    [SuppressMessage(
+    [SuppressMessage( // TODO introduce localization
         "Major Code Smell",
-        "S4055:Literals should not be passed as localized parameters",
-        Justification = "pending translation")]
+        "S4055:Literals should not be passed as localized parameters")]
     [SuppressMessage("ReSharper", "LocalizableElement")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellViewModel : Conductor<IScreen>, IDisposable
     {
         private const string GithubDomain = "github.com";
@@ -44,6 +43,13 @@ namespace lg2de.SimpleAccounting.Presentation
         private const string ProjectName = "SimpleAccounting";
         private const int MaxRecentProjects = 10;
         private const double CentFactor = 100.0;
+
+        private const string SecureDriveApp = "Cryptomator";
+        private const string SecureDriveAppExe = SecureDriveApp + ".exe";
+
+        private const string SecureDriveAppKey =
+            "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Cryptomator_is1";
+
         private static readonly string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
         private static readonly string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
         private readonly IFileSystem fileSystem;
@@ -176,7 +182,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     this,
                     this.currentModelJournal.DateStart.ToDateTime(),
                     this.currentModelJournal.DateEnd.ToDateTime())
-                { BookingNumber = this.GetMaxBookIdent() + 1 };
+                    { BookingNumber = this.GetMaxBookIdent() + 1 };
                 bookingModel.Accounts.AddRange(
                     this.ShowInactiveAccounts
                         ? this.accountingData.AllAccounts
@@ -186,10 +192,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     .Select(
                         t => new BookingTemplate
                         {
-                            Text = t.Text,
-                            Credit = t.Credit,
-                            Debit = t.Debit,
-                            Value = t.Value / CentFactor
+                            Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor
                         })
                     .ToList().ForEach(bookingModel.BindingTemplates.Add);
                 this.windowManager.ShowDialog(bookingModel);
@@ -261,32 +264,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.FullJournal.Any());
 
         public ICommand AssetBalancesReportCommand => new RelayCommand(
-            _ =>
-            {
-                var accountGroups = new List<AccountingDataAccountGroup>();
-                foreach (var group in this.accountingData.Accounts)
-                {
-                    var assertAccounts = group.Account
-                        .Where(a => a.Type == AccountDefinitionType.Asset).ToList();
-                    if (assertAccounts.Count <= 0)
-                    {
-                        // ignore group
-                        continue;
-                    }
-
-                    accountGroups.Add(new AccountingDataAccountGroup { Name = group.Name, Account = assertAccounts });
-                }
-
-                var report = this.reportFactory.CreateTotalsAndBalances(
-                    this.currentModelJournal,
-                    accountGroups,
-                    this.accountingData.Setup,
-                    CultureInfo.CurrentUICulture);
-                this.accountingData.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
-                const string title = "Bestandskontosalden";
-                report.CreateReport(title);
-                report.ShowPreview(title);
-            },
+            _ => this.OnAssetBalancesReport(),
             _ => this.FullJournal.Any());
 
         public ICommand AnnualBalanceReportCommand => new RelayCommand(
@@ -327,7 +305,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var accountVm = new AccountViewModel
                 {
                     DisplayName = "Account erstellen",
-                    Group = this.accountingData.Accounts.FirstOrDefault(),
+                    Group = this.accountingData.Accounts.First(),
                     Groups = this.accountingData.Accounts,
                     IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
                 };
@@ -473,36 +451,29 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnActivate();
 
-            foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
-            {
-                if (!this.fileSystem.FileExists(project))
-                {
-                    continue;
-                }
-
-                var item = new MenuViewModel(
-                    project,
-                    new RelayCommand(_ => this.LoadProjectFromFileAsync(project)));
-                this.RecentProjects.Add(item);
-            }
-
             var dispatcher = Dispatcher.CurrentDispatcher;
             this.cancellationTokenSource = new CancellationTokenSource();
-            if (this.fileSystem.FileExists(this.Settings.RecentProject))
+            if (!string.IsNullOrEmpty(this.Settings.RecentProject))
             {
                 // We move execution into thread pool thread.
                 // In case there is an auto-save file, the dialog should be shown on top of main window.
                 // Therefore OnActivate needs to completed.
                 this.LoadingTask = Task.Run(
-                    () =>
+                    async () =>
                     {
                         // re-invoke onto UI thread
-                        dispatcher.Invoke(() => this.LoadProjectFromFileAsync(this.Settings.RecentProject));
+                        await dispatcher.Invoke(
+                            async () =>
+                            {
+                                await this.LoadProjectFromFileAsync(this.Settings.RecentProject);
+                                this.BuildRecentProjectsMenu();
+                            });
                         this.autoSaveTask = this.AutoSaveAsync();
                     });
             }
             else
             {
+                this.BuildRecentProjectsMenu();
                 this.autoSaveTask = Task.Run(this.AutoSaveAsync);
             }
         }
@@ -725,8 +696,9 @@ namespace lg2de.SimpleAccounting.Presentation
                         return;
                     }
 
-                    if (!await this.StartCryptomatorAsync())
+                    if (!await this.StartSecureDriveApplicationAsync(projectFileName))
                     {
+                        // failed to start application
                         return;
                     }
                 }
@@ -782,9 +754,63 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        internal async Task<bool> StartCryptomatorAsync()
+        internal async Task<bool> StartSecureDriveApplicationAsync(string projectFileName)
         {
-            return true;
+            // TODO show progress window (to be used for CheckUpdate and here)
+            var process = GetSecureDriveProcess();
+            if (process == null)
+            {
+                var localMachine = Registry.LocalMachine;
+                using var fileKey = localMachine.OpenSubKey(SecureDriveAppKey);
+                var path = fileKey?.GetValue("InstallLocation").ToString();
+                if (string.IsNullOrEmpty(path))
+                {
+                    return false;
+                }
+
+                process = Process.Start(Path.Combine(path, SecureDriveAppExe));
+                if (process == null || process.HasExited)
+                {
+                    return false;
+                }
+            }
+
+            const int waitMilliseconds = 500;
+            while (true)
+            {
+                if (!process.MainWindowHandle.Equals(IntPtr.Zero))
+                {
+                    break;
+                }
+
+                await Task.Delay(waitMilliseconds);
+
+                process = GetSecureDriveProcess();
+                if (process == null || process.HasExited)
+                {
+                    return false;
+                }
+            }
+
+            WinApi.BringProcessToFront(process);
+
+            while (true)
+            {
+                if (this.fileSystem.FileExists(projectFileName))
+                {
+                    WinApi.MinimizeProcess(process);
+                    WinApi.BringProcessToFront(Process.GetCurrentProcess());
+                    return true;
+                }
+
+                await Task.Delay(waitMilliseconds);
+            }
+
+            static Process GetSecureDriveProcess()
+            {
+                return Process.GetProcesses().FirstOrDefault(
+                    x => x.ProcessName.Equals(SecureDriveApp, StringComparison.InvariantCultureIgnoreCase));
+            }
         }
 
         internal void LoadProjectData(AccountingData projectData)
@@ -904,6 +930,22 @@ namespace lg2de.SimpleAccounting.Presentation
             };
         }
 
+        private void BuildRecentProjectsMenu()
+        {
+            foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
+            {
+                if (!this.fileSystem.FileExists(project))
+                {
+                    continue;
+                }
+
+                var item = new MenuViewModel(
+                    project,
+                    new RelayCommand(_ => this.LoadProjectFromFileAsync(project)));
+                this.RecentProjects.Add(item);
+            }
+        }
+
         private async Task AutoSaveAsync()
         {
             try
@@ -927,7 +969,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private ulong GetMaxBookIdent()
         {
-            if (this.currentModelJournal.Booking?.Any() == false)
+            if (this.currentModelJournal?.Booking == null || !this.currentModelJournal.Booking.Any())
             {
                 return 0;
             }
@@ -1208,6 +1250,33 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 saldoItem.CreditValue = creditSum - debitSum;
             }
+        }
+
+        private void OnAssetBalancesReport()
+        {
+            var accountGroups = new List<AccountingDataAccountGroup>();
+            foreach (var group in this.accountingData.Accounts)
+            {
+                var assertAccounts = group.Account
+                    .Where(a => a.Type == AccountDefinitionType.Asset).ToList();
+                if (assertAccounts.Count <= 0)
+                {
+                    // ignore group
+                    continue;
+                }
+
+                accountGroups.Add(new AccountingDataAccountGroup { Name = group.Name, Account = assertAccounts });
+            }
+
+            var report = this.reportFactory.CreateTotalsAndBalances(
+                this.currentModelJournal,
+                accountGroups,
+                this.accountingData.Setup,
+                CultureInfo.CurrentUICulture);
+            this.accountingData.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
+            const string title = "Bestandskontosalden";
+            report.CreateReport(title);
+            report.ShowPreview(title);
         }
     }
 }
