@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Extensions
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
 
+    [ExcludeFromCodeCoverage]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal static class WinApi
     {

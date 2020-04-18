@@ -152,134 +152,34 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.LoadProjectData(GetTemplateProject());
             });
 
-        public ICommand OpenProjectCommand => new RelayCommand(
-            _ =>
-            {
-                using var openFileDialog = new OpenFileDialog
-                {
-                    Filter = "Accounting project files (*.acml)|*.acml",
-                    RestoreDirectory = true
-                };
+        public ICommand OpenProjectCommand => new RelayCommand(_ => this.OnOpenProject());
 
-                if (openFileDialog.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-
-                this.LoadProjectFromFileAsync(openFileDialog.FileName);
-            });
-
-        public ICommand SaveProjectCommand => new RelayCommand(
-            _ => this.SaveProject(),
-            _ => this.IsDocumentModified);
+        public ICommand SaveProjectCommand => new RelayCommand(_ => this.SaveProject(), _ => this.IsDocumentModified);
 
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
-        public ICommand AddBookingsCommand => new RelayCommand(
-            _ =>
-            {
-                var bookingModel = new AddBookingViewModel(
-                    this,
-                    this.currentModelJournal.DateStart.ToDateTime(),
-                    this.currentModelJournal.DateEnd.ToDateTime())
-                    { BookingNumber = this.GetMaxBookIdent() + 1 };
-                bookingModel.Accounts.AddRange(
-                    this.ShowInactiveAccounts
-                        ? this.accountingData.AllAccounts
-                        : this.accountingData.AllAccounts.Where(x => x.Active));
-
-                this.accountingData.Setup?.BookingTemplates?.Template
-                    .Select(
-                        t => new BookingTemplate
-                        {
-                            Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor
-                        })
-                    .ToList().ForEach(bookingModel.BindingTemplates.Add);
-                this.windowManager.ShowDialog(bookingModel);
-            }, _ => this.IsCurrentYearOpen);
+        public ICommand AddBookingsCommand => new RelayCommand(_ => this.OnAddBookings(), _ => this.IsCurrentYearOpen);
 
         public ICommand ImportBookingsCommand => new RelayCommand(
-            _ =>
-            {
-                var min = this.currentModelJournal.DateStart.ToDateTime();
-                var max = this.currentModelJournal.DateEnd.ToDateTime();
-
-                var importModel = new ImportBookingsViewModel(
-                    this.messageBox,
-                    this,
-                    this.accountingData.AllAccounts)
-                {
-                    BookingNumber = this.GetMaxBookIdent() + 1,
-                    RangeMin = min,
-                    RangMax = max,
-                    Journal = this.currentModelJournal
-                };
-                this.windowManager.ShowDialog(importModel);
-            }, _ => this.IsCurrentYearOpen);
+            _ => this.OnImportBookings(), _ => this.IsCurrentYearOpen);
 
         public ICommand CloseYearCommand => new RelayCommand(
-            _ => this.CloseYear(),
-            _ => this.IsCurrentYearOpen);
+            _ => this.CloseYear(), _ => this.IsCurrentYearOpen);
 
         public ICommand TotalJournalReportCommand => new RelayCommand(
-            _ =>
-            {
-                var report = this.reportFactory.CreateTotalJournal(
-                    this.currentModelJournal,
-                    this.accountingData.Setup,
-                    CultureInfo.CurrentUICulture);
-                const string title = "Journal";
-                report.CreateReport(title);
-                report.ShowPreview(title);
-            },
-            _ => this.FullJournal.Any());
+            _ => this.OnTotalJournalReport(), _ => this.FullJournal.Any());
 
         public ICommand AccountJournalReportCommand => new RelayCommand(
-            _ =>
-            {
-                var report = this.reportFactory.CreateAccountJournal(
-                    this.currentModelJournal,
-                    this.accountingData.Accounts.SelectMany(a => a.Account),
-                    this.accountingData.Setup, CultureInfo.CurrentUICulture);
-                report.PageBreakBetweenAccounts =
-                    this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
-                const string title = "Kontoblätter";
-                report.CreateReport(title);
-                report.ShowPreview(title);
-            },
-            _ => this.FullJournal.Any());
+            _ => this.OnAccountJournalReport(), _ => this.FullJournal.Any());
 
         public ICommand TotalsAndBalancesReportCommand => new RelayCommand(
-            _ =>
-            {
-                var report = this.reportFactory.CreateTotalsAndBalances(
-                    this.currentModelJournal,
-                    this.accountingData.Accounts,
-                    this.accountingData.Setup,
-                    CultureInfo.CurrentUICulture);
-                const string title = "Summen und Salden";
-                report.CreateReport(title);
-                report.ShowPreview(title);
-            },
-            _ => this.FullJournal.Any());
+            _ => this.OnTotalsAndBalancesReport(), _ => this.FullJournal.Any());
 
         public ICommand AssetBalancesReportCommand => new RelayCommand(
-            _ => this.OnAssetBalancesReport(),
-            _ => this.FullJournal.Any());
+            _ => this.OnAssetBalancesReport(), _ => this.FullJournal.Any());
 
         public ICommand AnnualBalanceReportCommand => new RelayCommand(
-            _ =>
-            {
-                var report = this.reportFactory.CreateAnnualBalance(
-                    this.currentModelJournal,
-                    this.accountingData.AllAccounts,
-                    this.accountingData.Setup,
-                    CultureInfo.CurrentUICulture);
-                const string title = "Jahresbilanz";
-                report.CreateReport(title);
-                report.ShowPreview(title);
-            },
-            _ => this.FullJournal.Any());
+            _ => this.OnAnnualBalanceReport(), _ => this.FullJournal.Any());
 
         public ICommand HelpAboutCommand => new RelayCommand(
             _ => Process.Start(new ProcessStartInfo(ProjectUrl) { UseShellExecute = true }));
@@ -299,99 +199,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
             });
 
-        public ICommand NewAccountCommand => new RelayCommand(
-            _ =>
-            {
-                var accountVm = new AccountViewModel
-                {
-                    DisplayName = "Account erstellen",
-                    Group = this.accountingData.Accounts.First(),
-                    Groups = this.accountingData.Accounts,
-                    IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
-                };
-                var result = this.windowManager.ShowDialog(accountVm);
-                if (result != true)
-                {
-                    return;
-                }
+        public ICommand NewAccountCommand => new RelayCommand(_ => this.OnNewAccount());
 
-                // update database
-                var newAccount = new AccountDefinition
-                {
-                    ID = accountVm.Identifier,
-                    Name = accountVm.Name,
-                    Type = accountVm.Type,
-                    Active = accountVm.IsActivated
-                };
-                accountVm.Group.Account.Add(newAccount);
-                accountVm.Group.Account = accountVm.Group.Account.OrderBy(x => x.ID).ToList();
-
-                // update view
-                this.AllAccounts.Add(accountVm);
-                this.RefreshAccountList();
-
-                this.IsDocumentModified = true;
-            });
-
-        public ICommand EditAccountCommand => new RelayCommand(
-            o =>
-            {
-                if (!(o is AccountViewModel account))
-                {
-                    return;
-                }
-
-                var vm = account.Clone();
-                vm.DisplayName = "Account bearbeiten";
-                var invalidIds = this.AllAccounts.Select(x => x.Identifier).Where(x => x != account.Identifier)
-                    .ToList();
-                vm.IsValidIdentifierFunc = id => !invalidIds.Contains(id);
-                var result = this.windowManager.ShowDialog(vm);
-                if (result != true)
-                {
-                    return;
-                }
-
-                // update database
-                var accountData = this.accountingData.AllAccounts.Single(x => x.ID == account.Identifier);
-                accountData.Name = vm.Name;
-                accountData.Type = vm.Type;
-                accountData.Active = vm.IsActivated;
-                if (account.Identifier != vm.Identifier)
-                {
-                    accountData.ID = vm.Identifier;
-                    account.Group.Account = account.Group.Account.OrderBy(x => x.ID).ToList();
-
-                    this.accountingData.Journal.ForEach(
-                        j => j.Booking?.ForEach(
-                            b =>
-                            {
-                                b.Credit.ForEach(c => UpdateAccount(c, account.Identifier, vm.Identifier));
-                                b.Debit.ForEach(d => UpdateAccount(d, account.Identifier, vm.Identifier));
-                            }));
-                }
-
-                // update view
-                account.Name = vm.Name;
-                account.Group = vm.Group;
-                account.Type = vm.Type;
-                account.Identifier = vm.Identifier;
-                account.IsActivated = vm.IsActivated;
-                this.RefreshAccountList();
-                account.Refresh();
-                this.RefreshFullJournal();
-                this.RefreshAccountJournal();
-
-                this.IsDocumentModified = true;
-
-                static void UpdateAccount(BookingValue entry, ulong oldIdentifier, ulong newIdentifier)
-                {
-                    if (entry.Account == oldIdentifier)
-                    {
-                        entry.Account = newIdentifier;
-                    }
-                }
-            });
+        public ICommand EditAccountCommand => new RelayCommand(this.OnEditAccount);
 
         internal Settings Settings { get; set; } = Settings.Default;
 
@@ -874,8 +684,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml",
-                    RestoreDirectory = true
+                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -930,6 +739,21 @@ namespace lg2de.SimpleAccounting.Presentation
             };
         }
 
+        private void OnOpenProject()
+        {
+            using var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
+            };
+
+            if (openFileDialog.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            this.LoadProjectFromFileAsync(openFileDialog.FileName);
+        }
+
         private void BuildRecentProjectsMenu()
         {
             foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
@@ -965,6 +789,144 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 // expected behavior
             }
+        }
+
+        private void UpdateDisplayName()
+        {
+            this.DisplayName = string.IsNullOrEmpty(this.FileName) || this.currentModelJournal == null
+                ? $"SimpleAccounting {this.version}"
+                : $"SimpleAccounting {this.version} - {this.FileName} - {this.currentModelJournal.Year}";
+        }
+
+        private void OnNewAccount()
+        {
+            var accountVm = new AccountViewModel
+            {
+                DisplayName = "Account erstellen",
+                Group = this.accountingData.Accounts.First(),
+                Groups = this.accountingData.Accounts,
+                IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
+            };
+            var result = this.windowManager.ShowDialog(accountVm);
+            if (result != true)
+            {
+                return;
+            }
+
+            // update database
+            var newAccount = new AccountDefinition
+            {
+                ID = accountVm.Identifier,
+                Name = accountVm.Name,
+                Type = accountVm.Type,
+                Active = accountVm.IsActivated
+            };
+            accountVm.Group.Account.Add(newAccount);
+            accountVm.Group.Account = accountVm.Group.Account.OrderBy(x => x.ID).ToList();
+
+            // update view
+            this.AllAccounts.Add(accountVm);
+            this.RefreshAccountList();
+
+            this.IsDocumentModified = true;
+        }
+
+        private void OnEditAccount(object commandParameter)
+        {
+            if (!(commandParameter is AccountViewModel account))
+            {
+                return;
+            }
+
+            var vm = account.Clone();
+            vm.DisplayName = "Account bearbeiten";
+            var invalidIds = this.AllAccounts.Select(x => x.Identifier).Where(x => x != account.Identifier)
+                .ToList();
+            vm.IsValidIdentifierFunc = id => !invalidIds.Contains(id);
+            var result = this.windowManager.ShowDialog(vm);
+            if (result != true)
+            {
+                return;
+            }
+
+            // update database
+            var accountData = this.accountingData.AllAccounts.Single(x => x.ID == account.Identifier);
+            accountData.Name = vm.Name;
+            accountData.Type = vm.Type;
+            accountData.Active = vm.IsActivated;
+            if (account.Identifier != vm.Identifier)
+            {
+                accountData.ID = vm.Identifier;
+                account.Group.Account = account.Group.Account.OrderBy(x => x.ID).ToList();
+
+                this.accountingData.Journal.ForEach(
+                    j => j.Booking?.ForEach(
+                        b =>
+                        {
+                            b.Credit.ForEach(c => UpdateAccount(c, account.Identifier, vm.Identifier));
+                            b.Debit.ForEach(d => UpdateAccount(d, account.Identifier, vm.Identifier));
+                        }));
+            }
+
+            // update view
+            account.Name = vm.Name;
+            account.Group = vm.Group;
+            account.Type = vm.Type;
+            account.Identifier = vm.Identifier;
+            account.IsActivated = vm.IsActivated;
+            this.RefreshAccountList();
+            account.Refresh();
+            this.RefreshFullJournal();
+            this.RefreshAccountJournal();
+
+            this.IsDocumentModified = true;
+
+            static void UpdateAccount(BookingValue entry, ulong oldIdentifier, ulong newIdentifier)
+            {
+                if (entry.Account == oldIdentifier)
+                {
+                    entry.Account = newIdentifier;
+                }
+            }
+        }
+
+        private void OnAddBookings()
+        {
+            var bookingModel = new AddBookingViewModel(
+                this,
+                this.currentModelJournal.DateStart.ToDateTime(),
+                this.currentModelJournal.DateEnd.ToDateTime()) { BookingNumber = this.GetMaxBookIdent() + 1 };
+            bookingModel.Accounts.AddRange(
+                this.ShowInactiveAccounts
+                    ? this.accountingData.AllAccounts
+                    : this.accountingData.AllAccounts.Where(x => x.Active));
+
+            this.accountingData.Setup?.BookingTemplates?.Template
+                .Select(
+                    t => new BookingTemplate
+                    {
+                        Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value / CentFactor
+                    })
+                .ToList().ForEach(bookingModel.BindingTemplates.Add);
+            this.windowManager.ShowDialog(bookingModel);
+        }
+
+        private void OnImportBookings()
+        {
+            var min = this.currentModelJournal.DateStart.ToDateTime();
+            var max = this.currentModelJournal.DateEnd.ToDateTime();
+
+            var importModel = new ImportBookingsViewModel(
+                this.messageBox,
+                this,
+                this.accountingData.AllAccounts)
+            {
+                BookingNumber = this.GetMaxBookIdent() + 1,
+                RangeMin = min,
+                RangMax = max,
+                Journal = this.currentModelJournal
+            };
+            this.windowManager.ShowDialog(importModel);
         }
 
         private ulong GetMaxBookIdent()
@@ -1042,8 +1004,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 newYearJournal.Booking.Add(newBooking);
                 var newDebit = new BookingValue
                 {
-                    Value = Math.Abs(creditAmount - debitAmount),
-                    Text = $"Eröffnungsbetrag {bookingId}"
+                    Value = Math.Abs(creditAmount - debitAmount), Text = $"Eröffnungsbetrag {bookingId}"
                 };
                 newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };
@@ -1068,17 +1029,11 @@ namespace lg2de.SimpleAccounting.Presentation
             this.UpdateBookingYears();
         }
 
+        // TODO move to extension method
         private string BuildAccountDescription(ulong accountNumber)
         {
             var account = this.accountingData.AllAccounts.Single(a => a.ID == accountNumber);
             return account.FormatName();
-        }
-
-        private void UpdateDisplayName()
-        {
-            this.DisplayName = string.IsNullOrEmpty(this.FileName) || this.currentModelJournal == null
-                ? $"SimpleAccounting {this.version}"
-                : $"SimpleAccounting {this.version} - {this.FileName} - {this.currentModelJournal.Year}";
         }
 
         private void SelectBookingYear(string newYearName)
@@ -1252,6 +1207,42 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        private void OnTotalJournalReport()
+        {
+            var report = this.reportFactory.CreateTotalJournal(
+                this.currentModelJournal,
+                this.accountingData.Setup,
+                CultureInfo.CurrentUICulture);
+            const string title = "Journal";
+            report.CreateReport(title);
+            report.ShowPreview(title);
+        }
+
+        private void OnAccountJournalReport()
+        {
+            var report = this.reportFactory.CreateAccountJournal(
+                this.currentModelJournal,
+                this.accountingData.Accounts.SelectMany(a => a.Account),
+                this.accountingData.Setup, CultureInfo.CurrentUICulture);
+            report.PageBreakBetweenAccounts =
+                this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
+            const string title = "Kontoblätter";
+            report.CreateReport(title);
+            report.ShowPreview(title);
+        }
+
+        private void OnTotalsAndBalancesReport()
+        {
+            var report = this.reportFactory.CreateTotalsAndBalances(
+                this.currentModelJournal,
+                this.accountingData.Accounts,
+                this.accountingData.Setup,
+                CultureInfo.CurrentUICulture);
+            const string title = "Summen und Salden";
+            report.CreateReport(title);
+            report.ShowPreview(title);
+        }
+
         private void OnAssetBalancesReport()
         {
             var accountGroups = new List<AccountingDataAccountGroup>();
@@ -1275,6 +1266,18 @@ namespace lg2de.SimpleAccounting.Presentation
                 CultureInfo.CurrentUICulture);
             this.accountingData.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
             const string title = "Bestandskontosalden";
+            report.CreateReport(title);
+            report.ShowPreview(title);
+        }
+
+        private void OnAnnualBalanceReport()
+        {
+            var report = this.reportFactory.CreateAnnualBalance(
+                this.currentModelJournal,
+                this.accountingData.AllAccounts,
+                this.accountingData.Setup,
+                CultureInfo.CurrentUICulture);
+            const string title = "Jahresbilanz";
             report.CreateReport(title);
             report.ShowPreview(title);
         }
