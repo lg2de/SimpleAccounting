@@ -26,7 +26,6 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
-    using Microsoft.Win32;
     using Octokit;
     using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
     using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
@@ -43,12 +42,6 @@ namespace lg2de.SimpleAccounting.Presentation
         private const string ProjectName = "SimpleAccounting";
         private const int MaxRecentProjects = 10;
         private const double CentFactor = 100.0;
-
-        private const string SecureDriveApp = "Cryptomator";
-        private const string SecureDriveAppExe = SecureDriveApp + ".exe";
-
-        private const string SecureDriveAppKey =
-            "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Cryptomator_is1";
 
         private static readonly string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
         private static readonly string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
@@ -506,7 +499,8 @@ namespace lg2de.SimpleAccounting.Presentation
                         return;
                     }
 
-                    if (!await this.StartSecureDriveApplicationAsync(projectFileName))
+                    var starter = new SecureDriveStarter(this.fileSystem, projectFileName);
+                    if (!await starter.StartApplicationAsync())
                     {
                         // failed to start application
                         return;
@@ -561,65 +555,6 @@ namespace lg2de.SimpleAccounting.Presentation
             catch (InvalidOperationException e)
             {
                 this.messageBox.Show($"Failed to load file '{this.FileName}':\n{e.Message}", "Load");
-            }
-        }
-
-        internal async Task<bool> StartSecureDriveApplicationAsync(string projectFileName)
-        {
-            // TODO show progress window (to be used for CheckUpdate and here)
-            var process = GetSecureDriveProcess();
-            if (process == null)
-            {
-                var localMachine = Registry.LocalMachine;
-                using var fileKey = localMachine.OpenSubKey(SecureDriveAppKey);
-                var path = fileKey?.GetValue("InstallLocation").ToString();
-                if (string.IsNullOrEmpty(path))
-                {
-                    return false;
-                }
-
-                process = Process.Start(Path.Combine(path, SecureDriveAppExe));
-                if (process == null || process.HasExited)
-                {
-                    return false;
-                }
-            }
-
-            const int waitMilliseconds = 500;
-            while (true)
-            {
-                if (!process.MainWindowHandle.Equals(IntPtr.Zero))
-                {
-                    break;
-                }
-
-                await Task.Delay(waitMilliseconds);
-
-                process = GetSecureDriveProcess();
-                if (process == null || process.HasExited)
-                {
-                    return false;
-                }
-            }
-
-            WinApi.BringProcessToFront(process);
-
-            while (true)
-            {
-                if (this.fileSystem.FileExists(projectFileName))
-                {
-                    WinApi.MinimizeProcess(process);
-                    WinApi.BringProcessToFront(Process.GetCurrentProcess());
-                    return true;
-                }
-
-                await Task.Delay(waitMilliseconds);
-            }
-
-            static Process GetSecureDriveProcess()
-            {
-                return Process.GetProcesses().FirstOrDefault(
-                    x => x.ProcessName.Equals(SecureDriveApp, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 
