@@ -36,24 +36,32 @@ namespace lg2de.SimpleAccounting.Extensions
 
         public async Task<bool> StartApplicationAsync()
         {
+            // check whether process is already running
             this.process = GetSecureDriveProcess();
+
             if (this.process == null
                 && !await this.StartProcessAsync())
             {
+                // the application is NOT running and could NOT be started
                 return false;
             }
 
+            // bring to front to force user to unlock drive
             WinApi.BringProcessToFront(this.process);
 
+            // which for the project file to be available
             while (true)
             {
                 if (this.fileSystem.FileExists(this.projectFileName))
                 {
+                    // file IS available
+                    // minimize the drive application and focus SimpleAccounting
                     WinApi.MinimizeProcess(this.process);
                     WinApi.BringProcessToFront(Process.GetCurrentProcess());
                     return true;
                 }
 
+                // just wait a bit...
                 await Task.Delay(WaitMilliseconds);
             }
         }
