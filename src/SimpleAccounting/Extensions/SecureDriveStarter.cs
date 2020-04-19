@@ -36,7 +36,6 @@ namespace lg2de.SimpleAccounting.Extensions
 
         public async Task<bool> StartApplicationAsync()
         {
-            // TODO show progress window (to be used for CheckUpdate and here)
             this.process = GetSecureDriveProcess();
             if (this.process == null
                 && !await this.StartProcessAsync())

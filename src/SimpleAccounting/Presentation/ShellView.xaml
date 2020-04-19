@@ -11,6 +11,7 @@
     d:DesignWidth="800" d:DesignHeight="450"
     d:DataContext="{d:DesignInstance Type=local:ShellDesignViewModel, IsDesignTimeCreatable=True}">
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="15" />
             <Setter Property="Margin" Value="5" />
@@ -22,192 +23,209 @@
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenProjectCommand}" />
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveProjectCommand}" />
     </Window.InputBindings>
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <Menu.Resources>
-                <Style x:Key="CommandMenuStyle" TargetType="{x:Type MenuItem}">
-                    <Setter Property="Header" Value="{Binding Header}" />
-                    <Setter Property="Command" Value="{Binding Command}" />
-                </Style>
-            </Menu.Resources>
-            <MenuItem Header="Projekt">
-                <MenuItem Header="Neu" Command="{Binding NewProjectCommand}" />
-                <MenuItem Header="Öffnen" Command="{Binding OpenProjectCommand}" InputGestureText="STRG-O" />
-                <MenuItem Header="Speichern" Command="{Binding SaveProjectCommand}" InputGestureText="STRG-S" />
-                <Separator />
-                <MenuItem
-                    Header="Letzte Projekte"
-                    ItemsSource="{Binding RecentProjects}"
-                    ItemContainerStyle="{StaticResource CommandMenuStyle}" />
-                <Separator />
-                <MenuItem Header="Beenden" Command="{Binding CloseApplicationCommand}" />
-            </MenuItem>
-            <MenuItem Header="Aktionen">
-                <MenuItem Header="Buchen" Command="{Binding AddBookingsCommand}" InputGestureText="STRG+B" />
-                <MenuItem Header="Buchungen importieren" Command="{Binding ImportBookingsCommand}"
-                          InputGestureText="STRG-I" />
-                <MenuItem Header="Buchungsjahr abschließen" Command="{Binding CloseYearCommand}" />
-                <MenuItem
-                    Header="Buchungsjahr wählen"
-                    ItemsSource="{Binding BookingYears}"
-                    ItemContainerStyle="{StaticResource CommandMenuStyle}" />
-                <Separator />
-                <MenuItem Header="Neues Konto" Command="{Binding NewAccountCommand}" />
-            </MenuItem>
-            <MenuItem Header="Berichte">
-                <MenuItem Header="Journal" Command="{Binding TotalJournalReportCommand}" />
-                <MenuItem Header="Kontenblätter" Command="{Binding AccountJournalReportCommand}" />
-                <MenuItem Header="Summen und Salden" Command="{Binding TotalsAndBalancesReportCommand}" />
-                <MenuItem Header="Bestandskontosalden" Command="{Binding AssetBalancesReportCommand}" />
-                <MenuItem Header="Jahresbilanz" Command="{Binding AnnualBalanceReportCommand}" />
-            </MenuItem>
-            <MenuItem Header="Hilfe">
-                <MenuItem Header="Über" Command="{Binding HelpAboutCommand}" />
-                <MenuItem Header="Problem melden" Command="{Binding HelpFeedbackCommand}" />
-                <MenuItem Header="Auf Update prüfen" Command="{Binding HelpCheckForUpdateCommand}" />
-            </MenuItem>
-        </Menu>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*" />
-                <RowDefinition Height="5" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkGray" />
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White" />
-                <Style x:Key="GridRowStyle" TargetType="{x:Type DataGridRow}">
-                    <Setter Property="FontSize" Value="11" />
-                </Style>
-                <Style TargetType="DataGridCell">
-                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=Content.Text}" />
-                </Style>
-                <Style x:Key="SummaryGridStyle" TargetType="DataGridCell">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsSummary}" Value="True">
-                            <Setter Property="Foreground" Value="LightGray" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Resources>
-            <DockPanel Grid.Column="0">
-                <TextBlock
-                    DockPanel.Dock="Top"
-                    Text="Journal des Buchungsjahres" />
-                <DataGrid
-                    DockPanel.Dock="Bottom"
-                    ItemsSource="{Binding FullJournal}"
-                    SelectedItem="{Binding SelectedFullJournalEntry}"
-                    RowStyle="{StaticResource GridRowStyle}"
-                    AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
-                    SelectionChanged="OnGridSelectionChanged">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Datum" Width="60" Binding="{Binding Date, StringFormat=\{0:d\}}" />
-                        <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}" />
-                        <DataGridTextColumn Header="Buchungstext" Width="200" Binding="{Binding Text}" />
-                        <DataGridTextColumn Header="Betrag" Width="70"
-                                            Binding="{Binding Value, StringFormat=\{0:0.00\}}"
-                                            ElementStyle="{StaticResource ValueGridStyle}" />
-                        <DataGridTextColumn Header="Sollkonto" Width="100" Binding="{Binding DebitAccount}" />
-                        <DataGridTextColumn Header="Habenkonto" Width="100" Binding="{Binding CreditAccount}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
-            <DockPanel Grid.Column="2">
-                <TextBlock DockPanel.Dock="Top">
-                    <Run Text="Kontenblatt '" />
-                    <Run Text="{Binding SelectedAccount.Name}" />
-                    <Run Text="'" />
-                </TextBlock>
-                <DataGrid
-                    DockPanel.Dock="Bottom"
-                    ItemsSource="{Binding AccountJournal}"
-                    SelectedItem="{Binding SelectedAccountJournalEntry}"
-                    AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
-                    SelectionChanged="OnGridSelectionChanged">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Datum" Width="60" Binding="{Binding Date, StringFormat=\{0:d\}}"
-                                            CellStyle="{StaticResource SummaryGridStyle}" />
-                        <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}"
-                                            CellStyle="{StaticResource SummaryGridStyle}" />
-                        <DataGridTextColumn Header="Buchungstext" Width="200" Binding="{Binding Text}" />
-                        <DataGridTextColumn Header="Sollwert" Width="70"
-                                            Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}"
-                                            ElementStyle="{StaticResource ValueGridStyle}" />
-                        <DataGridTextColumn Header="Habenwert" Width="70"
-                                            Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}"
-                                            ElementStyle="{StaticResource ValueGridStyle}" />
-                        <DataGridTextColumn Header="Gegenkonto" Width="100" Binding="{Binding RemoteAccount}" />
-                    </DataGrid.Columns>
-                    <DataGrid.RowStyle>
-                        <Style BasedOn="{StaticResource GridRowStyle}" TargetType="{x:Type DataGridRow}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsSummary}" Value="True">
-                                    <Setter Property="Background" Value="LightGray" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGrid.RowStyle>
-                </DataGrid>
-            </DockPanel>
-            <GridSplitter Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-            <DockPanel Grid.ColumnSpan="3" Grid.Row="2">
-                <TextBlock
-                    DockPanel.Dock="Left"
-                    Text="Konten"
-                    VerticalAlignment="Center">
-                    <TextBlock.LayoutTransform>
-                        <RotateTransform Angle="-90" />
-                    </TextBlock.LayoutTransform>
-                </TextBlock>
-                <DataGrid
-                    DockPanel.Dock="Right"
-                    ItemsSource="{Binding AccountList}"
-                    AutoGenerateColumns="False"
-                    CanUserAddRows="False"
-                    IsReadOnly="True"
-                    IsSynchronizedWithCurrentItem="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Nummer" Binding="{Binding Identifier}" />
-                        <DataGridTextColumn Header="Bezeichnung" Binding="{Binding Name}" />
-                        <DataGridTextColumn Header="Gruppe" Binding="{Binding Group.Name}" />
-                        <DataGridTextColumn Header="Typ" Binding="{Binding Type}" />
-                    </DataGrid.Columns>
-                    <DataGrid.InputBindings>
-                        <MouseBinding
-                            MouseAction="LeftDoubleClick"
-                            Command="{Binding AccountSelectionCommand}"
-                            CommandParameter="{Binding AccountList/}" />
-                    </DataGrid.InputBindings>
-                    <DataGrid.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem
-                                Header="Kontenblatt aktualisieren"
+    <Grid>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <Menu.Resources>
+                    <Style x:Key="CommandMenuStyle" TargetType="{x:Type MenuItem}">
+                        <Setter Property="Header" Value="{Binding Header}" />
+                        <Setter Property="Command" Value="{Binding Command}" />
+                    </Style>
+                </Menu.Resources>
+                <MenuItem Header="Projekt">
+                    <MenuItem Header="Neu" Command="{Binding NewProjectCommand}" />
+                    <MenuItem Header="Öffnen" Command="{Binding OpenProjectCommand}" InputGestureText="STRG-O" />
+                    <MenuItem Header="Speichern" Command="{Binding SaveProjectCommand}" InputGestureText="STRG-S" />
+                    <Separator />
+                    <MenuItem
+                        Header="Letzte Projekte"
+                        ItemsSource="{Binding RecentProjects}"
+                        ItemContainerStyle="{StaticResource CommandMenuStyle}" />
+                    <Separator />
+                    <MenuItem Header="Beenden" Command="{Binding CloseApplicationCommand}" />
+                </MenuItem>
+                <MenuItem Header="Aktionen">
+                    <MenuItem Header="Buchen" Command="{Binding AddBookingsCommand}" InputGestureText="STRG+B" />
+                    <MenuItem Header="Buchungen importieren" Command="{Binding ImportBookingsCommand}"
+                              InputGestureText="STRG-I" />
+                    <MenuItem Header="Buchungsjahr abschließen" Command="{Binding CloseYearCommand}" />
+                    <MenuItem
+                        Header="Buchungsjahr wählen"
+                        ItemsSource="{Binding BookingYears}"
+                        ItemContainerStyle="{StaticResource CommandMenuStyle}" />
+                    <Separator />
+                    <MenuItem Header="Neues Konto" Command="{Binding NewAccountCommand}" />
+                </MenuItem>
+                <MenuItem Header="Berichte">
+                    <MenuItem Header="Journal" Command="{Binding TotalJournalReportCommand}" />
+                    <MenuItem Header="Kontenblätter" Command="{Binding AccountJournalReportCommand}" />
+                    <MenuItem Header="Summen und Salden" Command="{Binding TotalsAndBalancesReportCommand}" />
+                    <MenuItem Header="Bestandskontosalden" Command="{Binding AssetBalancesReportCommand}" />
+                    <MenuItem Header="Jahresbilanz" Command="{Binding AnnualBalanceReportCommand}" />
+                </MenuItem>
+                <MenuItem Header="Hilfe">
+                    <MenuItem Header="Über" Command="{Binding HelpAboutCommand}" />
+                    <MenuItem Header="Problem melden" Command="{Binding HelpFeedbackCommand}" />
+                    <MenuItem Header="Auf Update prüfen" Command="{Binding HelpCheckForUpdateCommand}" />
+                </MenuItem>
+            </Menu>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.Resources>
+                    <SolidColorBrush
+                        x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                        Color="DarkGray" />
+                    <SolidColorBrush
+                        x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+                        Color="White" />
+                    <Style x:Key="GridRowStyle" TargetType="{x:Type DataGridRow}">
+                        <Setter Property="FontSize" Value="11" />
+                    </Style>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="ToolTip"
+                                Value="{Binding RelativeSource={RelativeSource Self},Path=Content.Text}" />
+                    </Style>
+                    <Style x:Key="SummaryGridStyle" TargetType="DataGridCell">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSummary}" Value="True">
+                                <Setter Property="Foreground" Value="LightGray" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Resources>
+                <DockPanel Grid.Column="0">
+                    <TextBlock
+                        DockPanel.Dock="Top"
+                        Text="Journal des Buchungsjahres" />
+                    <DataGrid
+                        DockPanel.Dock="Bottom"
+                        ItemsSource="{Binding FullJournal}"
+                        SelectedItem="{Binding SelectedFullJournalEntry}"
+                        RowStyle="{StaticResource GridRowStyle}"
+                        AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                        SelectionChanged="OnGridSelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Datum" Width="60"
+                                                Binding="{Binding Date, StringFormat=\{0:d\}}" />
+                            <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}" />
+                            <DataGridTextColumn Header="Buchungstext" Width="200" Binding="{Binding Text}" />
+                            <DataGridTextColumn Header="Betrag" Width="70"
+                                                Binding="{Binding Value, StringFormat=\{0:0.00\}}"
+                                                ElementStyle="{StaticResource ValueGridStyle}" />
+                            <DataGridTextColumn Header="Sollkonto" Width="100" Binding="{Binding DebitAccount}" />
+                            <DataGridTextColumn Header="Habenkonto" Width="100" Binding="{Binding CreditAccount}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
+                <DockPanel Grid.Column="2">
+                    <TextBlock DockPanel.Dock="Top">
+                        <Run Text="Kontenblatt '" />
+                        <Run Text="{Binding SelectedAccount.Name}" />
+                        <Run Text="'" />
+                    </TextBlock>
+                    <DataGrid
+                        DockPanel.Dock="Bottom"
+                        ItemsSource="{Binding AccountJournal}"
+                        SelectedItem="{Binding SelectedAccountJournalEntry}"
+                        AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                        SelectionChanged="OnGridSelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Datum" Width="60"
+                                                Binding="{Binding Date, StringFormat=\{0:d\}}"
+                                                CellStyle="{StaticResource SummaryGridStyle}" />
+                            <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}"
+                                                CellStyle="{StaticResource SummaryGridStyle}" />
+                            <DataGridTextColumn Header="Buchungstext" Width="200" Binding="{Binding Text}" />
+                            <DataGridTextColumn Header="Sollwert" Width="70"
+                                                Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}"
+                                                ElementStyle="{StaticResource ValueGridStyle}" />
+                            <DataGridTextColumn Header="Habenwert" Width="70"
+                                                Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}"
+                                                ElementStyle="{StaticResource ValueGridStyle}" />
+                            <DataGridTextColumn Header="Gegenkonto" Width="100" Binding="{Binding RemoteAccount}" />
+                        </DataGrid.Columns>
+                        <DataGrid.RowStyle>
+                            <Style BasedOn="{StaticResource GridRowStyle}" TargetType="{x:Type DataGridRow}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSummary}" Value="True">
+                                        <Setter Property="Background" Value="LightGray" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                    </DataGrid>
+                </DockPanel>
+                <GridSplitter
+                    Grid.ColumnSpan="3" Grid.Row="1"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                <DockPanel Grid.ColumnSpan="3" Grid.Row="2">
+                    <TextBlock
+                        DockPanel.Dock="Left"
+                        Text="Konten"
+                        VerticalAlignment="Center">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="-90" />
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                    <DataGrid
+                        DockPanel.Dock="Right"
+                        ItemsSource="{Binding AccountList}"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                        IsSynchronizedWithCurrentItem="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Nummer" Binding="{Binding Identifier}" />
+                            <DataGridTextColumn Header="Bezeichnung" Binding="{Binding Name}" />
+                            <DataGridTextColumn Header="Gruppe" Binding="{Binding Group.Name}" />
+                            <DataGridTextColumn Header="Typ" Binding="{Binding Type}" />
+                        </DataGrid.Columns>
+                        <DataGrid.InputBindings>
+                            <MouseBinding
+                                MouseAction="LeftDoubleClick"
                                 Command="{Binding AccountSelectionCommand}"
                                 CommandParameter="{Binding AccountList/}" />
-                            <MenuItem
-                                Header="Konto bearbeiten"
-                                Command="{Binding EditAccountCommand}"
-                                CommandParameter="{Binding AccountList/}" />
-                            <Separator />
-                            <MenuItem
-                                Header="Konto erstellen"
-                                Command="{Binding NewAccountCommand}" />
-                            <Separator />
-                            <MenuItem
-                                Header="Inaktive Konten anzeigen"
-                                IsCheckable="True"
-                                IsChecked="{Binding ShowInactiveAccounts}" />
-                        </ContextMenu>
-                    </DataGrid.ContextMenu>
-                </DataGrid>
-            </DockPanel>
+                        </DataGrid.InputBindings>
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem
+                                    Header="Kontenblatt aktualisieren"
+                                    Command="{Binding AccountSelectionCommand}"
+                                    CommandParameter="{Binding AccountList/}" />
+                                <MenuItem
+                                    Header="Konto bearbeiten"
+                                    Command="{Binding EditAccountCommand}"
+                                    CommandParameter="{Binding AccountList/}" />
+                                <Separator />
+                                <MenuItem
+                                    Header="Konto erstellen"
+                                    Command="{Binding NewAccountCommand}" />
+                                <Separator />
+                                <MenuItem
+                                    Header="Inaktive Konten anzeigen"
+                                    IsCheckable="True"
+                                    IsChecked="{Binding ShowInactiveAccounts}" />
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                    </DataGrid>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
+        <Grid Background="Gray" Opacity="0.5" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Rectangle Width="150" Height="50" Fill="White" />
+            <ProgressBar
+                Width="100" Height="20"
+                IsIndeterminate="True" />
         </Grid>
-    </DockPanel>
+    </Grid>
 </Window>

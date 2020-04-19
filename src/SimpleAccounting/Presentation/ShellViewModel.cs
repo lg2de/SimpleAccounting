@@ -60,6 +60,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private AccountJournalViewModel selectedAccountJournalEntry;
         private FullJournalViewModel selectedFullJournalEntry;
         private bool showInactiveAccounts;
+        private bool isBusy;
 
         public ShellViewModel(
             IWindowManager windowManager,
@@ -180,7 +181,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand HelpFeedbackCommand => new RelayCommand(
             _ => Process.Start(new ProcessStartInfo(NewIssueUrl) { UseShellExecute = true }));
 
-        public ICommand HelpCheckForUpdateCommand => new RelayCommand(this.OnCheckForUpdate);
+        public ICommand HelpCheckForUpdateCommand => new RelayCommand(_ => this.OnCheckForUpdate());
 
         public ICommand AccountSelectionCommand => new RelayCommand(
             o =>
@@ -195,6 +196,21 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand NewAccountCommand => new RelayCommand(_ => this.OnNewAccount());
 
         public ICommand EditAccountCommand => new RelayCommand(this.OnEditAccount);
+
+        public bool IsBusy
+        {
+            get => this.isBusy;
+            set
+            {
+                if (value == this.isBusy)
+                {
+                    return;
+                }
+
+                this.isBusy = value;
+                this.NotifyOfPropertyChange();
+            }
+        }
 
         internal Settings Settings { get; set; } = Settings.Default;
 
@@ -388,79 +404,88 @@ namespace lg2de.SimpleAccounting.Presentation
         [SuppressMessage(
             "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
             Justification = "prevent exceptions from external library")]
-        internal async void OnCheckForUpdate(object _)
+        private async void OnCheckForUpdate()
         {
-            const string caption = "Update-Prüfung";
-            IEnumerable<Release> releases;
+            this.IsBusy = true;
+
             try
             {
-                var client = new GitHubClient(new ProductHeaderValue(ProjectName));
-                releases = await client.Repository.Release.GetAll(OrganizationName, ProjectName);
-            }
-            catch (Exception exception)
-            {
-                this.messageBox.Show(
-                    $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
+                const string caption = "Update-Prüfung";
+                IEnumerable<Release> releases;
+                try
+                {
+                    var client = new GitHubClient(new ProductHeaderValue(ProjectName));
+                    releases = await client.Repository.Release.GetAll(OrganizationName, ProjectName);
+                }
+                catch (Exception exception)
+                {
+                    this.messageBox.Show(
+                        $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
+                        caption,
+                        icon: MessageBoxImage.Error);
+                    return;
+                }
+
+                var newRelease = GetNewRelease(this.version, releases);
+                if (newRelease == null)
+                {
+                    this.messageBox.Show("Sie verwenden die neueste Version.", caption);
+                    return;
+                }
+
+                var result = this.messageBox.Show(
+                    $"Wollen Sie auf die neue Version {newRelease.TagName} aktualisieren?",
                     caption,
-                    icon: MessageBoxImage.Error);
-                return;
-            }
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question,
+                    MessageBoxResult.No);
+                if (result != MessageBoxResult.Yes)
+                {
+                    return;
+                }
 
-            var newRelease = GetNewRelease(this.version, releases);
-            if (newRelease == null)
+                if (!this.CheckSaveProject())
+                {
+                    return;
+                }
+
+                var stream = this.GetType().Assembly.GetManifestResourceStream(
+                    "lg2de.SimpleAccounting.UpdateApplication.ps1");
+                if (stream == null)
+                {
+                    // script not found :(
+                    return;
+                }
+
+                using var reader = new StreamReader(stream);
+                var script = reader.ReadToEnd();
+                string scriptPath = Path.Combine(Path.GetTempPath(), "UpdateApplication.ps1");
+                File.WriteAllText(scriptPath, script);
+
+                var asset = newRelease.Assets.FirstOrDefault(
+                    x => x.Name.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase));
+                if (asset == null)
+                {
+                    // asset not found :(
+                    return;
+                }
+
+                string assetUrl = asset.BrowserDownloadUrl;
+                string targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
+                int processId = Process.GetCurrentProcess().Id;
+                var info = new ProcessStartInfo(
+                    "powershell",
+                    $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
+                Process.Start(info);
+
+                // The user was asked whether saving the project.
+                // We do not want to ask again.
+                this.IsDocumentModified = false;
+            }
+            finally
             {
-                this.messageBox.Show("Sie verwenden die neueste Version.", caption);
-                return;
+                this.IsBusy = false;
             }
-
-            var result = this.messageBox.Show(
-                $"Wollen Sie auf die neue Version {newRelease.TagName} aktualisieren?",
-                caption,
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No);
-            if (result != MessageBoxResult.Yes)
-            {
-                return;
-            }
-
-            if (!this.CheckSaveProject())
-            {
-                return;
-            }
-
-            var stream = this.GetType().Assembly.GetManifestResourceStream(
-                "lg2de.SimpleAccounting.UpdateApplication.ps1");
-            if (stream == null)
-            {
-                // script not found :(
-                return;
-            }
-
-            using var reader = new StreamReader(stream);
-            var script = reader.ReadToEnd();
-            string scriptPath = Path.Combine(Path.GetTempPath(), "UpdateApplication.ps1");
-            File.WriteAllText(scriptPath, script);
-
-            var asset = newRelease.Assets.FirstOrDefault(
-                x => x.Name.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase));
-            if (asset == null)
-            {
-                // asset not found :(
-                return;
-            }
-
-            string assetUrl = asset.BrowserDownloadUrl;
-            string targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
-            int processId = Process.GetCurrentProcess().Id;
-            var info = new ProcessStartInfo(
-                "powershell",
-                $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
-            Process.Start(info);
-
-            // The user was asked whether saving the project.
-            // We do not want to ask again.
-            this.IsDocumentModified = false;
 
             this.TryClose();
         }
@@ -499,6 +524,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         return;
                     }
 
+                    this.IsBusy = true;
                     var starter = new SecureDriveStarter(this.fileSystem, projectFileName);
                     if (!await starter.StartApplicationAsync())
                     {
@@ -508,6 +534,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 this.FileName = projectFileName;
+                this.IsBusy = true;
                 result = MessageBoxResult.No;
                 if (this.fileSystem.FileExists(this.AutoSaveFileName))
                 {
@@ -555,6 +582,10 @@ namespace lg2de.SimpleAccounting.Presentation
             catch (InvalidOperationException e)
             {
                 this.messageBox.Show($"Failed to load file '{this.FileName}':\n{e.Message}", "Load");
+            }
+            finally
+            {
+                this.IsBusy = false;
             }
         }
 
