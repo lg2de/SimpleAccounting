@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
@@ -122,7 +123,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -135,7 +137,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -148,7 +151,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -161,7 +165,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -174,7 +179,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
             fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -187,7 +193,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             messageBox = Substitute.For<IMessageBox>();
             fileSystem = Substitute.For<IFileSystem>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -218,23 +225,40 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [WpfFact]
         public async Task OnActivate_TwoRecentProjectsOneOnSecuredDrive_AllProjectListed()
         {
-            var sut = CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem);
-            sut.Settings = new Settings
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
             {
-                RecentProject = "k:\\file2",
-                RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
-                SecuredDrives = new StringCollection { "K:\\" }
+                Settings = new Settings
+                {
+                    RecentProject = "k:\\file2",
+                    RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
+                    SecuredDrives = new StringCollection { "K:\\" }
+                }
             };
+            messageBox.Show(
+                Arg.Is<string>(s => s.Contains("Cryptomator")),
+                Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.Yes);
             fileSystem.FileExists(Arg.Is("c:\\file1")).Returns(true);
             bool securedFileAvailable = false;
             fileSystem.FileExists(Arg.Is("k:\\file2")).Returns(info => securedFileAvailable);
+            var cryptomator = new Process();
+            processApi.GetProcessByName(Arg.Any<string>()).Returns(cryptomator);
+            processApi.When(x => x.BringProcessToFront(cryptomator)).Do(info => securedFileAvailable = true);
 
             ((IActivate)sut).Activate();
             await sut.LoadingTask;
 
             sut.RecentProjects?.Select(x => x.Header).Should().Equal("c:\\file1", "k:\\file2");
             messageBox.Received(1).Show(
-                Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Is<string>(s => s.Contains("Cryptomator")),
+                Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
         }
@@ -523,12 +547,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
             messageBox.Show(
                     Arg.Any<string>(), Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem)
+            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings(), IsDocumentModified = true
             };

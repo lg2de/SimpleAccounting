@@ -2,14 +2,12 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Extensions
+namespace lg2de.SimpleAccounting.Abstractions
 {
     using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Threading.Tasks;
-    using lg2de.SimpleAccounting.Abstractions;
     using Microsoft.Win32;
 
     internal class SecureDriveStarter
@@ -24,22 +22,24 @@ namespace lg2de.SimpleAccounting.Extensions
         const int WaitMilliseconds = 500;
 
         private readonly IFileSystem fileSystem;
+        private readonly IProcess processApi;
         private readonly string projectFileName;
 
-        private Process process;
+        private Process applicationProcess;
 
-        public SecureDriveStarter(IFileSystem fileSystem, string projectFileName)
+        public SecureDriveStarter(IFileSystem fileSystem, IProcess processApi, string projectFileName)
         {
             this.fileSystem = fileSystem;
+            this.processApi = processApi;
             this.projectFileName = projectFileName;
         }
 
         public async Task<bool> StartApplicationAsync()
         {
             // check whether process is already running
-            this.process = GetSecureDriveProcess();
+            this.applicationProcess = this.GetSecureDriveProcess();
 
-            if (this.process == null
+            if (this.applicationProcess == null
                 && !await this.StartProcessAsync())
             {
                 // the application is NOT running and could NOT be started
@@ -47,7 +47,7 @@ namespace lg2de.SimpleAccounting.Extensions
             }
 
             // bring to front to force user to unlock drive
-            WinApi.BringProcessToFront(this.process);
+            this.processApi.BringProcessToFront(this.applicationProcess);
 
             // which for the project file to be available
             while (true)
@@ -56,8 +56,8 @@ namespace lg2de.SimpleAccounting.Extensions
                 {
                     // file IS available
                     // minimize the drive application and focus SimpleAccounting
-                    WinApi.MinimizeProcess(this.process);
-                    WinApi.BringProcessToFront(Process.GetCurrentProcess());
+                    this.processApi.MinimizeProcess(this.applicationProcess);
+                    this.processApi.BringProcessToFront(this.processApi.GetCurrentProcess());
                     return true;
                 }
 
@@ -66,10 +66,9 @@ namespace lg2de.SimpleAccounting.Extensions
             }
         }
 
-        private static Process GetSecureDriveProcess()
+        private Process GetSecureDriveProcess()
         {
-            return Process.GetProcesses().FirstOrDefault(
-                x => x.ProcessName.Equals(SecureDriveApp, StringComparison.InvariantCultureIgnoreCase));
+            return this.processApi.GetProcessByName(SecureDriveApp);
         }
 
         private async Task<bool> StartProcessAsync()
@@ -82,23 +81,23 @@ namespace lg2de.SimpleAccounting.Extensions
                 return false;
             }
 
-            this.process = Process.Start(Path.Combine(path, SecureDriveAppExe));
-            if (this.process == null || this.process.HasExited)
+            this.applicationProcess = Process.Start(Path.Combine(path, SecureDriveAppExe));
+            if (this.applicationProcess == null || this.applicationProcess.HasExited)
             {
                 return false;
             }
 
             while (true)
             {
-                if (!this.process.MainWindowHandle.Equals(IntPtr.Zero))
+                if (!this.applicationProcess.MainWindowHandle.Equals(IntPtr.Zero))
                 {
                     break;
                 }
 
                 await Task.Delay(WaitMilliseconds);
 
-                this.process = GetSecureDriveProcess();
-                if (this.process == null || this.process.HasExited)
+                this.applicationProcess = this.GetSecureDriveProcess();
+                if (this.applicationProcess == null || this.applicationProcess.HasExited)
                 {
                     return false;
                 }

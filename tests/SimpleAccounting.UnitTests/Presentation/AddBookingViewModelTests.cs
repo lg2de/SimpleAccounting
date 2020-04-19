@@ -45,7 +45,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var parent = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem);
+            var processApi = Substitute.For<IProcess>();
+            var parent = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi);
             parent.LoadProjectData(Samples.SampleProject);
             var sut = new AddBookingViewModel(parent, YearBegin, YearEnd);
 

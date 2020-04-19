@@ -45,12 +45,13 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private static readonly string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
         private static readonly string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
-        private readonly IFileSystem fileSystem;
-        private readonly IMessageBox messageBox;
+        private readonly IWindowManager windowManager;
         private readonly IReportFactory reportFactory;
+        private readonly IMessageBox messageBox;
+        private readonly IFileSystem fileSystem;
+        private readonly IProcess processApi;
         private readonly string version;
 
-        private readonly IWindowManager windowManager;
         private AccountingData accountingData;
 
         private Task autoSaveTask = Task.CompletedTask;
@@ -66,12 +67,14 @@ namespace lg2de.SimpleAccounting.Presentation
             IWindowManager windowManager,
             IReportFactory reportFactory,
             IMessageBox messageBox,
-            IFileSystem fileSystem)
+            IFileSystem fileSystem,
+            IProcess processApi)
         {
             this.windowManager = windowManager;
             this.reportFactory = reportFactory;
             this.messageBox = messageBox;
             this.fileSystem = fileSystem;
+            this.processApi = processApi;
 
             this.version = this.GetType().Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
@@ -525,7 +528,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     }
 
                     this.IsBusy = true;
-                    var starter = new SecureDriveStarter(this.fileSystem, projectFileName);
+                    var starter = new SecureDriveStarter(this.fileSystem, this.processApi, projectFileName);
                     if (!await starter.StartApplicationAsync())
                     {
                         // failed to start application
