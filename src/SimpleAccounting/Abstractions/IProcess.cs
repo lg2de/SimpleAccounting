@@ -15,6 +15,10 @@ namespace lg2de.SimpleAccounting.Abstractions
 
         Process GetCurrentProcess();
 
+        Process Start(string filePath);
+
+        bool IsProcessWindowVisible(Process process);
+
         void BringProcessToFront(Process process);
 
         void MinimizeProcess(Process process);

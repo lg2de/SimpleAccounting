@@ -24,6 +24,21 @@ namespace lg2de.SimpleAccounting.Abstractions
             return Process.GetCurrentProcess();
         }
 
+        public Process Start(string filePath)
+        {
+            return Process.Start(filePath);
+        }
+
+        public bool IsProcessWindowVisible(Process process)
+        {
+            if (process.HasExited)
+            {
+                return false;
+            }
+
+            return !process.MainWindowHandle.Equals(IntPtr.Zero);
+        }
+
         public void BringProcessToFront(Process process)
         {
             WinApi.BringProcessToFront(process);

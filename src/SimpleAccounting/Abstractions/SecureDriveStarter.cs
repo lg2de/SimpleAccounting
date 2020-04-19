@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.Abstractions
 {
-    using System;
     using System.Diagnostics;
     using System.IO;
     using System.Threading.Tasks;
@@ -12,12 +11,16 @@ namespace lg2de.SimpleAccounting.Abstractions
 
     internal class SecureDriveStarter
     {
+#pragma warning disable S1075 // URIs should not be hardcoded
         private const string SecureDriveApp = "Cryptomator";
 
         private const string SecureDriveAppExe = SecureDriveApp + ".exe";
 
         private const string SecureDriveAppKey =
             "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Cryptomator_is1";
+
+        private const string SecureDriveAppFallbackPath = "C:\\Program Files\\Cryptomator\\";
+#pragma warning restore S1075 // URIs should not be hardcoded
 
         const int WaitMilliseconds = 500;
 
@@ -75,21 +78,22 @@ namespace lg2de.SimpleAccounting.Abstractions
         {
             var localMachine = Registry.LocalMachine;
             using var fileKey = localMachine.OpenSubKey(SecureDriveAppKey);
-            var path = fileKey?.GetValue("InstallLocation").ToString();
-            if (string.IsNullOrEmpty(path))
+            var directory = fileKey?.GetValue("InstallLocation").ToString() ?? SecureDriveAppFallbackPath;
+            string filePath = Path.Combine(directory, SecureDriveAppExe);
+            if (!this.fileSystem.FileExists(filePath))
             {
                 return false;
             }
 
-            this.applicationProcess = Process.Start(Path.Combine(path, SecureDriveAppExe));
-            if (this.applicationProcess == null || this.applicationProcess.HasExited)
+            this.applicationProcess = this.processApi.Start(filePath);
+            if (this.applicationProcess == null)
             {
                 return false;
             }
 
             while (true)
             {
-                if (!this.applicationProcess.MainWindowHandle.Equals(IntPtr.Zero))
+                if (this.processApi.IsProcessWindowVisible(this.applicationProcess))
                 {
                     break;
                 }
