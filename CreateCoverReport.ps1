@@ -15,10 +15,11 @@ $coverageAttributeExclude = "*ExcludeFromCodeCoverage*"
 $coverageFileExclude = "*.designer.cs;*.g.cs"
 $outputFile = "$PSScriptRoot\CoverOutput\coverage.xml"
 
-$arguments = "-register -target:`"$dotNetExe`" -targetargs:`"$testArguments`" -output:$outputFile -filter:`"$coverageFilter`" -excludebyattribute:`"$coverageAttributeExclude`" -excludebyfile:`"$coverageFileExclude`""
-$process = Start-Process -filepath $openCoverExe -ArgumentList $arguments -NoNewWindow -Wait
-if ($process.ExitCode -ne 0) {
-  Write-Error "exited with status code $($process.ExitCode)"
+$arguments = "-register -returntargetcode -target:`"$dotNetExe`" -targetargs:`"$testArguments`" -output:$outputFile -filter:`"$coverageFilter`" -excludebyattribute:`"$coverageAttributeExclude`" -excludebyfile:`"$coverageFileExclude`""
+$process = Start-Process -FilePath $openCoverExe -NoNewWindow -PassThru -Wait -ArgumentList $arguments
+$exitCode = $process.ExitCode
+if ($exitCode -ne 0) {
+  Write-Error "test fails with exit code $exitCode"
   return 1
 }
 
@@ -31,3 +32,5 @@ if (Test-Path $reportDir) {
   Remove-Item $reportDir -Confirm:$false -Force -Recurse
 }
 & $generatorExe -reports:$outputFile -targetdir:$reportDir
+
+Write-Host --- done ---
