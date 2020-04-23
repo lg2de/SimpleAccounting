@@ -14,7 +14,14 @@ $coverageFilter = "+[SimpleAccounting*]* -[SimpleAccounting.UnitTests*]*"
 $coverageAttributeExclude = "*ExcludeFromCodeCoverage*"
 $coverageFileExclude = "*.designer.cs;*.g.cs"
 $outputFile = "$PSScriptRoot\CoverOutput\coverage.xml"
-& $openCoverExe -register -target:$dotNetExe -targetargs:$testArguments -output:$outputFile -filter:$coverageFilter -excludebyattribute:$coverageAttributeExclude -excludebyfile:$coverageFileExclude
+
+$arguments = "-register -returntargetcode -target:`"$dotNetExe`" -targetargs:`"$testArguments`" -output:$outputFile -filter:`"$coverageFilter`" -excludebyattribute:`"$coverageAttributeExclude`" -excludebyfile:`"$coverageFileExclude`""
+$process = Start-Process -FilePath $openCoverExe -NoNewWindow -PassThru -Wait -ArgumentList $arguments
+$exitCode = $process.ExitCode
+if ($exitCode -ne 0) {
+  Write-Error "test fails with exit code $exitCode"
+  return 1
+}
 
 Write-Host --- creating coverage report ---
 $generatorDir = (Get-ChildItem -Path "$packagesFolder\ReportGenerator" -Directory | select -last 1).Name
@@ -25,3 +32,5 @@ if (Test-Path $reportDir) {
   Remove-Item $reportDir -Confirm:$false -Force -Recurse
 }
 & $generatorExe -reports:$outputFile -targetdir:$reportDir
+
+Write-Host --- done ---

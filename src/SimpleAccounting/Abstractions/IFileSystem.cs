@@ -5,6 +5,8 @@
 namespace lg2de.SimpleAccounting.Abstractions
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
 
     /// <summary>
     ///     Defines abstraction for file system access not available in .NET framework.
@@ -55,5 +57,11 @@ namespace lg2de.SimpleAccounting.Abstractions
         /// <param name="path">The file to open for reading.</param>
         /// <returns>A string containing all the text in the file.</returns>
         string ReadAllTextFromFile(string path);
+
+        /// <summary>
+        ///     Retrieves the drive names of all logical drives on a computer.
+        /// </summary>
+        /// <returns>An enumeration of type <see cref="DriveInfo"/> that represents the logical drives on a computer.</returns>
+        IEnumerable<(string RootPath, string Format)> GetDrives();
     }
 }

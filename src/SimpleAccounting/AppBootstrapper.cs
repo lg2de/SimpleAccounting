@@ -27,6 +27,7 @@ namespace lg2de.SimpleAccounting
             this.container.Singleton<IReportFactory, ReportFactory>();
             this.container.Singleton<IMessageBox, MessageBoxWrapper>();
             this.container.Singleton<IFileSystem, FileSystem>();
+            this.container.Singleton<IProcess, DotNetProcess>();
             this.container.PerRequest<ShellViewModel>();
         }
 

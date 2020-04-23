@@ -5,8 +5,10 @@
 namespace lg2de.SimpleAccounting.Abstractions
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
+    using System.Linq;
     using System.Text;
 
     /// <summary>
@@ -47,6 +49,11 @@ namespace lg2de.SimpleAccounting.Abstractions
         public string ReadAllTextFromFile(string path)
         {
             return File.ReadAllText(path);
+        }
+
+        public IEnumerable<(string RootPath, string Format)> GetDrives()
+        {
+            return DriveInfo.GetDrives().Select(x => (RootPath: x.RootDirectory.FullName, Format: x.DriveFormat));
         }
     }
 }
