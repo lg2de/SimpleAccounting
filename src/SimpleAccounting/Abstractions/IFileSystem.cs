@@ -62,6 +62,6 @@ namespace lg2de.SimpleAccounting.Abstractions
         ///     Retrieves the drive names of all logical drives on a computer.
         /// </summary>
         /// <returns>An enumeration of type <see cref="DriveInfo"/> that represents the logical drives on a computer.</returns>
-        IEnumerable<DriveInfo> GetDrives();
+        IEnumerable<(string RootPath, string Format)> GetDrives();
     }
 }

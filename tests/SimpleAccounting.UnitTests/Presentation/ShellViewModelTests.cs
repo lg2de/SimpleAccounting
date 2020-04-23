@@ -240,10 +240,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 }
             };
             messageBox.Show(
-                Arg.Is<string>(s => s.Contains("Cryptomator")),
-                Arg.Any<string>(),
-                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                    Arg.Is<string>(s => s.Contains("Cryptomator")),
+                    Arg.Any<string>(),
+                    Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
             fileSystem.FileExists(Arg.Is("c:\\file1")).Returns(true);
             bool securedFileAvailable = false;
@@ -879,53 +879,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void LoadProjectFromFile_AutoSaveFileExistsYes_AutoSaveFileLoaded()
-        {
-            var sut = CreateSut(out var messageBox, out var fileSystem);
-            messageBox.Show(
-                    Arg.Any<string>(), Arg.Any<string>(),
-                    MessageBoxButton.YesNo, MessageBoxImage.Question,
-                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-                .Returns(MessageBoxResult.Yes);
-            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-            fileSystem.FileExists("the.fileName~").Returns(true);
-
-            sut.LoadProjectFromFileAsync("the.fileName");
-
-            using var _ = new AssertionScope();
-            sut.FileName.Should().Be("the.fileName");
-            sut.IsDocumentModified.Should().BeTrue("changes are (still) not yet saved");
-            sut.Settings.RecentProject.Should().Be("the.fileName");
-            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
-            fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
-        }
-
-        [Fact]
-        public async Task LoadProjectFromFileAsync_FullRecentList_NewFileOnTop()
-        {
-            var sut = CreateSut(out IFileSystem fileSystem);
-            sut.Settings.RecentProjects = new StringCollection
-            {
-                "A",
-                "B",
-                "C",
-                "D",
-                "E",
-                "F",
-                "G",
-                "H",
-                "I",
-                "J"
-            };
-            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-
-            await sut.LoadProjectFromFileAsync("the.fileName");
-
-            sut.Settings.RecentProjects.OfType<string>().Should()
-                .Equal("the.fileName", "A", "B", "C", "D", "E", "F", "G", "H", "I");
-        }
-
-        [Fact]
         public async Task LoadProjectFromFileAsync_HappyPath_FileLoaded()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
@@ -942,18 +895,25 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public async Task LoadProjectFromFileAsync_MigrationRequired_ProjectModified()
+        public async Task LoadProjectFromFileAsync_AutoSaveFileExistsYes_AutoSaveFileLoaded()
         {
-            var sut = CreateSut(out IFileSystem fileSystem);
-            var accountingData = new AccountingData
-            {
-                Years = new List<AccountingDataYear> { new AccountingDataYear { Name = 2020 } }
-            };
-            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
+            var sut = CreateSut(out var messageBox, out var fileSystem);
+            messageBox.Show(
+                    Arg.Any<string>(), Arg.Any<string>(),
+                    MessageBoxButton.YesNo, MessageBoxImage.Question,
+                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.Yes);
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+            fileSystem.FileExists("the.fileName~").Returns(true);
 
             await sut.LoadProjectFromFileAsync("the.fileName");
 
-            sut.IsDocumentModified.Should().BeTrue();
+            using var _ = new AssertionScope();
+            sut.FileName.Should().Be("the.fileName");
+            sut.IsDocumentModified.Should().BeTrue("changes are (still) not yet saved");
+            sut.Settings.RecentProject.Should().Be("the.fileName");
+            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
+            fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
         }
 
         [Fact]
@@ -980,7 +940,28 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public async Task LoadProjectFromFileAsync_FileOnSecureDrive_StoreOpenedAndFileLoaded()
+        public async Task LoadProjectFromFileAsync_NewFileOnSecureDrive_StoreOpenedAndFileLoaded()
+        {
+            var sut = CreateSut(out var messageBox, out var fileSystem);
+            fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(true);
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+            fileSystem.GetDrives().Returns(
+                new[] { (FilePath: "C:\\", Format: "Normal"), (FilePath: "K:\\", Format: "Cryptomator File System") });
+
+            await sut.Awaiting(x => x.LoadProjectFromFileAsync("K:\\the.fileName")).Should()
+                .CompleteWithinAsync(1.Seconds());
+
+            sut.Settings.SecuredDrives.Should().Equal(new object[] { "K:\\" });
+            messageBox.DidNotReceive().Show(
+                Arg.Is<string>(s => s.Contains("Cryptomator")),
+                Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
+        }
+
+        [Fact]
+        public async Task LoadProjectFromFileAsync_KnownFileOnSecureDrive_StoreOpenedAndFileLoaded()
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
@@ -1018,6 +999,46 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .CompleteWithinAsync(1.Seconds());
 
             fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
+        }
+
+        [Fact]
+        public async Task LoadProjectFromFileAsync_FullRecentList_NewFileOnTop()
+        {
+            var sut = CreateSut(out IFileSystem fileSystem);
+            sut.Settings.RecentProjects = new StringCollection
+            {
+                "A",
+                "B",
+                "C",
+                "D",
+                "E",
+                "F",
+                "G",
+                "H",
+                "I",
+                "J"
+            };
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+
+            await sut.LoadProjectFromFileAsync("the.fileName");
+
+            sut.Settings.RecentProjects.OfType<string>().Should()
+                .Equal("the.fileName", "A", "B", "C", "D", "E", "F", "G", "H", "I");
+        }
+
+        [Fact]
+        public async Task LoadProjectFromFileAsync_MigrationRequired_ProjectModified()
+        {
+            var sut = CreateSut(out IFileSystem fileSystem);
+            var accountingData = new AccountingData
+            {
+                Years = new List<AccountingDataYear> { new AccountingDataYear { Name = 2020 } }
+            };
+            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
+
+            await sut.LoadProjectFromFileAsync("the.fileName");
+
+            sut.IsDocumentModified.Should().BeTrue();
         }
 
         [Fact]

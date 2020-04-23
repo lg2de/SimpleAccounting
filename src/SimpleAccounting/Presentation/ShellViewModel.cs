@@ -400,7 +400,6 @@ namespace lg2de.SimpleAccounting.Presentation
         }
 
         // TODO move to separate class?
-        [ExcludeFromCodeCoverage]
         [SuppressMessage(
             "Major Bug", "S3168:\"async\" methods should not return \"void\"",
             Justification = "missing async Caliburn")]
@@ -567,12 +566,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var info = this.fileSystem.GetDrives().SingleOrDefault(
                     x => this.FileName.StartsWith(
-                        x.RootDirectory.FullName, StringComparison.InvariantCultureIgnoreCase));
-                if (info != null
-                    && info.DriveFormat.Contains("cryptomator", StringComparison.InvariantCultureIgnoreCase)
-                    && !this.Settings.SecuredDrives.Contains(info.RootDirectory.FullName))
+                        x.RootPath, StringComparison.InvariantCultureIgnoreCase));
+                if (info.Format != null
+                    && info.Format.Contains("cryptomator", StringComparison.InvariantCultureIgnoreCase)
+                    && !this.Settings.SecuredDrives.Contains(info.RootPath))
                 {
-                    this.Settings.SecuredDrives.Add(info.RootDirectory.FullName);
+                    this.Settings.SecuredDrives.Add(info.RootPath);
                 }
 
                 this.Settings.RecentProjects.Remove(this.FileName);
