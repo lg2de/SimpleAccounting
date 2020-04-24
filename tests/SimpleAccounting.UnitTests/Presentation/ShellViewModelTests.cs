@@ -8,7 +8,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
@@ -19,12 +18,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using FluentAssertions.Extensions;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
     using NSubstitute;
-    using Octokit;
     using Xunit;
 
     public class ShellViewModelTests
@@ -91,10 +90,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -105,10 +106,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -119,10 +122,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -133,10 +138,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -147,10 +154,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -161,10 +170,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             messageBox = Substitute.For<IMessageBox>();
             fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings()
             };
@@ -176,18 +187,20 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings
+            var sut =
+                new ShellViewModel(windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
                 {
-                    RecentProject = "k:\\file2",
-                    RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
-                    SecuredDrives = new StringCollection { "K:\\" }
-                }
-            };
+                    Settings = new Settings
+                    {
+                        RecentProject = "k:\\file2",
+                        RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
+                        SecuredDrives = new StringCollection { "K:\\" }
+                    }
+                };
             messageBox.Show(
                     Arg.Is<string>(s => s.Contains("Cryptomator")),
                     Arg.Any<string>(),
@@ -494,6 +507,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
@@ -502,9 +516,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
-                Settings = new Settings(), IsDocumentModified = true
+                Settings = new Settings(),
+                IsDocumentModified = true
             };
             sut.LoadProjectData(Samples.SampleProject);
 
@@ -905,10 +921,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings { SecuredDrives = new StringCollection { "K:\\" } }
             };

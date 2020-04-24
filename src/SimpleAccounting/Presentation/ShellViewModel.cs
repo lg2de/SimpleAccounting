@@ -11,7 +11,6 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Threading;
@@ -23,10 +22,10 @@ namespace lg2de.SimpleAccounting.Presentation
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
-    using Octokit;
     using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
     using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
@@ -37,16 +36,12 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellViewModel : Conductor<IScreen>, IDisposable
     {
-        private const string GithubDomain = "github.com";
-        private const string OrganizationName = "lg2de";
-        private const string ProjectName = "SimpleAccounting";
         private const int MaxRecentProjects = 10;
         private const double CentFactor = 100.0;
 
-        private static readonly string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
-        private static readonly string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
         private readonly IWindowManager windowManager;
         private readonly IReportFactory reportFactory;
+        private readonly IApplicationUpdate applicationUpdate;
         private readonly IMessageBox messageBox;
         private readonly IFileSystem fileSystem;
         private readonly IProcess processApi;
@@ -66,12 +61,14 @@ namespace lg2de.SimpleAccounting.Presentation
         public ShellViewModel(
             IWindowManager windowManager,
             IReportFactory reportFactory,
+            IApplicationUpdate applicationUpdate,
             IMessageBox messageBox,
             IFileSystem fileSystem,
             IProcess processApi)
         {
             this.windowManager = windowManager;
             this.reportFactory = reportFactory;
+            this.applicationUpdate = applicationUpdate;
             this.messageBox = messageBox;
             this.fileSystem = fileSystem;
             this.processApi = processApi;
@@ -179,12 +176,12 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.OnAnnualBalanceReport(), _ => this.FullJournal.Any());
 
         public ICommand HelpAboutCommand => new RelayCommand(
-            _ => Process.Start(new ProcessStartInfo(ProjectUrl) { UseShellExecute = true }));
+            _ => Process.Start(new ProcessStartInfo(Defines.ProjectUrl) { UseShellExecute = true }));
 
         public ICommand HelpFeedbackCommand => new RelayCommand(
-            _ => Process.Start(new ProcessStartInfo(NewIssueUrl) { UseShellExecute = true }));
+            _ => Process.Start(new ProcessStartInfo(Defines.NewIssueUrl) { UseShellExecute = true }));
 
-        public ICommand HelpCheckForUpdateCommand => new RelayCommand(_ => this.OnCheckForUpdate());
+        public ICommand HelpCheckForUpdateCommand => new RelayCommand(_ => this.OnCheckForUpdateAsync());
 
         public ICommand AccountSelectionCommand => new RelayCommand(
             o =>
@@ -351,47 +348,15 @@ namespace lg2de.SimpleAccounting.Presentation
 
         // TODO move to separate class?
         [SuppressMessage(
-            "Major Bug", "S3168:\"async\" methods should not return \"void\"",
-            Justification = "missing async Caliburn")]
-        [SuppressMessage(
             "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
             Justification = "prevent exceptions from external library")]
-        private async void OnCheckForUpdate()
+        private async Task OnCheckForUpdateAsync()
         {
             this.IsBusy = true;
 
             try
             {
-                const string caption = "Update-Prüfung";
-                IEnumerable<Release> releases;
-                try
-                {
-                    var client = new GitHubClient(new ProductHeaderValue(ProjectName));
-                    releases = await client.Repository.Release.GetAll(OrganizationName, ProjectName);
-                }
-                catch (Exception exception)
-                {
-                    this.messageBox.Show(
-                        $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
-                        caption,
-                        icon: MessageBoxImage.Error);
-                    return;
-                }
-
-                var newRelease = releases.GetNewRelease(this.version);
-                if (newRelease == null)
-                {
-                    this.messageBox.Show("Sie verwenden die neueste Version.", caption);
-                    return;
-                }
-
-                var result = this.messageBox.Show(
-                    $"Wollen Sie auf die neue Version {newRelease.TagName} aktualisieren?",
-                    caption,
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question,
-                    MessageBoxResult.No);
-                if (result != MessageBoxResult.Yes)
+                if (!await this.applicationUpdate.UpdateAvailableAsync())
                 {
                     return;
                 }
@@ -401,34 +366,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                var stream = this.GetType().Assembly.GetManifestResourceStream(
-                    "lg2de.SimpleAccounting.UpdateApplication.ps1");
-                if (stream == null)
-                {
-                    // script not found :(
-                    return;
-                }
-
-                using var reader = new StreamReader(stream);
-                var script = reader.ReadToEnd();
-                string scriptPath = Path.Combine(Path.GetTempPath(), "UpdateApplication.ps1");
-                File.WriteAllText(scriptPath, script);
-
-                var asset = newRelease.Assets.FirstOrDefault(
-                    x => x.Name.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase));
-                if (asset == null)
-                {
-                    // asset not found :(
-                    return;
-                }
-
-                string assetUrl = asset.BrowserDownloadUrl;
-                string targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
-                int processId = Process.GetCurrentProcess().Id;
-                var info = new ProcessStartInfo(
-                    "powershell",
-                    $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
-                Process.Start(info);
+                this.applicationUpdate.StartUpdate();
 
                 // The user was asked whether saving the project.
                 // We do not want to ask again.

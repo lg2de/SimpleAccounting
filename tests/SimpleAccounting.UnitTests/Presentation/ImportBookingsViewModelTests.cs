@@ -36,8 +36,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = new ImportBookingsViewModel(
                 null,
                 null,
-                accounts);
-            sut.SelectedAccount = accounts.Single(x => x.Name == "Bank account");
+                accounts) { SelectedAccount = accounts.Single(x => x.Name == "Bank account") };
             sut.SelectedAccount.ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
             {
                 new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
@@ -72,14 +71,13 @@ Date;Name;Text;Value
         [Fact]
         public void ProcessData_SampleData_DataConverted()
         {
-            var parent = new ShellViewModel(null, null, null, null, null);
+            var parent = new ShellViewModel(null, null, null, null, null, null);
             parent.LoadProjectData(Samples.SampleProject);
             var accounts = Samples.SampleProject.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(
                 null,
                 parent,
-                accounts);
-            sut.SelectedAccount = accounts.Single(x => x.Name == "Bank account");
+                accounts) { SelectedAccount = accounts.Single(x => x.Name == "Bank account") };
             sut.SelectedAccountNumber = sut.SelectedAccount.ID;
             var remoteAccount = accounts.Single(x => x.ID == 600);
             sut.ImportData.Add(

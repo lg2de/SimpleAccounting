@@ -17,7 +17,7 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class ShellDesignViewModel : ShellViewModel
     {
         public ShellDesignViewModel()
-            : base(null, null, null, null, null)
+            : base(null, null, null, null, null, null)
         {
             var menuItem = new MenuViewModel("c:\\Test.acml", null);
             this.RecentProjects.Add(menuItem);
