@@ -327,56 +327,6 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        // TODO move to extenstion
-        internal static Release GetNewRelease(string currentVersion, IEnumerable<Release> releases)
-        {
-            bool isPreRelease = currentVersion.Contains("beta", StringComparison.InvariantCultureIgnoreCase);
-            var candidates = releases.Where(x => !x.Draft);
-            if (!isPreRelease)
-            {
-                candidates = candidates.Where(x => !x.Prerelease);
-            }
-
-            return candidates.SingleOrDefault(
-                x => x.Assets != null && x.Assets.Any() && IsGreater(x.TagName, currentVersion));
-
-            static bool IsGreater(string tag, string current)
-            {
-                if (tag == current)
-                {
-                    return false;
-                }
-
-                var tagElements = tag.Split('-');
-                var tagMain = tagElements[0];
-                var tagBeta = tagElements.Length > 1 ? tagElements[1] : string.Empty;
-                var currentElements = current.Split('-');
-                var currentMain = currentElements[0];
-                var currentBeta = currentElements.Length > 1 ? currentElements[1] : string.Empty;
-
-                if (string.Compare(tagMain, currentMain, StringComparison.Ordinal) > 0)
-                {
-                    // new release
-                    return true;
-                }
-
-                if (tagMain == currentMain)
-                {
-                    // same target version -> check beta
-                    if (string.IsNullOrEmpty(tagBeta))
-                    {
-                        // update from beta to release?
-                        return !string.IsNullOrEmpty(currentBeta);
-                    }
-
-                    return string.Compare(tagBeta, currentBeta, StringComparison.Ordinal) > 0;
-                }
-
-                // older release version
-                return false;
-            }
-        }
-
         internal void AddBooking(AccountingDataJournalBooking booking, bool refreshJournal = true)
         {
             this.currentModelJournal.Booking.Add(booking);
@@ -428,7 +378,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                var newRelease = GetNewRelease(this.version, releases);
+                var newRelease = releases.GetNewRelease(this.version);
                 if (newRelease == null)
                 {
                     this.messageBox.Show("Sie verwenden die neueste Version.", caption);

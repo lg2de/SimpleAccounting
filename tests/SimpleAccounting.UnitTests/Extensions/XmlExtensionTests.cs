@@ -10,7 +10,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
     using lg2de.SimpleAccounting.Extensions;
     using Xunit;
 
-    public class XmlExtensionsTests
+    public class XmlExtensionTests
     {
         [Fact]
         public void GetAttribute_IntNotExisting_ReturnsZero()

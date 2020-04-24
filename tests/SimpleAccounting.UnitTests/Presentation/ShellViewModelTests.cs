@@ -87,35 +87,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
         }
 
-        [Theory]
-        [InlineData("2.0.0", "2.0.0", null)]
-        [InlineData("2.0.0", "2.0.1", "2.0.1")]
-        [InlineData("2.0.0", "2.1.0", "2.1.0")]
-        [InlineData("2.1.0", "2.0.0", null)]
-        [InlineData("2.0.0-beta1", "2.0.0-beta1", null)]
-        [InlineData("2.0.0-beta1", "2.0.0-beta2", "2.0.0-beta2")]
-        [InlineData("2.0.0-beta1", "2.0.1-beta1", "2.0.1-beta1")]
-        [InlineData("2.0.0-beta2", "2.0.0-beta1", null)]
-        [InlineData("2.0.0", "2.0.0-beta1", null)] // release is greater than beta
-        [InlineData("2.0.0-beta1", "2.0.0", "2.0.0")] // update to release
-        [InlineData("2.0.0", "2.0.1-beta1", null)] // do not update to beta
-        public void GetNewRelease_TestScenarios(
-            string currentVersion,
-            string availableVersion,
-            string expectedVersion)
-        {
-            var result = ShellViewModel.GetNewRelease(currentVersion, CreateRelease(availableVersion));
-
-            if (string.IsNullOrEmpty(expectedVersion))
-            {
-                result.Should().BeNull();
-            }
-            else
-            {
-                result.Should().BeEquivalentTo(new { TagName = expectedVersion });
-            }
-        }
-
         private static ShellViewModel CreateSut()
         {
             var windowManager = Substitute.For<IWindowManager>();
@@ -198,28 +169,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Settings = new Settings()
             };
             return sut;
-        }
-
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        private static IReadOnlyList<Release> CreateRelease(string tag, bool addAsset = true)
-        {
-            Type releaseType = typeof(Release);
-            var tagProperty = releaseType.GetProperty(nameof(Release.TagName));
-            var preReleaseProperty = releaseType.GetProperty(nameof(Release.Prerelease));
-            var assetsProperty = releaseType.GetProperty(nameof(Release.Assets));
-            var release = new Release();
-            tagProperty.SetValue(release, tag);
-            if (tag.Contains("beta"))
-            {
-                preReleaseProperty.SetValue(release, true);
-            }
-
-            if (addAsset)
-            {
-                assetsProperty.SetValue(release, new List<ReleaseAsset> { new ReleaseAsset() });
-            }
-
-            return new List<Release> { release };
         }
 
         [WpfFact]
@@ -816,15 +765,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     new { Text = "Summe" },
                     new { Text = "Saldo" });
             }
-        }
-
-        [Fact]
-        public void GetNewRelease_AssetNotAvailable_VersionIgnored()
-        {
-            var releases = CreateRelease("2.1.0", addAsset: false);
-            var result = ShellViewModel.GetNewRelease("2.0.0", releases);
-
-            result.Should().BeNull();
         }
 
         [Fact]
