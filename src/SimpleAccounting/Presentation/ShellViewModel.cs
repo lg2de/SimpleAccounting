@@ -146,7 +146,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 this.FileName = "<new>";
-                this.LoadProjectData(GetTemplateProject());
+                this.LoadProjectData(AccountingData.GetTemplateProject());
             });
 
         public ICommand OpenProjectCommand => new RelayCommand(_ => this.OnOpenProject());
@@ -627,34 +627,6 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.fileSystem.FileDelete(this.AutoSaveFileName);
             }
-        }
-
-        // TODO move to extension class
-        private static AccountingData GetTemplateProject()
-        {
-            var year = (ushort)DateTime.Now.Year;
-            var defaultAccounts = new List<AccountDefinition>
-            {
-                new AccountDefinition { ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset },
-                new AccountDefinition { ID = 400, Name = "Salary", Type = AccountDefinitionType.Income },
-                new AccountDefinition { ID = 600, Name = "Food", Type = AccountDefinitionType.Expense },
-                new AccountDefinition { ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward }
-            };
-            var accountJournal = new AccountingDataJournal
-            {
-                Year = year.ToString(CultureInfo.InvariantCulture),
-                DateStart = (uint)year * 10000 + 101,
-                DateEnd = (uint)year * 10000 + 1231,
-                Booking = new List<AccountingDataJournalBooking>()
-            };
-            return new AccountingData
-            {
-                Accounts = new List<AccountingDataAccountGroup>
-                {
-                    new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }
-                },
-                Journal = new List<AccountingDataJournal> { accountJournal }
-            };
         }
 
         private void OnOpenProject()

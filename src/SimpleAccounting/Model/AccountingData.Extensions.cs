@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Model
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
@@ -12,9 +13,9 @@ namespace lg2de.SimpleAccounting.Model
 
     public partial class AccountingData
     {
-        internal const string DefaultXsiSchemaLocation = DefaultSchemaNamespacee + " " + DefaultSchemaLocation;
+        internal const string DefaultXsiSchemaLocation = DefaultSchemaNamespace + " " + DefaultSchemaLocation;
 
-        private const string DefaultSchemaNamespacee = "https://lg2.de/SimpleAccounting/AccountingSchema";
+        private const string DefaultSchemaNamespace = "https://lg2.de/SimpleAccounting/AccountingSchema";
         private const string DefaultSchemaLocation = "https://lg2de.github.io/SimpleAccounting/AccountingData.xsd";
 
         private string schema = DefaultXsiSchemaLocation;
@@ -38,6 +39,33 @@ namespace lg2de.SimpleAccounting.Model
         }
 
         internal IEnumerable<AccountDefinition> AllAccounts => this.Accounts?.SelectMany(g => g.Account);
+
+        internal static AccountingData GetTemplateProject()
+        {
+            var year = (ushort)DateTime.Now.Year;
+            var defaultAccounts = new List<AccountDefinition>
+            {
+                new AccountDefinition { ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset },
+                new AccountDefinition { ID = 400, Name = "Salary", Type = AccountDefinitionType.Income },
+                new AccountDefinition { ID = 600, Name = "Food", Type = AccountDefinitionType.Expense },
+                new AccountDefinition { ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward }
+            };
+            var accountJournal = new AccountingDataJournal
+            {
+                Year = year.ToString(CultureInfo.InvariantCulture),
+                DateStart = (uint)year * 10000 + 101,
+                DateEnd = (uint)year * 10000 + 1231,
+                Booking = new List<AccountingDataJournalBooking>()
+            };
+            return new AccountingData
+            {
+                Accounts = new List<AccountingDataAccountGroup>
+                {
+                    new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }
+                },
+                Journal = new List<AccountingDataJournal> { accountJournal }
+            };
+        }
 
         internal AccountingData Clone()
         {
