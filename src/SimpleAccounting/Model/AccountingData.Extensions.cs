@@ -81,6 +81,12 @@ namespace lg2de.SimpleAccounting.Model
             return result;
         }
 
+        internal string GetAccountName(BookingValue entry)
+        {
+            var account = this.AllAccounts.Single(a => a.ID == entry.Account);
+            return account.FormatName();
+        }
+
         private bool MergeYearsIntoJournal()
         {
             if (this.Years == null)

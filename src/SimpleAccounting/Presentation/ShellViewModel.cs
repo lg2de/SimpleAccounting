@@ -919,13 +919,6 @@ namespace lg2de.SimpleAccounting.Presentation
             this.UpdateBookingYears();
         }
 
-        // TODO move to extension method
-        private string BuildAccountDescription(ulong accountNumber)
-        {
-            var account = this.accountingData.AllAccounts.Single(a => a.ID == accountNumber);
-            return account.FormatName();
-        }
-
         private void SelectBookingYear(string newYearName)
         {
             this.currentModelJournal = this.accountingData.Journal.Single(y => y.Year == newYearName);
@@ -988,8 +981,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debit = debitAccounts[0];
                     item.Text = debit.Text;
                     item.Value = Convert.ToDouble(debit.Value) / CentFactor;
-                    item.DebitAccount = this.BuildAccountDescription(debit.Account);
-                    item.CreditAccount = this.BuildAccountDescription(creditAccounts[0].Account);
+                    item.DebitAccount = this.accountingData.GetAccountName(debit);
+                    item.CreditAccount = this.accountingData.GetAccountName(creditAccounts[0]);
                     this.FullJournal.Add(item);
                     continue;
                 }
@@ -999,7 +992,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debitItem = item.Clone();
                     debitItem.Text = debitEntry.Text;
                     debitItem.Value = Convert.ToDouble(debitEntry.Value) / CentFactor;
-                    debitItem.DebitAccount = this.BuildAccountDescription(debitEntry.Account);
+                    debitItem.DebitAccount = this.accountingData.GetAccountName(debitEntry);
                     this.FullJournal.Add(debitItem);
                 }
 
@@ -1008,7 +1001,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     var creditItem = item.Clone();
                     creditItem.Text = creditEntry.Text;
                     creditItem.Value = Convert.ToDouble(creditEntry.Value) / CentFactor;
-                    creditItem.CreditAccount = this.BuildAccountDescription(creditEntry.Account);
+                    creditItem.CreditAccount = this.accountingData.GetAccountName(creditEntry);
                     this.FullJournal.Add(creditItem);
                 }
             }
@@ -1055,7 +1048,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     item.DebitValue = Convert.ToDouble(debitEntry.Value) / CentFactor;
                     debitSum += item.DebitValue;
                     item.RemoteAccount = entry.Credit.Count == 1
-                        ? this.BuildAccountDescription(entry.Credit.Single().Account)
+                        ? this.accountingData.GetAccountName(entry.Credit.Single())
                         : "Diverse";
                 }
                 else
@@ -1065,7 +1058,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     item.CreditValue = Convert.ToDouble(creditEntry.Value) / CentFactor;
                     creditSum += item.CreditValue;
                     item.RemoteAccount = entry.Debit.Count == 1
-                        ? this.BuildAccountDescription(entry.Debit.Single().Account)
+                        ? this.accountingData.GetAccountName(entry.Debit.Single())
                         : "Diverse";
                 }
             }
