@@ -33,13 +33,17 @@ namespace lg2de.SimpleAccounting.Infrastructure
             this.version = version;
         }
 
-        public async Task<bool> UpdateAvailableAsync()
+        [SuppressMessage(
+            "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
+            Justification = "catch exceptions from external library")]
+        public async Task<bool> IsUpdateAvailableAsync()
         {
             const string caption = "Update-Prüfung";
             IEnumerable<Release> releases;
             try
             {
-                var client = new GitHubClient(new ProductHeaderValue(Defines.ProjectName));
+                var productInformation = new ProductHeaderValue(Defines.ProjectName);
+                var client = new GitHubClient(productInformation);
                 releases = await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
             }
             catch (Exception exception)
@@ -67,7 +71,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
             return result == MessageBoxResult.Yes;
         }
 
-        public void StartUpdate()
+        public void StartUpdateProcess()
         {
             if (this.newRelease == null)
             {
@@ -102,7 +106,6 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 "powershell",
                 $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
             Process.Start(info);
-
         }
     }
 }

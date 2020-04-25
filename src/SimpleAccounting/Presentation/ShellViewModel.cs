@@ -346,17 +346,13 @@ namespace lg2de.SimpleAccounting.Presentation
             this.SelectedAccountJournalEntry = this.AccountJournal.FirstOrDefault(x => x.Identifier == booking.ID);
         }
 
-        // TODO move to separate class?
-        [SuppressMessage(
-            "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
-            Justification = "prevent exceptions from external library")]
         private async Task OnCheckForUpdateAsync()
         {
             this.IsBusy = true;
 
             try
             {
-                if (!await this.applicationUpdate.UpdateAvailableAsync())
+                if (!await this.applicationUpdate.IsUpdateAvailableAsync())
                 {
                     return;
                 }
@@ -366,16 +362,19 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                this.applicationUpdate.StartUpdate();
-
-                // The user was asked whether saving the project.
-                // We do not want to ask again.
-                this.IsDocumentModified = false;
+                // starts separate process to update application in-place
+                // Now we need to close this application.
+                this.applicationUpdate.StartUpdateProcess();
             }
             finally
             {
                 this.IsBusy = false;
             }
+
+            // The user was asked whether saving the project (CheckSaveProject).
+            // It may have answered "No". So, the project may still be modified.
+            // We do not want to ask again, and he doesn't want to save.
+            this.IsDocumentModified = false;
 
             this.TryClose();
         }
@@ -988,17 +987,22 @@ namespace lg2de.SimpleAccounting.Presentation
                     item.RemoteAccount = entry.Credit.Count == 1
                         ? this.accountingData.GetAccountName(entry.Credit.Single())
                         : "Diverse";
+                    continue;
                 }
-                else
+
+                var creditEntry = entry.Credit.FirstOrDefault(x => x.Account == accountNumber);
+                if (creditEntry == null)
                 {
-                    var creditEntry = entry.Credit.FirstOrDefault(x => x.Account == accountNumber);
-                    item.Text = creditEntry.Text;
-                    item.CreditValue = Convert.ToDouble(creditEntry.Value) / CentFactor;
-                    creditSum += item.CreditValue;
-                    item.RemoteAccount = entry.Debit.Count == 1
-                        ? this.accountingData.GetAccountName(entry.Debit.Single())
-                        : "Diverse";
+                    // ops, no debit nor credit?
+                    continue;
                 }
+
+                item.Text = creditEntry.Text;
+                item.CreditValue = Convert.ToDouble(creditEntry.Value) / CentFactor;
+                creditSum += item.CreditValue;
+                item.RemoteAccount = entry.Debit.Count == 1
+                    ? this.accountingData.GetAccountName(entry.Debit.Single())
+                    : "Diverse";
             }
 
             if (debitSum < double.Epsilon && creditSum < double.Epsilon)
