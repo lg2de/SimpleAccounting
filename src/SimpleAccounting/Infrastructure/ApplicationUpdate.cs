@@ -12,6 +12,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Presentation;
     using Octokit;
@@ -23,52 +24,26 @@ namespace lg2de.SimpleAccounting.Infrastructure
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ApplicationUpdate : IApplicationUpdate
     {
+        private const string Caption = "Update-Prüfung";
+        private readonly IFileSystem fileSystem;
         private readonly IMessageBox messageBox;
+        private readonly IProcess process;
         private readonly string version;
+
         private Release newRelease;
 
-        public ApplicationUpdate(IMessageBox messageBox, string version)
+        public ApplicationUpdate(IMessageBox messageBox, IFileSystem fileSystem, IProcess process, string version)
         {
             this.messageBox = messageBox;
+            this.fileSystem = fileSystem;
+            this.process = process;
             this.version = version;
         }
 
-        [SuppressMessage(
-            "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
-            Justification = "catch exceptions from external library")]
         public async Task<bool> IsUpdateAvailableAsync()
         {
-            const string caption = "Update-Prüfung";
-            IEnumerable<Release> releases;
-            try
-            {
-                var productInformation = new ProductHeaderValue(Defines.ProjectName);
-                var client = new GitHubClient(productInformation);
-                releases = await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
-            }
-            catch (Exception exception)
-            {
-                this.messageBox.Show(
-                    $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
-                    caption,
-                    icon: MessageBoxImage.Error);
-                return false;
-            }
-
-            this.newRelease = releases.GetNewRelease(this.version);
-            if (this.newRelease == null)
-            {
-                this.messageBox.Show("Sie verwenden die neueste Version.", caption);
-                return false;
-            }
-
-            var result = this.messageBox.Show(
-                $"Wollen Sie auf die neue Version {this.newRelease.TagName} aktualisieren?",
-                caption,
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No);
-            return result == MessageBoxResult.Yes;
+            IEnumerable<Release> releases = await this.GetAllReleasesAsync();
+            return this.AskForUpdate(releases);
         }
 
         public void StartUpdateProcess()
@@ -78,6 +53,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 throw new InvalidOperationException();
             }
 
+            // load script from resource and write into temp file
             var stream = this.GetType().Assembly.GetManifestResourceStream(
                 "lg2de.SimpleAccounting.UpdateApplication.ps1");
             if (stream == null)
@@ -89,8 +65,9 @@ namespace lg2de.SimpleAccounting.Infrastructure
             using var reader = new StreamReader(stream);
             var script = reader.ReadToEnd();
             string scriptPath = Path.Combine(Path.GetTempPath(), "UpdateApplication.ps1");
-            File.WriteAllText(scriptPath, script);
+            this.fileSystem.WriteAllTextIntoFile(scriptPath, script);
 
+            // select and download the new version
             var asset = this.newRelease.Assets.FirstOrDefault(
                 x => x.Name.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase));
             if (asset == null)
@@ -101,11 +78,58 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
             string assetUrl = asset.BrowserDownloadUrl;
             string targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
-            int processId = Process.GetCurrentProcess().Id;
+            int processId = this.process.GetCurrentProcessId();
             var info = new ProcessStartInfo(
                 "powershell",
                 $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
-            Process.Start(info);
+            this.process.Start(info);
+        }
+
+        internal bool AskForUpdate(IEnumerable<Release> releases)
+        {
+            if (releases == null)
+            {
+                return false;
+            }
+
+            this.newRelease = releases.GetNewRelease(this.version);
+            if (this.newRelease == null)
+            {
+                this.messageBox.Show("Sie verwenden die neueste Version.", Caption);
+                return false;
+            }
+
+            var result = this.messageBox.Show(
+                $"Wollen Sie auf die neue Version {this.newRelease.TagName} aktualisieren?",
+                Caption,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No);
+            return result == MessageBoxResult.Yes;
+        }
+
+        [SuppressMessage(
+            "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
+            Justification = "catch exceptions from external library")]
+        private async Task<IEnumerable<Release>> GetAllReleasesAsync()
+        {
+            IEnumerable<Release> releases;
+            try
+            {
+                var productInformation = new ProductHeaderValue(Defines.ProjectName);
+                var client = new GitHubClient(productInformation);
+                releases = await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
+            }
+            catch (Exception exception)
+            {
+                this.messageBox.Show(
+                    $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
+                    Caption,
+                    icon: MessageBoxImage.Error);
+                return null;
+            }
+
+            return releases;
         }
     }
 }

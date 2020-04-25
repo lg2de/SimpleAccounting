@@ -942,7 +942,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Is<string>(s => s.Contains("cryptomator.exe", StringComparison.InvariantCultureIgnoreCase)))
                 .Returns(true);
             Process cryptomator = null;
-            processApi.Start(Arg.Any<string>()).Returns(
+            processApi.Start(Arg.Any<ProcessStartInfo>()).Returns(
                 info =>
                 {
                     cryptomator = new Process();

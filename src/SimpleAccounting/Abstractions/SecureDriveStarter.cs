@@ -85,7 +85,8 @@ namespace lg2de.SimpleAccounting.Abstractions
                 return false;
             }
 
-            this.applicationProcess = this.processApi.Start(filePath);
+            var info = new ProcessStartInfo(filePath);
+            this.applicationProcess = this.processApi.Start(info);
             if (this.applicationProcess == null)
             {
                 return false;

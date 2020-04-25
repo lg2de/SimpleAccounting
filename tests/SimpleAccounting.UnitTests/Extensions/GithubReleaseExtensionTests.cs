@@ -53,7 +53,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
         }
 
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        private static IReadOnlyList<Release> CreateRelease(string tag, bool addAsset = true)
+        internal static IReadOnlyList<Release> CreateRelease(string tag, bool addAsset = true)
         {
             Type releaseType = typeof(Release);
             var tagProperty = releaseType.GetProperty(nameof(Release.TagName));
@@ -68,10 +68,18 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
 
             if (addAsset)
             {
-                assetsProperty.SetValue(release, new List<ReleaseAsset> { new ReleaseAsset() });
+                assetsProperty.SetValue(release, new List<ReleaseAsset> { new TestingRelease("x.zip") });
             }
 
             return new List<Release> { release };
+        }
+
+        private class TestingRelease : ReleaseAsset
+        {
+            public TestingRelease(string name)
+            {
+                this.Name = name;
+            }
         }
     }
 }
