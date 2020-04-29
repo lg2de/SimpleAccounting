@@ -176,10 +176,10 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.OnAnnualBalanceReport(), _ => this.FullJournal.Any());
 
         public ICommand HelpAboutCommand => new RelayCommand(
-            _ => Process.Start(new ProcessStartInfo(Defines.ProjectUrl) { UseShellExecute = true }));
+            _ => this.processApi.Start(new ProcessStartInfo(Defines.ProjectUrl) { UseShellExecute = true }));
 
         public ICommand HelpFeedbackCommand => new RelayCommand(
-            _ => Process.Start(new ProcessStartInfo(Defines.NewIssueUrl) { UseShellExecute = true }));
+            _ => this.processApi.Start(new ProcessStartInfo(Defines.NewIssueUrl) { UseShellExecute = true }));
 
         public ICommand HelpCheckForUpdateCommand => new RelayCommand(_ => this.OnCheckForUpdateAsync());
 
