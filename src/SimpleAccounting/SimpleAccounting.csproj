@@ -27,7 +27,7 @@
     <!-- license is MS-PL -->
     <PackageReference Include="CsvHelper" Version="12.2.3" />
     <!-- license is MIT -->
-    <PackageReference Include="Octokit" Version="0.46.0" />
+    <PackageReference Include="Octokit" Version="0.47.0" />
     <!-- license is MIT -->
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.0" />
   </ItemGroup>
