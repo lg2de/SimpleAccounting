@@ -10,6 +10,7 @@ namespace lg2de.SimpleAccounting.Model
     using System.Globalization;
     using System.Linq;
     using System.Xml.Serialization;
+    using lg2de.SimpleAccounting.Extensions;
 
     public partial class AccountingData
     {
@@ -79,6 +80,81 @@ namespace lg2de.SimpleAccounting.Model
             result |= this.MergeYearsIntoJournal();
             result |= this.RemoveEmptyElements();
             return result;
+        }
+
+        internal AccountingDataJournal CloseYear(AccountingDataJournal currentModelJournal, AccountDefinition carryForwardAccount)
+        {
+            currentModelJournal.Closed = true;
+
+            var newYearJournal = new AccountingDataJournal
+            {
+                DateStart = currentModelJournal.DateStart + 10000,
+                DateEnd = currentModelJournal.DateEnd + 10000,
+                Booking = new List<AccountingDataJournalBooking>()
+            };
+            newYearJournal.Year = newYearJournal.DateStart.ToDateTime().Year.ToString(CultureInfo.InvariantCulture);
+            this.Journal.Add(newYearJournal);
+
+            ulong bookingId = 1;
+
+            // Asset Accounts (Bestandskonten), Credit and Debit Accounts
+            var accounts = this.AllAccounts.Where(
+                a =>
+                    a.Type == AccountDefinitionType.Asset
+                    || a.Type == AccountDefinitionType.Credit
+                    || a.Type == AccountDefinitionType.Debit);
+            foreach (var account in accounts)
+            {
+                if (currentModelJournal.Booking == null)
+                {
+                    continue;
+                }
+
+                var creditAmount = currentModelJournal.Booking
+                    .SelectMany(b => b.Credit.Where(x => x.Account == account.ID))
+                    .Sum(x => x.Value);
+                var debitAmount = currentModelJournal.Booking
+                    .SelectMany(b => b.Debit.Where(x => x.Account == account.ID))
+                    .Sum(x => x.Value);
+
+                if (creditAmount == 0 && debitAmount == 0 || creditAmount == debitAmount)
+                {
+                    // nothing to do
+                    continue;
+                }
+
+                var newBooking = new AccountingDataJournalBooking
+                {
+                    Date = newYearJournal.DateStart,
+                    ID = bookingId,
+                    Debit = new List<BookingValue>(),
+                    Credit = new List<BookingValue>(),
+                    Opening = true
+                };
+                newYearJournal.Booking.Add(newBooking);
+                var newDebit = new BookingValue
+                {
+                    Value = Math.Abs(creditAmount - debitAmount),
+                    Text = $"Eröffnungsbetrag {bookingId}"
+                };
+                newBooking.Debit.Add(newDebit);
+                var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };
+                newBooking.Credit.Add(newCredit);
+                if (creditAmount > debitAmount)
+                {
+                    newCredit.Account = account.ID;
+                    newDebit.Account = carryForwardAccount.ID;
+                }
+                else
+                {
+                    newDebit.Account = account.ID;
+                    newCredit.Account = carryForwardAccount.ID;
+                }
+
+                bookingId++;
+            }
+
+            return newYearJournal;
         }
 
         internal string GetAccountName(BookingValue entry)

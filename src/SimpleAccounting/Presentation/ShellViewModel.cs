@@ -766,7 +766,6 @@ namespace lg2de.SimpleAccounting.Presentation
             return this.currentModelJournal.Booking.Max(b => b.ID);
         }
 
-        // TODO move to separate class
         private void CloseYear()
         {
             var viewModel = new CloseYearViewModel(this.currentModelJournal);
@@ -779,76 +778,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var carryForwardAccount = viewModel.RemoteAccount;
-
-            this.currentModelJournal.Closed = true;
-
-            var newYearJournal = new AccountingDataJournal
-            {
-                DateStart = this.currentModelJournal.DateStart + 10000,
-                DateEnd = this.currentModelJournal.DateEnd + 10000,
-                Booking = new List<AccountingDataJournalBooking>()
-            };
-            newYearJournal.Year = newYearJournal.DateStart.ToDateTime().Year.ToString(CultureInfo.InvariantCulture);
-            this.accountingData.Journal.Add(newYearJournal);
-
-            ulong bookingId = 1;
-
-            // Asset Accounts (Bestandskonten), Credit and Debit Accounts
-            var accounts = this.accountingData.AllAccounts.Where(
-                a =>
-                    a.Type == AccountDefinitionType.Asset
-                    || a.Type == AccountDefinitionType.Credit
-                    || a.Type == AccountDefinitionType.Debit);
-            foreach (var account in accounts)
-            {
-                if (this.currentModelJournal.Booking == null)
-                {
-                    continue;
-                }
-
-                var creditAmount = this.currentModelJournal.Booking
-                    .SelectMany(b => b.Credit.Where(x => x.Account == account.ID))
-                    .Sum(x => x.Value);
-                var debitAmount = this.currentModelJournal.Booking
-                    .SelectMany(b => b.Debit.Where(x => x.Account == account.ID))
-                    .Sum(x => x.Value);
-
-                if (creditAmount == 0 && debitAmount == 0 || creditAmount == debitAmount)
-                {
-                    // nothing to do
-                    continue;
-                }
-
-                var newBooking = new AccountingDataJournalBooking
-                {
-                    Date = newYearJournal.DateStart,
-                    ID = bookingId,
-                    Debit = new List<BookingValue>(),
-                    Credit = new List<BookingValue>(),
-                    Opening = true
-                };
-                newYearJournal.Booking.Add(newBooking);
-                var newDebit = new BookingValue
-                {
-                    Value = Math.Abs(creditAmount - debitAmount), Text = $"Eröffnungsbetrag {bookingId}"
-                };
-                newBooking.Debit.Add(newDebit);
-                var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };
-                newBooking.Credit.Add(newCredit);
-                if (creditAmount > debitAmount)
-                {
-                    newCredit.Account = account.ID;
-                    newDebit.Account = carryForwardAccount.ID;
-                }
-                else
-                {
-                    newDebit.Account = account.ID;
-                    newCredit.Account = carryForwardAccount.ID;
-                }
-
-                bookingId++;
-            }
+            var newYearJournal = this.accountingData.CloseYear(this.currentModelJournal, viewModel.RemoteAccount);
 
             this.IsDocumentModified = true;
             this.SelectBookingYear(newYearJournal.Year);
