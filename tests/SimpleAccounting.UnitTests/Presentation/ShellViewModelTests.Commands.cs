@@ -9,12 +9,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using Caliburn.Micro;
     using FluentAssertions;
     using FluentAssertions.Execution;
+    using FluentAssertions.Extensions;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Reports;
@@ -639,6 +642,20 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.HelpFeedbackCommand.Execute(null);
 
             processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(x => x.UseShellExecute == true));
+        }
+
+        [Fact]
+        public async Task HelpCheckForUpdateCommand_Execute_InterfaceInvoked()
+        {
+            var sut = CreateSut(out IApplicationUpdate applicationUpdate);
+            applicationUpdate.IsUpdateAvailableAsync().Returns(true);
+
+            sut.HelpCheckForUpdateCommand.Execute(null);
+
+            // TODO remove with AsyncCommand
+            await Task.Delay(1.Seconds());
+
+            applicationUpdate.Received(1).StartUpdateProcess();
         }
     }
 }

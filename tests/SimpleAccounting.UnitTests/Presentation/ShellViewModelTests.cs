@@ -619,6 +619,22 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             return sut;
         }
 
+        private static ShellViewModel CreateSut(out IApplicationUpdate applicationUpdate)
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            applicationUpdate = Substitute.For<IApplicationUpdate>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            {
+                Settings = new Settings()
+            };
+            return sut;
+        }
+
         private static ShellViewModel CreateSut(out IMessageBox messageBox)
         {
             var windowManager = Substitute.For<IWindowManager>();
