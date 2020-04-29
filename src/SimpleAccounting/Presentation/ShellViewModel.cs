@@ -352,7 +352,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             try
             {
-                if (!await this.applicationUpdate.IsUpdateAvailableAsync())
+                if (!await this.applicationUpdate.IsUpdateAvailableAsync(this.version))
                 {
                     return;
                 }

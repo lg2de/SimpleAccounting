@@ -23,10 +23,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi, "2.0");
+            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi);
             var releases = GithubReleaseExtensionTests.CreateRelease("2.0");
 
-            sut.AskForUpdate(releases).Should().BeFalse();
+            sut.AskForUpdate(releases, "2.0").Should().BeFalse();
             messageBox.Received(1).Show(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
@@ -45,7 +45,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi, "2.0");
+            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi);
             var releases = GithubReleaseExtensionTests.CreateRelease("2.1");
             messageBox.Show(
                 Arg.Any<string>(),
@@ -54,7 +54,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
 
-            sut.AskForUpdate(releases).Should().BeFalse();
+            sut.AskForUpdate(releases, "2.0").Should().BeFalse();
             messageBox.DidNotReceive().Show(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
@@ -73,7 +73,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi, "2.0");
+            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi);
             var releases = GithubReleaseExtensionTests.CreateRelease("2.1");
             messageBox.Show(
                     Arg.Any<string>(),
@@ -82,7 +82,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
 
-            sut.AskForUpdate(releases).Should().BeTrue();
+            sut.AskForUpdate(releases, "2.0").Should().BeTrue();
             messageBox.DidNotReceive().Show(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
@@ -101,7 +101,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi, "2.0");
+            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi);
             var releases = GithubReleaseExtensionTests.CreateRelease("2.1");
             messageBox.Show(
                     Arg.Any<string>(),
@@ -109,7 +109,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
                     MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
-            sut.AskForUpdate(releases).Should().BeTrue();
+            sut.AskForUpdate(releases, "2.0").Should().BeTrue();
 
             sut.StartUpdateProcess();
 

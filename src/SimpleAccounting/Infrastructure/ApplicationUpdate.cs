@@ -28,22 +28,20 @@ namespace lg2de.SimpleAccounting.Infrastructure
         private readonly IFileSystem fileSystem;
         private readonly IMessageBox messageBox;
         private readonly IProcess process;
-        private readonly string version;
 
         private Release newRelease;
 
-        public ApplicationUpdate(IMessageBox messageBox, IFileSystem fileSystem, IProcess process, string version)
+        public ApplicationUpdate(IMessageBox messageBox, IFileSystem fileSystem, IProcess process)
         {
             this.messageBox = messageBox;
             this.fileSystem = fileSystem;
             this.process = process;
-            this.version = version;
         }
 
-        public async Task<bool> IsUpdateAvailableAsync()
+        public async Task<bool> IsUpdateAvailableAsync(string currentVersion)
         {
             IEnumerable<Release> releases = await this.GetAllReleasesAsync();
-            return this.AskForUpdate(releases);
+            return this.AskForUpdate(releases, currentVersion);
         }
 
         public void StartUpdateProcess()
@@ -85,14 +83,14 @@ namespace lg2de.SimpleAccounting.Infrastructure
             this.process.Start(info);
         }
 
-        internal bool AskForUpdate(IEnumerable<Release> releases)
+        internal bool AskForUpdate(IEnumerable<Release> releases, string currentVersion)
         {
             if (releases == null)
             {
                 return false;
             }
 
-            this.newRelease = releases.GetNewRelease(this.version);
+            this.newRelease = releases.GetNewRelease(currentVersion);
             if (this.newRelease == null)
             {
                 this.messageBox.Show("Sie verwenden die neueste Version.", Caption);
@@ -113,12 +111,11 @@ namespace lg2de.SimpleAccounting.Infrastructure
             Justification = "catch exceptions from external library")]
         private async Task<IEnumerable<Release>> GetAllReleasesAsync()
         {
-            IEnumerable<Release> releases;
             try
             {
                 var productInformation = new ProductHeaderValue(Defines.ProjectName);
                 var client = new GitHubClient(productInformation);
-                releases = await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
+                return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
             }
             catch (Exception exception)
             {
@@ -128,8 +125,6 @@ namespace lg2de.SimpleAccounting.Infrastructure
                     icon: MessageBoxImage.Error);
                 return null;
             }
-
-            return releases;
         }
     }
 }

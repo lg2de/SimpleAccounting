@@ -8,7 +8,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
     internal interface IApplicationUpdate
     {
-        Task<bool> IsUpdateAvailableAsync();
+        Task<bool> IsUpdateAvailableAsync(string currentVersion);
 
         void StartUpdateProcess();
     }

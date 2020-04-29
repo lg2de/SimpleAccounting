@@ -648,7 +648,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task HelpCheckForUpdateCommand_Execute_InterfaceInvoked()
         {
             var sut = CreateSut(out IApplicationUpdate applicationUpdate);
-            applicationUpdate.IsUpdateAvailableAsync().Returns(true);
+            applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
 
             sut.HelpCheckForUpdateCommand.Execute(null);
 
@@ -662,7 +662,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task HelpCheckForUpdateCommand_NoUpdateAvailable_UpdateProcessNotStarted()
         {
             var sut = CreateSut(out IApplicationUpdate applicationUpdate);
-            applicationUpdate.IsUpdateAvailableAsync().Returns(false);
+            applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(false);
 
             sut.HelpCheckForUpdateCommand.Execute(null);
 
@@ -676,7 +676,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task HelpCheckForUpdateCommand_UserDoesNotWantToSave_UpdateProcessNotStarted()
         {
             var sut = CreateSut(out IApplicationUpdate applicationUpdate);
-            applicationUpdate.IsUpdateAvailableAsync().Returns(true);
+            applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
             sut.IsDocumentModified = true;
 
             sut.HelpCheckForUpdateCommand.Execute(null);
