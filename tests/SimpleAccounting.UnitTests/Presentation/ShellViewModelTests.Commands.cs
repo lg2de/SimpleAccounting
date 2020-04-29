@@ -657,5 +657,34 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             applicationUpdate.Received(1).StartUpdateProcess();
         }
+
+        [Fact]
+        public async Task HelpCheckForUpdateCommand_NoUpdateAvailable_UpdateProcessNotStarted()
+        {
+            var sut = CreateSut(out IApplicationUpdate applicationUpdate);
+            applicationUpdate.IsUpdateAvailableAsync().Returns(false);
+
+            sut.HelpCheckForUpdateCommand.Execute(null);
+
+            // TODO remove with AsyncCommand
+            await Task.Delay(1.Seconds());
+
+            applicationUpdate.DidNotReceive().StartUpdateProcess();
+        }
+
+        [Fact]
+        public async Task HelpCheckForUpdateCommand_UserDoesNotWantToSave_UpdateProcessNotStarted()
+        {
+            var sut = CreateSut(out IApplicationUpdate applicationUpdate);
+            applicationUpdate.IsUpdateAvailableAsync().Returns(true);
+            sut.IsDocumentModified = true;
+
+            sut.HelpCheckForUpdateCommand.Execute(null);
+
+            // TODO remove with AsyncCommand
+            await Task.Delay(1.Seconds());
+
+            applicationUpdate.DidNotReceive().StartUpdateProcess();
+        }
     }
 }

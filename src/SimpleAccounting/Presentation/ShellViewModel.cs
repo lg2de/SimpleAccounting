@@ -530,7 +530,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return true;
             }
 
-            return true;
+            return result == MessageBoxResult.No;
         }
 
         internal void SaveProject()
