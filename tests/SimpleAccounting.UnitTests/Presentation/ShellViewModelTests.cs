@@ -8,8 +8,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -18,17 +16,26 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using FluentAssertions.Execution;
     using FluentAssertions.Extensions;
     using lg2de.SimpleAccounting.Abstractions;
-    using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
     using NSubstitute;
-    using Octokit;
     using Xunit;
 
-    public class ShellViewModelTests
+    public partial class ShellViewModelTests
     {
+        [Fact]
+        public void OnInitialize_NoProject_Initialized()
+        {
+            var sut = CreateSut();
+
+            ((IActivate)sut).Activate();
+
+            sut.DisplayName.Should().NotBeNullOrWhiteSpace();
+        }
+
         [WpfFact]
         public async Task OnActivate_NewProject_ProjectLoadedAndAutoSaveActive()
         {
@@ -87,158 +94,25 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
         }
 
-        [Theory]
-        [InlineData("2.0.0", "2.0.0", null)]
-        [InlineData("2.0.0", "2.0.1", "2.0.1")]
-        [InlineData("2.0.0", "2.1.0", "2.1.0")]
-        [InlineData("2.1.0", "2.0.0", null)]
-        [InlineData("2.0.0-beta1", "2.0.0-beta1", null)]
-        [InlineData("2.0.0-beta1", "2.0.0-beta2", "2.0.0-beta2")]
-        [InlineData("2.0.0-beta1", "2.0.1-beta1", "2.0.1-beta1")]
-        [InlineData("2.0.0-beta2", "2.0.0-beta1", null)]
-        [InlineData("2.0.0", "2.0.0-beta1", null)] // release is greater than beta
-        [InlineData("2.0.0-beta1", "2.0.0", "2.0.0")] // update to release
-        [InlineData("2.0.0", "2.0.1-beta1", null)] // do not update to beta
-        public void GetNewRelease_TestScenarios(
-            string currentVersion,
-            string availableVersion,
-            string expectedVersion)
-        {
-            var result = ShellViewModel.GetNewRelease(currentVersion, CreateRelease(availableVersion));
-
-            if (string.IsNullOrEmpty(expectedVersion))
-            {
-                result.Should().BeNull();
-            }
-            else
-            {
-                result.Should().BeEquivalentTo(new { TagName = expectedVersion });
-            }
-        }
-
-        private static ShellViewModel CreateSut()
-        {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings()
-            };
-            return sut;
-        }
-
-        private static ShellViewModel CreateSut(out IWindowManager windowManager)
-        {
-            windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings()
-            };
-            return sut;
-        }
-
-        private static ShellViewModel CreateSut(out IReportFactory reportFactory)
-        {
-            var windowManager = Substitute.For<IWindowManager>();
-            reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings()
-            };
-            return sut;
-        }
-
-        private static ShellViewModel CreateSut(out IMessageBox messageBox)
-        {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            messageBox = Substitute.For<IMessageBox>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings()
-            };
-            return sut;
-        }
-
-        private static ShellViewModel CreateSut(out IFileSystem fileSystem)
-        {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var messageBox = Substitute.For<IMessageBox>();
-            fileSystem = Substitute.For<IFileSystem>();
-            var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings()
-            };
-            return sut;
-        }
-
-        private static ShellViewModel CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem)
-        {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            messageBox = Substitute.For<IMessageBox>();
-            fileSystem = Substitute.For<IFileSystem>();
-            var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings()
-            };
-            return sut;
-        }
-
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        private static IReadOnlyList<Release> CreateRelease(string tag, bool addAsset = true)
-        {
-            Type releaseType = typeof(Release);
-            var tagProperty = releaseType.GetProperty(nameof(Release.TagName));
-            var preReleaseProperty = releaseType.GetProperty(nameof(Release.Prerelease));
-            var assetsProperty = releaseType.GetProperty(nameof(Release.Assets));
-            var release = new Release();
-            tagProperty.SetValue(release, tag);
-            if (tag.Contains("beta"))
-            {
-                preReleaseProperty.SetValue(release, true);
-            }
-
-            if (addAsset)
-            {
-                assetsProperty.SetValue(release, new List<ReleaseAsset> { new ReleaseAsset() });
-            }
-
-            return new List<Release> { release };
-        }
-
         [WpfFact]
         public async Task OnActivate_TwoRecentProjectsOneOnSecuredDrive_AllProjectListed()
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings
+            var sut =
+                new ShellViewModel(windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
                 {
-                    RecentProject = "k:\\file2",
-                    RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
-                    SecuredDrives = new StringCollection { "K:\\" }
-                }
-            };
+                    Settings = new Settings
+                    {
+                        RecentProject = "k:\\file2",
+                        RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
+                        SecuredDrives = new StringCollection { "K:\\" }
+                    }
+                };
             messageBox.Show(
                     Arg.Is<string>(s => s.Contains("Cryptomator")),
                     Arg.Any<string>(),
@@ -264,63 +138,71 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AccountJournalReportCommand_HappyPath_Completed()
-        {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var accountJournalReport = Substitute.For<IAccountJournalReport>();
-            reportFactory.CreateAccountJournal(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<IEnumerable<AccountDefinition>>(),
-                Arg.Any<AccountingDataSetup>(), Arg.Any<CultureInfo>()).Returns(accountJournalReport);
-            sut.LoadProjectData(Samples.SampleProject);
-
-            sut.AccountJournalReportCommand.Execute(null);
-
-            accountJournalReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
-        }
-
-        [Fact]
-        public void AccountJournalReportCommand_JournalWithEntries_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
-
-            sut.AccountJournalReportCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void AccountJournalReportCommand_NoJournal_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.AccountJournalReportCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void AccountSelectionCommand_SampleBookings_AccountJournalUpdated()
+        public void OnActivate_SampleProject_JournalsUpdates()
         {
             var sut = CreateSut();
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 100));
+            ((IActivate)sut).Activate();
 
-            sut.AccountJournal.Should().BeEquivalentTo(
-                new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
-                new { Text = "Salary", RemoteAccount = "Diverse", CreditValue = 0, DebitValue = 200 },
-                new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", CreditValue = 400, DebitValue = 0 },
-                new { Text = "Shoes", RemoteAccount = "Diverse", CreditValue = 50, DebitValue = 0 },
+            using var _ = new AssertionScope();
+            sut.AccountList.Should().BeEquivalentTo(
+                new { Name = "Bank account" },
+                new { Name = "Salary" },
+                new { Name = "Shoes" },
+                new { Name = "Carryforward" },
+                new { Name = "Bank credit" },
+                new { Name = "Friends debit" });
+
+            sut.FullJournal.Should().BeEquivalentTo(
+                new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
+                new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
+                new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
+                new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
+                new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
+                new { Text = "Credit rate", CreditAccount = "100 (Bank account)", DebitAccount = "5000 (Bank credit)" },
+                new { Text = "Shoes1", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+                new { Text = "Shoes2", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = string.Empty },
                 new
                 {
                     Text = "Rent to friend",
-                    RemoteAccount = "6000 (Friends debit)",
-                    CreditValue = 99,
-                    DebitValue = 0
-                },
-                new { Text = "Summe", RemoteAccount = (string)null, CreditValue = 549, DebitValue = 1200 },
-                new { Text = "Saldo", RemoteAccount = (string)null, CreditValue = 0, DebitValue = 651 });
+                    CreditAccount = "100 (Bank account)",
+                    DebitAccount = "6000 (Friends debit)"
+                });
+            sut.AccountJournal.Should().BeEquivalentTo(
+                new { Text = "Open 1", RemoteAccount = "990 (Carryforward)" },
+                new { Text = "Salary", RemoteAccount = "Diverse" },
+                new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)" },
+                new { Text = "Shoes", RemoteAccount = "Diverse" },
+                new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)" },
+                new { Text = "Summe" },
+                new { Text = "Saldo" });
+        }
+
+        [Fact]
+        public void OnActivate_TwoRecentProjectsOneExisting_ExistingProjectListed()
+        {
+            var sut = CreateSut(out IFileSystem fileSystem);
+            sut.Settings = new Settings { RecentProjects = new StringCollection { "file1", "file2" } };
+            fileSystem.FileExists(Arg.Is("file1")).Returns(true);
+
+            ((IActivate)sut).Activate();
+
+            sut.RecentProjects?.Select(x => x.Header).Should().Equal("file1");
+        }
+
+        [Fact]
+        public void OnDeactivate_HappyPath_Completes()
+        {
+            var sut = CreateSut();
+            ((IActivate)sut).Activate();
+
+            var task = Task.Run(() => ((IDeactivate)sut).Deactivate(close: true));
+
+            task.Awaiting(x => x).Should().CompleteWithin(1.Seconds());
         }
 
         [Fact]
@@ -366,136 +248,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Text = "Saldo", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 });
             monitor.Should().RaisePropertyChangeFor(x => x.SelectedAccountJournalEntry);
             sut.SelectedAccountJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
-        }
-
-        [Fact]
-        public void AddBookingsCommand_ClosedYear_CannotExecute()
-        {
-            var sut = CreateSut();
-            sut.LoadProjectData(Samples.SampleProject);
-            sut.BookingYears.First().Command.Execute(null);
-
-            sut.AddBookingsCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void AddBookingsCommand_HideInactiveAccounts_DialogInitialized()
-        {
-            var sut = CreateSut(out IWindowManager windowManager);
-            AddBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
-            sut.LoadProjectData(Samples.SampleProject);
-            sut.ShowInactiveAccounts = false;
-
-            sut.AddBookingsCommand.Execute(null);
-
-            using var _ = new AssertionScope();
-            vm.BookingNumber.Should().Be(1);
-            vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts.Where(x => x.Active));
-        }
-
-        [Fact]
-        public void AddBookingsCommand_NoProject_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.AddBookingsCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void AddBookingsCommand_OpenYear_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.LoadProjectData(Samples.SampleProject);
-            sut.BookingYears.Last().Command.Execute(null);
-
-            sut.AddBookingsCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void AddBookingsCommand_ShowInactiveAccounts_DialogInitialized()
-        {
-            var sut = CreateSut(out IWindowManager windowManager);
-            AddBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
-            sut.LoadProjectData(Samples.SampleProject);
-            sut.ShowInactiveAccounts = true;
-
-            sut.AddBookingsCommand.Execute(null);
-
-            using var _ = new AssertionScope();
-            vm.BookingNumber.Should().Be(1);
-            vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts);
-        }
-
-        [Fact]
-        public void AnnualBalanceReportCommand_HappyPath_Completed()
-        {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var annualBalanceReport = Substitute.For<IAnnualBalanceReport>();
-            reportFactory.CreateAnnualBalance(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<IEnumerable<AccountDefinition>>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(annualBalanceReport);
-            sut.LoadProjectData(Samples.SampleProject);
-
-            sut.AnnualBalanceReportCommand.Execute(null);
-
-            annualBalanceReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
-        }
-
-        [Fact]
-        public void AnnualBalanceReportCommand_JournalWithEntries_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
-
-            sut.AnnualBalanceReportCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void AnnualBalanceReportCommand_NoJournal_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.AnnualBalanceReportCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void AssetBalancesReportCommand_HappyPath_Completed()
-        {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var assetBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
-            reportFactory.CreateTotalsAndBalances(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(assetBalancesReport);
-            sut.LoadProjectData(Samples.SampleProject);
-
-            sut.AssetBalancesReportCommand.Execute(null);
-
-            assetBalancesReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
-        }
-
-        [Fact]
-        public void AssetBalancesReportCommand_JournalWithEntries_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
-
-            sut.AssetBalancesReportCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void AssetBalancesReportCommand_NoJournal_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.AssetBalancesReportCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -545,6 +297,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
@@ -553,9 +306,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
-                Settings = new Settings(), IsDocumentModified = true
+                Settings = new Settings(),
+                IsDocumentModified = true
             };
             sut.LoadProjectData(Samples.SampleProject);
 
@@ -579,303 +334,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-        }
-
-        [Fact]
-        public void CloseYearCommand_ActionAborted_YearsUnchanged()
-        {
-            var sut = CreateSut(out IMessageBox messageBox);
-            messageBox.Show(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No).Returns(MessageBoxResult.No);
-            sut.LoadProjectData(Samples.SampleProject);
-
-            sut.CloseYearCommand.Execute(null);
-
-            var thisYear = DateTime.Now.Year;
-            sut.BookingYears.Select(x => x.Header).Should().Equal("2000", thisYear.ToString());
-        }
-
-        [Fact]
-        public void CloseYearCommand_CurrentYearClosed_CannotExecute()
-        {
-            var sut = CreateSut(out IMessageBox messageBox);
-            messageBox.Show(
-                Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
-            sut.LoadProjectData(Samples.SampleProject);
-            sut.BookingYears.First().Command.Execute(null);
-
-            sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void CloseYearCommand_DefaultProject_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.LoadProjectData(Samples.SampleProject);
-
-            sut.CloseYearCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void CloseYearCommand_EmptyProject_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void CloseYearCommand_HappyPath_YearClosedAndNewAdded()
-        {
-            var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(
-                Arg.Any<CloseYearViewModel>(),
-                Arg.Any<object>(),
-                Arg.Any<IDictionary<string, object>>()).Returns(
-                info =>
-                {
-                    var vm = info.Arg<CloseYearViewModel>();
-                    vm.RemoteAccount = vm.Accounts.First();
-                    return true;
-                });
-            var project = Samples.SampleProject;
-            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            sut.LoadProjectData(project);
-
-            sut.CloseYearCommand.Execute(null);
-
-            windowManager.Received(1).ShowDialog(
-                Arg.Any<CloseYearViewModel>(),
-                Arg.Any<object>(),
-                Arg.Any<IDictionary<string, object>>());
-            var thisYear = DateTime.Now.Year;
-            using var _ = new AssertionScope();
-            sut.BookingYears.Select(x => x.Header).Should()
-                .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
-            sut.FullJournal.Should().BeEquivalentTo(
-                new
-                {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 1",
-                    Value = 651,
-                    CreditAccount = "990 (Carryforward)",
-                    DebitAccount = "100 (Bank account)"
-                },
-                new
-                {
-                    Identifier = 2,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 2",
-                    Value = 2600,
-                    CreditAccount = "5000 (Bank credit)",
-                    DebitAccount = "990 (Carryforward)"
-                },
-                new
-                {
-                    Identifier = 3,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 3",
-                    Value = 99,
-                    CreditAccount = "990 (Carryforward)",
-                    DebitAccount = "6000 (Friends debit)"
-                });
-            sut.AccountJournal.Should().BeEquivalentTo(
-                new
-                {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 1",
-                    DebitValue = 651,
-                    CreditValue = 0,
-                    RemoteAccount = "990 (Carryforward)"
-                },
-                new { Text = "Summe", IsSummary = true, DebitValue = 651, CreditValue = 0 },
-                new { Text = "Saldo", IsSummary = true, DebitValue = 651, CreditValue = 0 });
-        }
-
-        [Fact]
-        public void CloseYearCommand_SecondCarryForwardAccount_OpeningsWithSelectedAccount()
-        {
-            var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(
-                Arg.Any<CloseYearViewModel>(),
-                Arg.Any<object>(),
-                Arg.Any<IDictionary<string, object>>()).Returns(
-                info =>
-                {
-                    var vm = info.Arg<CloseYearViewModel>();
-                    vm.RemoteAccount = vm.Accounts.Last();
-                    return true;
-                });
-            var project = Samples.SampleProject;
-            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            project.Accounts.First().Account.Add(
-                new AccountDefinition { ID = 999, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward });
-            sut.LoadProjectData(project);
-
-            sut.CloseYearCommand.Execute(null);
-
-            windowManager.Received(1).ShowDialog(
-                Arg.Any<CloseYearViewModel>(),
-                Arg.Any<object>(),
-                Arg.Any<IDictionary<string, object>>());
-            var thisYear = DateTime.Now.Year;
-            using var _ = new AssertionScope();
-            sut.BookingYears.Select(x => x.Header).Should()
-                .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
-            sut.FullJournal.Should().BeEquivalentTo(
-                new
-                {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 1",
-                    Value = 651,
-                    CreditAccount = "999 (MyCarryForward)",
-                    DebitAccount = "100 (Bank account)"
-                },
-                new
-                {
-                    Identifier = 2,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 2",
-                    Value = 2600,
-                    CreditAccount = "5000 (Bank credit)",
-                    DebitAccount = "999 (MyCarryForward)"
-                },
-                new
-                {
-                    Identifier = 3,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 3",
-                    Value = 99,
-                    CreditAccount = "999 (MyCarryForward)",
-                    DebitAccount = "6000 (Friends debit)"
-                });
-            sut.AccountJournal.Should().BeEquivalentTo(
-                new
-                {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 1",
-                    DebitValue = 651,
-                    CreditValue = 0,
-                    RemoteAccount = "999 (MyCarryForward)"
-                },
-                new { Text = "Summe", IsSummary = true, DebitValue = 651, CreditValue = 0 },
-                new { Text = "Saldo", IsSummary = true, DebitValue = 651, CreditValue = 0 });
-        }
-
-        [Fact]
-        public void EditAccountCommand_AllDataUpdated()
-        {
-            var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(
-                Arg.Do<object>(
-                    model =>
-                    {
-                        var vm = (AccountViewModel)model;
-                        vm.Identifier += 1000;
-                    })).Returns(true);
-            sut.LoadProjectData(Samples.SampleProject);
-            var booking = new AccountingDataJournalBooking
-            {
-                Date = DateTime.Now.ToAccountingDate(),
-                ID = 1,
-                Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
-                Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
-            };
-            sut.AddBooking(booking);
-            booking = new AccountingDataJournalBooking
-            {
-                Date = DateTime.Now.ToAccountingDate(),
-                ID = 2,
-                Credit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Back", Value = 5 } },
-                Debit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Back", Value = 5 } }
-            };
-            sut.AddBooking(booking);
-            sut.AccountSelectionCommand.Execute(sut.AccountList.FirstOrDefault(x => x.Identifier == 990));
-
-            sut.EditAccountCommand.Execute(sut.AccountList.First());
-
-            using (new AssertionScope())
-            {
-                sut.AccountList.Select(x => x.Name).Should().Equal(
-                    "Salary", "Shoes", "Carryforward", "Bank account", "Bank credit", "Friends debit");
-                sut.FullJournal.Should().BeEquivalentTo(
-                    new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
-                    new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });
-                sut.AccountJournal.Should().BeEquivalentTo(
-                    new { RemoteAccount = "1100 (Bank account)" },
-                    new { RemoteAccount = "1100 (Bank account)" },
-                    new { Text = "Summe" },
-                    new { Text = "Saldo" });
-            }
-        }
-
-        [Fact]
-        public void GetNewRelease_AssetNotAvailable_VersionIgnored()
-        {
-            var releases = CreateRelease("2.1.0", addAsset: false);
-            var result = ShellViewModel.GetNewRelease("2.0.0", releases);
-
-            result.Should().BeNull();
-        }
-
-        [Fact]
-        public void ImportBookingsCommand_BookingNumberInitialized()
-        {
-            var sut = CreateSut(out IWindowManager windowManager);
-            ImportBookingsViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as ImportBookingsViewModel));
-            sut.LoadProjectData(Samples.SampleProject);
-
-            sut.ImportBookingsCommand.Execute(null);
-
-            using (new AssertionScope())
-            {
-                vm.Should().BeEquivalentTo(
-                    new
-                    {
-                        BookingNumber = 1,
-                        RangeMin = new DateTime(DateTime.Now.Year, 1, 1),
-                        RangMax = new DateTime(DateTime.Now.Year, 12, 31)
-                    });
-                vm.ImportAccounts.Should().NotBeEmpty();
-            }
-        }
-
-        [Fact]
-        public void ImportBookingsCommand_ClosedYear_CannotExecute()
-        {
-            var sut = CreateSut();
-            sut.LoadProjectData(Samples.SampleProject);
-            sut.BookingYears.First().Command.Execute(null);
-
-            sut.ImportBookingsCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void ImportBookingsCommand_NoProject_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.ImportBookingsCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void ImportBookingsCommand_OpenYear_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.LoadProjectData(Samples.SampleProject);
-            sut.BookingYears.Last().Command.Execute(null);
-
-            sut.ImportBookingsCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -965,10 +423,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(windowManager, reportFactory, messageBox, fileSystem, processApi)
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
             {
                 Settings = new Settings { SecuredDrives = new StringCollection { "K:\\" } }
             };
@@ -984,7 +444,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Is<string>(s => s.Contains("cryptomator.exe", StringComparison.InvariantCultureIgnoreCase)))
                 .Returns(true);
             Process cryptomator = null;
-            processApi.Start(Arg.Any<string>()).Returns(
+            processApi.Start(Arg.Any<ProcessStartInfo>()).Returns(
                 info =>
                 {
                     cryptomator = new Process();
@@ -1042,116 +502,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void NewAccountCommand_AccountCreatedAndSorted()
-        {
-            var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(
-                Arg.Do<object>(
-                    model =>
-                    {
-                        var vm = (AccountViewModel)model;
-                        vm.Name = "New Account";
-                        vm.Identifier = 500;
-                    })).Returns(true);
-            sut.LoadProjectData(Samples.SampleProject);
-
-            sut.NewAccountCommand.Execute(null);
-
-            sut.AccountList.Select(x => x.Name).Should().Equal(
-                "Bank account", "Salary", "New Account", "Shoes", "Carryforward", "Bank credit", "Friends debit");
-        }
-
-        [Fact]
-        public void NewProjectCommand_ProjectInitialized()
-        {
-            var sut = CreateSut();
-
-            sut.NewProjectCommand.Execute(null);
-
-            sut.AccountList.Should().NotBeEmpty();
-            sut.FullJournal.Should().BeEmpty();
-            sut.AccountJournal.Should().BeEmpty();
-        }
-
-        [Fact]
-        public void OnActivate_SampleProject_JournalsUpdates()
-        {
-            var sut = CreateSut();
-            var project = Samples.SampleProject;
-            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            sut.LoadProjectData(project);
-
-            ((IActivate)sut).Activate();
-
-            using var _ = new AssertionScope();
-            sut.AccountList.Should().BeEquivalentTo(
-                new { Name = "Bank account" },
-                new { Name = "Salary" },
-                new { Name = "Shoes" },
-                new { Name = "Carryforward" },
-                new { Name = "Bank credit" },
-                new { Name = "Friends debit" });
-
-            sut.FullJournal.Should().BeEquivalentTo(
-                new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
-                new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
-                new { Text = "Salary", CreditAccount = (string)null, DebitAccount = "100 (Bank account)" },
-                new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = (string)null },
-                new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = (string)null },
-                new { Text = "Credit rate", CreditAccount = "100 (Bank account)", DebitAccount = "5000 (Bank credit)" },
-                new { Text = "Shoes1", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes2", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = (string)null },
-                new
-                {
-                    Text = "Rent to friend",
-                    CreditAccount = "100 (Bank account)",
-                    DebitAccount = "6000 (Friends debit)"
-                });
-            sut.AccountJournal.Should().BeEquivalentTo(
-                new { Text = "Open 1", RemoteAccount = "990 (Carryforward)" },
-                new { Text = "Salary", RemoteAccount = "Diverse" },
-                new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)" },
-                new { Text = "Shoes", RemoteAccount = "Diverse" },
-                new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)" },
-                new { Text = "Summe" },
-                new { Text = "Saldo" });
-        }
-
-        [Fact]
-        public void OnActivate_TwoRecentProjectsOneExisting_ExistingProjectListed()
-        {
-            var sut = CreateSut(out IFileSystem fileSystem);
-            sut.Settings = new Settings { RecentProjects = new StringCollection { "file1", "file2" } };
-            fileSystem.FileExists(Arg.Is("file1")).Returns(true);
-
-            ((IActivate)sut).Activate();
-
-            sut.RecentProjects?.Select(x => x.Header).Should().Equal("file1");
-        }
-
-        [Fact]
-        public void OnDeactivate_HappyPath_Completes()
-        {
-            var sut = CreateSut();
-            ((IActivate)sut).Activate();
-
-            var task = Task.Run(() => ((IDeactivate)sut).Deactivate(close: true));
-
-            task.Awaiting(x => x).Should().CompleteWithin(1.Seconds());
-        }
-
-        [Fact]
-        public void OnInitialize_NoProject_Initialized()
-        {
-            var sut = CreateSut();
-
-            ((IActivate)sut).Activate();
-
-            sut.DisplayName.Should().NotBeNullOrWhiteSpace();
-        }
-
-        [Fact]
         public void SaveProject_AutoSaveExisting_AutoSaveFileDeleted()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
@@ -1200,25 +550,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void SaveProjectCommand_DocumentModified_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.LoadProjectData(Samples.SampleProject);
-            sut.IsDocumentModified = true;
-
-            sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void SaveProjectCommand_Initialized_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.SaveProjectCommand.CanExecute(null).Should()
-                .BeFalse("default instance does not contain modified document");
-        }
-
-        [Fact]
         public void ShowInactiveAccounts_SetTrue_InactiveAccountsGetVisible()
         {
             var sut = CreateSut();
@@ -1240,73 +571,133 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Name = "Inactive" });
         }
 
-        [Fact]
-        public void TotalJournalReportCommand_HappyPath_Completed()
+        private static ShellViewModel CreateSut()
         {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var totalJournalReport = Substitute.For<ITotalJournalReport>();
-            reportFactory.CreateTotalJournal(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(totalJournalReport);
-            sut.LoadProjectData(Samples.SampleProject);
-
-            sut.TotalJournalReportCommand.Execute(null);
-
-            totalJournalReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            {
+                Settings = new Settings()
+            };
+            return sut;
         }
 
-        [Fact]
-        public void TotalJournalReportCommand_JournalWithEntries_CanExecute()
+        private static ShellViewModel CreateSut(out IWindowManager windowManager)
         {
-            var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
-
-            sut.TotalJournalReportCommand.CanExecute(null).Should().BeTrue();
+            windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            {
+                Settings = new Settings()
+            };
+            return sut;
         }
 
-        [Fact]
-        public void TotalJournalReportCommand_NoJournal_CannotExecute()
+        private static ShellViewModel CreateSut(out IReportFactory reportFactory)
         {
-            var sut = CreateSut();
-
-            sut.TotalJournalReportCommand.CanExecute(null).Should().BeFalse();
+            var windowManager = Substitute.For<IWindowManager>();
+            reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            {
+                Settings = new Settings()
+            };
+            return sut;
         }
 
-        [Fact]
-        public void TotalsAndBalancesReportCommand_HappyPath_Completed()
+        private static ShellViewModel CreateSut(out IApplicationUpdate applicationUpdate)
         {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var totalsAndBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
-            reportFactory.CreateTotalsAndBalances(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(totalsAndBalancesReport);
-            sut.LoadProjectData(Samples.SampleProject);
-
-            sut.TotalsAndBalancesReportCommand.Execute(null);
-
-            totalsAndBalancesReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            applicationUpdate = Substitute.For<IApplicationUpdate>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            {
+                Settings = new Settings()
+            };
+            return sut;
         }
 
-        [Fact]
-        public void TotalsAndBalancesReportCommand_JournalWithEntries_CanExecute()
+        private static ShellViewModel CreateSut(out IMessageBox messageBox)
         {
-            var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
-
-            sut.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeTrue();
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
+            messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            {
+                Settings = new Settings()
+            };
+            return sut;
         }
 
-        [Fact]
-        public void TotalsAndBalancesReportCommand_NoJournal_CannotExecute()
+        private static ShellViewModel CreateSut(out IFileSystem fileSystem)
         {
-            var sut = CreateSut();
-
-            sut.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeFalse();
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
+            var messageBox = Substitute.For<IMessageBox>();
+            fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            {
+                Settings = new Settings()
+            };
+            return sut;
         }
+
+        private static ShellViewModel CreateSut(out IProcess processApi)
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            {
+                Settings = new Settings()
+            };
+            return sut;
+        }
+
+        private static ShellViewModel CreateSut(out IMessageBox messageBox, out IFileSystem fileSystem)
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var applicationUpdate = Substitute.For<IApplicationUpdate>();
+            messageBox = Substitute.For<IMessageBox>();
+            fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var sut = new ShellViewModel(
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            {
+                Settings = new Settings()
+            };
+            return sut;
+        }
+
     }
 }

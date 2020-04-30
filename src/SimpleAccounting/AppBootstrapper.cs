@@ -10,6 +10,7 @@ namespace lg2de.SimpleAccounting
     using System.Windows;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Reports;
 
@@ -25,6 +26,7 @@ namespace lg2de.SimpleAccounting
             // register default implementations for our interfaces
             this.container.Singleton<IWindowManager, WindowManager>();
             this.container.Singleton<IReportFactory, ReportFactory>();
+            this.container.Singleton<IApplicationUpdate, ApplicationUpdate>();
             this.container.Singleton<IMessageBox, MessageBoxWrapper>();
             this.container.Singleton<IFileSystem, FileSystem>();
             this.container.Singleton<IProcess, DotNetProcess>();

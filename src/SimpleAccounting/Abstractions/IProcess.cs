@@ -15,7 +15,9 @@ namespace lg2de.SimpleAccounting.Abstractions
 
         Process GetCurrentProcess();
 
-        Process Start(string filePath);
+        int GetCurrentProcessId();
+
+        Process Start(ProcessStartInfo info);
 
         bool IsProcessWindowVisible(Process process);
 

@@ -28,7 +28,7 @@ namespace lg2de.SimpleAccounting.Abstractions
         private readonly IProcess processApi;
         private readonly string projectFileName;
 
-        private Process applicationProcess;
+        private Process? applicationProcess;
 
         public SecureDriveStarter(IFileSystem fileSystem, IProcess processApi, string projectFileName)
         {
@@ -50,7 +50,7 @@ namespace lg2de.SimpleAccounting.Abstractions
             }
 
             // bring to front to force user to unlock drive
-            this.processApi.BringProcessToFront(this.applicationProcess);
+            this.processApi.BringProcessToFront(this.applicationProcess!);
 
             // which for the project file to be available
             while (true)
@@ -59,7 +59,7 @@ namespace lg2de.SimpleAccounting.Abstractions
                 {
                     // file IS available
                     // minimize the drive application and focus SimpleAccounting
-                    this.processApi.MinimizeProcess(this.applicationProcess);
+                    this.processApi.MinimizeProcess(this.applicationProcess!);
                     this.processApi.BringProcessToFront(this.processApi.GetCurrentProcess());
                     return true;
                 }
@@ -85,7 +85,8 @@ namespace lg2de.SimpleAccounting.Abstractions
                 return false;
             }
 
-            this.applicationProcess = this.processApi.Start(filePath);
+            var info = new ProcessStartInfo(filePath);
+            this.applicationProcess = this.processApi.Start(info);
             if (this.applicationProcess == null)
             {
                 return false;

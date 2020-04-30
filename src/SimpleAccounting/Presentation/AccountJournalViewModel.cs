@@ -12,7 +12,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public double DebitValue { get; set; }
 
-        public string RemoteAccount { get; set; }
+        public string RemoteAccount { get; set; } = string.Empty;
 
         public bool IsSummary { get; set; }
 

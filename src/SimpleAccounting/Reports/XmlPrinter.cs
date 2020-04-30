@@ -10,7 +10,6 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Drawing;
     using System.Drawing.Printing;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
     using System.Windows.Forms;
     using System.Xml;
@@ -30,8 +29,8 @@ namespace lg2de.SimpleAccounting.Reports
         private readonly Stack<Pen> penStack;
         private readonly Stack<SolidBrush> solidBrushStack;
 
-        private XmlNode currentNode;
-        private XmlNode pageTextsNode;
+        private XmlNode? currentNode;
+        private XmlNode? pageTextsNode;
 
         /// <summary>
         ///     Defines factor to translate logical position to physical position.
@@ -69,10 +68,8 @@ namespace lg2de.SimpleAccounting.Reports
                 throw new ArgumentException($"The report {resourceName} is invalid.");
             }
 
-            using (Stream stream = assembly.GetManifestResourceStream(fullResourceName))
-            {
-                this.Document.Load(stream);
-            }
+            using var stream = assembly.GetManifestResourceStream(fullResourceName);
+            this.Document.Load(stream);
         }
 
         public void PrintDocument(string documentName)
@@ -84,18 +81,16 @@ namespace lg2de.SimpleAccounting.Reports
 
             this.TransformDocument();
 
-            // The setup and cleanup procedured must be executed by event handlers
+            // The setup and cleanup procedures must be executed by event handlers
             // because they are executed for preview AND real printing.
             printDocument.BeginPrint += (_, printArgs) => this.SetupGraphics();
             printDocument.EndPrint += (_, printArgs) => this.CleanupGraphics();
 
-            using (var dialog = new PrintPreviewDialog
+            using var dialog = new PrintPreviewDialog
             {
                 Document = printDocument, WindowState = FormWindowState.Maximized,
-            })
-            {
-                dialog.ShowDialog();
-            }
+            };
+            dialog.ShowDialog();
         }
 
         internal void LoadXml(string xml)
@@ -153,7 +148,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         [SuppressMessage(
             "Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "Stack items will be disposed explicitely.")]
+            Justification = "Stack items will be disposed explicitly.")]
         internal void SetupGraphics()
         {
             var defaultPen = new Pen(Color.Black);
@@ -341,16 +336,16 @@ namespace lg2de.SimpleAccounting.Reports
         {
             XmlNode columnsRoot =
                 tableNode.SelectSingleNode("columns")
-                ?? throw new InvalidOperationException($"The table must define columns.");
+                ?? throw new InvalidOperationException("The table must define columns.");
             XmlNodeList columnNodes =
                 tableNode.SelectNodes("columns/column")
-                ?? throw new InvalidOperationException($"The table must define at least one column.");
+                ?? throw new InvalidOperationException("The table must define at least one column.");
 
             int tableLineHeight = tableNode.GetAttribute("lineHeight", DefaultLineHeight);
             int headerLineHeight = columnsRoot.GetAttribute("lineHeight", tableLineHeight);
 
             int xPosition = 0;
-            foreach (XmlNode columnNode in columnNodes)
+            foreach (var columnNode in columnNodes.OfType<XmlNode>())
             {
                 var width = columnNode.GetAttribute<int>("width");
 
@@ -429,7 +424,7 @@ namespace lg2de.SimpleAccounting.Reports
                 }
 
                 textNode.InnerText = strText;
-                int colmnWidth = columnNode.GetAttribute<int>("width");
+                int columnWidth = columnNode.GetAttribute<int>("width");
                 int xAdoption = 0;
                 var align = rowNode.Attributes.GetNamedItem("align")
                             ?? columnNode.Attributes.GetNamedItem("align");
@@ -438,18 +433,18 @@ namespace lg2de.SimpleAccounting.Reports
                     textNode.SetAttribute("align", align.Value);
                     if (align.Value == "right")
                     {
-                        xAdoption = colmnWidth;
+                        xAdoption = columnWidth;
                     }
                     else if (align.Value == "center")
                     {
-                        xAdoption = colmnWidth / Two;
+                        xAdoption = columnWidth / Two;
                     }
                 }
 
                 textNode.SetAttribute("relX", (xPosition + xAdoption));
                 tableNode.ParentNode.InsertBefore(textNode, tableNode);
-                this.CreateFrame(columnNode, textNode, xPosition, 0, xPosition + colmnWidth, lineHeight);
-                xPosition += colmnWidth;
+                this.CreateFrame(columnNode, textNode, xPosition, 0, xPosition + columnWidth, lineHeight);
+                xPosition += columnWidth;
             }
 
             this.CreateFrame(dataNode, tableNode, 0, 0, xPosition, lineHeight);
@@ -517,22 +512,22 @@ namespace lg2de.SimpleAccounting.Reports
             int pageNumber = 1;
 
             var pageWraps = this.Document.SelectNodes("//newPage");
-            foreach (XmlNode pageWrap in pageWraps)
+            foreach (var pageWrap in pageWraps.OfType<XmlNode>())
             {
                 pageNumber++;
                 this.InsertPageTexts(pageWrap, pageNumber);
             }
         }
 
-        private void InsertPageTexts(XmlNode currentNode, int pageNumber)
+        private void InsertPageTexts(XmlNode baseNode, int pageNumber)
         {
-            var insertParent = currentNode;
-            foreach (XmlNode child in this.pageTextsNode.ChildNodes)
+            var insertParent = baseNode;
+            foreach (var child in this.pageTextsNode!.ChildNodes.OfType<XmlNode>())
             {
                 var copiedChild = insertParent.OwnerDocument.ImportNode(child, deep: true);
                 var textElements = copiedChild.SelectNodes("//text");
                 string pageNumberText = pageNumber.ToString(CultureInfo.InvariantCulture);
-                foreach (XmlElement element in textElements)
+                foreach (var element in textElements.OfType<XmlElement>())
                 {
                     element.InnerText = element.InnerText.Replace(
                         "{page}", pageNumberText, StringComparison.InvariantCultureIgnoreCase);
@@ -612,6 +607,11 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void PrintTextNode(IGraphics graphics)
         {
+            if (this.currentNode == null)
+            {
+                throw new InvalidOperationException("The current node is uninitialized.");
+            }
+
             SolidBrush drawBrush = this.solidBrushStack.Peek();
             Font drawFont = this.fontStack.Peek();
 
@@ -653,6 +653,11 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void PrintLineNode(IGraphics graphics)
         {
+            if (this.currentNode == null)
+            {
+                throw new InvalidOperationException("The current node is uninitialized.");
+            }
+
             Pen drawPen = this.penStack.Peek();
 
             var absFromX = this.currentNode.GetAttribute<int?>("absFromX");
@@ -717,6 +722,11 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void PrintFontNode(IGraphics graphics)
         {
+            if (this.currentNode == null)
+            {
+                throw new InvalidOperationException("The current node is uninitialized.");
+            }
+
             Font drawFont = this.fontStack.Peek();
 
             XmlNode nodeBold = this.currentNode.Attributes.GetNamedItem("bold");
@@ -738,11 +748,11 @@ namespace lg2de.SimpleAccounting.Reports
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
             var newFont = new Font(fontName, fontSize, fontStyle);
-#pragma warning restore CA2000 // The font stack will be disposed explicitely.
+#pragma warning restore CA2000 // The font stack will be disposed explicitly.
 
             if (this.currentNode.ChildNodes.Count > 0)
             {
-                // change font temporary for subnodes
+                // change font temporary for sub-nodes
                 this.fontStack.Push(newFont);
                 var stackNode = this.currentNode;
                 this.currentNode = this.currentNode.FirstChild;

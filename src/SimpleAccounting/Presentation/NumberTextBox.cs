@@ -24,7 +24,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 typeof(NumberTextBox),
                 new FrameworkPropertyMetadata((uint)0, OnScaleChanged));
 
-        private Regex numberExpression;
+        private Regex? numberExpression;
 
         public NumberTextBox()
         {
@@ -89,7 +89,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.Text.Substring(0, this.SelectionStart)
                 + e.Text
                 + this.Text.Substring(this.SelectionStart + this.SelectionLength);
-            var isValid = this.numberExpression.IsMatch(newText);
+            var isValid = this.numberExpression!.IsMatch(newText);
             e.Handled = !isValid;
         }
 
@@ -102,7 +102,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             var text = (string)e.DataObject.GetData(typeof(string));
-            if (text == null || !this.numberExpression.IsMatch(text))
+            if (text == null || !this.numberExpression!.IsMatch(text))
             {
                 e.CancelCommand();
             }

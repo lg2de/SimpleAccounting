@@ -6,7 +6,7 @@ namespace lg2de.SimpleAccounting.Extensions
 {
     using System;
 
-    public static class NumberExtensions
+    internal static class NumberExtensions
     {
         private const double ConversionFactor = 100.0;
 

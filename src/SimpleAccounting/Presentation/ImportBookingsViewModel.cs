@@ -33,10 +33,12 @@ namespace lg2de.SimpleAccounting.Presentation
         public ImportBookingsViewModel(
             IMessageBox messageBox,
             ShellViewModel parent,
+            AccountingDataJournal journal,
             IEnumerable<AccountDefinition> accounts)
         {
             this.messageBox = messageBox;
             this.parent = parent;
+            this.Journal = journal;
             this.accounts = accounts.ToList();
 
             // ReSharper disable once VirtualMemberCallInConstructor
@@ -56,7 +58,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public DateTime RangMax { get; internal set; }
 
-        public AccountingDataJournal Journal { get; internal set; }
+        public AccountingDataJournal Journal { get; }
 
         public ulong BookingNumber { get; internal set; }
 
@@ -75,7 +77,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        public AccountDefinition SelectedAccount { get; set; }
+        public AccountDefinition? SelectedAccount { get; set; }
 
         public ObservableCollection<ImportEntryViewModel> ImportData { get; }
             = new ObservableCollection<ImportEntryViewModel>();
@@ -85,10 +87,10 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand LoadDataCommand => new RelayCommand(
             _ =>
             {
-                System.Windows.Forms.OpenFileDialog openFileDialog = null;
+                string fileName = string.Empty;
                 try
                 {
-                    openFileDialog = new System.Windows.Forms.OpenFileDialog
+                    using var openFileDialog = new System.Windows.Forms.OpenFileDialog
                     {
                         Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
                     };
@@ -98,14 +100,15 @@ namespace lg2de.SimpleAccounting.Presentation
                         return;
                     }
 
+                    fileName = openFileDialog.FileName;
                     this.ImportData.Clear();
 
                     // note, the stream is disposed by the reader
                     var stream = new FileStream(
-                        openFileDialog.FileName, FileMode.Open, FileAccess.Read,
+                        fileName, FileMode.Open, FileAccess.Read,
                         FileShare.ReadWrite);
                     var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-                    using (var reader = new StreamReader(stream, enc1252))
+                    using (var reader = new StreamReader(stream, enc1252!))
                     {
                         this.ImportBookings(reader, new Configuration());
                     }
@@ -117,11 +120,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
                 catch (IOException e)
                 {
-                    this.messageBox.Show($"Failed to load file '{openFileDialog.FileName}':\n{e.Message}", "Import");
-                }
-                finally
-                {
-                    openFileDialog?.Dispose();
+                    this.messageBox.Show($"Failed to load file '{fileName}':\n{e.Message}", "Import");
                 }
             }, _ => this.SelectedAccount != null);
 
@@ -135,19 +134,22 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal void ImportBookings(TextReader reader, Configuration configuration)
         {
-            var dateField = this.SelectedAccount.ImportMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source;
+            var dateField = this.SelectedAccount!.ImportMapping.Columns
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source
+                ?? "date";
             var nameField = this.SelectedAccount.ImportMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source;
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source
+                ?? "name";
             var textField = this.SelectedAccount.ImportMapping.Columns
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
             var valueField = this.SelectedAccount.ImportMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source;
+                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
+                ?? "value";
 
-            var lastEntry = this.Journal?.Booking?
+            var lastEntry = this.Journal.Booking
                 .Where(
-                    x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber) ||
-                         x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
+                    x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber)
+                         || x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
                 .OrderBy(x => x.Date)
                 .LastOrDefault();
             if (lastEntry != null)
@@ -200,10 +202,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
             }
 
-            var item = new ImportEntryViewModel
+            var item = new ImportEntryViewModel(this.accounts)
             {
                 Date = date,
-                Accounts = this.accounts,
                 Identifier = this.BookingNumber++,
                 Name = name,
                 Text = text,
@@ -211,7 +212,7 @@ namespace lg2de.SimpleAccounting.Presentation
             };
 
             var longValue = (long)(value * 100);
-            foreach (var importMapping in this.SelectedAccount.ImportMapping.Patterns)
+            foreach (var importMapping in this.SelectedAccount!.ImportMapping.Patterns)
             {
                 if (!Regex.IsMatch(text, importMapping.Expression))
                 {

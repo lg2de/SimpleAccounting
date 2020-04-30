@@ -1,8 +1,8 @@
 ﻿<Project>
 
   <PropertyGroup>
-    <!--<NullableContextOptions>enable</NullableContextOptions>
-    <Nullable>enable</Nullable>-->
+    <NullableContextOptions>enable</NullableContextOptions>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <!-- license is LGPL -->
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.6.0.16497">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.6.1.17183">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
