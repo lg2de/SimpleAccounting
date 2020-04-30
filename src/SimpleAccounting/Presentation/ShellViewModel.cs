@@ -586,6 +586,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void BuildRecentProjectsMenu()
         {
+            // ReSharper disable once ConstantNullCoalescingCondition - FP
             foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
             {
                 if (!this.fileSystem.FileExists(project))
@@ -730,6 +731,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var allAccounts = this.accountingData!.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
+            // ReSharper disable ConstantConditionalAccessQualifier
             this.accountingData.Setup?.BookingTemplates?.Template
                 .Select(
                     t => new BookingTemplate
@@ -740,6 +742,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         Value = t.Value / CentFactor
                     })
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
+            // ReSharper restore ConstantConditionalAccessQualifier
             this.windowManager.ShowDialog(bookingModel);
         }
 
@@ -796,7 +799,9 @@ namespace lg2de.SimpleAccounting.Presentation
             this.currentModelJournal = this.accountingData!.Journal.Single(y => y.Year == newYearName);
             this.UpdateDisplayName();
             this.RefreshFullJournal();
+            // ReSharper disable ConstantConditionalAccessQualifier
             var firstBooking = this.currentModelJournal.Booking?.FirstOrDefault();
+            // ReSharper restore ConstantConditionalAccessQualifier
             if (firstBooking != null)
             {
                 var firstAccount = firstBooking
@@ -986,8 +991,10 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentModelJournal!,
                 this.accountingData!.Accounts.SelectMany(a => a.Account),
                 this.accountingData.Setup, CultureInfo.CurrentUICulture);
+            // ReSharper disable ConstantConditionalAccessQualifier
             report.PageBreakBetweenAccounts =
                 this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
+            // ReSharper restore ConstantConditionalAccessQualifier
             const string title = "Kontoblätter";
             report.CreateReport(title);
             report.ShowPreview(title);
@@ -1026,7 +1033,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 accountGroups,
                 this.accountingData.Setup,
                 CultureInfo.CurrentUICulture);
+            // ReSharper disable ConstantConditionalAccessQualifier
             this.accountingData.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
+            // ReSharper restore ConstantConditionalAccessQualifier
             const string title = "Bestandskontosalden";
             report.CreateReport(title);
             report.ShowPreview(title);
