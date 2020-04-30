@@ -17,7 +17,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)))
             {
-                Types.Add((AccountDefinitionType)type);
+                Types.Add((AccountDefinitionType)type!);
             }
         }
 
@@ -25,12 +25,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ulong Identifier { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public IEnumerable<AccountingDataAccountGroup> Groups { get; set; }
             = Enumerable.Empty<AccountingDataAccountGroup>();
 
-        public AccountingDataAccountGroup Group { get; set; }
+        public AccountingDataAccountGroup? Group { get; set; }
 
         public AccountDefinitionType Type { get; set; }
 
@@ -41,11 +41,11 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => !string.IsNullOrWhiteSpace(this.Name)
                  && (this.IsValidIdentifierFunc?.Invoke(this.Identifier) ?? true));
 
-        internal Func<ulong, bool> IsValidIdentifierFunc { get; set; }
+        internal Func<ulong, bool>? IsValidIdentifierFunc { get; set; }
 
         internal AccountViewModel Clone()
         {
-            return this.MemberwiseClone() as AccountViewModel;
+            return (AccountViewModel)this.MemberwiseClone();
         }
     }
 }

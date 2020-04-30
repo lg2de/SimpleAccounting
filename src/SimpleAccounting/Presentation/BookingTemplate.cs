@@ -6,7 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     internal class BookingTemplate
     {
-        public string Text { get; set; }
+        public string Text { get; set; } = string.Empty;
 
         public ulong Credit { get; set; }
 

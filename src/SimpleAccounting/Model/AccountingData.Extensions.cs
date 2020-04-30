@@ -39,7 +39,8 @@ namespace lg2de.SimpleAccounting.Model
             }
         }
 
-        internal IEnumerable<AccountDefinition> AllAccounts => this.Accounts?.SelectMany(g => g.Account);
+        internal IEnumerable<AccountDefinition> AllAccounts =>
+            this.Accounts?.SelectMany(g => g.Account) ?? Enumerable.Empty<AccountDefinition>();
 
         internal static AccountingData GetTemplateProject()
         {
@@ -232,7 +233,7 @@ namespace lg2de.SimpleAccounting.Model
     {
         internal BookingValue Clone()
         {
-            return this.MemberwiseClone() as BookingValue;
+            return (BookingValue)this.MemberwiseClone();
         }
     }
 }

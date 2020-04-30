@@ -29,7 +29,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
         private readonly IMessageBox messageBox;
         private readonly IProcess process;
 
-        private Release newRelease;
+        private Release? newRelease;
 
         public ApplicationUpdate(IMessageBox messageBox, IFileSystem fileSystem, IProcess process)
         {
@@ -75,7 +75,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
             }
 
             string assetUrl = asset.BrowserDownloadUrl;
-            string targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
+            var targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
             int processId = this.process.GetCurrentProcessId();
             var info = new ProcessStartInfo(
                 "powershell",
@@ -85,11 +85,6 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
         internal bool AskForUpdate(IEnumerable<Release> releases, string currentVersion)
         {
-            if (releases == null)
-            {
-                return false;
-            }
-
             this.newRelease = releases.GetNewRelease(currentVersion);
             if (this.newRelease == null)
             {
@@ -123,7 +118,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
                     $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
                     Caption,
                     icon: MessageBoxImage.Error);
-                return null;
+                return Enumerable.Empty<Release>();
             }
         }
     }

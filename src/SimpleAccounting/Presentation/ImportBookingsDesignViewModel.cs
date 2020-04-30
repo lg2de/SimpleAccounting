@@ -44,7 +44,7 @@ namespace lg2de.SimpleAccounting.Presentation
         };
 
         public ImportBookingsDesignViewModel()
-            : base(null, null, SampleAccounts)
+            : base(null!, null!, SampleAccounts)
         {
             this.SelectedAccountNumber = 100;
 

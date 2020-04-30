@@ -20,7 +20,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private ulong creditAccount;
         private ulong debitAccount;
-        private BookingTemplate selectedTemplate;
+        private BookingTemplate? selectedTemplate;
 
         public AddBookingViewModel(ShellViewModel parent, DateTime dateStart, DateTime dateEnd)
         {
@@ -36,7 +36,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<BookingTemplate> BindingTemplates { get; }
             = new ObservableCollection<BookingTemplate>();
 
-        public BookingTemplate SelectedTemplate
+        public BookingTemplate? SelectedTemplate
         {
             get => this.selectedTemplate;
             set
@@ -64,7 +64,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        public string BookingText { get; set; }
+        public string BookingText { get; set; } = string.Empty;
 
         public double BookingValue { get; set; }
 

@@ -8,13 +8,13 @@ namespace lg2de.SimpleAccounting.Presentation
     {
         public double Value { get; set; }
 
-        public string CreditAccount { get; set; }
+        public string CreditAccount { get; set; } = string.Empty;
 
-        public string DebitAccount { get; set; }
+        public string DebitAccount { get; set; } = string.Empty;
 
         internal FullJournalViewModel Clone()
         {
-            return this.MemberwiseClone() as FullJournalViewModel;
+            return (FullJournalViewModel)this.MemberwiseClone();
         }
     }
 }
