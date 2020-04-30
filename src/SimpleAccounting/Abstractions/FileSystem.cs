@@ -8,7 +8,6 @@ namespace lg2de.SimpleAccounting.Abstractions
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
-    using System.Linq;
     using System.Text;
 
     /// <summary>
@@ -53,7 +52,20 @@ namespace lg2de.SimpleAccounting.Abstractions
 
         public IEnumerable<(string RootPath, string Format)> GetDrives()
         {
-            return DriveInfo.GetDrives().Select(x => (RootPath: x.RootDirectory.FullName, Format: x.DriveFormat));
+            foreach (var driveInfo in DriveInfo.GetDrives())
+            {
+                (string RootPath, string Format) info;
+                try
+                {
+                    info = (RootPath: driveInfo.RootDirectory.FullName, Format: driveInfo.DriveFormat);
+                }
+                catch (IOException)
+                {
+                    continue;
+                }
+
+                yield return info;
+            }
         }
     }
 }

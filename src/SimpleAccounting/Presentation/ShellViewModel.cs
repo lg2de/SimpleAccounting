@@ -687,7 +687,7 @@ namespace lg2de.SimpleAccounting.Presentation
             if (account.Identifier != vm.Identifier)
             {
                 accountData.ID = vm.Identifier;
-                account.Group.Account = account.Group.Account.OrderBy(x => x.ID).ToList();
+                account.Group!.Account = account.Group.Account.OrderBy(x => x.ID).ToList();
 
                 this.accountingData.Journal.ForEach(
                     j => j.Booking?.ForEach(
@@ -751,12 +751,12 @@ namespace lg2de.SimpleAccounting.Presentation
             var importModel = new ImportBookingsViewModel(
                 this.messageBox,
                 this,
+                this.currentModelJournal,
                 this.accountingData!.AllAccounts)
             {
                 BookingNumber = this.GetMaxBookIdent() + 1,
                 RangeMin = min,
-                RangMax = max,
-                Journal = this.currentModelJournal
+                RangMax = max
             };
             this.windowManager.ShowDialog(importModel);
         }
@@ -778,7 +778,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 .ToList().ForEach(viewModel.Accounts.Add);
 
             var result = this.windowManager.ShowDialog(viewModel);
-            if (result != true)
+            if (result != true || viewModel.RemoteAccount == null)
             {
                 return;
             }

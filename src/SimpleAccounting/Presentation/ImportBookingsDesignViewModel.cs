@@ -44,13 +44,12 @@ namespace lg2de.SimpleAccounting.Presentation
         };
 
         public ImportBookingsDesignViewModel()
-            : base(null!, null!, SampleAccounts)
+            : base(null!, null!, null!, SampleAccounts)
         {
             this.SelectedAccountNumber = 100;
 
-            var item = new ImportEntryViewModel
+            var item = new ImportEntryViewModel(SampleAccounts)
             {
-                Accounts = SampleAccounts,
                 Date = DateTime.Now,
                 Identifier = 42,
                 Name = "McX",

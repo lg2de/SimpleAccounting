@@ -607,6 +607,11 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void PrintTextNode(IGraphics graphics)
         {
+            if (this.currentNode == null)
+            {
+                throw new InvalidOperationException("The current node is uninitialized.");
+            }
+
             SolidBrush drawBrush = this.solidBrushStack.Peek();
             Font drawFont = this.fontStack.Peek();
 
@@ -648,6 +653,11 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void PrintLineNode(IGraphics graphics)
         {
+            if (this.currentNode == null)
+            {
+                throw new InvalidOperationException("The current node is uninitialized.");
+            }
+
             Pen drawPen = this.penStack.Peek();
 
             var absFromX = this.currentNode.GetAttribute<int?>("absFromX");
@@ -712,6 +722,11 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void PrintFontNode(IGraphics graphics)
         {
+            if (this.currentNode == null)
+            {
+                throw new InvalidOperationException("The current node is uninitialized.");
+            }
+
             Font drawFont = this.fontStack.Peek();
 
             XmlNode nodeBold = this.currentNode.Attributes.GetNamedItem("bold");

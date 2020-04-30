@@ -20,11 +20,11 @@ namespace lg2de.SimpleAccounting.Presentation
             this.currentYear = currentYear ?? throw new ArgumentNullException(nameof(currentYear));
         }
 
-        public string InstructionText { get; private set; }
+        public string InstructionText { get; private set; } = string.Empty;
 
         public IList<AccountDefinition> Accounts { get; } = new List<AccountDefinition>();
 
-        public AccountDefinition RemoteAccount { get; set; }
+        public AccountDefinition? RemoteAccount { get; set; }
 
         public ICommand CloseYearCommand => new RelayCommand(
             _ => this.TryClose(true),

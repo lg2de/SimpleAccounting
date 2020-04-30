@@ -24,6 +24,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = new ImportBookingsViewModel(
                 null,
                 null,
+                null,
                 accounts);
 
             sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
@@ -32,10 +33,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookings_SampleInput_DataImported()
         {
-            var accounts = Samples.SampleProject.AllAccounts.ToList();
+            AccountingData project = Samples.SampleProject;
+            var accounts = project.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(
                 null,
                 null,
+                project.Journal.Last(),
                 accounts) { SelectedAccount = accounts.Single(x => x.Name == "Bank account") };
             sut.SelectedAccount.ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
             {
@@ -77,11 +80,12 @@ Date;Name;Text;Value
             var sut = new ImportBookingsViewModel(
                 null,
                 parent,
+                null,
                 accounts) { SelectedAccount = accounts.Single(x => x.Name == "Bank account") };
             sut.SelectedAccountNumber = sut.SelectedAccount.ID;
             var remoteAccount = accounts.Single(x => x.ID == 600);
             sut.ImportData.Add(
-                new ImportEntryViewModel
+                new ImportEntryViewModel(accounts)
                 {
                     Date = new DateTime(2020, 1, 1),
                     Identifier = 101,
@@ -91,7 +95,7 @@ Date;Name;Text;Value
                     RemoteAccount = remoteAccount
                 });
             sut.ImportData.Add(
-                new ImportEntryViewModel
+                new ImportEntryViewModel(accounts)
                 {
                     Date = new DateTime(2020, 1, 2),
                     Identifier = 102,
@@ -100,7 +104,7 @@ Date;Name;Text;Value
                     RemoteAccount = remoteAccount
                 });
             sut.ImportData.Add(
-                new ImportEntryViewModel
+                new ImportEntryViewModel(accounts)
                 {
                     Date = new DateTime(2020, 1, 3),
                     Identifier = 103,
@@ -109,7 +113,7 @@ Date;Name;Text;Value
                     RemoteAccount = remoteAccount
                 });
             sut.ImportData.Add(
-                new ImportEntryViewModel
+                new ImportEntryViewModel(accounts)
                 {
                     Date = new DateTime(2020, 1, 3),
                     Identifier = 104,

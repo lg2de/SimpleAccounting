@@ -48,8 +48,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     CreditValue = 99,
                     DebitValue = 0
                 },
-                new { Text = "Summe", RemoteAccount = (string)null, CreditValue = 549, DebitValue = 1200 },
-                new { Text = "Saldo", RemoteAccount = (string)null, CreditValue = 0, DebitValue = 651 });
+                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 549, DebitValue = 1200 },
+                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 651 });
         }
 
         [Fact]

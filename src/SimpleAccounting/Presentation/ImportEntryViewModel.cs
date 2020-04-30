@@ -10,15 +10,20 @@ namespace lg2de.SimpleAccounting.Presentation
 
     public class ImportEntryViewModel : JournalBaseViewModel
     {
-        private AccountDefinition remoteAccount;
+        private AccountDefinition? remoteAccount;
 
-        public IEnumerable<AccountDefinition> Accounts { get; set; }
+        public ImportEntryViewModel(IEnumerable<AccountDefinition> accounts)
+        {
+            this.Accounts = accounts;
+        }
 
-        public string Name { get; set; }
+        public IEnumerable<AccountDefinition> Accounts { get; }
+
+        public string Name { get; set; } = string.Empty;
 
         public double Value { get; set; }
 
-        public AccountDefinition RemoteAccount
+        public AccountDefinition? RemoteAccount
         {
             get => this.remoteAccount;
             set

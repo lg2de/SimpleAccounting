@@ -159,13 +159,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.FullJournal.Should().BeEquivalentTo(
                 new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
                 new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
-                new { Text = "Salary", CreditAccount = (string)null, DebitAccount = "100 (Bank account)" },
-                new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = (string)null },
-                new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = (string)null },
+                new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
+                new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
+                new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
                 new { Text = "Credit rate", CreditAccount = "100 (Bank account)", DebitAccount = "5000 (Bank credit)" },
-                new { Text = "Shoes1", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes2", CreditAccount = (string)null, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = (string)null },
+                new { Text = "Shoes1", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+                new { Text = "Shoes2", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = string.Empty },
                 new
                 {
                     Text = "Rent to friend",

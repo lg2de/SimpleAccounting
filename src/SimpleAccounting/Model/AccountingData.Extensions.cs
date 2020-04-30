@@ -207,8 +207,8 @@ namespace lg2de.SimpleAccounting.Model
             var accountsWithMapping = this.Accounts.SelectMany(x => x.Account).Where(x => x.ImportMapping != null);
             foreach (var account in accountsWithMapping)
             {
-                if ((account.ImportMapping.Columns?.Any() ?? false)
-                    || (account.ImportMapping.Patterns?.Any() ?? false))
+                if ((account.ImportMapping?.Columns?.Any() ?? false)
+                    || (account.ImportMapping?.Patterns?.Any() ?? false))
                 {
                     continue;
                 }
