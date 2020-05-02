@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Presentation
+namespace lg2de.SimpleAccounting.Infrastructure
 {
     using System;
     using System.Windows.Input;

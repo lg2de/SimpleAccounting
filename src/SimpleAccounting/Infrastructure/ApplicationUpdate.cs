@@ -106,20 +106,24 @@ namespace lg2de.SimpleAccounting.Infrastructure
             Justification = "catch exceptions from external library")]
         private async Task<IEnumerable<Release>> GetAllReleasesAsync()
         {
-            try
-            {
-                var productInformation = new ProductHeaderValue(Defines.ProjectName);
-                var client = new GitHubClient(productInformation);
-                return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
-            }
-            catch (Exception exception)
-            {
-                this.messageBox.Show(
-                    $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
-                    Caption,
-                    icon: MessageBoxImage.Error);
-                return Enumerable.Empty<Release>();
-            }
+            return await Task.Run(
+                async () =>
+                {
+                    try
+                    {
+                        var productInformation = new ProductHeaderValue(Defines.ProjectName);
+                        var client = new GitHubClient(productInformation);
+                        return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
+                    }
+                    catch (Exception exception)
+                    {
+                        this.messageBox.Show(
+                            $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
+                            Caption,
+                            icon: MessageBoxImage.Error);
+                        return Enumerable.Empty<Release>();
+                    }
+                });
         }
     }
 }
