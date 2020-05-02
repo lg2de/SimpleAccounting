@@ -36,7 +36,6 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellViewModel : Conductor<IScreen>, IBusy, IDisposable
     {
-        private const int MaxRecentProjects = 10;
         private const double CentFactor = 100.0;
 
         private readonly IWindowManager windowManager;
@@ -223,7 +222,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
 
-        private string AutoSaveFileName => this.FileName + "~";
+        private string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
 
         private bool IsCurrentYearOpen
         {
@@ -371,7 +370,6 @@ namespace lg2de.SimpleAccounting.Presentation
             this.TryClose();
         }
 
-        // TODO move to project loader?
         internal async Task LoadProjectFromFileAsync(string projectFileName)
         {
             if (!this.CheckSaveProject())
@@ -380,92 +378,16 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.IsDocumentModified = false;
-            this.Settings.RecentProjects ??= new StringCollection();
-            this.Settings.SecuredDrives ??= new StringCollection();
 
-            try
+            var loader = new ProjectFileLoader(this.messageBox, this.fileSystem, this.processApi, this.Settings);
+            if (!await Task.Run(() => loader.LoadAsync(projectFileName)))
             {
-                MessageBoxResult result;
-                if (!this.fileSystem.FileExists(projectFileName)
-                    && this.Settings.SecuredDrives.OfType<string>().Any(
-                        drive => projectFileName.StartsWith(
-                            drive, StringComparison.InvariantCultureIgnoreCase)))
-                {
-                    result = this.messageBox.Show(
-                        $"Das Projekt {projectFileName} scheint auf einem gesicherten Laufwerk gespeichert zu sein.\n"
-                        + "(Cryptomator)\n"
-                        + "Dieses Laufwerk ist nicht verfügbar.\n"
-                        + "Soll 'Cryptomator' gestartet werden?",
-                        "Projekt laden",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question,
-                        MessageBoxResult.Yes);
-                    if (result != MessageBoxResult.Yes)
-                    {
-                        return;
-                    }
-
-                    var starter = new SecureDriveStarter(this.fileSystem, this.processApi, projectFileName);
-                    if (!await starter.StartApplicationAsync())
-                    {
-                        // failed to start application
-                        return;
-                    }
-                }
-
-                this.FileName = projectFileName;
-                result = MessageBoxResult.No;
-                if (this.fileSystem.FileExists(this.AutoSaveFileName))
-                {
-                    result = this.messageBox.Show(
-                        "Es existiert eine automatische Sicherung der Projektdatei\n"
-                        + $"{this.FileName}.\n"
-                        + "Soll diese geöffnet werden?",
-                        "Projekt öffnen",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
-                }
-
-                await Task.Run(
-                    () =>
-                    {
-                        var projectXml = this.fileSystem.ReadAllTextFromFile(
-                            result == MessageBoxResult.Yes
-                                ? this.AutoSaveFileName
-                                : this.FileName);
-                        var projectData = AccountingData.Deserialize(projectXml);
-
-                        if (projectData.Migrate() || result == MessageBoxResult.Yes)
-                        {
-                            this.IsDocumentModified = true;
-                        }
-
-                        Execute.OnUIThread(() => this.LoadProjectData(projectData));
-
-                        this.Settings.RecentProject = this.FileName;
-
-                        var info = this.fileSystem.GetDrives().SingleOrDefault(
-                            x => this.FileName.StartsWith(
-                                x.RootPath, StringComparison.InvariantCultureIgnoreCase));
-                        if (info.Format != null
-                            && info.Format.Contains("cryptomator", StringComparison.InvariantCultureIgnoreCase)
-                            && !this.Settings.SecuredDrives.Contains(info.RootPath))
-                        {
-                            this.Settings.SecuredDrives.Add(info.RootPath);
-                        }
-
-                        this.Settings.RecentProjects.Remove(this.FileName);
-                        this.Settings.RecentProjects.Insert(0, this.FileName);
-                        while (this.Settings.RecentProjects.Count > MaxRecentProjects)
-                        {
-                            this.Settings.RecentProjects.RemoveAt(MaxRecentProjects);
-                        }
-                    });
+                return;
             }
-            catch (InvalidOperationException e)
-            {
-                this.messageBox.Show($"Failed to load file '{this.FileName}':\n{e.Message}", "Load");
-            }
+
+            this.LoadProjectData(loader.ProjectData);
+            this.FileName = projectFileName;
+            this.IsDocumentModified = loader.Migrated;
         }
 
         internal void LoadProjectData(AccountingData projectData)
