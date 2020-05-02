@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
 
     public class CloseYearViewModel : Screen

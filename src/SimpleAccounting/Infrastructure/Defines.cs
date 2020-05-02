@@ -15,5 +15,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
         public static readonly string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
         public static readonly string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
+
+        public static string GetAutoSaveFileName(string fileName) => fileName + "~";
     }
 }

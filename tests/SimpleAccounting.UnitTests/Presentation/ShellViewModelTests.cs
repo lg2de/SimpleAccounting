@@ -77,20 +77,23 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     }
                 }
             };
+            fileSystem.FileExists("recent.project").Returns(true);
             fileSystem.ReadAllTextFromFile("recent.project").Returns(sample.Serialize());
             var fileSaved = new TaskCompletionSource<bool>();
             fileSystem
                 .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
                 .Do(x => fileSaved.SetResult(true));
-
             ((IActivate)sut).Activate();
             await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
             sut.IsDocumentModified = true;
-            await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
+
+            await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(
+                1.Seconds(), "file should be saved by auto-save task");
 
             using var _ = new AssertionScope();
-            sut.IsDocumentModified.Should().BeTrue();
+            sut.IsDocumentModified.Should().BeTrue("the project is ONLY auto-saved and not saved to real project file");
             sut.AccountList.Should().BeEquivalentTo(new { Name = "TheAccount" });
+            fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project", Arg.Any<string>());
             fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
         }
 
@@ -129,7 +132,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
             await sut.LoadingTask;
 
-            sut.RecentProjects?.Select(x => x.Header).Should().Equal("c:\\file1", "k:\\file2");
+            sut.RecentProjects.Select(x => x.Header).Should().Equal("c:\\file1", "k:\\file2");
             messageBox.Received(1).Show(
                 Arg.Is<string>(s => s.Contains("Cryptomator")),
                 Arg.Any<string>(),
@@ -191,7 +194,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             ((IActivate)sut).Activate();
 
-            sut.RecentProjects?.Select(x => x.Header).Should().Equal("file1");
+            sut.RecentProjects.Select(x => x.Header).Should().Equal("file1");
         }
 
         [Fact]
@@ -340,6 +343,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task LoadProjectFromFileAsync_HappyPath_FileLoaded()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
+            fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
             await sut.LoadProjectFromFileAsync("the.fileName");
@@ -353,7 +357,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public async Task LoadProjectFromFileAsync_AutoSaveFileExistsYes_AutoSaveFileLoaded()
+        public async Task LoadProjectFromFileAsync_UserWantsAutoSaveFile_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             messageBox.Show(
@@ -362,6 +366,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+            fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.FileExists("the.fileName~").Returns(true);
 
             await sut.LoadProjectFromFileAsync("the.fileName");
@@ -375,7 +380,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public async Task LoadProjectFromFileAsync_AutoSaveFileExistsNo_AutoSaveFileLoaded()
+        public async Task LoadProjectFromFileAsync_UserDoesNotWantAutoSaveFileExists_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             messageBox.Show(
@@ -384,6 +389,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+            fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.FileExists("the.fileName~").Returns(true);
 
             await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
@@ -478,6 +484,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 "I",
                 "J"
             };
+            fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
             await sut.LoadProjectFromFileAsync("the.fileName");
@@ -494,6 +501,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             {
                 Years = new List<AccountingDataYear> { new AccountingDataYear { Name = 2020 } }
             };
+            fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 
             await sut.LoadProjectFromFileAsync("the.fileName");

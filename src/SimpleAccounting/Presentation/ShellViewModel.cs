@@ -34,9 +34,8 @@ namespace lg2de.SimpleAccounting.Presentation
         "S4055:Literals should not be passed as localized parameters")]
     [SuppressMessage("ReSharper", "LocalizableElement")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    internal class ShellViewModel : Conductor<IScreen>, IDisposable
+    internal class ShellViewModel : Conductor<IScreen>, IBusy, IDisposable
     {
-        private const int MaxRecentProjects = 10;
         private const double CentFactor = 100.0;
 
         private readonly IWindowManager windowManager;
@@ -182,7 +181,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand HelpFeedbackCommand => new RelayCommand(
             _ => this.processApi.Start(new ProcessStartInfo(Defines.NewIssueUrl) { UseShellExecute = true }));
 
-        public ICommand HelpCheckForUpdateCommand => new RelayCommand(_ => this.OnCheckForUpdateAsync());
+        public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this, this.OnCheckForUpdateAsync);
 
         public ICommand AccountSelectionCommand => new RelayCommand(
             o =>
@@ -223,7 +222,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
 
-        private string AutoSaveFileName => this.FileName + "~";
+        private string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
 
         private bool IsCurrentYearOpen
         {
@@ -285,8 +284,10 @@ namespace lg2de.SimpleAccounting.Presentation
                         await dispatcher.Invoke(
                             async () =>
                             {
+                                this.IsBusy = true;
                                 await this.LoadProjectFromFileAsync(this.Settings.RecentProject);
                                 this.BuildRecentProjectsMenu();
+                                this.IsBusy = false;
                             });
                         this.autoSaveTask = this.AutoSaveAsync();
                     });
@@ -349,28 +350,19 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private async Task OnCheckForUpdateAsync()
         {
-            this.IsBusy = true;
-
-            try
+            if (!await this.applicationUpdate.IsUpdateAvailableAsync(this.version))
             {
-                if (!await this.applicationUpdate.IsUpdateAvailableAsync(this.version))
-                {
-                    return;
-                }
-
-                if (!this.CheckSaveProject())
-                {
-                    return;
-                }
-
-                // starts separate process to update application in-place
-                // Now we need to close this application.
-                this.applicationUpdate.StartUpdateProcess();
+                return;
             }
-            finally
+
+            if (!this.CheckSaveProject())
             {
-                this.IsBusy = false;
+                return;
             }
+
+            // starts separate process to update application in-place
+            // Now we need to close this application.
+            this.applicationUpdate.StartUpdateProcess();
 
             // The user was asked whether saving the project (CheckSaveProject).
             // It may have answered "No". So, the project may still be modified.
@@ -380,7 +372,6 @@ namespace lg2de.SimpleAccounting.Presentation
             this.TryClose();
         }
 
-        // TODO move to project loader?
         internal async Task LoadProjectFromFileAsync(string projectFileName)
         {
             if (!this.CheckSaveProject())
@@ -389,94 +380,16 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.IsDocumentModified = false;
-            this.Settings.RecentProjects ??= new StringCollection();
-            this.Settings.SecuredDrives ??= new StringCollection();
 
-            try
+            var loader = new ProjectFileLoader(this.messageBox, this.fileSystem, this.processApi, this.Settings);
+            if (!await Task.Run(() => loader.LoadAsync(projectFileName)))
             {
-                MessageBoxResult result;
-                if (!this.fileSystem.FileExists(projectFileName)
-                    && this.Settings.SecuredDrives.OfType<string>().Any(
-                        drive => projectFileName.StartsWith(
-                            drive, StringComparison.InvariantCultureIgnoreCase)))
-                {
-                    result = this.messageBox.Show(
-                        $"Das Projekt {projectFileName} scheint auf einem gesicherten Laufwerk gespeichert zu sein.\n"
-                        + "(Cryptomator)\n"
-                        + "Dieses Laufwerk ist nicht verfügbar.\n"
-                        + "Soll 'Cryptomator' gestartet werden?",
-                        "Projekt laden",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question,
-                        MessageBoxResult.Yes);
-                    if (result != MessageBoxResult.Yes)
-                    {
-                        return;
-                    }
-
-                    this.IsBusy = true;
-                    var starter = new SecureDriveStarter(this.fileSystem, this.processApi, projectFileName);
-                    if (!await starter.StartApplicationAsync())
-                    {
-                        // failed to start application
-                        return;
-                    }
-                }
-
-                this.FileName = projectFileName;
-                this.IsBusy = true;
-                result = MessageBoxResult.No;
-                if (this.fileSystem.FileExists(this.AutoSaveFileName))
-                {
-                    result = this.messageBox.Show(
-                        "Es existiert eine automatische Sicherung der Projektdatei\n"
-                        + $"{this.FileName}.\n"
-                        + "Soll diese geöffnet werden?",
-                        "Projekt öffnen",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question);
-                }
-
-                var projectXml = this.fileSystem.ReadAllTextFromFile(
-                    result == MessageBoxResult.Yes
-                        ? this.AutoSaveFileName
-                        : this.FileName);
-                var projectData = AccountingData.Deserialize(projectXml);
-
-                if (projectData.Migrate() || result == MessageBoxResult.Yes)
-                {
-                    this.IsDocumentModified = true;
-                }
-
-                this.LoadProjectData(projectData);
-
-                this.Settings.RecentProject = this.FileName;
-
-                var info = this.fileSystem.GetDrives().SingleOrDefault(
-                    x => this.FileName.StartsWith(
-                        x.RootPath, StringComparison.InvariantCultureIgnoreCase));
-                if (info.Format != null
-                    && info.Format.Contains("cryptomator", StringComparison.InvariantCultureIgnoreCase)
-                    && !this.Settings.SecuredDrives.Contains(info.RootPath))
-                {
-                    this.Settings.SecuredDrives.Add(info.RootPath);
-                }
-
-                this.Settings.RecentProjects.Remove(this.FileName);
-                this.Settings.RecentProjects.Insert(0, this.FileName);
-                while (this.Settings.RecentProjects.Count > MaxRecentProjects)
-                {
-                    this.Settings.RecentProjects.RemoveAt(MaxRecentProjects);
-                }
+                return;
             }
-            catch (InvalidOperationException e)
-            {
-                this.messageBox.Show($"Failed to load file '{this.FileName}':\n{e.Message}", "Load");
-            }
-            finally
-            {
-                this.IsBusy = false;
-            }
+
+            this.LoadProjectData(loader.ProjectData);
+            this.FileName = projectFileName;
+            this.IsDocumentModified = loader.Migrated;
         }
 
         internal void LoadProjectData(AccountingData projectData)
@@ -581,7 +494,14 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            this.LoadProjectFromFileAsync(openFileDialog.FileName);
+            this.IsBusy = true;
+            string fileName = openFileDialog.FileName;
+            Task.Run(
+                async () =>
+                {
+                    await this.LoadProjectFromFileAsync(fileName);
+                    Execute.OnUIThread(() => this.IsBusy = false);
+                });
         }
 
         private void BuildRecentProjectsMenu()
@@ -596,7 +516,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var item = new MenuViewModel(
                     project,
-                    new RelayCommand(_ => this.LoadProjectFromFileAsync(project)));
+                    new AsyncCommand(this, () => this.LoadProjectFromFileAsync(project)));
                 this.RecentProjects.Add(item);
             }
         }

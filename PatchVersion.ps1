@@ -1,11 +1,18 @@
 # check whether build on tag
 $version = "DEVEL"
+
+Write-Host ref = $env:GITHUB_REF
 if ($env:GITHUB_REF -match "/tags/") {
   # use tag as version name
   $version = $env:GITHUB_REF -replace "(\w+/)*",""
 } else {
+  if ($env:GITHUB_REF -match "/heads/") {
+    # use branch as version name base
+    $version = $env:GITHUB_REF -replace "(\w+/)*",""
+  }
+
   # use git sha as version name
-  $version = ($env:GITHUB_SHA).Substring(0, 8)
+  $version = $version + "-" + ($env:GITHUB_SHA).Substring(0, 8)
 }
 
 Write-Host version = $version

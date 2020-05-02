@@ -2,11 +2,12 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Abstractions
+namespace lg2de.SimpleAccounting.Infrastructure
 {
     using System.Diagnostics;
     using System.IO;
     using System.Threading.Tasks;
+    using lg2de.SimpleAccounting.Abstractions;
     using Microsoft.Win32;
 
     internal class SecureDriveStarter

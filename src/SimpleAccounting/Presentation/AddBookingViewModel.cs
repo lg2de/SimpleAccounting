@@ -12,6 +12,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Windows.Input;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
 
     internal class AddBookingViewModel : Screen
