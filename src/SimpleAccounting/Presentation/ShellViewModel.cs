@@ -284,8 +284,10 @@ namespace lg2de.SimpleAccounting.Presentation
                         await dispatcher.Invoke(
                             async () =>
                             {
+                                this.IsBusy = true;
                                 await this.LoadProjectFromFileAsync(this.Settings.RecentProject);
                                 this.BuildRecentProjectsMenu();
+                                this.IsBusy = false;
                             });
                         this.autoSaveTask = this.AutoSaveAsync();
                     });

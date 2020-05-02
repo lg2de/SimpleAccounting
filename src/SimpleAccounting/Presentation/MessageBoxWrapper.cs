@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System.Windows;
+    using Caliburn.Micro;
 
     /// <summary>
     ///     Default implementation of <see cref="IMessageBox"/> using <see cref="MessageBox"/>.
@@ -19,15 +20,21 @@ namespace lg2de.SimpleAccounting.Presentation
             MessageBoxResult defaultResult = MessageBoxResult.None,
             MessageBoxOptions options = MessageBoxOptions.None)
         {
-            Application.Current.MainWindow.Activate();
-            return MessageBox.Show(
-                Application.Current.MainWindow,
-                messageBoxText,
-                caption,
-                button,
-                icon,
-                defaultResult,
-                options);
+            MessageBoxResult result = MessageBoxResult.None;
+            Execute.OnUIThread(
+                () =>
+                {
+                    Application.Current.MainWindow.Activate();
+                    result = MessageBox.Show(
+                        Application.Current.MainWindow,
+                        messageBoxText,
+                        caption,
+                        button,
+                        icon,
+                        defaultResult,
+                        options);
+                });
+            return result;
         }
     }
 }
