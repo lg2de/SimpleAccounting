@@ -1,5 +1,7 @@
 # check whether build on tag
 $version = "DEVEL"
+
+Write-Host ref = $env:GITHUB_REF
 if ($env:GITHUB_REF -match "/tags/") {
   # use tag as version name
   $version = $env:GITHUB_REF -replace "(\w+/)*",""
