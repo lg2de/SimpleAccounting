@@ -12,7 +12,6 @@ namespace lg2de.SimpleAccounting.Infrastructure
     using System.Windows;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Model;
-    using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
 
     [SuppressMessage(

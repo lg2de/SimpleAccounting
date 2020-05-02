@@ -14,7 +14,6 @@ namespace lg2de.SimpleAccounting.Infrastructure
     using System.Windows;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
-    using lg2de.SimpleAccounting.Presentation;
     using Octokit;
 
     [SuppressMessage(

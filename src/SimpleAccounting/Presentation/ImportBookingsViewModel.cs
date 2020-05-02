@@ -16,6 +16,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using Caliburn.Micro;
     using CsvHelper;
     using CsvHelper.Configuration;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;

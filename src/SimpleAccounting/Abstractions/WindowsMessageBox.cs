@@ -2,15 +2,17 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Presentation
+namespace lg2de.SimpleAccounting.Abstractions
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using Caliburn.Micro;
 
     /// <summary>
     ///     Default implementation of <see cref="IMessageBox"/> using <see cref="MessageBox"/>.
     /// </summary>
-    internal class MessageBoxWrapper : IMessageBox
+    [ExcludeFromCodeCoverage]
+    internal class WindowsMessageBox : IMessageBox
     {
         public MessageBoxResult Show(
             string messageBoxText,
