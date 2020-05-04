@@ -154,6 +154,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand AddBookingsCommand => new RelayCommand(_ => this.OnAddBookings(), _ => this.IsCurrentYearOpen);
 
+        public ICommand EditBookingCommand => new RelayCommand(
+            o =>
+            {
+
+            });
+
         public ICommand ImportBookingsCommand => new RelayCommand(
             _ => this.OnImportBookings(), _ => this.IsCurrentYearOpen);
 
