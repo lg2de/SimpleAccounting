@@ -372,11 +372,11 @@ namespace lg2de.SimpleAccounting.Presentation
             this.TryClose();
         }
 
-        internal async Task LoadProjectFromFileAsync(string projectFileName)
+        internal async Task<bool> LoadProjectFromFileAsync(string projectFileName)
         {
             if (!this.CheckSaveProject())
             {
-                return;
+                return true;
             }
 
             this.IsDocumentModified = false;
@@ -384,12 +384,14 @@ namespace lg2de.SimpleAccounting.Presentation
             var loader = new ProjectFileLoader(this.messageBox, this.fileSystem, this.processApi, this.Settings);
             if (!await Task.Run(() => loader.LoadAsync(projectFileName)))
             {
-                return;
+                return false;
             }
 
             this.LoadProjectData(loader.ProjectData);
             this.FileName = projectFileName;
             this.IsDocumentModified = loader.Migrated;
+
+            return true;
         }
 
         internal void LoadProjectData(AccountingData projectData)
@@ -509,15 +511,18 @@ namespace lg2de.SimpleAccounting.Presentation
             // ReSharper disable once ConstantNullCoalescingCondition - FP
             foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
             {
-                if (!this.fileSystem.FileExists(project))
+                var command = new AsyncCommand(this, async () =>
                 {
-                    continue;
-                }
+                    if (await this.LoadProjectFromFileAsync(project))
+                    {
+                        return;
+                    }
 
-                var item = new MenuViewModel(
-                    project,
-                    new AsyncCommand(this, () => this.LoadProjectFromFileAsync(project)));
-                this.RecentProjects.Add(item);
+                    // failed to load, remove from menu
+                    var item = this.RecentProjects.FirstOrDefault(x => x.Header == project);
+                    this.RecentProjects.Remove(item);
+                });
+                this.RecentProjects.Add(new MenuViewModel(project, command));
             }
         }
 

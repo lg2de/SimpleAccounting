@@ -56,6 +56,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
             {
                 if (!await this.CheckSecureDriveAsync(projectFileName))
                 {
+                    // TODO decide between NO and CANCEL
                     return false;
                 }
 
