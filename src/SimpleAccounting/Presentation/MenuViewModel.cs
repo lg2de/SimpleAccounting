@@ -4,11 +4,11 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    using System.Windows.Input;
+    using lg2de.SimpleAccounting.Infrastructure;
 
     public class MenuViewModel
     {
-        public MenuViewModel(string header, ICommand command)
+        public MenuViewModel(string header, IAsyncCommand command)
         {
             this.Header = header;
             this.Command = command;
@@ -16,6 +16,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public string Header { get; }
 
-        public ICommand Command { get; }
+        public IAsyncCommand Command { get; }
     }
 }

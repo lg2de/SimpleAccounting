@@ -529,6 +529,7 @@ namespace lg2de.SimpleAccounting.Presentation
             // keep in menu if aborted (e.g. SecureDrive not available)
             var item = this.RecentProjects.FirstOrDefault(x => x.Header == project);
             this.RecentProjects.Remove(item);
+            this.Settings.RecentProjects.Remove(project);
         }
 
         private async Task AutoSaveAsync()
@@ -764,7 +765,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 var menu = new MenuViewModel(
                     year.Year.ToString(CultureInfo.InvariantCulture),
-                    new RelayCommand(_ => this.SelectBookingYear(year.Year)));
+                    new AsyncCommand(this, () => this.SelectBookingYear(year.Year)));
                 this.BookingYears.Add(menu);
             }
         }
