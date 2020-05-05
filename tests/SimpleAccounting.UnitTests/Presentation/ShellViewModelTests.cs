@@ -186,7 +186,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void OnActivate_TwoRecentProjectsOneExisting_ExistingProjectListed()
+        public void OnActivate_TwoRecentProjectsOneExisting_AllProjectListed()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
             sut.Settings = new Settings { RecentProjects = new StringCollection { "file1", "file2" } };
@@ -194,7 +194,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             ((IActivate)sut).Activate();
 
-            sut.RecentProjects.Select(x => x.Header).Should().Equal("file1");
+            // even the file is not available currently it should not be removed immediately from menu
+            sut.RecentProjects.Select(x => x.Header).Should().Equal("file1", "file2");
         }
 
         [Fact]
@@ -346,7 +347,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            await sut.LoadProjectFromFileAsync("the.fileName");
+            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+                    .CompleteWithinAsync(1.Seconds()))
+                .Which.Should().Be(OperationResult.Completed);
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
@@ -369,7 +372,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.FileExists("the.fileName~").Returns(true);
 
-            await sut.LoadProjectFromFileAsync("the.fileName");
+            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+                    .CompleteWithinAsync(1.Seconds()))
+                .Which.Should().Be(OperationResult.Completed);
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
@@ -392,8 +397,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.FileExists("the.fileName~").Returns(true);
 
-            await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds());
+            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+                    .CompleteWithinAsync(1.Seconds()))
+                .Which.Should().Be(OperationResult.Completed);
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
@@ -412,8 +418,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.GetDrives().Returns(
                 new[] { (FilePath: "C:\\", Format: "Normal"), (FilePath: "K:\\", Format: "Cryptomator File System") });
 
-            await sut.Awaiting(x => x.LoadProjectFromFileAsync("K:\\the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds());
+            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("K:\\the.fileName")).Should()
+                    .CompleteWithinAsync(1.Seconds()))
+                .Which.Should().Be(OperationResult.Completed);
 
             sut.Settings.SecuredDrives.Should().Equal(new object[] { "K:\\" });
             messageBox.DidNotReceive().Show(
@@ -461,8 +468,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             processApi.When(x => x.BringProcessToFront(Arg.Any<Process>())).Do(info => securedFileAvailable = true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            await sut.Awaiting(x => x.LoadProjectFromFileAsync("K:\\the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds());
+            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("K:\\the.fileName")).Should()
+                    .CompleteWithinAsync(1.Seconds()))
+                .Which.Should().Be(OperationResult.Completed);
 
             fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
         }
@@ -487,7 +495,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            await sut.LoadProjectFromFileAsync("the.fileName");
+            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+                    .CompleteWithinAsync(1.Seconds()))
+                .Which.Should().Be(OperationResult.Completed);
 
             sut.Settings.RecentProjects.OfType<string>().Should()
                 .Equal("the.fileName", "A", "B", "C", "D", "E", "F", "G", "H", "I");
@@ -504,7 +514,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 
-            await sut.LoadProjectFromFileAsync("the.fileName");
+            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+                    .CompleteWithinAsync(1.Seconds()))
+                .Which.Should().Be(OperationResult.Completed);
 
             sut.IsDocumentModified.Should().BeTrue();
         }
