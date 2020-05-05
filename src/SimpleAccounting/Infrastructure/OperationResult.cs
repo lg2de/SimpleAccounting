@@ -4,11 +4,10 @@
 
 namespace lg2de.SimpleAccounting.Infrastructure
 {
-    using System.Threading.Tasks;
-    using System.Windows.Input;
-
-    public interface IAsyncCommand : ICommand
+    internal enum OperationResult
     {
-        Task ExecuteAsync(object? parameter);
+        Completed,
+        Failed,
+        Aborted
     }
 }

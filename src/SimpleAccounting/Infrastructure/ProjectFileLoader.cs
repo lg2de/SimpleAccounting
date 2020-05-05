@@ -50,18 +50,18 @@ namespace lg2de.SimpleAccounting.Infrastructure
         /// </remarks>
         public bool Migrated { get; private set; }
 
-        public async Task<bool> LoadAsync(string projectFileName)
+        public async Task<OperationResult> LoadAsync(string projectFileName)
         {
             try
             {
                 if (!await this.CheckSecureDriveAsync(projectFileName))
                 {
-                    return false;
+                    return OperationResult.Aborted;
                 }
 
                 if (!this.LoadFile(projectFileName, out bool autoSaveFileLoaded))
                 {
-                    return false;
+                    return OperationResult.Failed;
                 }
 
                 if (this.ProjectData.Migrate() || autoSaveFileLoaded)
@@ -71,12 +71,12 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
                 this.UpdateSettings(projectFileName);
 
-                return true;
+                return OperationResult.Completed;
             }
             catch (InvalidOperationException e)
             {
                 this.messageBox.Show($"Failed to load file '{projectFileName}':\n{e.Message}", "Load");
-                return false;
+                return OperationResult.Failed;
             }
         }
 
