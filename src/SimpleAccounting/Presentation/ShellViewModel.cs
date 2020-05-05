@@ -372,24 +372,27 @@ namespace lg2de.SimpleAccounting.Presentation
             this.TryClose();
         }
 
-        internal async Task LoadProjectFromFileAsync(string projectFileName)
+        internal async Task<OperationResult> LoadProjectFromFileAsync(string projectFileName)
         {
             if (!this.CheckSaveProject())
             {
-                return;
+                return OperationResult.Aborted;
             }
 
             this.IsDocumentModified = false;
 
             var loader = new ProjectFileLoader(this.messageBox, this.fileSystem, this.processApi, this.Settings);
-            if (!await Task.Run(() => loader.LoadAsync(projectFileName)))
+            var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName));
+            if (loadResult != OperationResult.Completed)
             {
-                return;
+                return loadResult;
             }
 
             this.LoadProjectData(loader.ProjectData);
             this.FileName = projectFileName;
             this.IsDocumentModified = loader.Migrated;
+
+            return OperationResult.Completed;
         }
 
         internal void LoadProjectData(AccountingData projectData)
@@ -500,7 +503,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 async () =>
                 {
                     await this.LoadProjectFromFileAsync(fileName);
-                    Execute.OnUIThread(() => this.IsBusy = false);
+                    await Execute.OnUIThreadAsync(() => this.IsBusy = false);
                 });
         }
 
@@ -509,16 +512,24 @@ namespace lg2de.SimpleAccounting.Presentation
             // ReSharper disable once ConstantNullCoalescingCondition - FP
             foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
             {
-                if (!this.fileSystem.FileExists(project))
-                {
-                    continue;
-                }
-
-                var item = new MenuViewModel(
-                    project,
-                    new AsyncCommand(this, () => this.LoadProjectFromFileAsync(project)));
-                this.RecentProjects.Add(item);
+                var command = new AsyncCommand(this, () => this.OnLoadRecentProjectAsync(project));
+                this.RecentProjects.Add(new MenuViewModel(project, command));
             }
+        }
+
+        private async Task OnLoadRecentProjectAsync(string project)
+        {
+            var loadResult = await this.LoadProjectFromFileAsync(project);
+            if (loadResult != OperationResult.Failed)
+            {
+                return;
+            }
+
+            // failed to load, remove from menu
+            // keep in menu if aborted (e.g. SecureDrive not available)
+            var item = this.RecentProjects.FirstOrDefault(x => x.Header == project);
+            this.RecentProjects.Remove(item);
+            this.Settings.RecentProjects.Remove(project);
         }
 
         private async Task AutoSaveAsync()
@@ -754,7 +765,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 var menu = new MenuViewModel(
                     year.Year.ToString(CultureInfo.InvariantCulture),
-                    new RelayCommand(_ => this.SelectBookingYear(year.Year)));
+                    new AsyncCommand(this, () => this.SelectBookingYear(year.Year)));
                 this.BookingYears.Add(menu);
             }
         }

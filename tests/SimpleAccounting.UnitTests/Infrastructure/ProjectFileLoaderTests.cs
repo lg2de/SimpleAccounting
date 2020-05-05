@@ -12,7 +12,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
     using FluentAssertions.Extensions;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Infrastructure;
-    using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
     using NSubstitute;
     using Xunit;
@@ -20,7 +19,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
     public class ProjectFileLoaderTests
     {
         [Fact]
-        public async Task LoadAsync_FileNotExists_ReturnsFalse()
+        public async Task LoadAsync_FileNotExists_ReturnsFailed()
         {
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
@@ -30,11 +29,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
 
             var result = await sut.Awaiting(x => x.LoadAsync("the.fileName")).Should().CompleteWithinAsync(1.Seconds());
 
-            result.Subject.Should().BeFalse();
+            result.Subject.Should().Be(OperationResult.Failed);
         }
 
         [Fact]
-        public async Task LoadAsync_UserDoesNotWantToStartSecureDriveApp_ReturnsFalse()
+        public async Task LoadAsync_UserDoesNotWantToStartSecureDriveApp_ReturnsAborted()
         {
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
@@ -50,7 +49,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
 
             var result = await sut.Awaiting(x => x.LoadAsync("K:\\the.fileName")).Should().CompleteWithinAsync(1.Seconds());
 
-            result.Subject.Should().BeFalse();
+            result.Subject.Should().Be(OperationResult.Aborted);
             processApi.DidNotReceive().Start(Arg.Any<ProcessStartInfo>());
             messageBox.Received(1).Show(
                 Arg.Is<string>(s => s.Contains("Cryptomator")),

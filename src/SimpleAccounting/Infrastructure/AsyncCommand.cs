@@ -13,6 +13,16 @@ namespace lg2de.SimpleAccounting.Infrastructure
         private readonly IBusy busy;
         private readonly Func<Task> command;
 
+        public AsyncCommand(IBusy busy, Action command)
+        {
+            this.busy = busy;
+            this.command = () =>
+            {
+                command();
+                return Task.CompletedTask;
+            };
+        }
+
         public AsyncCommand(IBusy busy, Func<Task> command)
         {
             this.busy = busy;
@@ -35,7 +45,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
             return true;
         }
 
-        public async Task ExecuteAsync(object parameter)
+        public async Task ExecuteAsync(object? parameter)
         {
             this.busy.IsBusy = true;
             RaiseCanExecuteChanged();
