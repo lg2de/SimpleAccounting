@@ -164,8 +164,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AddBookingsCommand_HideInactiveAccounts_DialogInitialized()
         {
             var sut = CreateSut(out IWindowManager windowManager);
-            AddBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
             sut.LoadProjectData(Samples.SampleProject);
             sut.ShowInactiveAccounts = false;
 
@@ -198,8 +198,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AddBookingsCommand_ShowInactiveAccounts_DialogInitialized()
         {
             var sut = CreateSut(out IWindowManager windowManager);
-            AddBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
             sut.LoadProjectData(Samples.SampleProject);
             sut.ShowInactiveAccounts = true;
 

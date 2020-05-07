@@ -23,7 +23,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddBookingDesignViewModel_ConstructorSucceed()
         {
-            Action action = () => new AddBookingDesignViewModel();
+            Action action = () => new EditBookingDesignViewModel();
             action.Should().NotThrow();
         }
 

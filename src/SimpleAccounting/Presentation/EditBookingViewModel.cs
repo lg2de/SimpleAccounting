@@ -15,7 +15,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
 
-    internal class AddBookingViewModel : Screen
+    internal class EditBookingViewModel : Screen
     {
         private readonly ShellViewModel parent;
 
@@ -23,12 +23,17 @@ namespace lg2de.SimpleAccounting.Presentation
         private ulong debitAccount;
         private BookingTemplate? selectedTemplate;
 
-        public AddBookingViewModel(ShellViewModel parent, DateTime dateStart, DateTime dateEnd)
+        public EditBookingViewModel(ShellViewModel parent, DateTime dateStart, DateTime dateEnd, bool editMode = false)
         {
+            this.EditMode = editMode;
             this.parent = parent;
             this.DateStart = dateStart;
             this.DateEnd = dateEnd;
         }
+
+        public bool NewMode => !this.EditMode;
+
+        public bool EditMode { get; }
 
         public DateTime Date { get; set; } = DateTime.Today;
 
@@ -120,7 +125,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         [SuppressMessage(
             "Critical Code Smell", "S1067:Expressions should not be too complex", Justification = "Ok for CanExecute")]
-        public ICommand BookCommand => new RelayCommand(
+        public ICommand AddCommand => new RelayCommand(
             _ =>
             {
                 var newBooking = new AccountingDataJournalBooking
@@ -151,6 +156,25 @@ namespace lg2de.SimpleAccounting.Presentation
                  && this.DebitIndex >= 0
                  && this.CreditIndex != this.DebitIndex
                  && !string.IsNullOrWhiteSpace(this.BookingText));
+
+        public ICommand SaveCommand => new RelayCommand(
+            _ =>
+            {
+                this.TryClose(true);
+            });
+
+        public ICommand DefaultCommand => new RelayCommand(
+            _ =>
+            {
+                if (this.EditMode)
+                {
+                    this.SaveCommand.Execute(null);
+                }
+                else
+                {
+                    this.AddCommand.Execute(null);
+                }
+            });
 
         internal DateTime DateStart { get; }
 

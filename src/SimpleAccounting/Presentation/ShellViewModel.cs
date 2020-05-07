@@ -154,11 +154,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand AddBookingsCommand => new RelayCommand(_ => this.OnAddBookings(), _ => this.IsCurrentYearOpen);
 
-        public ICommand EditBookingCommand => new RelayCommand(
-            o =>
-            {
-
-            });
+        public ICommand EditBookingCommand => new RelayCommand(o => this.OnEditBooking(o), _ => this.IsCurrentYearOpen);
 
         public ICommand ImportBookingsCommand => new RelayCommand(
             _ => this.OnImportBookings(), _ => this.IsCurrentYearOpen);
@@ -660,10 +656,11 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void OnAddBookings()
         {
-            var bookingModel = new AddBookingViewModel(
+            var bookingModel = new EditBookingViewModel(
                 this,
                 this.currentModelJournal!.DateStart.ToDateTime(),
-                this.currentModelJournal.DateEnd.ToDateTime())
+                this.currentModelJournal.DateEnd.ToDateTime(),
+                editMode: false)
             { BookingNumber = this.GetMaxBookIdent() + 1 };
             var allAccounts = this.accountingData!.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
@@ -681,6 +678,48 @@ namespace lg2de.SimpleAccounting.Presentation
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
             // ReSharper restore ConstantConditionalAccessQualifier
             this.windowManager.ShowDialog(bookingModel);
+        }
+
+        private void OnEditBooking(object commandParameter)
+        {
+            if (!(commandParameter is JournalBaseViewModel journalViewModel))
+            {
+                return;
+            }
+
+            var journalEntry = this.currentModelJournal!.Booking.Single(x => x.ID == journalViewModel.Identifier);
+            if (journalEntry.Credit.Count != 1 || journalEntry.Debit.Count != 1)
+            {
+                // not yet supported
+                return;
+            }
+
+            var bookingModel = new EditBookingViewModel(
+                    this,
+                    this.currentModelJournal!.DateStart.ToDateTime(),
+                    this.currentModelJournal.DateEnd.ToDateTime(),
+                    editMode: true)
+            {
+                BookingNumber = journalViewModel.Identifier,
+                BookingText = journalViewModel.Text,
+                BookingValue = journalEntry.Credit.First().Value / CentFactor,
+                CreditAccount = journalEntry.Credit.First().Account,
+                DebitAccount = journalEntry.Debit.First().Account
+            };
+            var allAccounts = this.accountingData!.AllAccounts;
+            bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
+
+            var result = this.windowManager.ShowDialog(bookingModel);
+            if (result != true)
+            {
+                return;
+            }
+
+            journalEntry.Credit.First().Text = bookingModel.BookingText;
+            journalEntry.Debit.First().Text = bookingModel.BookingText;
+
+            this.IsDocumentModified = true;
+            this.RefreshFullJournal();
         }
 
         private void OnImportBookings()
