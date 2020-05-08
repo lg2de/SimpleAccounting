@@ -172,7 +172,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.AddBookingsCommand.Execute(null);
 
             using var _ = new AssertionScope();
-            vm.BookingNumber.Should().Be(1);
+            vm.BookingIdentifier.Should().Be(1);
             vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts.Where(x => x.Active));
         }
 
@@ -206,7 +206,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.AddBookingsCommand.Execute(null);
 
             using var _ = new AssertionScope();
-            vm.BookingNumber.Should().Be(1);
+            vm.BookingIdentifier.Should().Be(1);
             vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts);
         }
 

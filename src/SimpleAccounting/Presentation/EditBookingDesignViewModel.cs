@@ -19,7 +19,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public EditBookingDesignViewModel()
             : base(null!, DateTime.Now, DateTime.Now, editMode: false)
         {
-            this.BookingNumber = 42;
+            this.BookingIdentifier = 42;
             this.BookingText = "shoes";
             this.BookingValue = 169.95;
 

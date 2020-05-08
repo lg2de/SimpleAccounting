@@ -154,7 +154,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand AddBookingsCommand => new RelayCommand(_ => this.OnAddBookings(), _ => this.IsCurrentYearOpen);
 
-        public ICommand EditBookingCommand => new RelayCommand(o => this.OnEditBooking(o), _ => this.IsCurrentYearOpen);
+        public ICommand EditBookingCommand => new RelayCommand(this.OnEditBooking, _ => this.IsCurrentYearOpen);
 
         public ICommand ImportBookingsCommand => new RelayCommand(
             _ => this.OnImportBookings(), _ => this.IsCurrentYearOpen);
@@ -661,7 +661,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentModelJournal!.DateStart.ToDateTime(),
                 this.currentModelJournal.DateEnd.ToDateTime(),
                 editMode: false)
-            { BookingNumber = this.GetMaxBookIdent() + 1 };
+            { BookingIdentifier = this.GetMaxBookIdent() + 1 };
             var allAccounts = this.accountingData!.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
@@ -687,8 +687,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var journalEntry = this.currentModelJournal!.Booking.Single(x => x.ID == journalViewModel.Identifier);
-            if (journalEntry.Credit.Count != 1 || journalEntry.Debit.Count != 1)
+            var journalEntry =
+                this.currentModelJournal!.Booking.SingleOrDefault(x => x.ID == journalViewModel.Identifier);
+            if (journalEntry == null || journalEntry.Credit.Count != 1 || journalEntry.Debit.Count != 1)
             {
                 // not yet supported
                 return;
@@ -700,7 +701,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentModelJournal.DateEnd.ToDateTime(),
                     editMode: true)
             {
-                BookingNumber = journalViewModel.Identifier,
+                BookingIdentifier = journalViewModel.Identifier,
                 BookingText = journalViewModel.Text,
                 BookingValue = journalEntry.Credit.First().Value / CentFactor,
                 CreditAccount = journalEntry.Credit.First().Account,
@@ -715,11 +716,25 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            journalEntry.Credit.First().Text = bookingModel.BookingText;
-            journalEntry.Debit.First().Text = bookingModel.BookingText;
+            journalEntry.ID = bookingModel.BookingIdentifier;
+            journalEntry.Date = bookingModel.Date.ToAccountingDate();
+            var creditValue = journalEntry.Credit.First();
+            creditValue.Text = bookingModel.BookingText;
+            creditValue.Account = bookingModel.CreditAccount;
+            creditValue.Value = (long)Math.Round(bookingModel.BookingValue * CentFactor);
+            var debitValue = journalEntry.Debit.First();
+            debitValue.Text = bookingModel.BookingText;
+            debitValue.Account = bookingModel.DebitAccount;
+            debitValue.Value = creditValue.Value;
 
             this.IsDocumentModified = true;
             this.RefreshFullJournal();
+            if (this.SelectedAccount != null
+                && (this.SelectedAccount.Identifier == creditValue.Account ||
+                    this.SelectedAccount.Identifier == debitValue.Account))
+            {
+                this.RefreshAccountJournal();
+            }
         }
 
         private void OnImportBookings()

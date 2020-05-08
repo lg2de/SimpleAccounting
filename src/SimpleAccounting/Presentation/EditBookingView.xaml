@@ -55,7 +55,7 @@
         <local:NumberTextBox
             Grid.Column="3" Grid.Row="0"
             Width="100" HorizontalContentAlignment="Right"
-            Text="{Binding BookingNumber}" />
+            Text="{Binding BookingIdentifier}" />
 
         <ComboBox
             Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
@@ -75,7 +75,7 @@
             Scale="2"
             Text="{Binding BookingValue, StringFormat='#0.00'}" />
 
-        <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4">
+        <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" SelectedIndex="{Binding PageIndex}">
             <TabItem>
                 <TabItem.Header>
                     <TextBlock Text="Soll/Haben" Padding="2" />
@@ -148,7 +148,7 @@
                         Grid.Column="2" Grid.Row="0"
                         ItemsSource="{Binding IncomeAccounts}"
                         SelectedValue="{Binding CreditAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding CreditIndex, Mode=OneWayToSource}"
+                        SelectedIndex="{Binding IncomeIndex, Mode=OneWayToSource}"
                         SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
                         TextSearch.TextPath="Name" />
 
@@ -163,7 +163,7 @@
                         Grid.Column="2" Grid.Row="1"
                         ItemsSource="{Binding IncomeRemoteAccounts}"
                         SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding DebitIndex, Mode=OneWayToSource}"
+                        SelectedIndex="{Binding IncomeRemoteIndex, Mode=OneWayToSource}"
                         SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
                         TextSearch.TextPath="Name" />
                 </Grid>
@@ -194,7 +194,7 @@
                         Grid.Column="2" Grid.Row="0"
                         ItemsSource="{Binding ExpenseAccounts}"
                         SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding DebitIndex, Mode=OneWayToSource}"
+                        SelectedIndex="{Binding ExpenseIndex, Mode=OneWayToSource}"
                         SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
                         TextSearch.TextPath="Name" />
 
@@ -209,7 +209,7 @@
                         Grid.Column="2" Grid.Row="1"
                         ItemsSource="{Binding ExpenseRemoteAccounts}"
                         SelectedValue="{Binding CreditAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding CreditIndex, Mode=OneWayToSource}"
+                        SelectedIndex="{Binding ExpenseRemoteIndex, Mode=OneWayToSource}"
                         SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
                         TextSearch.TextPath="Name" />
                 </Grid>
@@ -219,17 +219,14 @@
         <StackPanel
             Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="4"
             Margin="0 30 0 0"
-            Orientation="Horizontal" HorizontalAlignment="Right"
-            Visibility="{Binding NewMode, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Button Width="140" Content="Buchen (CTRL-ENTER)" Command="{Binding AddCommand}" />
+            Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button
+                Width="140" Content="Buchen (CTRL-ENTER)" Command="{Binding AddCommand}"
+                Visibility="{Binding NewMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <Button
+                Width="140" Content="Speichern (CTRL-ENTER)" Command="{Binding SaveCommand}"
+                Visibility="{Binding EditMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <Button Width="140" Content="Schließen (ESC)" IsCancel="True" />
-        </StackPanel>
-        <StackPanel
-            Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="4"
-            Margin="0 30 0 0"
-            Orientation="Horizontal" HorizontalAlignment="Right"
-            Visibility="{Binding EditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Button Width="140" Content="Speichern (CTRL-ENTER)" Command="{Binding SaveCommand}" />
         </StackPanel>
     </Grid>
 </UserControl>

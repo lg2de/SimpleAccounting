@@ -53,15 +53,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             parent.LoadProjectData(Samples.SampleProject);
             var sut = new EditBookingViewModel(parent, YearBegin, YearEnd);
 
-            var oldNumber = sut.BookingNumber;
+            var oldNumber = sut.BookingIdentifier;
             sut.CreditAccount = 100;
             sut.DebitAccount = 990;
 
             using var monitor = sut.Monitor();
             sut.AddCommand.Execute(null);
 
-            sut.BookingNumber.Should().Be(oldNumber + 1);
-            monitor.Should().RaisePropertyChangeFor(m => m.BookingNumber);
+            sut.BookingIdentifier.Should().Be(oldNumber + 1);
+            monitor.Should().RaisePropertyChangeFor(m => m.BookingIdentifier);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 2,
@@ -85,7 +85,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 DebitIndex = 2,
                 BookingValue = 42
@@ -99,7 +99,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 BookingValue = 42
@@ -127,7 +127,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 CreditIndex = 1,
                 DebitIndex = 2,
                 BookingValue = 42
@@ -141,7 +141,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 2
@@ -155,7 +155,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 1,
@@ -170,7 +170,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 2,

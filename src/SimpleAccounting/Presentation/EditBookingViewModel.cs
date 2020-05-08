@@ -37,7 +37,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public DateTime Date { get; set; } = DateTime.Today;
 
-        public ulong BookingNumber { get; set; }
+        public ulong BookingIdentifier { get; set; }
 
         public ObservableCollection<BookingTemplate> BindingTemplates { get; }
             = new ObservableCollection<BookingTemplate>();
@@ -119,18 +119,27 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        public int CreditIndex { get; set; } = -1;
-
         public int DebitIndex { get; set; } = -1;
 
-        [SuppressMessage(
-            "Critical Code Smell", "S1067:Expressions should not be too complex", Justification = "Ok for CanExecute")]
+        public int CreditIndex { get; set; } = -1;
+
+        public int IncomeIndex { get; set; } = -1;
+
+        public int IncomeRemoteIndex { get; set; } = -1;
+
+        public int ExpenseIndex { get; set; } = -1;
+
+        public int ExpenseRemoteIndex { get; set; } = -1;
+
+        public int PageIndex { get; set; }
+
         public ICommand AddCommand => new RelayCommand(
             _ =>
             {
                 var newBooking = new AccountingDataJournalBooking
                 {
-                    Date = this.Date.ToAccountingDate(), ID = this.BookingNumber
+                    Date = this.Date.ToAccountingDate(),
+                    ID = this.BookingIdentifier
                 };
                 var creditValue = new BookingValue
                 {
@@ -145,23 +154,14 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.parent.AddBooking(newBooking);
 
                 // update for next booking
-                this.BookingNumber++;
-                this.NotifyOfPropertyChange(nameof(this.BookingNumber));
+                this.BookingIdentifier++;
+                this.NotifyOfPropertyChange(nameof(this.BookingIdentifier));
             },
-            _ => this.Date >= this.DateStart
-                 && this.Date <= this.DateEnd
-                 && this.BookingNumber > 0
-                 && this.BookingValue > 0
-                 && this.CreditIndex >= 0
-                 && this.DebitIndex >= 0
-                 && this.CreditIndex != this.DebitIndex
-                 && !string.IsNullOrWhiteSpace(this.BookingText));
+            _ => this.IsDataValid());
 
         public ICommand SaveCommand => new RelayCommand(
-            _ =>
-            {
-                this.TryClose(true);
-            });
+            _ => this.TryClose(true),
+            _ => this.IsDataValid());
 
         public ICommand DefaultCommand => new RelayCommand(
             _ =>
@@ -185,6 +185,38 @@ namespace lg2de.SimpleAccounting.Presentation
             base.OnInitialize();
 
             this.DisplayName = "Neue Buchung erstellen";
+        }
+
+        [SuppressMessage("Major Code Smell", "S109:Magic numbers should not be used", Justification = "<Pending>")]
+        private bool IsDataValid()
+        {
+            if (this.Date < this.DateStart || this.Date > this.DateEnd)
+            {
+                return false;
+            }
+
+            if (this.BookingIdentifier <= 0 || this.BookingValue <= 0)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(this.BookingText))
+            {
+                return false;
+            }
+
+            switch (this.PageIndex)
+            {
+            case 0: // debit/credit
+                return this.CreditIndex >= 0 && this.DebitIndex >= 0 && this.CreditIndex != this.DebitIndex;
+            case 1: // income
+                return this.IncomeIndex >= 0 && this.IncomeRemoteIndex >= 0;
+            case 2: // expense
+                return this.ExpenseIndex >= 0 && this.ExpenseRemoteIndex >= 0;
+
+            default:
+                throw new InvalidOperationException();
+            }
         }
     }
 }
