@@ -135,10 +135,16 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 result = this.messageBox.Show(
                     "Es existiert eine automatische Sicherung der Projektdatei\n"
                     + $"{projectFileName}.\n"
-                    + "Soll diese geöffnet werden?",
+                    + "Soll diese geöffnet werden?\n"
+                    + "Mit 'Nein' wird diese Sicherung gelöscht.",
                     "Projekt öffnen",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.No)
+                {
+                    this.fileSystem.FileDelete(autoSaveFileName);
+                }
             }
 
             autoSaveFileLoaded = result == MessageBoxResult.Yes;
