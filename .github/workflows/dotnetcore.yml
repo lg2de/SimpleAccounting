@@ -31,7 +31,7 @@ jobs:
       run: |
         $prNo=${{ github.event.number }}
         if ($prNo -gt 0) {
-          $branch=${{ github.HEAD_REF }}
+          $branch="${{ github.HEAD_REF }}"
           Write-Host analyzing Pull Request $prNo on branch $branch
           $branchCommand="/d:sonar.pullrequest.key=$prNo"
         } else {
