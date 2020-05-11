@@ -1,5 +1,10 @@
 name: continous integration
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
 
 jobs:
   build:
@@ -13,7 +18,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.100
+        dotnet-version: 3.1.103
     - name: Setup SonarScanner
       run: choco install "sonarscanner-msbuild-net46" -y
     - name: Patch version info
