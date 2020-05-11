@@ -25,6 +25,7 @@ jobs:
     - name: Prepare SonarScanner
       run: |
         Write-Host GITHUB_REF=$env:GITHUB_REF
+        Write-Host PR=${{ github.event.number }}
         $branch = $env:GITHUB_REF -replace "(\w+/)*",""
         SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting /d:sonar.branch.name=$branch /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
       shell: pwsh
