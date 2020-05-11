@@ -14,12 +14,12 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage(
         "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
         Justification = "Design view model defines useful values")]
-    internal class AddBookingDesignViewModel : AddBookingViewModel
+    internal class EditBookingDesignViewModel : EditBookingViewModel
     {
-        public AddBookingDesignViewModel()
-            : base(null!, DateTime.Now, DateTime.Now)
+        public EditBookingDesignViewModel()
+            : base(null!, DateTime.Now, DateTime.Now, editMode: false)
         {
-            this.BookingNumber = 42;
+            this.BookingIdentifier = 42;
             this.BookingText = "shoes";
             this.BookingValue = 169.95;
 

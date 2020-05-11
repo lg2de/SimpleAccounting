@@ -17,7 +17,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using NSubstitute;
     using Xunit;
 
-    public class AddBookingViewModelTests
+    public class EditBookingViewModelTests
     {
         private static readonly DateTime YearBegin = new DateTime(DateTime.Now.Year, 1, 1);
         private static readonly DateTime YearEnd = new DateTime(DateTime.Now.Year, 12, 31);
@@ -25,7 +25,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void Accounts_AllAccountTypesAdded_AccountRelatedPropertiesNotEmpty()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd);
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd);
 
             foreach (AccountDefinitionType type in Enum.GetValues(typeof(AccountDefinitionType)))
             {
@@ -51,25 +51,25 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var parent = new ShellViewModel(
                 windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi);
             parent.LoadProjectData(Samples.SampleProject);
-            var sut = new AddBookingViewModel(parent, YearBegin, YearEnd);
+            var sut = new EditBookingViewModel(parent, YearBegin, YearEnd);
 
-            var oldNumber = sut.BookingNumber;
+            var oldNumber = sut.BookingIdentifier;
             sut.CreditAccount = 100;
             sut.DebitAccount = 990;
 
             using var monitor = sut.Monitor();
-            sut.BookCommand.Execute(null);
+            sut.DefaultCommand.Execute(null);
 
-            sut.BookingNumber.Should().Be(oldNumber + 1);
-            monitor.Should().RaisePropertyChangeFor(m => m.BookingNumber);
+            sut.BookingIdentifier.Should().Be(oldNumber + 1);
+            monitor.Should().RaisePropertyChangeFor(m => m.BookingIdentifier);
         }
 
         [Fact]
         public void BookCommand_InvalidYear_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 2,
@@ -77,41 +77,41 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Date = YearEnd + TimeSpan.FromDays(1)
             };
 
-            sut.BookCommand.CanExecute(null).Should().BeFalse();
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
         public void BookCommand_MissingCredit_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 DebitIndex = 2,
                 BookingValue = 42
             };
 
-            sut.BookCommand.CanExecute(null).Should().BeFalse();
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
         public void BookCommand_MissingDebit_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 BookingValue = 42
             };
 
-            sut.BookCommand.CanExecute(null).Should().BeFalse();
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
         public void BookCommand_MissingNumber_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
                 BookingText = "abc",
                 CreditIndex = 1,
@@ -119,71 +119,71 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 BookingValue = 42
             };
 
-            sut.BookCommand.CanExecute(null).Should().BeFalse();
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
         public void BookCommand_MissingText_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 CreditIndex = 1,
                 DebitIndex = 2,
                 BookingValue = 42
             };
 
-            sut.BookCommand.CanExecute(null).Should().BeFalse();
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
         public void BookCommand_MissingValue_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 2
             };
 
-            sut.BookCommand.CanExecute(null).Should().BeFalse();
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
         public void BookCommand_SameAccount_CannotExecute()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 1,
                 BookingValue = 42
             };
 
-            sut.BookCommand.CanExecute(null).Should().BeFalse();
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
         public void BookCommand_ValidValues_CanExecute()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
-                BookingNumber = 1,
+                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 2,
                 BookingValue = 42
             };
 
-            sut.BookCommand.CanExecute(null).Should().BeTrue();
+            sut.AddCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
         public void OnInitialize_Initialized()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd);
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd);
 
             ((IActivate)sut).Activate();
 
@@ -193,7 +193,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SelectedTemplate_SetNull_PropertiesUnchanged()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
                 CreditAccount = 1,
                 DebitAccount = 2,
@@ -217,7 +217,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SelectedTemplate_SetTemplateWithCredit_CreditAccountSet()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
                 CreditAccount = 1,
                 DebitAccount = 2,
@@ -241,7 +241,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SelectedTemplate_SetTemplateWithDebit_DebitAccountSet()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
                 CreditAccount = 1,
                 DebitAccount = 2,
@@ -265,7 +265,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SelectedTemplate_SetTemplateWithValue_ValueSet()
         {
-            var sut = new AddBookingViewModel(null, YearBegin, YearEnd)
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
                 CreditAccount = 1,
                 DebitAccount = 2,

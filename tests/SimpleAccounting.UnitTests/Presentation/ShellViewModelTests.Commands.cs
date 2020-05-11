@@ -161,22 +161,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AddBookingsCommand_HideInactiveAccounts_DialogInitialized()
-        {
-            var sut = CreateSut(out IWindowManager windowManager);
-            AddBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
-            sut.LoadProjectData(Samples.SampleProject);
-            sut.ShowInactiveAccounts = false;
-
-            sut.AddBookingsCommand.Execute(null);
-
-            using var _ = new AssertionScope();
-            vm.BookingNumber.Should().Be(1);
-            vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts.Where(x => x.Active));
-        }
-
-        [Fact]
         public void AddBookingsCommand_NoProject_CannotExecute()
         {
             var sut = CreateSut();
@@ -198,16 +182,80 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AddBookingsCommand_ShowInactiveAccounts_DialogInitialized()
         {
             var sut = CreateSut(out IWindowManager windowManager);
-            AddBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as AddBookingViewModel));
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
             sut.LoadProjectData(Samples.SampleProject);
             sut.ShowInactiveAccounts = true;
 
             sut.AddBookingsCommand.Execute(null);
 
             using var _ = new AssertionScope();
-            vm.BookingNumber.Should().Be(1);
+            vm.BookingIdentifier.Should().Be(1);
             vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts);
+        }
+
+        [Fact]
+        public void AddBookingsCommand_HideInactiveAccounts_DialogInitialized()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
+            sut.LoadProjectData(Samples.SampleProject);
+            sut.ShowInactiveAccounts = false;
+
+            sut.AddBookingsCommand.Execute(null);
+
+            using var _ = new AssertionScope();
+            vm.BookingIdentifier.Should().Be(1);
+            vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts.Where(x => x.Active));
+        }
+
+        [Fact]
+        public void EditBookingCommand_HappyPath_DialogInitialized()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
+            var project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            sut.EditBookingCommand.Execute(sut.FullJournal.Last());
+
+            using var _ = new AssertionScope();
+            sut.IsDocumentModified.Should().BeFalse("the project remains unchanged");
+            vm.BookingIdentifier.Should().Be(6);
+            vm.BookingText.Should().Be("Rent to friend");
+            vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts.Where(x => x.Active));
+        }
+
+        [Fact]
+        public void EditBookingCommand_EntryChanged_JournalsUpdated()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            windowManager.ShowDialog(Arg.Do<object>(UpdateAction)).Returns(true);
+            static void UpdateAction(object parameter)
+            {
+                var vm = (EditBookingViewModel)parameter;
+                vm.BookingIdentifier += 100;
+                vm.BookingValue += 100.0;
+                vm.BookingText += " Paul";
+            }
+            var project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            sut.EditBookingCommand.Execute(sut.FullJournal.Last());
+
+            using var _ = new AssertionScope();
+            sut.IsDocumentModified.Should().BeTrue("the project changed");
+            sut.FullJournal.Last().Should().BeEquivalentTo(
+                new
+                {
+                    Identifier = 106,
+                    Value = 199.0,
+                    Text = "Rent to friend Paul"
+                });
         }
 
         [Fact]
@@ -631,7 +679,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.HelpAboutCommand.Execute(null);
 
-            processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(x => x.UseShellExecute == true));
+            processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(x => x.UseShellExecute));
         }
 
         [Fact]
@@ -641,7 +689,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.HelpFeedbackCommand.Execute(null);
 
-            processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(x => x.UseShellExecute == true));
+            processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(x => x.UseShellExecute));
         }
 
         [Fact]

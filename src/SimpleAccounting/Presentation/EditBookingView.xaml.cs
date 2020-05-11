@@ -7,12 +7,12 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    ///     Implements the view to create new booking entry.
+    ///     Implements the view to create new booking entry or edit existing one.
     /// </summary>
-    public partial class AddBookingView
+    public partial class EditBookingView
     {
         [ExcludeFromCodeCoverage]
-        public AddBookingView()
+        public EditBookingView()
         {
             this.InitializeComponent();
         }

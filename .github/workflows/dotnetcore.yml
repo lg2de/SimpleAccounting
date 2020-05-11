@@ -1,5 +1,10 @@
 name: continous integration
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
 
 jobs:
   build:
@@ -13,7 +18,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.100
+        dotnet-version: 3.1.103
     - name: Setup SonarScanner
       run: choco install "sonarscanner-msbuild-net46" -y
     - name: Patch version info
@@ -24,9 +29,18 @@ jobs:
       run: dotnet restore --configfile nuget.config
     - name: Prepare SonarScanner
       run: |
-        Write-Host GITHUB_REF=$env:GITHUB_REF
-        $branch = $env:GITHUB_REF -replace "(\w+/)*",""
-        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting /d:sonar.branch.name=$branch /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
+        $prNo=${{ github.event.number }}
+        if ($prNo -gt 0) {
+          $branch="${{ github.HEAD_REF }}"
+          Write-Host analyzing Pull Request $prNo on branch $branch
+          $branchCommand="/d:sonar.pullrequest.key=$prNo"
+        } else {
+          $branch=$env:GITHUB_REF -replace "(\w+/)*",""
+          Write-Host analyzing branch $branch
+          $branchCommand="/d:sonar.branch.name=$branch"
+        }
+        Write-Host CMDs=$branchCommand
+        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
       shell: pwsh
     - name: Build Debug
       run: dotnet build --configuration Debug

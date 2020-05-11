@@ -112,7 +112,8 @@
                         SelectedItem="{Binding SelectedFullJournalEntry}"
                         RowStyle="{StaticResource GridRowStyle}"
                         AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
-                        SelectionChanged="OnGridSelectionChanged">
+                        SelectionChanged="OnGridSelectionChanged"
+                        IsSynchronizedWithCurrentItem="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Datum" Width="60"
                                                 Binding="{Binding Date, StringFormat=\{0:d\}}" />
@@ -124,6 +125,12 @@
                             <DataGridTextColumn Header="Sollkonto" Width="100" Binding="{Binding DebitAccount}" />
                             <DataGridTextColumn Header="Habenkonto" Width="100" Binding="{Binding CreditAccount}" />
                         </DataGrid.Columns>
+                        <DataGrid.InputBindings>
+                            <MouseBinding
+                                MouseAction="LeftDoubleClick"
+                                Command="{Binding EditBookingCommand}"
+                                CommandParameter="{Binding FullJournal/}" />
+                        </DataGrid.InputBindings>
                     </DataGrid>
                 </DockPanel>
                 <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
@@ -138,7 +145,8 @@
                         ItemsSource="{Binding AccountJournal}"
                         SelectedItem="{Binding SelectedAccountJournalEntry}"
                         AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
-                        SelectionChanged="OnGridSelectionChanged">
+                        SelectionChanged="OnGridSelectionChanged"
+                        IsSynchronizedWithCurrentItem="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Datum" Width="60"
                                                 Binding="{Binding Date, StringFormat=\{0:d\}}"
@@ -163,6 +171,12 @@
                                 </Style.Triggers>
                             </Style>
                         </DataGrid.RowStyle>
+                        <DataGrid.InputBindings>
+                            <MouseBinding
+                                MouseAction="LeftDoubleClick"
+                                Command="{Binding EditBookingCommand}"
+                                CommandParameter="{Binding AccountJournal/}" />
+                        </DataGrid.InputBindings>
                     </DataGrid>
                 </DockPanel>
                 <GridSplitter
