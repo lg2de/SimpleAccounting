@@ -29,13 +29,18 @@ jobs:
       run: dotnet restore --configfile nuget.config
     - name: Prepare SonarScanner
       run: |
-        Write-Host GITHUB_REF=$env:GITHUB_REF
-        if (${{ github.event.number }} -gt 0) {
-          Write-Host analyzing Pull Request ${{ github.event.number }}
-          $prCommand="/d:sonar.pullrequest.key=${{ github.event.number }}"
+        $prNo=${{ github.event.number }}
+        if ($prNo -gt 0) {
+          $branch=${{ github.HEAD_REF }}
+          Write-Host analyzing Pull Request $prNo on branch $branch
+          $branchCommand="/d:sonar.pullrequest.key=$prNo"
+        } else {
+          $branch=$env:GITHUB_REF -replace "(\w+/)*",""
+          Write-Host analyzing branch $branch
+          $branchCommand="/d:sonar.branch.name=$branch"
         }
-        $branch = $env:GITHUB_REF -replace "(\w+/)*",""
-        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting /d:sonar.branch.name=$branch $prCommand /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
+        Write-Host CMDs=$branchCommand
+        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
       shell: pwsh
     - name: Build Debug
       run: dotnet build --configuration Debug
