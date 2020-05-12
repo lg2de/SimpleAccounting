@@ -3,14 +3,14 @@ $version = "DEVEL"
 
 Write-Host ref = $env:GITHUB_REF
 
-TODO PR build
-
 if ($env:GITHUB_REF -match "/tags/") {
   # use tag as version name
+  Write-Host building tag...
   $version = $env:GITHUB_REF -replace "(\w+/)*",""
 } else {
   if ($env:GITHUB_REF -match "/pull/") {
     # use branch as version name base
+    Write-Host building PR...
     $version = $env:GITHUB_PR_REF
   }
 
