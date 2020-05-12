@@ -9,7 +9,7 @@ if ($env:GITHUB_REF -match "/tags/") {
   # use tag as version name
   $version = $env:GITHUB_REF -replace "(\w+/)*",""
 } else {
-  if ($env:GITHUB_REF -match "/merge/") {
+  if ($env:GITHUB_REF -match "/pull/") {
     # use branch as version name base
     $version = $env:GITHUB_PR_REF
   }
