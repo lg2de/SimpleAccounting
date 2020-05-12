@@ -11,7 +11,7 @@ if ($env:GITHUB_REF -match "/tags/") {
 } else {
   if ($env:GITHUB_REF -match "/merge/") {
     # use branch as version name base
-    $version = $env:GITHUB_PR_REF -replace "(\w+/)*",""
+    $version = $env:GITHUB_PR_REF
   }
 
   # use git sha as version name
