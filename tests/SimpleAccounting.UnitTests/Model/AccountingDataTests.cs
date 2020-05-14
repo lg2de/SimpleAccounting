@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.UnitTests.Model
 {
     using System.Collections.Generic;
+    using System.Linq;
     using FluentAssertions;
     using lg2de.SimpleAccounting.Model;
     using Xunit;
@@ -162,7 +163,41 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
         }
 
         [Fact]
-        public void XsiSchemaLocation_DefaultContructor_DefaultValue()
+        public void CloseYear_JournalWithInvalidBookings_EntryIgnored()
+        {
+            var sut = new AccountingData
+            {
+                Accounts = new List<AccountingDataAccountGroup>
+                {
+                    new AccountingDataAccountGroup
+                    {
+                        Account = new List<AccountDefinition>
+                        {
+                            new AccountDefinition
+                            {
+                                ID = 100, Type = AccountDefinitionType.Asset
+                            },
+                            new AccountDefinition
+                            {
+                                ID = 999, Type = AccountDefinitionType.Carryforward
+                            }
+                        }
+                    }
+                },
+                Journal = new List<AccountingDataJournal>
+                {
+                    new AccountingDataJournal { Booking = null, DateStart = 20200101, DateEnd = 20201231 }
+                }
+            };
+
+            sut.CloseYear(sut.Journal.Last(), sut.Accounts.Last().Account.Last());
+
+            sut.Journal.First().Closed.Should().BeTrue();
+            sut.Journal.Last().Closed.Should().BeFalse();
+        }
+
+        [Fact]
+        public void XsiSchemaLocation_DefaultConstructor_DefaultValue()
         {
             var sut = new AccountingData();
 
