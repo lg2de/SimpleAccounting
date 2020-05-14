@@ -61,7 +61,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [WpfFact]
-        public async Task OnActivate_RecentProject_ProjectLoadedAndAutoSaveActive()
+        public async Task OnActivate_RecentProject_ProjectLoadedAndModifiedProjectAutoSaved()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
             sut.AutoSaveInterval = 100.Milliseconds();
@@ -97,6 +97,42 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.AccountList.Should().BeEquivalentTo(new { Name = "TheAccount" });
             fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project", Arg.Any<string>());
             fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
+        }
+
+        [WpfFact]
+        public async Task OnActivate_RecentProject_ProjectLoadedAndUnmodifiedProjectNotAutoSaved()
+        {
+            var sut = CreateSut(out IFileSystem fileSystem);
+            sut.AutoSaveInterval = 10.Milliseconds();
+            sut.Settings.RecentProject = "recent.project";
+            var sample = new AccountingData
+            {
+                Accounts = new List<AccountingDataAccountGroup>
+                {
+                    new AccountingDataAccountGroup
+                    {
+                        Account = new List<AccountDefinition>
+                        {
+                            new AccountDefinition { ID = 1, Name = "TheAccount" }
+                        }
+                    }
+                }
+            };
+            fileSystem.FileExists("recent.project").Returns(true);
+            fileSystem.ReadAllTextFromFile("recent.project").Returns(sample.Serialize());
+            var fileSaved = new TaskCompletionSource<bool>();
+            fileSystem
+                .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
+                .Do(x => fileSaved.SetResult(true));
+            ((IActivate)sut).Activate();
+            await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
+            sut.IsDocumentModified = false;
+
+            var delayTask = Task.Delay(200.Milliseconds());
+            var completedTask = await Task.WhenAny(fileSaved.Task, delayTask);
+            completedTask.Should().Be(delayTask, "file should not be saved");
+
+            fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
         }
 
         [WpfFact]

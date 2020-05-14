@@ -86,15 +86,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void NewAccountCommand_AccountCreatedAndSorted()
         {
+            static void UpdateAction(object parameter)
+            {
+                var vm = (AccountViewModel)parameter;
+                vm.Name = "New Account";
+                vm.Identifier = 500;
+            }
+
             var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(
-                Arg.Do<object>(
-                    model =>
-                    {
-                        var vm = (AccountViewModel)model;
-                        vm.Name = "New Account";
-                        vm.Identifier = 500;
-                    })).Returns(true);
+            windowManager.ShowDialog(Arg.Do<object>(UpdateAction)).Returns(true);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.NewAccountCommand.Execute(null);
@@ -104,7 +104,19 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void EditAccountCommand_AllDataUpdated()
+        public void EditAccountCommand_Abort_AllDataUpdated()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.EditAccountCommand.Execute(sut.AccountList.First());
+
+            sut.IsDocumentModified.Should().BeFalse();
+            windowManager.Received(1).ShowDialog(Arg.Any<object>());
+        }
+
+        [Fact]
+        public void EditAccountCommand_Confirmed_AllDataUpdated()
         {
             var sut = CreateSut(out IWindowManager windowManager);
             windowManager.ShowDialog(
@@ -137,6 +149,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using (new AssertionScope())
             {
+                sut.IsDocumentModified.Should().BeTrue();
                 sut.AccountList.Select(x => x.Name).Should().Equal(
                     "Salary", "Shoes", "Carryforward", "Bank account", "Bank credit", "Friends debit");
                 sut.FullJournal.Should().BeEquivalentTo(
@@ -148,6 +161,18 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     new { Text = "Summe" },
                     new { Text = "Saldo" });
             }
+        }
+
+        [Fact]
+        public void EditAccountCommand_NullParameter_JustIgnored()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            sut.LoadProjectData(Samples.SampleProject);
+
+            sut.EditAccountCommand.Execute(null);
+
+            sut.IsDocumentModified.Should().BeFalse();
+            windowManager.DidNotReceive().ShowDialog(Arg.Any<object>());
         }
 
         [Fact]
@@ -211,7 +236,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void EditBookingCommand_HappyPath_DialogInitialized()
+        public void EditBookingCommand_NoSave_DialogInitialized()
         {
             var sut = CreateSut(out IWindowManager windowManager);
             EditBookingViewModel vm = null;
@@ -232,8 +257,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void EditBookingCommand_EntryChanged_JournalsUpdated()
         {
-            var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(Arg.Do<object>(UpdateAction)).Returns(true);
             static void UpdateAction(object parameter)
             {
                 var vm = (EditBookingViewModel)parameter;
@@ -241,6 +264,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 vm.BookingValue += 100.0;
                 vm.BookingText += " Paul";
             }
+
+            var sut = CreateSut(out IWindowManager windowManager);
+            windowManager.ShowDialog(Arg.Do<object>(UpdateAction)).Returns(true);
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
@@ -256,6 +282,21 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Value = 199.0,
                     Text = "Rent to friend Paul"
                 });
+        }
+
+        [Fact]
+        public void EditBookingCommand_NullParameter_JustIgnored()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            var project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            sut.EditBookingCommand.Execute(null);
+
+            using var _ = new AssertionScope();
+            sut.IsDocumentModified.Should().BeFalse("the project remains unchanged");
+            windowManager.DidNotReceive().ShowDialog(Arg.Any<object>());
         }
 
         [Fact]
@@ -578,12 +619,20 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
                 Arg.Any<AccountingDataSetup>(),
                 Arg.Any<CultureInfo>()).Returns(assetBalancesReport);
-            sut.LoadProjectData(Samples.SampleProject);
+            var project = Samples.SampleProject;
+            project.Accounts.Add(
+                new AccountingDataAccountGroup { Name = "EMPTY", Account = new List<AccountDefinition>() });
+            sut.LoadProjectData(project);
 
             sut.AssetBalancesReportCommand.Execute(null);
 
             assetBalancesReport.Received(1)
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
+            reportFactory.Received(1).CreateTotalsAndBalances(
+                Arg.Any<AccountingDataJournal>(),
+                Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.ToList().All(y => y.Name != "EMPTY")),
+                Arg.Any<AccountingDataSetup>(),
+                Arg.Any<CultureInfo>());
         }
 
         [Fact]

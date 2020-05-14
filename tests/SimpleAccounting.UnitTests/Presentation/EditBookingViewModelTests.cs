@@ -188,6 +188,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
 
             sut.DisplayName.Should().NotBeNullOrWhiteSpace();
+            sut.SelectedTemplate.Should().BeNull("not template should be selected by default");
         }
 
         [Fact]

@@ -24,6 +24,8 @@ jobs:
     - name: Patch version info
       run: .\PatchVersion.ps1
       shell: pwsh
+      env:
+        GITHUB_PR_REF: ${{ github.head_ref }}
 
     - name: Restore packages
       run: dotnet restore --configfile nuget.config
