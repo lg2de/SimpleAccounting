@@ -26,7 +26,7 @@
                     </Style>
                     <Style TargetType="ComboBox">
                         <Setter Property="Margin" Value="5" />
-                        <Setter Property="Height" Value="30" />
+                        <Setter Property="Height" Value="35" />
                         <Setter Property="VerticalContentAlignment" Value="Center" />
                     </Style>
                     <Style x:Key="ValueGridStyle" TargetType="{x:Type TextBlock}">
