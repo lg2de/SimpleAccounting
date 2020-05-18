@@ -32,6 +32,11 @@
             <Style TargetType="TextBlock">
                 <Setter Property="Margin" Value="5" />
             </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
             <Style TargetType="local:NumberTextBox">
                 <Setter Property="Margin" Value="5" />
                 <Setter Property="Height" Value="30" />
@@ -98,37 +103,9 @@
                         Grid.Column="1" Grid.Row="0"
                         AccountIndex="{Binding DebitIndex, Mode=OneWayToSource}"
                         AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
-                        Accounts="{Binding Accounts}" />
-                    <ListBox
-                        Grid.Column="1" Grid.Row="0" Visibility="Collapsed"
-                        ItemsSource="{Binding Accounts}"
-                        HorizontalContentAlignment="Stretch">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="2*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <local:NumberTextBox
-                                        Grid.Column="0" Grid.Row="0"
-                                        Text="{Binding DebitAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                    <ComboBox
-                                        Grid.Column="1" Grid.Row="0"
-                                        ItemsSource="{Binding Accounts}"
-                                        SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
-                                        SelectedIndex="{Binding DebitIndex, Mode=OneWayToSource}"
-                                        SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                                        TextSearch.TextPath="Name" />
-                                    <Button
-                                        Grid.Column="2" Grid.Row="0"
-                                        Content="Splitten"
-                                        Command="{Binding SplitDebitCommand}" />
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                        Accounts="{Binding Accounts}"
+                        SplitEntries="{Binding DebitSplitEntries}"
+                        AllowSplitting="True" />
 
                     <TextBlock
                         Grid.Column="0" Grid.Row="1"
@@ -138,7 +115,9 @@
                         Grid.Column="1" Grid.Row="1"
                         AccountIndex="{Binding CreditIndex, Mode=OneWayToSource}"
                         AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
-                        Accounts="{Binding Accounts}" />
+                        Accounts="{Binding Accounts}"
+                        SplitEntries="{Binding CreditSplitEntries}"
+                        AllowSplitting="True" />
                 </Grid>
             </TabItem>
             <TabItem>
@@ -198,8 +177,7 @@
                         Grid.Column="1" Grid.Row="0"
                         AccountIndex="{Binding ExpenseIndex, Mode=OneWayToSource}"
                         AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
-                        Accounts="{Binding ExpenseAccounts}"
-                        AllowSplitting="True" />
+                        Accounts="{Binding ExpenseAccounts}" />
 
                     <TextBlock
                         Grid.Column="0" Grid.Row="1"

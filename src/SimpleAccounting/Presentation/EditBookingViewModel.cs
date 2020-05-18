@@ -121,6 +121,12 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        public ObservableCollection<SplitBookingViewModel> CreditSplitEntries { get; } =
+            new ObservableCollection<SplitBookingViewModel>();
+
+        public ObservableCollection<SplitBookingViewModel> DebitSplitEntries { get; } =
+            new ObservableCollection<SplitBookingViewModel>();
+
         public int DebitIndex { get; set; } = -1;
 
         public int CreditIndex { get; set; } = -1;

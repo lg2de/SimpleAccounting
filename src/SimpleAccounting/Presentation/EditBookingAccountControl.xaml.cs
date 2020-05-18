@@ -5,13 +5,20 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Windows;
+    using System.Windows.Input;
+    using lg2de.SimpleAccounting.Annotations;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
 
     /// <summary>
     ///     Implements the control to edit single booking account.
     /// </summary>
-    public partial class EditBookingAccountControl
+    public partial class EditBookingAccountControl : INotifyPropertyChanged
     {
         public static readonly DependencyProperty AccountIndexProperty
             = DependencyProperty.Register(
@@ -41,10 +48,19 @@ namespace lg2de.SimpleAccounting.Presentation
                 typeof(EditBookingAccountControl),
                 new PropertyMetadata(false));
 
+        public static readonly DependencyProperty SplitEntriesProperty
+            = DependencyProperty.Register(
+                "SplitEntries",
+                typeof(ObservableCollection<SplitBookingViewModel>),
+                typeof(EditBookingAccountControl),
+                new PropertyMetadata());
+
         public EditBookingAccountControl()
         {
             this.InitializeComponent();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public int AccountIndex
         {
@@ -70,8 +86,34 @@ namespace lg2de.SimpleAccounting.Presentation
             set => this.SetValue(AllowSplittingProperty, value);
         }
 
+        public ObservableCollection<SplitBookingViewModel> SplitEntries
+        {
+            get => (ObservableCollection<SplitBookingViewModel>)this.GetValue(SplitEntriesProperty);
+            set => this.SetValue(SplitEntriesProperty, value);
+        }
+
         public Visibility SplitButtonVisibility => this.AllowSplitting ? Visibility.Visible : Visibility.Collapsed;
 
+        public Visibility SingleRowVisibility =>
+            this.SplitEntries?.Any() == true ? Visibility.Collapsed : Visibility.Visible;
+
+        public Visibility SplitRowsVisibility => this.AllowSplitting && this.SplitEntries?.Any() == true
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
         public int AccountSelectionSpan => this.AllowSplitting ? 1 : 2;
+
+        public ICommand SplitCommand => new RelayCommand(
+            _ =>
+            {
+                this.SplitEntries.Add(new SplitBookingViewModel { AccountNumber = this.AccountNumber });
+                this.OnPropertyChanged(nameof(this.SingleRowVisibility));
+            });
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

@@ -9,26 +9,72 @@
     mc:Ignorable="d"
     d:DesignWidth="400" d:DesignHeight="50">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <local:NumberTextBox
-            Grid.Column="0" Grid.Row="0"
-            Text="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}" />
-        <ComboBox
-            Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="{Binding AccountSelectionSpan, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-            ItemsSource="{Binding Accounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-            SelectedValue="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-            SelectedIndex="{Binding AccountIndex, Mode=OneWayToSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-            TextSearch.TextPath="Name" />
-        <Button
-            Grid.Column="2" Grid.Row="0"
-            VerticalAlignment="Center"
-            Visibility="{Binding SplitButtonVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-            Content="Splitten"
-            Command="{Binding SplitDebitCommand}" />
+        <Grid Visibility="{Binding SingleRowVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <local:NumberTextBox
+                Grid.Column="0" Grid.Row="0"
+                Text="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}" />
+            <ComboBox
+                Grid.Column="1" Grid.Row="0"
+                Grid.ColumnSpan="{Binding AccountSelectionSpan, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                ItemsSource="{Binding Accounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                SelectedValue="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                SelectedIndex="{Binding AccountIndex, Mode=OneWayToSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
+                TextSearch.TextPath="Name" />
+            <Button
+                Grid.Column="2" Grid.Row="0"
+                VerticalAlignment="Center"
+                Visibility="{Binding SplitButtonVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                Content="Splitten"
+                Command="{Binding SplitCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
+        </Grid>
+        <ListBox
+            Visibility="{Binding SplitRowsVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+            ItemsSource="{Binding SplitEntries, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+            HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="35" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBox
+                            Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0"
+                            Height="30"
+                            Text="{Binding BookingText}" />
+                        <local:NumberTextBox
+                            Grid.Column="0" Grid.Row="1"
+                            Text="{Binding AccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <ComboBox
+                            Grid.Column="1" Grid.Row="1"
+                            ItemsSource="{Binding Accounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                            SelectedValue="{Binding AccountNumber, Mode=TwoWay}"
+                            SelectedIndex="{Binding AccountIndex, Mode=OneWayToSource}"
+                            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
+                            TextSearch.TextPath="Name" />
+                        <Button
+                            Grid.Column="2" Grid.Row="1"
+                            Content="+" Width="35" Padding="0" Margin="0"
+                            Command="{Binding AddCommand}" />
+                        <Button
+                            Grid.Column="3" Grid.Row="1"
+                            Content="-" Width="35" Padding="0" Margin="0"
+                            Command="{Binding RemoveCommand}" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </UserControl>
