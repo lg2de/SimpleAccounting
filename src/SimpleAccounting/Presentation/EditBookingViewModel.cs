@@ -29,6 +29,19 @@ namespace lg2de.SimpleAccounting.Presentation
             this.parent = parent;
             this.DateStart = dateStart;
             this.DateEnd = dateEnd;
+
+            this.CreditSplitEntries.CollectionChanged +=
+                (sender, args) =>
+                {
+                    this.NotifyOfPropertyChange(nameof(this.DebitSplitAllowed));
+                    this.NotifyOfPropertyChange(nameof(this.IsEasyBookingEnabled));
+                };
+            this.DebitSplitEntries.CollectionChanged +=
+                (sender, args) =>
+                {
+                    this.NotifyOfPropertyChange(nameof(this.CreditSplitAllowed));
+                    this.NotifyOfPropertyChange(nameof(this.IsEasyBookingEnabled));
+                };
         }
 
         public bool NewMode => !this.EditMode;
@@ -77,6 +90,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public List<AccountDefinition> Accounts { get; }
             = new List<AccountDefinition>();
 
+        public bool IsEasyBookingEnabled => this.DebitSplitAllowed && this.CreditSplitAllowed;
+
 #pragma warning disable S2365 // Properties should not make collection or array copies
         public List<AccountDefinition> IncomeAccounts =>
             this.Accounts.Where(x => x.Type == AccountDefinitionType.Income).ToList();
@@ -124,8 +139,12 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<SplitBookingViewModel> CreditSplitEntries { get; } =
             new ObservableCollection<SplitBookingViewModel>();
 
+        public bool CreditSplitAllowed => this.DebitSplitEntries.Count == 0;
+
         public ObservableCollection<SplitBookingViewModel> DebitSplitEntries { get; } =
             new ObservableCollection<SplitBookingViewModel>();
+
+        public bool DebitSplitAllowed => this.CreditSplitEntries.Count == 0;
 
         public int DebitIndex { get; set; } = -1;
 
@@ -209,6 +228,16 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             if (string.IsNullOrWhiteSpace(this.BookingText))
+            {
+                return false;
+            }
+
+            if (!this.DebitSplitEntries.IsConsistent(this.BookingValue))
+            {
+                return false;
+            }
+
+            if (!this.CreditSplitEntries.IsConsistent(this.BookingValue))
             {
                 return false;
             }

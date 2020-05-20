@@ -28,5 +28,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public int AccountIndex { get; set; } = -1;
 
         public string BookingText { get; set; } = string.Empty;
+
+        public double BookingValue { get; set; }
     }
 }
