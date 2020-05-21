@@ -20,5 +20,10 @@ namespace lg2de.SimpleAccounting.Extensions
         {
             return (value / ConversionFactor).FormatCurrency(formatProvider);
         }
+
+        public static long ToModelValue(this double value)
+        {
+            return (long)Math.Round(value * ConversionFactor);
+        }
     }
 }

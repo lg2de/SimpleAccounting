@@ -106,6 +106,7 @@
                     <TextBlock
                         DockPanel.Dock="Top"
                         Text="Journal des Buchungsjahres" />
+                    <!-- TODO highlight split booking -->
                     <DataGrid
                         DockPanel.Dock="Bottom"
                         ItemsSource="{Binding FullJournal}"

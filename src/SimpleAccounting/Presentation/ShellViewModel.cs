@@ -36,6 +36,7 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellViewModel : Conductor<IScreen>, IBusy, IDisposable
     {
+        // TODO move to NumberExtension
         private const double CentFactor = 100.0;
 
         private readonly IWindowManager windowManager;
@@ -721,7 +722,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var creditValue = journalEntry.Credit.First();
             creditValue.Text = bookingModel.BookingText;
             creditValue.Account = bookingModel.CreditAccount;
-            creditValue.Value = (long)Math.Round(bookingModel.BookingValue * CentFactor);
+            creditValue.Value = bookingModel.BookingValue.ToModelValue();
             var debitValue = journalEntry.Debit.First();
             debitValue.Text = bookingModel.BookingText;
             debitValue.Account = bookingModel.DebitAccount;

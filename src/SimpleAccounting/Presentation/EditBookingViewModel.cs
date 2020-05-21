@@ -92,20 +92,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool IsEasyBookingEnabled => this.DebitSplitAllowed && this.CreditSplitAllowed;
 
-#pragma warning disable S2365 // Properties should not make collection or array copies
-        public List<AccountDefinition> IncomeAccounts =>
-            this.Accounts.Where(x => x.Type == AccountDefinitionType.Income).ToList();
-
-        public List<AccountDefinition> IncomeRemoteAccounts =>
-            this.Accounts.Where(x => x.Type != AccountDefinitionType.Income).ToList();
-
-        public List<AccountDefinition> ExpenseAccounts =>
-            this.Accounts.Where(x => x.Type == AccountDefinitionType.Expense).ToList();
-
-        public List<AccountDefinition> ExpenseRemoteAccounts =>
-            this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense).ToList();
-#pragma warning restore S2365 // Properties should not make collection or array copies
-
         public ulong CreditAccount
         {
             get => this.creditAccount;
@@ -163,21 +149,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand AddCommand => new RelayCommand(
             _ =>
             {
-                var newBooking = new AccountingDataJournalBooking
-                {
-                    Date = this.Date.ToAccountingDate(),
-                    ID = this.BookingIdentifier
-                };
-                var creditValue = new BookingValue
-                {
-                    Account = this.CreditAccount,
-                    Text = this.BookingText,
-                    Value = (long)Math.Round(this.BookingValue * 100)
-                };
-                var debitValue = creditValue.Clone();
-                debitValue.Account = this.DebitAccount;
-                newBooking.Credit = new List<BookingValue> { creditValue };
-                newBooking.Debit = new List<BookingValue> { debitValue };
+                var newBooking = this.CreateNewBooking();
                 this.parent.AddBooking(newBooking);
 
                 // update for next booking
@@ -214,7 +186,6 @@ namespace lg2de.SimpleAccounting.Presentation
             this.DisplayName = "Neue Buchung erstellen";
         }
 
-        [SuppressMessage("Major Code Smell", "S109:Magic numbers should not be used", Justification = "<Pending>")]
         private bool IsDataValid()
         {
             if (this.Date < this.DateStart || this.Date > this.DateEnd)
@@ -245,7 +216,7 @@ namespace lg2de.SimpleAccounting.Presentation
             switch (this.PageIndex)
             {
             case 0: // debit/credit
-                return this.CreditIndex >= 0 && this.DebitIndex >= 0 && this.CreditIndex != this.DebitIndex;
+                return this.IsDebitCreditBookingValid();
             case 1: // income
                 return this.IncomeIndex >= 0 && this.IncomeRemoteIndex >= 0;
             case 2: // expense
@@ -254,6 +225,99 @@ namespace lg2de.SimpleAccounting.Presentation
             default:
                 throw new InvalidOperationException();
             }
+
         }
+
+        private bool IsDebitCreditBookingValid()
+        {
+            if (this.DebitSplitEntries.Any())
+            {
+                if (this.CreditIndex < 0)
+                {
+                    return false;
+                }
+
+                if (this.DebitSplitEntries.Any(x => x.AccountNumber == this.CreditAccount))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            if (this.CreditSplitEntries.Any())
+            {
+                if (this.DebitIndex < 0)
+                {
+                    return false;
+                }
+
+                if (this.CreditSplitEntries.Any(x => x.AccountNumber == this.DebitAccount))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            return this.CreditIndex >= 0 && this.DebitIndex >= 0 && this.CreditIndex != this.DebitIndex;
+        }
+
+        private AccountingDataJournalBooking CreateNewBooking()
+        {
+            var newBooking = new AccountingDataJournalBooking
+            {
+                Date = this.Date.ToAccountingDate(), ID = this.BookingIdentifier
+            };
+            var baseValue = new BookingValue
+            {
+                Text = this.BookingText,
+                Value = this.BookingValue.ToModelValue()
+            };
+
+            if (this.CreditSplitEntries.Any())
+            {
+                // complete base value for debit...
+                baseValue.Account = this.DebitAccount;
+                newBooking.Debit = new List<BookingValue> { baseValue };
+
+                // ...and build credit values
+                newBooking.Credit = this.CreditSplitEntries.Select(x => x.ToBooking()).ToList();
+                return newBooking;
+            }
+
+            if (this.DebitSplitEntries.Any())
+            {
+                // complete base value for credit...
+                baseValue.Account = this.CreditAccount;
+                newBooking.Credit = new List<BookingValue> { baseValue };
+
+                // ...and build debit values
+                newBooking.Debit = this.DebitSplitEntries.Select(x => x.ToBooking()).ToList();
+                return newBooking;
+            }
+
+            var debitValue = baseValue.Clone();
+            baseValue.Account = this.CreditAccount;
+            debitValue.Account = this.DebitAccount;
+            newBooking.Credit = new List<BookingValue> { baseValue };
+            newBooking.Debit = new List<BookingValue> { debitValue };
+            return newBooking;
+        }
+
+        [SuppressMessage("Major Code Smell", "S109:Magic numbers should not be used", Justification = "<Pending>")]
+#pragma warning disable S2365 // Properties should not make collection or array copies
+        public List<AccountDefinition> IncomeAccounts =>
+            this.Accounts.Where(x => x.Type == AccountDefinitionType.Income).ToList();
+
+        public List<AccountDefinition> IncomeRemoteAccounts =>
+            this.Accounts.Where(x => x.Type != AccountDefinitionType.Income).ToList();
+
+        public List<AccountDefinition> ExpenseAccounts =>
+            this.Accounts.Where(x => x.Type == AccountDefinitionType.Expense).ToList();
+
+        public List<AccountDefinition> ExpenseRemoteAccounts =>
+            this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense).ToList();
+#pragma warning restore S2365 // Properties should not make collection or array copies
     }
 }

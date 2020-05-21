@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Extensions
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
 
     internal static class SplitBookingViewModelExtensions
@@ -27,6 +28,16 @@ namespace lg2de.SimpleAccounting.Extensions
 
             var splitSum = list.Sum(x => x.BookingValue);
             return Math.Abs(splitSum - expectedSum) <= Tolerance;
+        }
+
+        public static BookingValue ToBooking(this SplitBookingViewModel viewModel)
+        {
+            return new BookingValue
+            {
+                Account = viewModel.AccountNumber,
+                Text = viewModel.BookingText,
+                Value = viewModel.BookingValue.ToModelValue()
+            };
         }
     }
 }
