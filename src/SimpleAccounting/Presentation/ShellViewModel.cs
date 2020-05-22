@@ -36,9 +36,6 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellViewModel : Conductor<IScreen>, IBusy, IDisposable
     {
-        // TODO move to NumberExtension
-        private const double CentFactor = 100.0;
-
         private readonly IWindowManager windowManager;
         private readonly IReportFactory reportFactory;
         private readonly IApplicationUpdate applicationUpdate;
@@ -257,6 +254,12 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 callback(false);
                 return;
+            }
+
+            if (this.fileSystem.FileExists(this.AutoSaveFileName))
+            {
+                // remove auto backup
+                this.fileSystem.FileDelete(this.AutoSaveFileName);
             }
 
             base.CanClose(callback);
@@ -674,7 +677,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         Text = t.Text,
                         Credit = t.Credit,
                         Debit = t.Debit,
-                        Value = t.Value / CentFactor
+                        Value = t.Value.ToViewModel()
                     })
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
             // ReSharper restore ConstantConditionalAccessQualifier
@@ -690,9 +693,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
             var journalEntry =
                 this.currentModelJournal!.Booking.SingleOrDefault(x => x.ID == journalViewModel.Identifier);
-            if (journalEntry == null || journalEntry.Credit.Count != 1 || journalEntry.Debit.Count != 1)
+            if (journalEntry == null)
             {
-                // not yet supported
+                // summary item selected => ignore
                 return;
             }
 
@@ -703,11 +706,29 @@ namespace lg2de.SimpleAccounting.Presentation
                     editMode: true)
             {
                 BookingIdentifier = journalViewModel.Identifier,
-                BookingText = journalViewModel.Text,
-                BookingValue = journalEntry.Credit.First().Value / CentFactor,
-                CreditAccount = journalEntry.Credit.First().Account,
-                DebitAccount = journalEntry.Debit.First().Account
+                BookingValue = journalEntry.Credit.First().Value.ToViewModel()
             };
+            if (journalEntry.Credit.Count > 1)
+            {
+                journalEntry.Credit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.CreditSplitEntries.Add);
+                var theDebit = journalEntry.Debit.First();
+                bookingModel.DebitAccount = theDebit.Account;
+                bookingModel.BookingText = theDebit.Text;
+            }
+            else if (journalEntry.Debit.Count > 1)
+            {
+                journalEntry.Debit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.DebitSplitEntries.Add);
+                var theCredit = journalEntry.Credit.First();
+                bookingModel.CreditAccount = theCredit.Account;
+                bookingModel.BookingText = theCredit.Text;
+            }
+            else
+            {
+                bookingModel.DebitAccount = journalEntry.Debit.First().Account;
+                bookingModel.CreditAccount = journalEntry.Credit.First().Account;
+                bookingModel.BookingText = journalViewModel.Text;
+            }
+
             var allAccounts = this.accountingData!.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
@@ -849,7 +870,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var debit = debitAccounts[0];
                     item.Text = debit.Text;
-                    item.Value = Convert.ToDouble(debit.Value) / CentFactor;
+                    item.Value = debit.Value.ToViewModel();
                     item.DebitAccount = this.accountingData!.GetAccountName(debit);
                     item.CreditAccount = this.accountingData.GetAccountName(creditAccounts[0]);
                     this.FullJournal.Add(item);
@@ -860,7 +881,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var debitItem = item.Clone();
                     debitItem.Text = debitEntry.Text;
-                    debitItem.Value = Convert.ToDouble(debitEntry.Value) / CentFactor;
+                    debitItem.Value = debitEntry.Value.ToViewModel();
                     debitItem.DebitAccount = this.accountingData!.GetAccountName(debitEntry);
                     this.FullJournal.Add(debitItem);
                 }
@@ -869,7 +890,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var creditItem = item.Clone();
                     creditItem.Text = creditEntry.Text;
-                    creditItem.Value = Convert.ToDouble(creditEntry.Value) / CentFactor;
+                    creditItem.Value = creditEntry.Value.ToViewModel();
                     creditItem.CreditAccount = this.accountingData!.GetAccountName(creditEntry);
                     this.FullJournal.Add(creditItem);
                 }
@@ -916,7 +937,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (debitEntry != null)
                 {
                     item.Text = debitEntry.Text;
-                    item.DebitValue = Convert.ToDouble(debitEntry.Value) / CentFactor;
+                    item.DebitValue = debitEntry.Value.ToViewModel();
                     debitSum += item.DebitValue;
                     item.RemoteAccount = entry.Credit.Count == 1
                         ? this.accountingData.GetAccountName(entry.Credit.Single())
@@ -932,7 +953,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 item.Text = creditEntry.Text;
-                item.CreditValue = Convert.ToDouble(creditEntry.Value) / CentFactor;
+                item.CreditValue = creditEntry.Value.ToViewModel();
                 creditSum += item.CreditValue;
                 item.RemoteAccount = entry.Debit.Count == 1
                     ? this.accountingData.GetAccountName(entry.Debit.Single())

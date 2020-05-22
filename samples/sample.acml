@@ -18,7 +18,8 @@
       <Credit Value="10000" Account="990" Text="Opening value 1" />
     </Booking>
     <Booking Date="20200115" ID="2">
-      <Debit Value="1500" Account="600" Text="Order food" />
+      <Debit Value="1000" Account="600" Text="Food X" />
+      <Debit Value="500" Account="600" Text="Food Y" />
       <Credit Value="1500" Account="100" Text="Order food" />
     </Booking>
     <Booking Date="20200128" ID="3">

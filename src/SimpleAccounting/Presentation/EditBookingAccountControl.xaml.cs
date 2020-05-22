@@ -8,6 +8,7 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
@@ -59,7 +60,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 "SplitEntries",
                 typeof(ObservableCollection<SplitBookingViewModel>),
                 typeof(EditBookingAccountControl),
-                new PropertyMetadata());
+                new PropertyMetadata(OnSplitEntriesChanged));
 
         public static readonly DependencyProperty BookingTextProperty
             = DependencyProperty.Register(
@@ -79,9 +80,6 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.InitializeComponent();
         }
-
-        /// <inheritdoc />
-        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         ///     Gets or sets the account index (within list of accounts) for single booking mode.
@@ -206,8 +204,8 @@ namespace lg2de.SimpleAccounting.Presentation
                         BookingText = this.BookingText,
                         BookingValue = this.BookingValue
                     });
-                this.OnPropertyChanged(nameof(this.SingleRowVisibility));
-                this.OnPropertyChanged(nameof(this.SplitRowsVisibility));
+                //this.OnPropertyChanged(nameof(this.SingleRowVisibility));
+                //this.OnPropertyChanged(nameof(this.SplitRowsVisibility));
             });
 
         public ICommand AddSplitEntryCommand => new RelayCommand(
@@ -231,9 +229,12 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 this.SplitEntries.Remove(viewModel);
-                this.OnPropertyChanged(nameof(this.SingleRowVisibility));
-                this.OnPropertyChanged(nameof(this.SplitRowsVisibility));
+                //this.OnPropertyChanged(nameof(this.SingleRowVisibility));
+                //this.OnPropertyChanged(nameof(this.SplitRowsVisibility));
             });
+
+        /// <inheritdoc />
+        public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -246,6 +247,34 @@ namespace lg2de.SimpleAccounting.Presentation
             var control = (EditBookingAccountControl)d;
             control.OnPropertyChanged(nameof(control.SplitButtonVisibility));
             control.OnPropertyChanged(nameof(control.AccountSelectionSpan));
+            control.OnPropertyChanged(nameof(control.SingleRowVisibility));
+            control.OnPropertyChanged(nameof(control.SplitRowsVisibility));
+        }
+
+        private static void OnSplitEntriesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (EditBookingAccountControl)d;
+
+            var collection = (ObservableCollection<SplitBookingViewModel>)e.OldValue;
+            if (collection != null)
+            {
+                collection.CollectionChanged -= control.OnSplitEntriesCollectionChanged;
+            }
+
+            collection = (ObservableCollection<SplitBookingViewModel>)e.NewValue;
+            if (collection != null)
+            {
+                collection.CollectionChanged += control.OnSplitEntriesCollectionChanged;
+            }
+
+            control.OnPropertyChanged(nameof(control.SingleRowVisibility));
+            control.OnPropertyChanged(nameof(control.SplitRowsVisibility));
+        }
+
+        private void OnSplitEntriesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            this.OnPropertyChanged(nameof(this.SingleRowVisibility));
+            this.OnPropertyChanged(nameof(this.SplitRowsVisibility));
         }
     }
 }

@@ -25,5 +25,10 @@ namespace lg2de.SimpleAccounting.Extensions
         {
             return (long)Math.Round(value * ConversionFactor);
         }
+
+        public static double ToViewModel(this long value)
+        {
+            return value / ConversionFactor;
+        }
     }
 }

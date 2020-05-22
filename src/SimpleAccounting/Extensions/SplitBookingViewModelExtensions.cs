@@ -39,5 +39,13 @@ namespace lg2de.SimpleAccounting.Extensions
                 Value = viewModel.BookingValue.ToModelValue()
             };
         }
+
+        public static SplitBookingViewModel ToSplitModel(this BookingValue value)
+        {
+            return new SplitBookingViewModel
+            {
+                AccountNumber = value.Account, BookingText = value.Text, BookingValue = value.Value.ToViewModel()
+            };
+        }
     }
 }
