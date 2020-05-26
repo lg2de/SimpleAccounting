@@ -9,6 +9,7 @@
       <Account ID="100" Name="Bank account" Type="Asset" />
       <Account ID="400" Name="Salary" Type="Income" />
       <Account ID="600" Name="Food" Type="Expense" />
+      <Account ID="610" Name="Clothes" Type="Expense" />
       <Account ID="990" Name="Carryforward" Type="Carryforward" />
     </AccountGroup>
   </Accounts>
@@ -18,13 +19,14 @@
       <Credit Value="10000" Account="990" Text="Opening value 1" />
     </Booking>
     <Booking Date="20200115" ID="2">
-      <Debit Value="1000" Account="600" Text="Food X" />
-      <Debit Value="500" Account="600" Text="Food Y" />
-      <Credit Value="1500" Account="100" Text="Order food" />
+      <Debit Value="1000" Account="600" Text="Apples" />
+      <Debit Value="2500" Account="610" Text="Shoes" />
+      <Credit Value="3500" Account="100" Text="Supermarket shopping" />
     </Booking>
     <Booking Date="20200128" ID="3">
-      <Debit Value="5000" Account="100" Text="Monthly salary" />
-      <Credit Value="5000" Account="400" Text="Monthly salary" />
+      <Debit Value="55000" Account="100" Text="Salary" />
+      <Credit Value="40000" Account="400" Text="Monthly salary" />
+      <Credit Value="15000" Account="400" Text="Annual extra salary" />
     </Booking>
   </Journal>
 </AccountingData>
