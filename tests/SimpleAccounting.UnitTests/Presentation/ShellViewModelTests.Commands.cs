@@ -27,7 +27,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     public partial class ShellViewModelTests
     {
         [Fact]
-        public void AccountSelectionCommand_SampleBookings_AccountJournalUpdated()
+        public void AccountSelectionCommand_SampleBookingsBankAccount_AccountJournalUpdated()
         {
             var sut = CreateSut();
             var project = Samples.SampleProject;
@@ -50,6 +50,40 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 },
                 new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 549, DebitValue = 1200 },
                 new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 651 });
+        }
+
+        [Fact]
+        public void AccountSelectionCommand_SampleBookingsSalary_AccountJournalUpdated()
+        {
+            var sut = CreateSut();
+            var project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 400));
+
+            sut.AccountJournal.Should().BeEquivalentTo(
+                new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 12000, DebitValue = 0 },
+                new { Text = "Salary2", RemoteAccount = "100 (Bank account)", CreditValue = 8000, DebitValue = 0 },
+                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 20000, DebitValue = 0 },
+                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 20000, DebitValue = 0 });
+        }
+
+        [Fact]
+        public void AccountSelectionCommand_SampleBookingsShoes_AccountJournalUpdated()
+        {
+            var sut = CreateSut();
+            var project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 600));
+
+            sut.AccountJournal.Should().BeEquivalentTo(
+                new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 2000 },
+                new { Text = "Shoes2", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 3000 },
+                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 5000 },
+                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 5000 });
         }
 
         [Fact]
