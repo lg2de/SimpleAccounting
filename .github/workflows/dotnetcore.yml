@@ -15,6 +15,10 @@ jobs:
     - run: |
         git fetch --prune --unshallow
 
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
