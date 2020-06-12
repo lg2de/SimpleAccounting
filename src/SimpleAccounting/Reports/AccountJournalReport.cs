@@ -98,48 +98,34 @@ namespace lg2de.SimpleAccounting.Reports
                     XmlNode sumLineNode = this.PrintDocument.CreateElement("tr");
                     sumLineNode.SetAttribute("topLine", true);
                     dataNode.AppendChild(sumLineNode);
-                    XmlNode sumItemNode = this.PrintDocument.CreateElement("td");
-                    sumItemNode.InnerText = "Summen";
-                    sumItemNode.SetAttribute("align", "right");
-                    sumLineNode.AppendChild(sumItemNode);
-                    sumLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // id
-                    sumLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // text
-                    sumItemNode = this.PrintDocument.CreateElement("td");
-                    sumItemNode.InnerText = this.debitSum.FormatCurrency(this.culture);
-                    sumLineNode.AppendChild(sumItemNode);
-                    sumItemNode = sumItemNode.Clone();
-                    sumItemNode.InnerText = this.creditSum.FormatCurrency(this.culture);
-                    sumLineNode.AppendChild(sumItemNode);
-                    sumLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // remote
+                    sumLineNode.AddTableNode("Summen").SetAttribute("align", "right");
+                    sumLineNode.AddTableNode(string.Empty); // id
+                    sumLineNode.AddTableNode(string.Empty); // text
+                    sumLineNode.AddTableNode(this.debitSum.FormatCurrency(this.culture));
+                    sumLineNode.AddTableNode(this.creditSum.FormatCurrency(this.culture));
+                    sumLineNode.AddTableNode(string.Empty); // remote
                 }
 
                 // saldo
                 XmlNode saldoLineNode = this.PrintDocument.CreateElement("tr");
                 saldoLineNode.SetAttribute("topLine", true);
                 dataNode.AppendChild(saldoLineNode);
-                XmlNode saldoItemNode = this.PrintDocument.CreateElement("td");
-                saldoItemNode.InnerText = "Saldo";
-                saldoItemNode.SetAttribute("align", "right");
-                saldoLineNode.AppendChild(saldoItemNode);
-                saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // id
-                saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td")); // text
+                saldoLineNode.AddTableNode("Saldo").SetAttribute("align", "right");
+                saldoLineNode.AddTableNode(string.Empty); // id
+                saldoLineNode.AddTableNode(string.Empty); // text
                 if (this.debitSum > this.creditSum)
                 {
-                    saldoItemNode = this.PrintDocument.CreateElement("td");
-                    saldoItemNode.InnerText = (this.debitSum - this.creditSum).FormatCurrency(this.culture);
-                    saldoLineNode.AppendChild(saldoItemNode);
-                    saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td"));
+                    saldoLineNode.AddTableNode((this.debitSum - this.creditSum).FormatCurrency(this.culture));
+                    saldoLineNode.AddTableNode(string.Empty);
                 }
                 else
                 {
-                    saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td"));
-                    saldoItemNode = this.PrintDocument.CreateElement("td");
-                    saldoItemNode.InnerText = (this.creditSum - this.debitSum).FormatCurrency(this.culture);
-                    saldoLineNode.AppendChild(saldoItemNode);
+                    saldoLineNode.AddTableNode(string.Empty);
+                    saldoLineNode.AddTableNode((this.creditSum - this.debitSum).FormatCurrency(this.culture));
                 }
 
                 // empty remote account column
-                saldoLineNode.AppendChild(this.PrintDocument.CreateElement("td"));
+                saldoLineNode.AddTableNode(string.Empty);
             }
 
             tableNode.ParentNode.RemoveChild(tableNode);
@@ -168,8 +154,7 @@ namespace lg2de.SimpleAccounting.Reports
             tableNode.ParentNode.InsertBefore(separatorNode, tableNode);
         }
 
-        private void AddBookingEntries(
-            AccountingDataJournalBooking entry, ulong accountIdentifier, XmlNode dataNode)
+        private void AddBookingEntries(AccountingDataJournalBooking entry, ulong accountIdentifier, XmlNode dataNode)
         {
             XmlNode lineTemplate = this.PrintDocument.CreateElement("tr");
             lineTemplate.SetAttribute("topLine", true);

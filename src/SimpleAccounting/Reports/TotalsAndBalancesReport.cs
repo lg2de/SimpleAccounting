@@ -90,7 +90,7 @@ namespace lg2de.SimpleAccounting.Reports
 
                 groupLineNode.AddTableNode(string.Empty);
 
-                groupLineNode.AddTableNode(accountGroup.Name);
+                groupLineNode.AddTableNode(accountGroup.Name).SetAttribute("align", "right");
 
                 groupLineNode.AddTableNode(string.Empty);
 
@@ -103,7 +103,6 @@ namespace lg2de.SimpleAccounting.Reports
                 groupLineNode.AddTableNode(this.FormatValue(this.groupSaldoDebit));
                 groupLineNode.AddTableNode(this.FormatValue(this.groupSaldoCredit));
 
-                groupLineNode.ChildNodes[1].SetAttribute("align", "right");
                 dataNode.AppendChild(groupLineNode);
             }
 
@@ -112,7 +111,7 @@ namespace lg2de.SimpleAccounting.Reports
 
             totalLineNode.AddTableNode(string.Empty);
 
-            totalLineNode.AddTableNode("Total");
+            totalLineNode.AddTableNode("Total").SetAttribute("align", "right");
 
             totalLineNode.AddTableNode(string.Empty);
 
@@ -125,7 +124,6 @@ namespace lg2de.SimpleAccounting.Reports
             totalLineNode.AddTableNode(this.FormatValue(this.totalSaldoDebit));
             totalLineNode.AddTableNode(this.FormatValue(this.totalSaldoCredit));
 
-            totalLineNode.ChildNodes[1].SetAttribute("align", "right");
             dataNode.AppendChild(totalLineNode);
 
             var signatures = this.PrintDocument.SelectSingleNode("//signatures");
