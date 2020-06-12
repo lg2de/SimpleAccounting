@@ -160,8 +160,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 128,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 400, Text = "Salary1", Value = 10000 },
-                        new BookingValue { Account = 400, Text = "Salary2", Value = 10000 }
+                        new BookingValue { Account = 400, Text = "Salary1", Value = 12000 },
+                        new BookingValue { Account = 400, Text = "Salary2", Value = 8000 }
                     },
                     Debit = new List<BookingValue>
                     {
