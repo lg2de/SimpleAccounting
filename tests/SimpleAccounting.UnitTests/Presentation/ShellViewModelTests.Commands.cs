@@ -63,10 +63,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 400));
 
             sut.AccountJournal.Should().BeEquivalentTo(
-                new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 12000, DebitValue = 0 },
-                new { Text = "Salary2", RemoteAccount = "100 (Bank account)", CreditValue = 8000, DebitValue = 0 },
-                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 20000, DebitValue = 0 },
-                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 20000, DebitValue = 0 });
+                new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 120, DebitValue = 0 },
+                new { Text = "Salary2", RemoteAccount = "100 (Bank account)", CreditValue = 80, DebitValue = 0 },
+                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 },
+                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 });
         }
 
         [Fact]
@@ -80,10 +80,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 600));
 
             sut.AccountJournal.Should().BeEquivalentTo(
-                new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 2000 },
-                new { Text = "Shoes2", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 3000 },
-                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 5000 },
-                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 5000 });
+                new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 20 },
+                new { Text = "Shoes2", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 30 },
+                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 },
+                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 });
         }
 
         [Fact]
