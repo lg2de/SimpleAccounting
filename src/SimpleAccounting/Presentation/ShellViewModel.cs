@@ -894,7 +894,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.AccountJournal.Clear();
             if (this.accountingData == null
-                || this.currentModelJournal!.Booking == null
+                || this.currentModelJournal?.Booking == null
                 || this.SelectedAccount == null)
             {
                 return;
@@ -903,42 +903,50 @@ namespace lg2de.SimpleAccounting.Presentation
             var accountNumber = this.SelectedAccount.Identifier;
             double creditSum = 0;
             double debitSum = 0;
-            var entries = this.currentModelJournal
+            var relevantBookings = this.currentModelJournal
                 .Booking.Where(b => b.Credit.Any(x => x.Account == accountNumber))
-                .Concat(this.currentModelJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)));
-            foreach (var entry in entries.OrderBy(x => x.Date).ThenBy(x => x.ID))
+                .Concat(this.currentModelJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)))
+                .OrderBy(x => x.Date).ThenBy(x => x.ID);
+            foreach (var booking in relevantBookings)
             {
-                var item = new AccountJournalViewModel { Date = entry.Date.ToDateTime() };
-                this.AccountJournal.Add(item);
-                item.Identifier = entry.ID;
-                var debitEntry = entry.Debit.FirstOrDefault(x => x.Account == accountNumber);
-                if (debitEntry != null)
+                var debitEntries = booking.Debit.Where(x => x.Account == accountNumber);
+                foreach (var debitEntry in debitEntries)
                 {
-                    item.Text = debitEntry.Text;
-                    item.DebitValue = Convert.ToDouble(debitEntry.Value) / CentFactor;
+                    var item = new AccountJournalViewModel
+                    {
+                        Identifier = booking.ID,
+                        Date = booking.Date.ToDateTime(),
+                        Text = debitEntry.Text,
+                        DebitValue = Convert.ToDouble(debitEntry.Value) / CentFactor
+                    };
+
                     debitSum += item.DebitValue;
-                    item.RemoteAccount = entry.Credit.Count == 1
-                        ? this.accountingData.GetAccountName(entry.Credit.Single())
+                    item.RemoteAccount = booking.Credit.Count == 1
+                        ? this.accountingData.GetAccountName(booking.Credit.Single())
                         : "Diverse";
-                    continue;
+                    this.AccountJournal.Add(item);
                 }
 
-                var creditEntry = entry.Credit.FirstOrDefault(x => x.Account == accountNumber);
-                if (creditEntry == null)
+                var creditEntries = booking.Credit.Where(x => x.Account == accountNumber);
+                foreach (var creditEntry in creditEntries)
                 {
-                    // ops, no debit nor credit?
-                    continue;
-                }
+                    var item = new AccountJournalViewModel
+                    {
+                        Identifier = booking.ID,
+                        Date = booking.Date.ToDateTime(),
+                        Text = creditEntry.Text,
+                        CreditValue = Convert.ToDouble(creditEntry.Value) / CentFactor,
+                    };
 
-                item.Text = creditEntry.Text;
-                item.CreditValue = Convert.ToDouble(creditEntry.Value) / CentFactor;
-                creditSum += item.CreditValue;
-                item.RemoteAccount = entry.Debit.Count == 1
-                    ? this.accountingData.GetAccountName(entry.Debit.Single())
-                    : "Diverse";
+                    creditSum += item.CreditValue;
+                    item.RemoteAccount = booking.Debit.Count == 1
+                        ? this.accountingData.GetAccountName(booking.Debit.Single())
+                        : "Diverse";
+                    this.AccountJournal.Add(item);
+                }
             }
 
-            if (debitSum < double.Epsilon && creditSum < double.Epsilon)
+            if (debitSum + creditSum < double.Epsilon)
             {
                 // no summary required
                 return;
@@ -982,10 +990,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentModelJournal!,
                 this.accountingData!.Accounts.SelectMany(a => a.Account),
                 this.accountingData.Setup, CultureInfo.CurrentUICulture);
-            // ReSharper disable ConstantConditionalAccessQualifier
             report.PageBreakBetweenAccounts =
                 this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
-            // ReSharper restore ConstantConditionalAccessQualifier
             const string title = "Kontoblätter";
             report.CreateReport(title);
             report.ShowPreview(title);

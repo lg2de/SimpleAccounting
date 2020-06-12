@@ -63,7 +63,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td />
     <td>400</td>
-    <td>100.00</td>
+    <td>120.00</td>
   </tr>
   <tr>
     <td />
@@ -72,7 +72,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
     <td />
     <td>400</td>
-    <td>100.00</td>
+    <td>80.00</td>
   </tr>
   <tr topLine=""True"">
     <td>1/29/2020</td>
