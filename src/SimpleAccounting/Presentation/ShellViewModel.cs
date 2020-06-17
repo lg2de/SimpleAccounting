@@ -705,8 +705,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.currentModelJournal.DateEnd.ToDateTime(),
                     editMode: true)
             {
-                BookingIdentifier = journalViewModel.Identifier,
-                BookingValue = journalEntry.Credit.First().Value.ToViewModel()
+                BookingIdentifier = journalViewModel.Identifier
             };
             if (journalEntry.Credit.Count > 1)
             {
@@ -714,6 +713,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var theDebit = journalEntry.Debit.First();
                 bookingModel.DebitAccount = theDebit.Account;
                 bookingModel.BookingText = theDebit.Text;
+                bookingModel.BookingValue = theDebit.Value.ToViewModel();
             }
             else if (journalEntry.Debit.Count > 1)
             {
@@ -721,10 +721,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 var theCredit = journalEntry.Credit.First();
                 bookingModel.CreditAccount = theCredit.Account;
                 bookingModel.BookingText = theCredit.Text;
+                bookingModel.BookingValue = theCredit.Value.ToViewModel();
             }
             else
             {
-                bookingModel.DebitAccount = journalEntry.Debit.First().Account;
+                var theDebit = journalEntry.Debit.First();
+                bookingModel.DebitAccount = theDebit.Account;
+                bookingModel.BookingValue = theDebit.Value.ToViewModel();
                 bookingModel.CreditAccount = journalEntry.Credit.First().Account;
                 bookingModel.BookingText = journalViewModel.Text;
             }
@@ -738,6 +741,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
+            // TODO reuse code from EditBookingViewModel.CreateNewBooking
             journalEntry.ID = bookingModel.BookingIdentifier;
             journalEntry.Date = bookingModel.Date.ToAccountingDate();
             var creditValue = journalEntry.Credit.First();
@@ -752,8 +756,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.IsDocumentModified = true;
             this.RefreshFullJournal();
             if (this.SelectedAccount != null
-                && (this.SelectedAccount.Identifier == creditValue.Account ||
-                    this.SelectedAccount.Identifier == debitValue.Account))
+                && (this.SelectedAccount.Identifier == creditValue.Account
+                    || this.SelectedAccount.Identifier == debitValue.Account))
             {
                 this.RefreshAccountJournal();
             }
