@@ -691,22 +691,21 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var journalEntry =
-                this.currentModelJournal!.Booking.SingleOrDefault(x => x.ID == journalViewModel.Identifier);
-            if (journalEntry == null)
+            var journalIndex = this.currentModelJournal!.Booking.FindIndex(x => x.ID == journalViewModel.Identifier);
+            if (journalIndex < 0)
             {
                 // summary item selected => ignore
                 return;
             }
 
+            var journalEntry = this.currentModelJournal!.Booking[journalIndex];
+
             var bookingModel = new EditBookingViewModel(
-                    this,
-                    this.currentModelJournal!.DateStart.ToDateTime(),
-                    this.currentModelJournal.DateEnd.ToDateTime(),
-                    editMode: true)
-            {
-                BookingIdentifier = journalViewModel.Identifier
-            };
+                this,
+                this.currentModelJournal!.DateStart.ToDateTime(),
+                this.currentModelJournal.DateEnd.ToDateTime(),
+                editMode: true) { BookingIdentifier = journalEntry.ID, Date = journalEntry.Date.ToDateTime() };
+
             if (journalEntry.Credit.Count > 1)
             {
                 journalEntry.Credit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.CreditSplitEntries.Add);
@@ -741,23 +740,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            // TODO reuse code from EditBookingViewModel.CreateNewBooking
-            journalEntry.ID = bookingModel.BookingIdentifier;
-            journalEntry.Date = bookingModel.Date.ToAccountingDate();
-            var creditValue = journalEntry.Credit.First();
-            creditValue.Text = bookingModel.BookingText;
-            creditValue.Account = bookingModel.CreditAccount;
-            creditValue.Value = bookingModel.BookingValue.ToModelValue();
-            var debitValue = journalEntry.Debit.First();
-            debitValue.Text = bookingModel.BookingText;
-            debitValue.Account = bookingModel.DebitAccount;
-            debitValue.Value = creditValue.Value;
+            // replace entry
+            journalEntry = bookingModel.CreateJournalEntry();
+            this.currentModelJournal!.Booking[journalIndex] = journalEntry;
 
             this.IsDocumentModified = true;
             this.RefreshFullJournal();
-            if (this.SelectedAccount != null
-                && (this.SelectedAccount.Identifier == creditValue.Account
-                    || this.SelectedAccount.Identifier == debitValue.Account))
+            if (journalEntry.Credit.Concat(journalEntry.Debit).Any(x => x.Account == this.SelectedAccount?.Identifier))
             {
                 this.RefreshAccountJournal();
             }

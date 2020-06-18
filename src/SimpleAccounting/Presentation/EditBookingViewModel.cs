@@ -15,6 +15,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")] // TODO introduce localization
     internal class EditBookingViewModel : Screen
     {
         private readonly ShellViewModel parent;
@@ -144,12 +145,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public int ExpenseRemoteIndex { get; set; } = -1;
 
-        public int PageIndex { get; set; }
+        public uint PageIndex { get; set; }
 
         public ICommand AddCommand => new RelayCommand(
             _ =>
             {
-                var newBooking = this.CreateNewBooking();
+                var newBooking = this.CreateJournalEntry();
                 this.parent.AddBooking(newBooking);
 
                 // update for next booking
@@ -178,6 +179,59 @@ namespace lg2de.SimpleAccounting.Presentation
         internal DateTime DateStart { get; }
 
         internal DateTime DateEnd { get; }
+
+        public AccountingDataJournalBooking CreateJournalEntry()
+        {
+            var newBooking = new AccountingDataJournalBooking
+            {
+                Date = this.Date.ToAccountingDate(), ID = this.BookingIdentifier
+            };
+            var baseValue = new BookingValue { Text = this.BookingText, Value = this.BookingValue.ToModelValue() };
+
+            if (this.CreditSplitEntries.Any())
+            {
+                // complete base value for debit...
+                baseValue.Account = this.DebitAccount;
+                newBooking.Debit = new List<BookingValue> { baseValue };
+
+                // ...and build credit values
+                newBooking.Credit = this.CreditSplitEntries.Select(x => x.ToBooking()).ToList();
+                if (newBooking.Credit.Count == 1)
+                {
+                    // consistent use of overall text
+                    newBooking.Credit.Single().Text = this.BookingText;
+                    newBooking.Debit.Single().Text = this.BookingText;
+                }
+
+                return newBooking;
+            }
+
+            if (this.DebitSplitEntries.Any())
+            {
+                // complete base value for credit...
+                baseValue.Account = this.CreditAccount;
+                newBooking.Credit = new List<BookingValue> { baseValue };
+
+                // ...and build debit values
+                newBooking.Debit = this.DebitSplitEntries.Select(x => x.ToBooking()).ToList();
+
+                if (newBooking.Debit.Count == 1)
+                {
+                    // consistent use of overall text
+                    newBooking.Credit.Single().Text = this.BookingText;
+                    newBooking.Debit.Single().Text = this.BookingText;
+                }
+
+                return newBooking;
+            }
+
+            var debitValue = baseValue.Clone();
+            baseValue.Account = this.CreditAccount;
+            debitValue.Account = this.DebitAccount;
+            newBooking.Credit = new List<BookingValue> { baseValue };
+            newBooking.Debit = new List<BookingValue> { debitValue };
+            return newBooking;
+        }
 
         protected override void OnInitialize()
         {
@@ -215,17 +269,16 @@ namespace lg2de.SimpleAccounting.Presentation
 
             switch (this.PageIndex)
             {
-            case 0: // debit/credit
+            case EditBookingView.DebitCreditPageIndex:
                 return this.IsDebitCreditBookingValid();
-            case 1: // income
+            case EditBookingView.IncomePageIndex:
                 return this.IncomeIndex >= 0 && this.IncomeRemoteIndex >= 0;
-            case 2: // expense
+            case EditBookingView.ExpensePageIndex:
                 return this.ExpenseIndex >= 0 && this.ExpenseRemoteIndex >= 0;
 
             default:
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"The page index {this.PageIndex} is not implemented.");
             }
-
         }
 
         private bool IsDebitCreditBookingValid()
@@ -263,49 +316,6 @@ namespace lg2de.SimpleAccounting.Presentation
             return this.CreditIndex >= 0 && this.DebitIndex >= 0 && this.CreditIndex != this.DebitIndex;
         }
 
-        private AccountingDataJournalBooking CreateNewBooking()
-        {
-            var newBooking = new AccountingDataJournalBooking
-            {
-                Date = this.Date.ToAccountingDate(), ID = this.BookingIdentifier
-            };
-            var baseValue = new BookingValue
-            {
-                Text = this.BookingText,
-                Value = this.BookingValue.ToModelValue()
-            };
-
-            if (this.CreditSplitEntries.Any())
-            {
-                // complete base value for debit...
-                baseValue.Account = this.DebitAccount;
-                newBooking.Debit = new List<BookingValue> { baseValue };
-
-                // ...and build credit values
-                newBooking.Credit = this.CreditSplitEntries.Select(x => x.ToBooking()).ToList();
-                return newBooking;
-            }
-
-            if (this.DebitSplitEntries.Any())
-            {
-                // complete base value for credit...
-                baseValue.Account = this.CreditAccount;
-                newBooking.Credit = new List<BookingValue> { baseValue };
-
-                // ...and build debit values
-                newBooking.Debit = this.DebitSplitEntries.Select(x => x.ToBooking()).ToList();
-                return newBooking;
-            }
-
-            var debitValue = baseValue.Clone();
-            baseValue.Account = this.CreditAccount;
-            debitValue.Account = this.DebitAccount;
-            newBooking.Credit = new List<BookingValue> { baseValue };
-            newBooking.Debit = new List<BookingValue> { debitValue };
-            return newBooking;
-        }
-
-        [SuppressMessage("Major Code Smell", "S109:Magic numbers should not be used", Justification = "<Pending>")]
 #pragma warning disable S2365 // Properties should not make collection or array copies
         public List<AccountDefinition> IncomeAccounts =>
             this.Accounts.Where(x => x.Type == AccountDefinitionType.Income).ToList();
