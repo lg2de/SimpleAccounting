@@ -167,7 +167,15 @@ namespace lg2de.SimpleAccounting.Presentation
         /// <remarks>
         ///     This property is used only in the control itself.
         /// </remarks>
-        public int AccountSelectionSpan => this.AllowSplitting ? 1 : 2;
+        public int AccountSelectionSpan
+        {
+            get
+            {
+                const int oneColumn = 1;
+                const int twoColumns = 2;
+                return this.AllowSplitting ? oneColumn : twoColumns;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the visibility for the single row mode controls.
@@ -204,8 +212,6 @@ namespace lg2de.SimpleAccounting.Presentation
                         BookingText = this.BookingText,
                         BookingValue = this.BookingValue
                     });
-                //this.OnPropertyChanged(nameof(this.SingleRowVisibility));
-                //this.OnPropertyChanged(nameof(this.SplitRowsVisibility));
             });
 
         public ICommand AddSplitEntryCommand => new RelayCommand(
@@ -229,8 +235,6 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 this.SplitEntries.Remove(viewModel);
-                //this.OnPropertyChanged(nameof(this.SingleRowVisibility));
-                //this.OnPropertyChanged(nameof(this.SplitRowsVisibility));
             });
 
         /// <inheritdoc />
