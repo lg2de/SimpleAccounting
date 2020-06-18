@@ -76,9 +76,14 @@ namespace lg2de.SimpleAccounting.Presentation
                 typeof(EditBookingAccountControl),
                 new PropertyMetadata(0.0));
 
+        [ExcludeFromCodeCoverage]
         public EditBookingAccountControl()
         {
             this.InitializeComponent();
+        }
+
+        internal EditBookingAccountControl(bool _)
+        {
         }
 
         /// <summary>
@@ -212,7 +217,8 @@ namespace lg2de.SimpleAccounting.Presentation
                         BookingText = this.BookingText,
                         BookingValue = this.BookingValue
                     });
-            });
+            },
+            _ => this.AllowSplitting);
 
         public ICommand AddSplitEntryCommand => new RelayCommand(
             parameter =>
@@ -224,7 +230,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var index = this.SplitEntries.IndexOf(currentViewModel);
                 this.SplitEntries.Insert(index + 1, new SplitBookingViewModel());
-            });
+            },
+            _ => this.AllowSplitting);
 
         public ICommand RemoveSplitEntryCommand => new RelayCommand(
             parameter =>
@@ -235,7 +242,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 this.SplitEntries.Remove(viewModel);
-            });
+            },
+            _ => this.AllowSplitting);
 
         /// <inheritdoc />
         public event PropertyChangedEventHandler PropertyChanged;
