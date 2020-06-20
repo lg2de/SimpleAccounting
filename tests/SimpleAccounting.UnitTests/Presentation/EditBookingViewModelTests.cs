@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Caliburn.Micro;
     using FluentAssertions;
@@ -58,7 +59,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.DebitAccount = 990;
 
             using var monitor = sut.Monitor();
-            sut.DefaultCommand.Execute(null);
+            sut.AddCommand.Execute(null);
 
             sut.BookingIdentifier.Should().Be(oldNumber + 1);
             monitor.Should().RaisePropertyChangeFor(m => m.BookingIdentifier);
@@ -285,6 +286,124 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.CreditAccount.Should().Be(1);
             sut.BookingValue.Should().Be(123);
             sut.BookingText.Should().Be("default");
+        }
+
+        [Fact]
+        public void CreateJournalEntry_SplitCreditEntries_JournalEntryCorrect()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd) { BookingIdentifier = 42 };
+            sut.CreditSplitEntries.Add(
+                new SplitBookingViewModel { BookingText = "Credit1", BookingValue = 10, AccountNumber = 100 });
+            sut.CreditSplitEntries.Add(
+                new SplitBookingViewModel { BookingText = "Credit2", BookingValue = 20, AccountNumber = 200 });
+            sut.BookingText = "Debit";
+            sut.BookingValue = 30;
+            sut.DebitAccount = 300;
+
+            var journalEntry = sut.CreateJournalEntry();
+
+            journalEntry.Should().BeEquivalentTo(
+                new AccountingDataJournalBooking
+                {
+                    Date = 20200620,
+                    ID = 42,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Credit1", Value = 1000 },
+                        new BookingValue { Account = 200, Text = "Credit2", Value = 2000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 300, Text = "Debit", Value = 3000 }
+                    }
+                });
+        }
+
+        [Fact]
+        public void CreateJournalEntry_SplitSingleCreditEntry_JournalEntryCorrect()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd) { BookingIdentifier = 42 };
+            sut.CreditSplitEntries.Add(
+                new SplitBookingViewModel { BookingText = "Credit", BookingValue = 10, AccountNumber = 100 });
+            sut.BookingText = "Overall";
+            sut.BookingValue = 10;
+            sut.DebitAccount = 300;
+
+            var journalEntry = sut.CreateJournalEntry();
+
+            journalEntry.Should().BeEquivalentTo(
+                new AccountingDataJournalBooking
+                {
+                    Date = 20200620,
+                    ID = 42,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Overall", Value = 1000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 300, Text = "Overall", Value = 1000 }
+                    }
+                });
+        }
+
+        [Fact]
+        public void CreateJournalEntry_SplitDebitEntries_JournalEntryCorrect()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd) { BookingIdentifier = 42 };
+            sut.DebitSplitEntries.Add(
+                new SplitBookingViewModel { BookingText = "Debit1", BookingValue = 10, AccountNumber = 100 });
+            sut.DebitSplitEntries.Add(
+                new SplitBookingViewModel { BookingText = "Debit2", BookingValue = 20, AccountNumber = 200 });
+            sut.BookingText = "Credit";
+            sut.BookingValue = 30;
+            sut.CreditAccount = 300;
+
+            var journalEntry = sut.CreateJournalEntry();
+
+            journalEntry.Should().BeEquivalentTo(
+                new AccountingDataJournalBooking
+                {
+                    Date = 20200620,
+                    ID = 42,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 300, Text = "Credit", Value = 3000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Debit1", Value = 1000 },
+                        new BookingValue { Account = 200, Text = "Debit2", Value = 2000 }
+                    }
+                });
+        }
+
+        [Fact]
+        public void CreateJournalEntry_SplitSingleDebitEntry_JournalEntryCorrect()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd) { BookingIdentifier = 42 };
+            sut.DebitSplitEntries.Add(
+                new SplitBookingViewModel { BookingText = "Debit", BookingValue = 10, AccountNumber = 100 });
+            sut.BookingText = "Overall";
+            sut.BookingValue = 10;
+            sut.CreditAccount = 300;
+
+            var journalEntry = sut.CreateJournalEntry();
+
+            journalEntry.Should().BeEquivalentTo(
+                new AccountingDataJournalBooking
+                {
+                    Date = 20200620,
+                    ID = 42,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 300, Text = "Overall", Value = 1000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Overall", Value = 1000 }
+                    }
+                });
         }
     }
 }
