@@ -289,6 +289,42 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void EditBookingCommand_SplitBookingCredit_SplitViewModelInitialized()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
+            var project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            sut.EditBookingCommand.Execute(sut.FullJournal.First(x => x.Identifier == 3));
+
+            using var _ = new AssertionScope();
+            vm.CreditSplitEntries.Should().BeEquivalentTo(
+                new { AccountNumber = 400, BookingText = "Salary1", BookingValue = 120 },
+                new { AccountNumber = 400, BookingText = "Salary2", BookingValue = 80 });
+        }
+
+        [Fact]
+        public void EditBookingCommand_SplitBookingDebit_SplitViewModelInitialized()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
+            var project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.LoadProjectData(project);
+
+            sut.EditBookingCommand.Execute(sut.FullJournal.First(x => x.Identifier == 5));
+
+            using var _ = new AssertionScope();
+            vm.DebitSplitEntries.Should().BeEquivalentTo(
+                new { AccountNumber = 600, BookingText = "Shoes1", BookingValue = 20 },
+                new { AccountNumber = 600, BookingText = "Shoes2", BookingValue = 30 });
+        }
+
+        [Fact]
         public void EditBookingCommand_EntryChanged_JournalsUpdated()
         {
             static void UpdateAction(object parameter)

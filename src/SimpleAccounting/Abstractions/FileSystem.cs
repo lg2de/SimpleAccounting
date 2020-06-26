@@ -57,6 +57,7 @@ namespace lg2de.SimpleAccounting.Abstractions
                 (string RootPath, string Format) info;
                 try
                 {
+                    // TODO implement cache for DriveFormat which is time consuming
                     info = (RootPath: driveInfo.RootDirectory.FullName, Format: driveInfo.DriveFormat);
                 }
                 catch (IOException)

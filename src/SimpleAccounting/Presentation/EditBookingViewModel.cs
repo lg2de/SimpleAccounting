@@ -15,6 +15,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")] // TODO introduce localization
     internal class EditBookingViewModel : Screen
     {
         private readonly ShellViewModel parent;
@@ -29,11 +30,34 @@ namespace lg2de.SimpleAccounting.Presentation
             this.parent = parent;
             this.DateStart = dateStart;
             this.DateEnd = dateEnd;
+
+            this.CreditSplitEntries.CollectionChanged +=
+                (sender, args) =>
+                {
+                    this.NotifyOfPropertyChange(nameof(this.DebitSplitAllowed));
+                    this.NotifyOfPropertyChange(nameof(this.IsEasyBookingEnabled));
+                };
+            this.DebitSplitEntries.CollectionChanged +=
+                (sender, args) =>
+                {
+                    this.NotifyOfPropertyChange(nameof(this.CreditSplitAllowed));
+                    this.NotifyOfPropertyChange(nameof(this.IsEasyBookingEnabled));
+                };
         }
 
         public bool NewMode => !this.EditMode;
 
         public bool EditMode { get; }
+
+        public List<AccountDefinition> Accounts { get; } = new List<AccountDefinition>();
+
+        public List<AccountDefinition> IncomeAccounts { get; private set; } = new List<AccountDefinition>();
+
+        public List<AccountDefinition> IncomeRemoteAccounts { get; private set; } = new List<AccountDefinition>();
+
+        public List<AccountDefinition> ExpenseAccounts { get; private set; } = new List<AccountDefinition>();
+
+        public List<AccountDefinition> ExpenseRemoteAccounts { get; private set; } = new List<AccountDefinition>();
 
         public DateTime Date { get; set; } = DateTime.Today;
 
@@ -74,20 +98,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public double BookingValue { get; set; }
 
-        public List<AccountDefinition> Accounts { get; }
-            = new List<AccountDefinition>();
-
-        public IEnumerable<AccountDefinition> IncomeAccounts =>
-            this.Accounts.Where(x => x.Type == AccountDefinitionType.Income);
-
-        public IEnumerable<AccountDefinition> IncomeRemoteAccounts =>
-            this.Accounts.Where(x => x.Type != AccountDefinitionType.Income);
-
-        public IEnumerable<AccountDefinition> ExpenseAccounts =>
-            this.Accounts.Where(x => x.Type == AccountDefinitionType.Expense);
-
-        public IEnumerable<AccountDefinition> ExpenseRemoteAccounts =>
-            this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense);
+        public bool IsEasyBookingEnabled => this.DebitSplitAllowed && this.CreditSplitAllowed;
 
         public ulong CreditAccount
         {
@@ -119,6 +130,16 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        public ObservableCollection<SplitBookingViewModel> CreditSplitEntries { get; } =
+            new ObservableCollection<SplitBookingViewModel>();
+
+        public bool CreditSplitAllowed => this.DebitSplitEntries.Count == 0;
+
+        public ObservableCollection<SplitBookingViewModel> DebitSplitEntries { get; } =
+            new ObservableCollection<SplitBookingViewModel>();
+
+        public bool DebitSplitAllowed => this.CreditSplitEntries.Count == 0;
+
         public int DebitIndex { get; set; } = -1;
 
         public int CreditIndex { get; set; } = -1;
@@ -131,26 +152,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public int ExpenseRemoteIndex { get; set; } = -1;
 
-        public int PageIndex { get; set; }
+        public uint PageIndex { get; set; }
 
         public ICommand AddCommand => new RelayCommand(
             _ =>
             {
-                var newBooking = new AccountingDataJournalBooking
-                {
-                    Date = this.Date.ToAccountingDate(),
-                    ID = this.BookingIdentifier
-                };
-                var creditValue = new BookingValue
-                {
-                    Account = this.CreditAccount,
-                    Text = this.BookingText,
-                    Value = (long)Math.Round(this.BookingValue * 100)
-                };
-                var debitValue = creditValue.Clone();
-                debitValue.Account = this.DebitAccount;
-                newBooking.Credit = new List<BookingValue> { creditValue };
-                newBooking.Debit = new List<BookingValue> { debitValue };
+                var newBooking = this.CreateJournalEntry();
                 this.parent.AddBooking(newBooking);
 
                 // update for next booking
@@ -180,14 +187,78 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal DateTime DateEnd { get; }
 
+        public AccountingDataJournalBooking CreateJournalEntry()
+        {
+            var newBooking = new AccountingDataJournalBooking
+            {
+                Date = this.Date.ToAccountingDate(), ID = this.BookingIdentifier
+            };
+            var baseValue = new BookingValue { Text = this.BookingText, Value = this.BookingValue.ToModelValue() };
+
+            if (this.CreditSplitEntries.Any())
+            {
+                // complete base value for debit...
+                baseValue.Account = this.DebitAccount;
+                newBooking.Debit = new List<BookingValue> { baseValue };
+
+                // ...and build credit values
+                newBooking.Credit = this.CreditSplitEntries.Select(x => x.ToBooking()).ToList();
+                if (newBooking.Credit.Count == 1)
+                {
+                    // consistent use of overall text
+                    newBooking.Credit.Single().Text = this.BookingText;
+                    newBooking.Debit.Single().Text = this.BookingText;
+                }
+
+                return newBooking;
+            }
+
+            if (this.DebitSplitEntries.Any())
+            {
+                // complete base value for credit...
+                baseValue.Account = this.CreditAccount;
+                newBooking.Credit = new List<BookingValue> { baseValue };
+
+                // ...and build debit values
+                newBooking.Debit = this.DebitSplitEntries.Select(x => x.ToBooking()).ToList();
+
+                if (newBooking.Debit.Count == 1)
+                {
+                    // consistent use of overall text
+                    newBooking.Credit.Single().Text = this.BookingText;
+                    newBooking.Debit.Single().Text = this.BookingText;
+                }
+
+                return newBooking;
+            }
+
+            var debitValue = baseValue.Clone();
+            baseValue.Account = this.CreditAccount;
+            debitValue.Account = this.DebitAccount;
+            newBooking.Credit = new List<BookingValue> { baseValue };
+            newBooking.Debit = new List<BookingValue> { debitValue };
+            return newBooking;
+        }
+
         protected override void OnInitialize()
         {
             base.OnInitialize();
 
-            this.DisplayName = "Neue Buchung erstellen";
+            this.DisplayName = this.EditMode ? "Buchungseintrag bearbeiten" : "Neue Buchung erstellen";
+
+            this.IncomeAccounts = this.Accounts.Where(x => x.Type == AccountDefinitionType.Income).ToList();
+
+            this.IncomeRemoteAccounts =
+                this.Accounts.Where(x => x.Type != AccountDefinitionType.Income).ToList();
+
+            this.ExpenseAccounts =
+                this.Accounts.Where(x => x.Type == AccountDefinitionType.Expense).ToList();
+
+            this.ExpenseRemoteAccounts =
+                this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense).ToList();
+
         }
 
-        [SuppressMessage("Major Code Smell", "S109:Magic numbers should not be used", Justification = "<Pending>")]
         private bool IsDataValid()
         {
             if (this.Date < this.DateStart || this.Date > this.DateEnd)
@@ -205,18 +276,47 @@ namespace lg2de.SimpleAccounting.Presentation
                 return false;
             }
 
+            if (!this.DebitSplitEntries.IsConsistent(
+                (ExpectedSum: this.BookingValue, RemoteAccountNumber: this.CreditAccount)))
+            {
+                return false;
+            }
+
+            if (!this.CreditSplitEntries.IsConsistent(
+                (ExpectedSum: this.BookingValue, RemoteAccountNumber: this.DebitAccount)))
+            {
+                return false;
+            }
+
             switch (this.PageIndex)
             {
-            case 0: // debit/credit
-                return this.CreditIndex >= 0 && this.DebitIndex >= 0 && this.CreditIndex != this.DebitIndex;
-            case 1: // income
+            case EditBookingView.DebitCreditPageIndex:
+                return this.IsDebitCreditBookingValid();
+            case EditBookingView.IncomePageIndex:
                 return this.IncomeIndex >= 0 && this.IncomeRemoteIndex >= 0;
-            case 2: // expense
+            case EditBookingView.ExpensePageIndex:
                 return this.ExpenseIndex >= 0 && this.ExpenseRemoteIndex >= 0;
 
             default:
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"The page index {this.PageIndex} is not implemented.");
             }
+        }
+
+        private bool IsDebitCreditBookingValid()
+        {
+            if (this.DebitSplitEntries.Any())
+            {
+                // already checked
+                return true;
+            }
+
+            if (this.CreditSplitEntries.Any())
+            {
+                // already checked
+                return true;
+            }
+
+            return this.CreditIndex >= 0 && this.DebitIndex >= 0 && this.CreditIndex != this.DebitIndex;
         }
     }
 }

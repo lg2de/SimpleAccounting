@@ -213,7 +213,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 Value = value
             };
 
-            var longValue = (long)(value * 100);
+            var modelValue = value.ToModelValue();
             foreach (var importMapping in this.SelectedAccount!.ImportMapping.Patterns)
             {
                 if (!Regex.IsMatch(text, importMapping.Expression))
@@ -222,7 +222,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     continue;
                 }
 
-                if (importMapping.ValueSpecified && longValue != importMapping.Value)
+                if (importMapping.ValueSpecified && modelValue != importMapping.Value)
                 {
                     // mapping does not match
                     continue;
@@ -250,7 +250,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     Date = importing.Date.ToAccountingDate(), ID = importing.Identifier
                 };
-                var creditValue = new BookingValue { Value = (long)Math.Abs(Math.Round(importing.Value * 100)) };
+                var creditValue = new BookingValue { Value = Math.Abs(importing.Value.ToModelValue()) };
 
                 // build booking text from name and/or text
                 if (string.IsNullOrWhiteSpace(importing.Text))

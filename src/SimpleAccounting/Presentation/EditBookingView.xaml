@@ -7,7 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance Type=local:EditBookingDesignViewModel, IsDesignTimeCreatable=True}">
+    d:DataContext="{d:DesignInstance Type=local:EditBookingDesignViewModel, IsDesignTimeCreatable=True}"
+    d:DesignWidth="600" d:DesignHeight="500">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
@@ -17,20 +18,24 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" MinWidth="100" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="Margin" Value="5" />
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
             <Style TargetType="local:NumberTextBox">
                 <Setter Property="Margin" Value="5" />
@@ -59,7 +64,7 @@
 
         <ComboBox
             Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
-            Width="200" IsEditable="True"
+            MinWidth="200" IsEditable="True"
             Text="{Binding BookingText}"
             ItemsSource="{Binding BindingTemplates}"
             SelectedItem="{Binding SelectedTemplate}"
@@ -80,57 +85,53 @@
                 <TabItem.Header>
                     <TextBlock Text="Soll/Haben" Padding="2" />
                 </TabItem.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="2*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="4*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <TextBlock
-                        Grid.Column="0" Grid.Row="0"
-                        VerticalAlignment="Center"
-                        Text="Soll" />
-                    <local:NumberTextBox
-                        Grid.Column="1" Grid.Row="0"
-                        Text="{Binding DebitAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ComboBox
-                        Grid.Column="2" Grid.Row="0"
-                        ItemsSource="{Binding Accounts}"
-                        SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding DebitIndex, Mode=OneWayToSource}"
-                        SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                        TextSearch.TextPath="Name" />
+                        <TextBlock
+                            Grid.Column="0" Grid.Row="0"
+                            VerticalAlignment="Center"
+                            Text="Soll" />
+                        <local:EditBookingAccountControl
+                            Grid.Column="1" Grid.Row="0"
+                            AccountIndex="{Binding DebitIndex, Mode=OneWayToSource}"
+                            AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
+                            BookingText="{Binding BookingText}"
+                            BookingValue="{Binding BookingValue}"
+                            Accounts="{Binding Accounts}"
+                            SplitEntries="{Binding DebitSplitEntries}"
+                            AllowSplitting="{Binding DebitSplitAllowed}" />
 
-                    <TextBlock
-                        Grid.Column="0" Grid.Row="1"
-                        VerticalAlignment="Center"
-                        Text="Haben" />
-                    <local:NumberTextBox
-                        Grid.Column="1" Grid.Row="1"
-                        Text="{Binding CreditAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ComboBox
-                        Grid.Column="2" Grid.Row="1"
-                        ItemsSource="{Binding Accounts}"
-                        SelectedValue="{Binding CreditAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding CreditIndex, Mode=OneWayToSource}"
-                        SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                        TextSearch.TextPath="Name" />
-                </Grid>
+                        <TextBlock
+                            Grid.Column="0" Grid.Row="1"
+                            VerticalAlignment="Center"
+                            Text="Haben" />
+                        <local:EditBookingAccountControl
+                            Grid.Column="1" Grid.Row="1"
+                            AccountIndex="{Binding CreditIndex, Mode=OneWayToSource}"
+                            AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
+                            Accounts="{Binding Accounts}"
+                            SplitEntries="{Binding CreditSplitEntries}"
+                            AllowSplitting="{Binding CreditSplitAllowed}" />
+                    </Grid>
+                </ScrollViewer>
             </TabItem>
-            <TabItem>
+            <TabItem IsEnabled="{Binding IsEasyBookingEnabled}">
                 <TabItem.Header>
                     <TextBlock Text="Einnahme" Padding="2" />
                 </TabItem.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="4*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -141,42 +142,31 @@
                         Grid.Column="0" Grid.Row="0"
                         VerticalAlignment="Center"
                         Text="Einnahmeart" />
-                    <local:NumberTextBox
+                    <local:EditBookingAccountControl
                         Grid.Column="1" Grid.Row="0"
-                        Text="{Binding CreditAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ComboBox
-                        Grid.Column="2" Grid.Row="0"
-                        ItemsSource="{Binding IncomeAccounts}"
-                        SelectedValue="{Binding CreditAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding IncomeIndex, Mode=OneWayToSource}"
-                        SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                        TextSearch.TextPath="Name" />
+                        AccountIndex="{Binding IncomeIndex, Mode=OneWayToSource}"
+                        AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
+                        Accounts="{Binding IncomeAccounts}" />
 
                     <TextBlock
                         Grid.Column="0" Grid.Row="1"
                         VerticalAlignment="Center"
                         Text="Herkunft&#10;Gegenkonto" />
-                    <local:NumberTextBox
+                    <local:EditBookingAccountControl
                         Grid.Column="1" Grid.Row="1"
-                        Text="{Binding DebitAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ComboBox
-                        Grid.Column="2" Grid.Row="1"
-                        ItemsSource="{Binding IncomeRemoteAccounts}"
-                        SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding IncomeRemoteIndex, Mode=OneWayToSource}"
-                        SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                        TextSearch.TextPath="Name" />
+                        AccountIndex="{Binding IncomeRemoteIndex, Mode=OneWayToSource}"
+                        AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
+                        Accounts="{Binding IncomeRemoteAccounts}" />
                 </Grid>
             </TabItem>
-            <TabItem>
+            <TabItem IsEnabled="{Binding IsEasyBookingEnabled}">
                 <TabItem.Header>
                     <TextBlock Text="Ausgabe" Padding="2" />
                 </TabItem.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="4*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -187,37 +177,27 @@
                         Grid.Column="0" Grid.Row="0"
                         VerticalAlignment="Center"
                         Text="Ausgabeart" />
-                    <local:NumberTextBox
+                    <local:EditBookingAccountControl
                         Grid.Column="1" Grid.Row="0"
-                        Text="{Binding DebitAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ComboBox
-                        Grid.Column="2" Grid.Row="0"
-                        ItemsSource="{Binding ExpenseAccounts}"
-                        SelectedValue="{Binding DebitAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding ExpenseIndex, Mode=OneWayToSource}"
-                        SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                        TextSearch.TextPath="Name" />
+                        AccountIndex="{Binding ExpenseIndex, Mode=OneWayToSource}"
+                        AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
+                        Accounts="{Binding ExpenseAccounts}" />
 
                     <TextBlock
                         Grid.Column="0" Grid.Row="1"
                         VerticalAlignment="Center"
                         Text="Belastungskonto&#10;Gegenkonto" />
-                    <local:NumberTextBox
+                    <local:EditBookingAccountControl
                         Grid.Column="1" Grid.Row="1"
-                        Text="{Binding CreditAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ComboBox
-                        Grid.Column="2" Grid.Row="1"
-                        ItemsSource="{Binding ExpenseRemoteAccounts}"
-                        SelectedValue="{Binding CreditAccount, Mode=TwoWay}"
-                        SelectedIndex="{Binding ExpenseRemoteIndex, Mode=OneWayToSource}"
-                        SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                        TextSearch.TextPath="Name" />
+                        AccountIndex="{Binding ExpenseRemoteIndex, Mode=OneWayToSource}"
+                        AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
+                        Accounts="{Binding ExpenseRemoteAccounts}" />
                 </Grid>
             </TabItem>
         </TabControl>
 
         <StackPanel
-            Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="4"
+            Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="3"
             Margin="0 30 0 0"
             Orientation="Horizontal" HorizontalAlignment="Right">
             <Button

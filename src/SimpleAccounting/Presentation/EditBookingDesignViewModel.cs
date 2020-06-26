@@ -27,7 +27,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.Accounts.Add(
                 new AccountDefinition { ID = 600, Name = "Shopping", Type = AccountDefinitionType.Expense });
 
-            this.DebitAccount = 600;
+            this.DebitSplitEntries.Add(new SplitBookingViewModel { AccountNumber = 600, BookingText = "Booking1" });
+            this.DebitSplitEntries.Add(new SplitBookingViewModel { AccountNumber = 600, BookingText = "Booking2"  });
             this.CreditAccount = 100;
         }
     }

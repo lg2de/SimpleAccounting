@@ -36,8 +36,6 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellViewModel : Conductor<IScreen>, IBusy, IDisposable
     {
-        private const double CentFactor = 100.0;
-
         private readonly IWindowManager windowManager;
         private readonly IReportFactory reportFactory;
         private readonly IApplicationUpdate applicationUpdate;
@@ -256,6 +254,12 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 callback(false);
                 return;
+            }
+
+            if (this.fileSystem.FileExists(this.AutoSaveFileName))
+            {
+                // remove auto backup
+                this.fileSystem.FileDelete(this.AutoSaveFileName);
             }
 
             base.CanClose(callback);
@@ -673,7 +677,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         Text = t.Text,
                         Credit = t.Credit,
                         Debit = t.Debit,
-                        Value = t.Value / CentFactor
+                        Value = t.Value.ToViewModel()
                     })
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
             // ReSharper restore ConstantConditionalAccessQualifier
@@ -687,26 +691,46 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var journalEntry =
-                this.currentModelJournal!.Booking.SingleOrDefault(x => x.ID == journalViewModel.Identifier);
-            if (journalEntry == null || journalEntry.Credit.Count != 1 || journalEntry.Debit.Count != 1)
+            var journalIndex = this.currentModelJournal!.Booking.FindIndex(x => x.ID == journalViewModel.Identifier);
+            if (journalIndex < 0)
             {
-                // not yet supported
+                // summary item selected => ignore
                 return;
             }
 
+            var journalEntry = this.currentModelJournal!.Booking[journalIndex];
+
             var bookingModel = new EditBookingViewModel(
-                    this,
-                    this.currentModelJournal!.DateStart.ToDateTime(),
-                    this.currentModelJournal.DateEnd.ToDateTime(),
-                    editMode: true)
+                this,
+                this.currentModelJournal!.DateStart.ToDateTime(),
+                this.currentModelJournal.DateEnd.ToDateTime(),
+                editMode: true) { BookingIdentifier = journalEntry.ID, Date = journalEntry.Date.ToDateTime() };
+
+            if (journalEntry.Credit.Count > 1)
             {
-                BookingIdentifier = journalViewModel.Identifier,
-                BookingText = journalViewModel.Text,
-                BookingValue = journalEntry.Credit.First().Value / CentFactor,
-                CreditAccount = journalEntry.Credit.First().Account,
-                DebitAccount = journalEntry.Debit.First().Account
-            };
+                journalEntry.Credit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.CreditSplitEntries.Add);
+                var theDebit = journalEntry.Debit.First();
+                bookingModel.DebitAccount = theDebit.Account;
+                bookingModel.BookingText = theDebit.Text;
+                bookingModel.BookingValue = theDebit.Value.ToViewModel();
+            }
+            else if (journalEntry.Debit.Count > 1)
+            {
+                journalEntry.Debit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.DebitSplitEntries.Add);
+                var theCredit = journalEntry.Credit.First();
+                bookingModel.CreditAccount = theCredit.Account;
+                bookingModel.BookingText = theCredit.Text;
+                bookingModel.BookingValue = theCredit.Value.ToViewModel();
+            }
+            else
+            {
+                var theDebit = journalEntry.Debit.First();
+                bookingModel.DebitAccount = theDebit.Account;
+                bookingModel.BookingValue = theDebit.Value.ToViewModel();
+                bookingModel.CreditAccount = journalEntry.Credit.First().Account;
+                bookingModel.BookingText = journalViewModel.Text;
+            }
+
             var allAccounts = this.accountingData!.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
@@ -716,22 +740,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            journalEntry.ID = bookingModel.BookingIdentifier;
-            journalEntry.Date = bookingModel.Date.ToAccountingDate();
-            var creditValue = journalEntry.Credit.First();
-            creditValue.Text = bookingModel.BookingText;
-            creditValue.Account = bookingModel.CreditAccount;
-            creditValue.Value = (long)Math.Round(bookingModel.BookingValue * CentFactor);
-            var debitValue = journalEntry.Debit.First();
-            debitValue.Text = bookingModel.BookingText;
-            debitValue.Account = bookingModel.DebitAccount;
-            debitValue.Value = creditValue.Value;
+            // replace entry
+            journalEntry = bookingModel.CreateJournalEntry();
+            this.currentModelJournal!.Booking[journalIndex] = journalEntry;
 
             this.IsDocumentModified = true;
             this.RefreshFullJournal();
-            if (this.SelectedAccount != null
-                && (this.SelectedAccount.Identifier == creditValue.Account ||
-                    this.SelectedAccount.Identifier == debitValue.Account))
+            if (journalEntry.Credit.Concat(journalEntry.Debit).Any(x => x.Account == this.SelectedAccount?.Identifier))
             {
                 this.RefreshAccountJournal();
             }
@@ -848,7 +863,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var debit = debitAccounts[0];
                     item.Text = debit.Text;
-                    item.Value = Convert.ToDouble(debit.Value) / CentFactor;
+                    item.Value = debit.Value.ToViewModel();
                     item.DebitAccount = this.accountingData!.GetAccountName(debit);
                     item.CreditAccount = this.accountingData.GetAccountName(creditAccounts[0]);
                     this.FullJournal.Add(item);
@@ -859,7 +874,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var debitItem = item.Clone();
                     debitItem.Text = debitEntry.Text;
-                    debitItem.Value = Convert.ToDouble(debitEntry.Value) / CentFactor;
+                    debitItem.Value = debitEntry.Value.ToViewModel();
                     debitItem.DebitAccount = this.accountingData!.GetAccountName(debitEntry);
                     this.FullJournal.Add(debitItem);
                 }
@@ -868,7 +883,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     var creditItem = item.Clone();
                     creditItem.Text = creditEntry.Text;
-                    creditItem.Value = Convert.ToDouble(creditEntry.Value) / CentFactor;
+                    creditItem.Value = creditEntry.Value.ToViewModel();
                     creditItem.CreditAccount = this.accountingData!.GetAccountName(creditEntry);
                     this.FullJournal.Add(creditItem);
                 }
@@ -917,7 +932,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         Identifier = booking.ID,
                         Date = booking.Date.ToDateTime(),
                         Text = debitEntry.Text,
-                        DebitValue = Convert.ToDouble(debitEntry.Value) / CentFactor
+                        DebitValue = debitEntry.Value.ToViewModel()
                     };
 
                     debitSum += item.DebitValue;
@@ -935,7 +950,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         Identifier = booking.ID,
                         Date = booking.Date.ToDateTime(),
                         Text = creditEntry.Text,
-                        CreditValue = Convert.ToDouble(creditEntry.Value) / CentFactor,
+                        CreditValue = creditEntry.Value.ToViewModel()
                     };
 
                     creditSum += item.CreditValue;

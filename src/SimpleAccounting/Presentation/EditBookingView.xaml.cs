@@ -11,6 +11,10 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     public partial class EditBookingView
     {
+        internal const uint DebitCreditPageIndex = 0;
+        internal const uint IncomePageIndex = 1;
+        internal const uint ExpensePageIndex = 2;
+
         [ExcludeFromCodeCoverage]
         public EditBookingView()
         {
