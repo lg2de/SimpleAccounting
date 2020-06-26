@@ -24,23 +24,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         private static readonly DateTime YearEnd = new DateTime(DateTime.Now.Year, 12, 31);
 
         [Fact]
-        public void Accounts_AllAccountTypesAdded_AccountRelatedPropertiesNotEmpty()
-        {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd);
-
-            foreach (AccountDefinitionType type in Enum.GetValues(typeof(AccountDefinitionType)))
-            {
-                sut.Accounts.Add(new AccountDefinition { Name = type.ToString(), Type = type });
-            }
-
-            sut.Accounts.Should().NotBeEmpty();
-            sut.IncomeAccounts.Should().NotBeEmpty();
-            sut.IncomeRemoteAccounts.Should().NotBeEmpty();
-            sut.ExpenseAccounts.Should().NotBeEmpty();
-            sut.ExpenseRemoteAccounts.Should().NotBeEmpty();
-        }
-
-        [Fact]
         public void AddCommand_FirstBooking_BookingNumberIncremented()
         {
             var windowManager = Substitute.For<IWindowManager>();
@@ -351,6 +334,25 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.DisplayName.Should().NotBeNullOrWhiteSpace();
             sut.SelectedTemplate.Should().BeNull("not template should be selected by default");
         }
+
+        [Fact]
+        public void OnInitialize_AllAccountTypesAdded_AccountRelatedPropertiesNotEmpty()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd);
+            foreach (AccountDefinitionType type in Enum.GetValues(typeof(AccountDefinitionType)))
+            {
+                sut.Accounts.Add(new AccountDefinition { Name = type.ToString(), Type = type });
+            }
+
+            ((IActivate)sut).Activate();
+
+            sut.Accounts.Should().NotBeEmpty();
+            sut.IncomeAccounts.Should().NotBeEmpty();
+            sut.IncomeRemoteAccounts.Should().NotBeEmpty();
+            sut.ExpenseAccounts.Should().NotBeEmpty();
+            sut.ExpenseRemoteAccounts.Should().NotBeEmpty();
+        }
+
 
         [Fact]
         public void SelectedTemplate_SetNull_PropertiesUnchanged()

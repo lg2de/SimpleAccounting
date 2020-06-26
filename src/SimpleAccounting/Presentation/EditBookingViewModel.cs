@@ -49,6 +49,16 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool EditMode { get; }
 
+        public List<AccountDefinition> Accounts { get; } = new List<AccountDefinition>();
+
+        public List<AccountDefinition> IncomeAccounts { get; private set; } = new List<AccountDefinition>();
+
+        public List<AccountDefinition> IncomeRemoteAccounts { get; private set; } = new List<AccountDefinition>();
+
+        public List<AccountDefinition> ExpenseAccounts { get; private set; } = new List<AccountDefinition>();
+
+        public List<AccountDefinition> ExpenseRemoteAccounts { get; private set; } = new List<AccountDefinition>();
+
         public DateTime Date { get; set; } = DateTime.Today;
 
         public ulong BookingIdentifier { get; set; }
@@ -87,9 +97,6 @@ namespace lg2de.SimpleAccounting.Presentation
         public string BookingText { get; set; } = string.Empty;
 
         public double BookingValue { get; set; }
-
-        public List<AccountDefinition> Accounts { get; }
-            = new List<AccountDefinition>();
 
         public bool IsEasyBookingEnabled => this.DebitSplitAllowed && this.CreditSplitAllowed;
 
@@ -237,7 +244,19 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnInitialize();
 
-            this.DisplayName = "Neue Buchung erstellen";
+            this.DisplayName = this.EditMode ? "Buchungseintrag bearbeiten" : "Neue Buchung erstellen";
+
+            this.IncomeAccounts = this.Accounts.Where(x => x.Type == AccountDefinitionType.Income).ToList();
+
+            this.IncomeRemoteAccounts =
+                this.Accounts.Where(x => x.Type != AccountDefinitionType.Income).ToList();
+
+            this.ExpenseAccounts =
+                this.Accounts.Where(x => x.Type == AccountDefinitionType.Expense).ToList();
+
+            this.ExpenseRemoteAccounts =
+                this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense).ToList();
+
         }
 
         private bool IsDataValid()
@@ -299,19 +318,5 @@ namespace lg2de.SimpleAccounting.Presentation
 
             return this.CreditIndex >= 0 && this.DebitIndex >= 0 && this.CreditIndex != this.DebitIndex;
         }
-
-#pragma warning disable S2365 // Properties should not make collection or array copies
-        public List<AccountDefinition> IncomeAccounts =>
-            this.Accounts.Where(x => x.Type == AccountDefinitionType.Income).ToList();
-
-        public List<AccountDefinition> IncomeRemoteAccounts =>
-            this.Accounts.Where(x => x.Type != AccountDefinitionType.Income).ToList();
-
-        public List<AccountDefinition> ExpenseAccounts =>
-            this.Accounts.Where(x => x.Type == AccountDefinitionType.Expense).ToList();
-
-        public List<AccountDefinition> ExpenseRemoteAccounts =>
-            this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense).ToList();
-#pragma warning restore S2365 // Properties should not make collection or array copies
     }
 }
