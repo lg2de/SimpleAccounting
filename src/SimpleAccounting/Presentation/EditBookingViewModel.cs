@@ -257,12 +257,14 @@ namespace lg2de.SimpleAccounting.Presentation
                 return false;
             }
 
-            if (!this.DebitSplitEntries.IsConsistent(this.BookingValue))
+            if (!this.DebitSplitEntries.IsConsistent(
+                (ExpectedSum: this.BookingValue, RemoteAccountNumber: this.CreditAccount)))
             {
                 return false;
             }
 
-            if (!this.CreditSplitEntries.IsConsistent(this.BookingValue))
+            if (!this.CreditSplitEntries.IsConsistent(
+                (ExpectedSum: this.BookingValue, RemoteAccountNumber: this.DebitAccount)))
             {
                 return false;
             }
@@ -285,31 +287,13 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             if (this.DebitSplitEntries.Any())
             {
-                if (this.CreditIndex < 0)
-                {
-                    return false;
-                }
-
-                if (this.DebitSplitEntries.Any(x => x.AccountNumber == this.CreditAccount))
-                {
-                    return false;
-                }
-
+                // already checked
                 return true;
             }
 
             if (this.CreditSplitEntries.Any())
             {
-                if (this.DebitIndex < 0)
-                {
-                    return false;
-                }
-
-                if (this.CreditSplitEntries.Any(x => x.AccountNumber == this.DebitAccount))
-                {
-                    return false;
-                }
-
+                // already checked
                 return true;
             }
 

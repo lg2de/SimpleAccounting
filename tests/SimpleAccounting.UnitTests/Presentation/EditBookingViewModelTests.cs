@@ -41,7 +41,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void BookCommand_FirstBooking_BookingNumberIncremented()
+        public void AddCommand_FirstBooking_BookingNumberIncremented()
         {
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
@@ -66,7 +66,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void BookCommand_InvalidYear_CannotExecute()
+        public void AddCommand_InvalidYear_CannotExecute()
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
@@ -82,7 +82,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void BookCommand_MissingCredit_CannotExecute()
+        public void AddCommand_MissingCredit_CannotExecute()
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
@@ -96,7 +96,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void BookCommand_MissingDebit_CannotExecute()
+        public void AddCommand_MissingDebit_CannotExecute()
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
@@ -110,7 +110,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void BookCommand_MissingNumber_CannotExecute()
+        public void AddCommand_MissingNumber_CannotExecute()
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
@@ -124,7 +124,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void BookCommand_MissingText_CannotExecute()
+        public void AddCommand_MissingText_CannotExecute()
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
@@ -138,7 +138,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void BookCommand_MissingValue_CannotExecute()
+        public void AddCommand_MissingValue_CannotExecute()
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
@@ -152,7 +152,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void BookCommand_SameAccount_CannotExecute()
+        public void AddCommand_SameAccount_CannotExecute()
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
@@ -167,7 +167,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void BookCommand_ValidValues_CanExecute()
+        public void AddCommand_ValidValues_CanExecute()
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
             {
@@ -179,6 +179,166 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             };
 
             sut.AddCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AddCommand_ConsistentCreditSplitBooking_CanExecute()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 1,
+                BookingText = "abc",
+                DebitIndex = 1,
+                DebitAccount = 100,
+                BookingValue = 3,
+                CreditSplitEntries =
+                {
+                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
+                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                }
+            };
+
+            sut.AddCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AddCommand_ConsistentDebitSplitBooking_CanExecute()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 1,
+                BookingText = "abc",
+                CreditIndex = 1,
+                CreditAccount = 100,
+                BookingValue = 3,
+                DebitSplitEntries =
+                {
+                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
+                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                }
+            };
+
+            sut.AddCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void AddCommand_InconsistentDebitSplitBooking_CannotExecute()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 1,
+                BookingText = "abc",
+                CreditIndex = 1,
+                CreditAccount = 100,
+                BookingValue = 3,
+                DebitSplitEntries =
+                {
+                    new SplitBookingViewModel { BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200 },
+                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                }
+            };
+
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AddCommand_SplitBookingWithZeroValue_CannotExecute()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 1,
+                BookingText = "abc",
+                DebitIndex = 1,
+                DebitAccount = 100,
+                BookingValue = 3,
+                CreditSplitEntries =
+                {
+                    new SplitBookingViewModel { BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200 },
+                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 1, AccountIndex = 2, AccountNumber = 300 }
+                }
+            };
+
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AddCommand_SplitBookingMissingText_CannotExecute()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 1,
+                BookingText = "abc",
+                DebitIndex = 1,
+                DebitAccount = 100,
+                BookingValue = 3,
+                CreditSplitEntries =
+                {
+                    new SplitBookingViewModel { BookingText = "", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
+                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                }
+            };
+
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AddCommand_SplitBookingMissingAccount_CannotExecute()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 1,
+                BookingText = "abc",
+                DebitIndex = 1,
+                DebitAccount = 100,
+                BookingValue = 3,
+                CreditSplitEntries =
+                {
+                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = -1, AccountNumber = 200 },
+                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                }
+            };
+
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AddCommand_SplitBookingSameAccount_CannotExecute()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 1,
+                BookingText = "abc",
+                DebitIndex = 1,
+                DebitAccount = 100,
+                BookingValue = 3,
+                CreditSplitEntries =
+                {
+                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 0, AccountNumber = 100 },
+                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                }
+            };
+
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void AddCommand_SplitBookingNonMatchingValues_CannotExecute()
+        {
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 1,
+                BookingText = "abc",
+                DebitIndex = 1,
+                DebitAccount = 100,
+                BookingValue = 4,
+                CreditSplitEntries =
+                {
+                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
+                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                }
+            };
+
+            sut.AddCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -272,7 +432,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 CreditAccount = 1,
                 DebitAccount = 2,
                 BookingText = "default",
-                BookingValue = 42
+                BookingValue = 42,
+                Date = new DateTime(2020, 6, 20)
             };
             sut.Accounts.Add(new AccountDefinition { ID = 1 });
             sut.Accounts.Add(new AccountDefinition { ID = 2 });
@@ -291,7 +452,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CreateJournalEntry_SplitCreditEntries_JournalEntryCorrect()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd) { BookingIdentifier = 42 };
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
+            };
             sut.CreditSplitEntries.Add(
                 new SplitBookingViewModel { BookingText = "Credit1", BookingValue = 10, AccountNumber = 100 });
             sut.CreditSplitEntries.Add(
@@ -322,7 +486,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CreateJournalEntry_SplitSingleCreditEntry_JournalEntryCorrect()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd) { BookingIdentifier = 42 };
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
+            };
             sut.CreditSplitEntries.Add(
                 new SplitBookingViewModel { BookingText = "Credit", BookingValue = 10, AccountNumber = 100 });
             sut.BookingText = "Overall";
@@ -350,7 +517,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CreateJournalEntry_SplitDebitEntries_JournalEntryCorrect()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd) { BookingIdentifier = 42 };
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
+            };
             sut.DebitSplitEntries.Add(
                 new SplitBookingViewModel { BookingText = "Debit1", BookingValue = 10, AccountNumber = 100 });
             sut.DebitSplitEntries.Add(
@@ -381,7 +551,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CreateJournalEntry_SplitSingleDebitEntry_JournalEntryCorrect()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd) { BookingIdentifier = 42 };
+            var sut = new EditBookingViewModel(null!, YearBegin, YearEnd)
+            {
+                BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
+            };
             sut.DebitSplitEntries.Add(
                 new SplitBookingViewModel { BookingText = "Debit", BookingValue = 10, AccountNumber = 100 });
             sut.BookingText = "Overall";

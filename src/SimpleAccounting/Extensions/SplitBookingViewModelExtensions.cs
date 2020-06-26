@@ -14,20 +14,25 @@ namespace lg2de.SimpleAccounting.Extensions
     {
         private const double Tolerance = 0.001;
 
-        public static bool IsConsistent(this IList<SplitBookingViewModel> list, double expectedSum)
+        public static bool IsConsistent(
+            this IList<SplitBookingViewModel> list, (double ExpectedSum, ulong RemoteAccountNumber) booking)
         {
             if (!list.Any())
             {
                 return true;
             }
 
-            if (list.Any(x => string.IsNullOrWhiteSpace(x.BookingText) || x.BookingValue <= 0 || x.AccountIndex < 0))
+            if (list.Any(
+                x => string.IsNullOrWhiteSpace(x.BookingText)
+                     || x.BookingValue <= 0
+                     || x.AccountIndex < 0
+                     || x.AccountNumber == booking.RemoteAccountNumber))
             {
                 return false;
             }
 
             var splitSum = list.Sum(x => x.BookingValue);
-            return Math.Abs(splitSum - expectedSum) <= Tolerance;
+            return Math.Abs(splitSum - booking.ExpectedSum) <= Tolerance;
         }
 
         public static BookingValue ToBooking(this SplitBookingViewModel viewModel)
