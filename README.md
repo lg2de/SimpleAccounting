@@ -30,19 +30,20 @@ The software focuses on journal and balance sheet reporting.
 
 * Data management for double-entry accounting, stored as XML (see [example](./samples/sample.acml)) and defined using [XSD](./docs/AccountingData.xsd)
 * User interface for the management of accounts, the creation of entries, the listing of account journals
+* Support for split booking entries, either on credit or debit side
 * Import of booking entries from CSV files incl. semi-automatic assignment of offsetting accounts
 * Printable reports for full journal, account journal, accounts and balances, and annual financial statements
 
 Some screenshots for first impression:
 
-|Main view|Totals and balances report|
+|Main view|Split booking|Totals and balances report|
 |-|-|
-|<img src="./samples/MainView.png" alt="Main view" width="250" />|<img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report" width="250" />|
+|<img src="./samples/MainView.png" alt="Main view" width="250" />|<img src="./samples/SplitBooking.png" alt="Split booking" width="250" />|<img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report" width="250" />|
 
 ## Getting started
 
 The application is based on [.NET Core 3](https://dotnet.microsoft.com/download/dotnet-core/3.1).
-Please download and install the Runtime in version [3.1](https://dotnet.microsoft.com/download/dotnet-core/thank-you/runtime-desktop-3.1.2-windows-x64-installer) or above.
+Please download and install the Runtime in version [3.1](https://dotnet.microsoft.com/download/dotnet-core/thank-you/runtime-desktop-3.1.5-windows-x64-installer) or above.
 
 Download the `SimpleAccounting` package from the [release page](https://github.com/lg2de/SimpleAccounting/releases).
 Extract the ZIP archive into your preferred destination directory.
