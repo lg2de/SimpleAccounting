@@ -37,7 +37,7 @@ The software focuses on journal and balance sheet reporting.
 Some screenshots for first impression:
 
 |Main view|Split booking|Totals and balances report|
-|-|-|
+|-|-|-|
 |<img src="./samples/MainView.png" alt="Main view" width="250" />|<img src="./samples/SplitBooking.png" alt="Split booking" width="250" />|<img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report" width="250" />|
 
 ## Getting started
