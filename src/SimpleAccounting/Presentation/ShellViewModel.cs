@@ -704,7 +704,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 this,
                 this.currentModelJournal!.DateStart.ToDateTime(),
                 this.currentModelJournal.DateEnd.ToDateTime(),
-                editMode: true) { BookingIdentifier = journalEntry.ID, Date = journalEntry.Date.ToDateTime() };
+                editMode: true)
+            {
+                BookingIdentifier = journalEntry.ID,
+                Date = journalEntry.Date.ToDateTime(),
+                IsFollowup = journalEntry.Followup,
+                IsOpening = journalEntry.Opening
+            };
 
             if (journalEntry.Credit.Count > 1)
             {
@@ -805,9 +811,13 @@ namespace lg2de.SimpleAccounting.Presentation
             this.currentModelJournal = this.accountingData!.Journal.Single(y => y.Year == newYearName);
             this.UpdateDisplayName();
             this.RefreshFullJournal();
-            // ReSharper disable ConstantConditionalAccessQualifier
             var firstBooking = this.currentModelJournal.Booking?.FirstOrDefault();
-            // ReSharper restore ConstantConditionalAccessQualifier
+            if (!this.AccountList.Any())
+            {
+                this.AccountJournal.Clear();
+                return;
+            }
+
             if (firstBooking != null)
             {
                 var firstAccount = firstBooking
@@ -817,14 +827,10 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.SelectedAccount = this.AccountList.Single(x => x.Identifier == firstAccount);
                 this.RefreshAccountJournal();
             }
-            else if (this.AccountList.Any())
+            else
             {
                 this.SelectedAccount = this.AccountList.First();
                 this.RefreshAccountJournal();
-            }
-            else
-            {
-                this.AccountJournal.Clear();
             }
         }
 
@@ -856,7 +862,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             foreach (var booking in this.currentModelJournal.Booking.OrderBy(b => b.Date))
             {
-                var item = new FullJournalViewModel { Date = booking.Date.ToDateTime(), Identifier = booking.ID };
+                var item = new FullJournalViewModel { Date = booking.Date.ToDateTime(), Identifier = booking.ID, IsFollowup = booking.Followup };
                 var debitAccounts = booking.Debit;
                 var creditAccounts = booking.Credit;
                 if (debitAccounts.Count == 1 && creditAccounts.Count == 1)

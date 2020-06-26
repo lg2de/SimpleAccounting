@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<AccountingData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://lg2.de/SimpleAccounting/AccountingSchema https://lg2de.github.io/SimpleAccounting/AccountingData.xsd">
+﻿<?xml version="1.0"?>
+<AccountingData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="https://lg2.de/SimpleAccounting/AccountingSchema https://lg2de.github.io/SimpleAccounting/AccountingData.xsd">
   <Setup>
     <Name>Demo</Name>
     <Location>World</Location>
@@ -14,7 +14,7 @@
     </AccountGroup>
   </Accounts>
   <Journal Year="2020" DateStart="20200101" DateEnd="20201231">
-    <Booking Date="20200101" ID="1" Opening="true">
+    <Booking Date="20200101" ID="1" Opening="true" Followup="true">
       <Debit Value="10000" Account="100" Text="Opening value 1" />
       <Credit Value="10000" Account="990" Text="Opening value 1" />
     </Booking>
@@ -29,4 +29,5 @@
       <Credit Value="15000" Account="400" Text="Annual extra salary" />
     </Booking>
   </Journal>
+  <OpenIssues />
 </AccountingData>

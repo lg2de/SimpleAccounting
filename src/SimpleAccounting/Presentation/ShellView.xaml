@@ -89,6 +89,11 @@
                         Color="White" />
                     <Style x:Key="GridRowStyle" TargetType="{x:Type DataGridRow}">
                         <Setter Property="FontSize" Value="11" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsFollowup}" Value="True">
+                                <Setter Property="Background" Value="LightPink" />
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                     <Style TargetType="DataGridCell">
                         <Setter Property="ToolTip"
@@ -134,8 +139,8 @@
                         </DataGrid.InputBindings>
                     </DataGrid>
                 </DockPanel>
-                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
-                <DockPanel Grid.Column="2">
+                <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" />
+                <DockPanel Grid.Row="0" Grid.Column="2">
                     <TextBlock DockPanel.Dock="Top">
                         <Run Text="Kontenblatt '" />
                         <Run Text="{Binding SelectedAccount.Name}" />

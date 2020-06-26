@@ -84,6 +84,7 @@
                   </xs:sequence>
                   <xs:attribute name="Date" type="xs:unsignedInt" use="required" />
                   <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
+                  <xs:attribute name="Followup" type="xs:boolean" use="optional" default="false" />
                   <xs:attribute name="Opening" type="xs:boolean" use="optional" default="false" />
                 </xs:complexType>
               </xs:element>

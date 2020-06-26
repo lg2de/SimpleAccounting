@@ -35,9 +35,6 @@
                 <Setter Property="Height" Value="30" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
-            <Style TargetType="CheckBox">
-                <Setter Property="Margin" Value="5" />
-            </Style>
         </Grid.Resources>
         <TextBlock
             Grid.Column="0" Grid.Row="0"

@@ -27,6 +27,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.Resources>
             <Style TargetType="TextBlock">
@@ -198,6 +199,17 @@
 
         <StackPanel
             Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="3"
+            Orientation="Horizontal">
+            <CheckBox
+                Content="Eröffnungsbuchung"
+                IsChecked="{Binding IsOpening}" />
+            <CheckBox
+                Content="Nachverfolgung"
+                IsChecked="{Binding IsFollowup}" />
+        </StackPanel>
+
+        <StackPanel
+            Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="4"
             Margin="0 30 0 0"
             Orientation="Horizontal" HorizontalAlignment="Right">
             <Button

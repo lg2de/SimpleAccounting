@@ -2930,6 +2930,8 @@ namespace lg2de.SimpleAccounting.Model {
         
         private ulong idField;
         
+        private bool followupField;
+        
         private bool openingField;
         
         private static System.Xml.Serialization.XmlSerializer serializer;
@@ -2975,6 +2977,17 @@ namespace lg2de.SimpleAccounting.Model {
             }
             set {
                 this.idField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(false)]
+        public bool Followup {
+            get {
+                return this.followupField;
+            }
+            set {
+                this.followupField = value;
             }
         }
         

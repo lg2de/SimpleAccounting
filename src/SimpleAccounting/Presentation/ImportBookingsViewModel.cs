@@ -248,7 +248,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var newBooking = new AccountingDataJournalBooking
                 {
-                    Date = importing.Date.ToAccountingDate(), ID = importing.Identifier
+                    Date = importing.Date.ToAccountingDate(),
+                    ID = importing.Identifier,
+                    Followup = importing.IsFollowup
                 };
                 var creditValue = new BookingValue { Value = Math.Abs(importing.Value.ToModelValue()) };
 

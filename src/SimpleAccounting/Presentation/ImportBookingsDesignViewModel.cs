@@ -55,7 +55,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 Name = "McX",
                 RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
                 Text = "Shoes",
-                Value = 99.95
+                Value = 99.95,
+                IsFollowup = true
             };
             this.ImportData.Add(item);
         }

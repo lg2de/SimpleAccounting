@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
     mc:Ignorable="d"
-    MinWidth="800" MinHeight="600"
+    MinWidth="900" MinHeight="600"
     d:DataContext="{d:DesignInstance Type=local:ImportBookingsDesignViewModel, IsDesignTimeCreatable=True}">
     <DockPanel>
         <DockPanel.Resources>
@@ -80,6 +80,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridCheckBoxColumn Header="Nachverfolgung" Binding="{Binding IsFollowup}" />
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
