@@ -58,7 +58,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public DateTime RangeMin { get; internal set; }
 
-        public DateTime RangMax { get; internal set; }
+        public DateTime RangeMax { get; internal set; }
 
         public AccountingDataJournal Journal { get; }
 
@@ -76,10 +76,22 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 this.selectedAccountNumber = value;
                 this.NotifyOfPropertyChange();
+
+                var bookings = this.Journal.Booking.Where(
+                    x => x.Credit.Any(c => c.Account == this.selectedAccountNumber) ||
+                         x.Debit.Any(d => d.Account == this.selectedAccountNumber));
+                var last = bookings.DefaultIfEmpty(null).Max(x => x?.Date);
+                if (last.HasValue)
+                {
+                    this.StartDate = last.Value.ToDateTime();
+                    this.NotifyOfPropertyChange(nameof(this.StartDate));
+                }
             }
         }
 
         public AccountDefinition? SelectedAccount { get; set; }
+
+        public DateTime StartDate { get; set; }
 
         public ObservableCollection<ImportEntryViewModel> ImportData { get; }
             = new ObservableCollection<ImportEntryViewModel>();
@@ -180,7 +192,7 @@ namespace lg2de.SimpleAccounting.Presentation
             string valueField)
         {
             csv.TryGetField(dateField, out DateTime date);
-            if (date < this.RangeMin || date > this.RangMax)
+            if (date < this.RangeMin || date > this.RangeMax)
             {
                 return;
             }

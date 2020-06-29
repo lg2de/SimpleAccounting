@@ -771,7 +771,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 BookingNumber = this.GetMaxBookIdent() + 1,
                 RangeMin = min,
-                RangMax = max
+                RangeMax = max
             };
             this.windowManager.ShowDialog(importModel);
         }

@@ -37,6 +37,9 @@
                 SelectedValue="{Binding SelectedAccountNumber, Mode=TwoWay}"
                 SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
                 SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+            <DatePicker
+                SelectedDate="{Binding StartDate}"
+                DisplayDateStart="{Binding RangeMin, Mode=OneWay}" DisplayDateEnd="{Binding RangeMax, Mode=OneWay}"/>
             <Button
                 Width="100"
                 Content="Lade Daten"

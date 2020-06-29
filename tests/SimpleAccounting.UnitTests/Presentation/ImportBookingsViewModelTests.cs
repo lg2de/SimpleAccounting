@@ -45,7 +45,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
             };
             sut.RangeMin = new DateTime(2019, 1, 1);
-            sut.RangMax = new DateTime(2021, 1, 1);
+            sut.RangeMax = new DateTime(2021, 1, 1);
 
             var input = @"
 Date;Name;Text;Value

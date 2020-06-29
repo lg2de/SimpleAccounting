@@ -47,6 +47,9 @@ namespace lg2de.SimpleAccounting.Presentation
             : base(null!, null!, null!, SampleAccounts)
         {
             this.SelectedAccountNumber = 100;
+            this.StartDate = DateTime.Today;
+            this.RangeMin = new DateTime(this.StartDate.Year, 1, 1);
+            this.RangeMax = new DateTime(this.StartDate.Year, 12, 31);
 
             var item = new ImportEntryViewModel(SampleAccounts)
             {
