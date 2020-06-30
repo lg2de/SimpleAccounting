@@ -6,7 +6,16 @@
   </Setup>
   <Accounts>
     <AccountGroup Name="Default">
-      <Account ID="100" Name="Bank account" Type="Asset" />
+      <Account ID="100" Name="Bank account" Type="Asset">
+        <ImportMapping>
+          <Columns>
+            <Column Source="Date" Target="Date" />
+            <Column Source="Name" Target="Name" />
+            <Column Source="Text" Target="Text" />
+            <Column Source="Value" Target="Value" />
+          </Columns>
+        </ImportMapping>
+      </Account>
       <Account ID="400" Name="Salary" Type="Income" />
       <Account ID="600" Name="Food" Type="Expense" />
       <Account ID="610" Name="Clothes" Type="Expense" />

@@ -386,7 +386,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     {
                         BookingNumber = 1,
                         RangeMin = new DateTime(DateTime.Now.Year, 1, 1),
-                        RangMax = new DateTime(DateTime.Now.Year, 12, 31)
+                        RangeMax = new DateTime(DateTime.Now.Year, 12, 31)
                     });
                 vm.ImportAccounts.Should().NotBeEmpty();
             }

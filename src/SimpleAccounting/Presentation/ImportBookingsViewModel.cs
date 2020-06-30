@@ -31,6 +31,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly IMessageBox messageBox;
         private readonly ShellViewModel parent;
         private ulong selectedAccountNumber;
+        private DateTime startDate;
 
         public ImportBookingsViewModel(
             IMessageBox messageBox,
@@ -42,6 +43,9 @@ namespace lg2de.SimpleAccounting.Presentation
             this.parent = parent;
             this.Journal = journal;
             this.accounts = accounts.ToList();
+
+            this.RangeMin = this.Journal.DateStart.ToDateTime();
+            this.RangeMax = this.Journal.DateEnd.ToDateTime();
 
             // ReSharper disable once VirtualMemberCallInConstructor
             this.DisplayName = "Import von Kontodaten";
@@ -56,9 +60,9 @@ namespace lg2de.SimpleAccounting.Presentation
                         x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) ==
                     true);
 
-        public DateTime RangeMin { get; internal set; }
+        public DateTime RangeMin { get; }
 
-        public DateTime RangeMax { get; internal set; }
+        public DateTime RangeMax { get; }
 
         public AccountingDataJournal Journal { get; }
 
@@ -77,10 +81,10 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.selectedAccountNumber = value;
                 this.NotifyOfPropertyChange();
 
-                var bookings = this.Journal.Booking.Where(
+                var bookings = this.Journal.Booking?.Where(
                     x => x.Credit.Any(c => c.Account == this.selectedAccountNumber) ||
                          x.Debit.Any(d => d.Account == this.selectedAccountNumber));
-                var last = bookings.DefaultIfEmpty(null).Max(x => x?.Date);
+                var last = bookings?.DefaultIfEmpty(null).Max(x => x?.Date);
                 if (last.HasValue)
                 {
                     this.StartDate = last.Value.ToDateTime();
@@ -91,10 +95,31 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public AccountDefinition? SelectedAccount { get; set; }
 
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate
+        {
+            get => this.startDate;
+            set
+            {
+                if (value.Equals(this.startDate))
+                {
+                    return;
+                }
 
-        public ObservableCollection<ImportEntryViewModel> ImportData { get; }
-            = new ObservableCollection<ImportEntryViewModel>();
+                this.startDate = value;
+                this.NotifyOfPropertyChange();
+                this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
+            }
+        }
+
+        public List<ImportEntryViewModel> LoadedData { get; } = new List<ImportEntryViewModel>();
+
+        public List<ImportEntryViewModel> ExistingData { get; } = new List<ImportEntryViewModel>();
+
+        public IEnumerable<ImportEntryViewModel> ImportDataFiltered =>
+            this.LoadedData
+                .Concat(this.ExistingData)
+                .Where(x => x.Date >= this.StartDate)
+                .OrderBy(x => x.Date);
 
         [SuppressMessage(
             "Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
@@ -114,8 +139,10 @@ namespace lg2de.SimpleAccounting.Presentation
                         return;
                     }
 
+                    // TODO BUSY
+
                     fileName = openFileDialog.FileName;
-                    this.ImportData.Clear();
+                    this.LoadedData.Clear();
 
                     // note, the stream is disposed by the reader
                     var stream = new FileStream(
@@ -127,10 +154,12 @@ namespace lg2de.SimpleAccounting.Presentation
                         this.ImportBookings(reader, new Configuration());
                     }
 
-                    if (!this.ImportData.Any())
+                    if (!this.LoadedData.Any())
                     {
                         this.messageBox.Show($"No relevant data found in {openFileDialog.FileName}.", "Import");
                     }
+
+                    this.SetupExisting();
                 }
                 catch (IOException e)
                 {
@@ -140,11 +169,30 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand BookAllCommand => new RelayCommand(
             _ => this.ProcessData(),
-            _ => this.ImportData.All(x => x.RemoteAccount != null));
+            _ => this.LoadedData.All(x => x.RemoteAccount != null));
 
         public ICommand BookMappedCommand => new RelayCommand(
             _ => this.ProcessData(),
-            _ => this.ImportData.Any(x => x.RemoteAccount != null));
+            _ => this.LoadedData.Any(x => x.RemoteAccount != null));
+
+        internal void SetupExisting()
+        {
+            this.ExistingData.Clear();
+            this.ExistingData.AddRange(
+                this.Journal.Booking
+                    .Where(
+                        x => x.Credit.Any(c => c.Account == this.selectedAccountNumber)
+                             || x.Debit.Any(d => d.Account == this.selectedAccountNumber))
+                    .Select(
+                        x => new ImportEntryViewModel(this.accounts)
+                        {
+                            Identifier = x.ID,
+                            Date = x.Date.ToDateTime(),
+                            Text = x.Credit.First().Text,
+                            Name = "<bereits gebucht>"
+                        }));
+            this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
+        }
 
         internal void ImportBookings(TextReader reader, Configuration configuration)
         {
@@ -159,17 +207,6 @@ namespace lg2de.SimpleAccounting.Presentation
             var valueField = this.SelectedAccount.ImportMapping.Columns
                 .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
                 ?? "value";
-
-            var lastEntry = this.Journal.Booking
-                .Where(
-                    x => x.Credit.Any(c => c.Account == this.SelectedAccountNumber)
-                         || x.Debit.Any(c => c.Account == this.SelectedAccountNumber))
-                .OrderBy(x => x.Date)
-                .LastOrDefault();
-            if (lastEntry != null)
-            {
-                this.RangeMin = lastEntry.Date.ToDateTime() + TimeSpan.FromDays(1);
-            }
 
             using var csv = new CsvReader(reader, configuration);
             csv.Read();
@@ -245,12 +282,12 @@ namespace lg2de.SimpleAccounting.Presentation
                 break;
             }
 
-            this.ImportData.Add(item);
+            this.LoadedData.Add(item);
         }
 
         internal void ProcessData()
         {
-            foreach (var importing in this.ImportData)
+            foreach (var importing in this.LoadedData)
             {
                 if (importing.RemoteAccount == null)
                 {

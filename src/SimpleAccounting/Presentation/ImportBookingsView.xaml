@@ -37,13 +37,14 @@
                 SelectedValue="{Binding SelectedAccountNumber, Mode=TwoWay}"
                 SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
                 SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
-            <DatePicker
-                SelectedDate="{Binding StartDate}"
-                DisplayDateStart="{Binding RangeMin, Mode=OneWay}" DisplayDateEnd="{Binding RangeMax, Mode=OneWay}"/>
             <Button
                 Width="100"
                 Content="Lade Daten"
                 Command="{Binding LoadDataCommand}" />
+            <DatePicker
+                SelectedDate="{Binding StartDate}"
+                DisplayDateStart="{Binding RangeMin, Mode=OneWay}" DisplayDateEnd="{Binding RangeMax, Mode=OneWay}"
+                Height="30" IsTodayHighlighted="True" />
             <Button
                 Width="100"
                 Content="Teilweise Buchen"
@@ -57,7 +58,7 @@
             <Button Content="CloseDummy" IsCancel="True" Width="0" Height="0" />
         </StackPanel>
         <DataGrid
-            ItemsSource="{Binding ImportData}"
+            ItemsSource="{Binding ImportDataFiltered}"
             AutoGenerateColumns="False"
             CanUserResizeColumns="True"
             CanUserAddRows="False" CanUserDeleteRows="False">

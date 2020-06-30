@@ -20,11 +20,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookings_SampleData_AccountsFiltered()
         {
-            var accounts = Samples.SampleProject.AllAccounts.ToList();
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = project.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(
                 null,
                 null,
-                null,
+                project.Journal.Last(),
                 accounts);
 
             sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
@@ -38,20 +40,22 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = new ImportBookingsViewModel(
                 null,
                 null,
-                project.Journal.Last(),
-                accounts) { SelectedAccount = accounts.Single(x => x.Name == "Bank account") };
+                project.Journal.First(),
+                accounts)
+            {
+                SelectedAccount = accounts.Single(x => x.Name == "Bank account")
+            };
             sut.SelectedAccount.ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
             {
                 new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
             };
-            sut.RangeMin = new DateTime(2019, 1, 1);
-            sut.RangeMax = new DateTime(2021, 1, 1);
 
             var input = @"
 Date;Name;Text;Value
-2018-12-31;NameIgnore;TextIgnore;12.34
-2019-12-31;Name1;Text1;12.34
-2020-01-01;Name2;Text2;-42.42";
+1999-12-31;NameIgnore;TextIgnore;12.34
+2000-12-01;Name1;Text1;12.34
+2000-12-31;Name2;Text2;-42.42
+2001-01-01;Name3;Text3;99.99";
             using (var inputStream = new StringReader(input))
             {
                 sut.ImportBookings(
@@ -59,63 +63,65 @@ Date;Name;Text;Value
                     new Configuration { Delimiter = ";", CultureInfo = new CultureInfo("en-us") });
             }
 
-            sut.ImportData.Should().BeEquivalentTo(
+            sut.LoadedData.Should().BeEquivalentTo(
                 new
                 {
-                    Date = new DateTime(2019, 12, 31),
+                    Date = new DateTime(2000, 12, 1),
                     Name = "Name1",
                     Text = "Text1",
                     Value = 12.34,
                     RemoteAccount = new { ID = 600 }
                 },
-                new { Date = new DateTime(2020, 1, 1), Name = "Name2", Text = "Text2", Value = -42.42 });
+                new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
         }
 
         [Fact]
         public void ProcessData_SampleData_DataConverted()
         {
             var parent = new ShellViewModel(null, null, null, null, null, null);
-            parent.LoadProjectData(Samples.SampleProject);
-            var accounts = Samples.SampleProject.AllAccounts.ToList();
+            var project = Samples.SampleProject;
+            parent.LoadProjectData(project);
+            var accounts = project.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(
                 null,
                 parent,
-                null,
+                project.Journal.Last(),
                 accounts) { SelectedAccount = accounts.Single(x => x.Name == "Bank account") };
             sut.SelectedAccountNumber = sut.SelectedAccount.ID;
             var remoteAccount = accounts.Single(x => x.ID == 600);
-            sut.ImportData.Add(
+            int year = DateTime.Today.Year;
+            sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(2020, 1, 1),
+                    Date = new DateTime(year, 1, 1),
                     Identifier = 101,
                     Name = "Name",
                     Text = "Text",
                     Value = 1,
                     RemoteAccount = remoteAccount
                 });
-            sut.ImportData.Add(
+            sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(2020, 1, 2),
+                    Date = new DateTime(year, 1, 2),
                     Identifier = 102,
                     Text = "Text",
                     Value = 2,
                     RemoteAccount = remoteAccount
                 });
-            sut.ImportData.Add(
+            sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(2020, 1, 3),
+                    Date = new DateTime(year, 1, 3),
                     Identifier = 103,
                     Name = "Name",
                     Value = -1,
                     RemoteAccount = remoteAccount
                 });
-            sut.ImportData.Add(
+            sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(2020, 1, 3),
+                    Date = new DateTime(year, 1, 3),
                     Identifier = 104,
                     Name = "Ignore",
                     Value = -2,

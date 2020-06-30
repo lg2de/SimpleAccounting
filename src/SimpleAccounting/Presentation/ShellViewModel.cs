@@ -760,18 +760,13 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void OnImportBookings()
         {
-            var min = this.currentModelJournal!.DateStart.ToDateTime();
-            var max = this.currentModelJournal.DateEnd.ToDateTime();
-
             var importModel = new ImportBookingsViewModel(
                 this.messageBox,
                 this,
-                this.currentModelJournal,
+                this.currentModelJournal!,
                 this.accountingData!.AllAccounts)
             {
-                BookingNumber = this.GetMaxBookIdent() + 1,
-                RangeMin = min,
-                RangeMax = max
+                BookingNumber = this.GetMaxBookIdent() + 1
             };
             this.windowManager.ShowDialog(importModel);
         }
