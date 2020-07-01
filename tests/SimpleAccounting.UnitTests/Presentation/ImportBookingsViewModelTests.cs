@@ -27,7 +27,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 null,
                 null,
                 project.Journal.Last(),
-                accounts);
+                accounts,
+                0);
 
             sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
         }
@@ -41,7 +42,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 null,
                 null,
                 project.Journal.First(),
-                accounts)
+                accounts,
+                0)
             {
                 SelectedAccount = accounts.Single(x => x.Name == "Bank account")
             };
@@ -86,7 +88,8 @@ Date;Name;Text;Value
                 null,
                 parent,
                 project.Journal.Last(),
-                accounts) { SelectedAccount = accounts.Single(x => x.Name == "Bank account") };
+                accounts,
+                0) { SelectedAccount = accounts.Single(x => x.Name == "Bank account") };
             sut.SelectedAccountNumber = sut.SelectedAccount.ID;
             var remoteAccount = accounts.Single(x => x.ID == 600);
             int year = DateTime.Today.Year;

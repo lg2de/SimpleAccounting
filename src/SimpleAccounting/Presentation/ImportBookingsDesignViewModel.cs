@@ -68,7 +68,8 @@ namespace lg2de.SimpleAccounting.Presentation
                         }
                     }
                 },
-                SampleAccounts)
+                SampleAccounts,
+                42)
         {
             this.SelectedAccountNumber = 100;
             this.StartDate = DateTime.Today;
@@ -77,7 +78,6 @@ namespace lg2de.SimpleAccounting.Presentation
                 new ImportEntryViewModel(SampleAccounts)
                 {
                     Date = DateTime.Now - TimeSpan.FromDays(1),
-                    Identifier = 41,
                     Name = "Should not be visible!",
                     Text = "Should not be visible!",
                     RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
@@ -87,7 +87,6 @@ namespace lg2de.SimpleAccounting.Presentation
                 new ImportEntryViewModel(SampleAccounts)
                 {
                     Date = DateTime.Now,
-                    Identifier = 42,
                     Name = "McX",
                     Text = "Shoes",
                     RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
@@ -98,12 +97,12 @@ namespace lg2de.SimpleAccounting.Presentation
                 new ImportEntryViewModel(SampleAccounts)
                 {
                     Date = DateTime.Now + TimeSpan.FromDays(1),
-                    Identifier = 43,
                     Name = "McY",
                     Text = "More Shoes",
                     Value = 99.95
                 });
 
+            this.UpdateIdentifierInLoadedData();
             this.SetupExisting();
         }
     }

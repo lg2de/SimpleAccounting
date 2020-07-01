@@ -1,5 +1,6 @@
 Date;Name;Text;Value
 1999-12-31;NameIgnore;TextIgnore;12.34
-2020-02-01;Name1;Text1;12.34
-2020-12-31;Name2;Text2;-42.42
-2021-01-01;Name3;Text3;99.99
+2020-01-15;Name1;Text1;10.00
+2020-02-01;Name2;Text2;12.34
+2020-12-31;Name3;Text3;-42.42
+2021-01-01;Name4;Text4;99.99

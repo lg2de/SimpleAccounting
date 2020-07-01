@@ -63,7 +63,7 @@
             CanUserResizeColumns="True"
             CanUserAddRows="False" CanUserDeleteRows="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" />
+                <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" IsReadOnly="True" />
                 <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" />
                 <DataGridTextColumn Header="Empfänger" Binding="{Binding Name}" Width="200" />
                 <DataGridTextColumn Header="Buchungstext" Binding="{Binding Text}" Width="200" />
@@ -108,6 +108,12 @@
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsExisting}" Value="True">
+                            <Setter Property="Background" Value="LightGray" />
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
                 </Style>
             </DataGrid.CellStyle>
         </DataGrid>

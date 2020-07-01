@@ -37,12 +37,14 @@ namespace lg2de.SimpleAccounting.Presentation
             IMessageBox messageBox,
             ShellViewModel parent,
             AccountingDataJournal journal,
-            IEnumerable<AccountDefinition> accounts)
+            IEnumerable<AccountDefinition> accounts,
+            ulong firstBookingNumber)
         {
             this.messageBox = messageBox;
             this.parent = parent;
             this.Journal = journal;
             this.accounts = accounts.ToList();
+            this.FirstBookingNumber = firstBookingNumber;
 
             this.RangeMin = this.Journal.DateStart.ToDateTime();
             this.RangeMax = this.Journal.DateEnd.ToDateTime();
@@ -66,7 +68,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public AccountingDataJournal Journal { get; }
 
-        public ulong BookingNumber { get; internal set; }
+        public ulong FirstBookingNumber { get; }
 
         public ulong SelectedAccountNumber
         {
@@ -106,6 +108,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 this.startDate = value;
+                this.UpdateIdentifierInLoadedData();
                 this.NotifyOfPropertyChange();
                 this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
             }
@@ -115,11 +118,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public List<ImportEntryViewModel> ExistingData { get; } = new List<ImportEntryViewModel>();
 
-        public IEnumerable<ImportEntryViewModel> ImportDataFiltered =>
-            this.LoadedData
-                .Concat(this.ExistingData)
-                .Where(x => x.Date >= this.StartDate)
-                .OrderBy(x => x.Date);
+        public ObservableCollection<ImportEntryViewModel> ImportDataFiltered =>
+            new ObservableCollection<ImportEntryViewModel>(
+                this.LoadedData
+                    .Concat(this.ExistingData)
+                    .Where(x => x.Date >= this.StartDate)
+                    .OrderBy(x => x.Date));
 
         [SuppressMessage(
             "Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
@@ -159,6 +163,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         this.messageBox.Show($"No relevant data found in {openFileDialog.FileName}.", "Import");
                     }
 
+                    this.UpdateIdentifierInLoadedData();
                     this.SetupExisting();
                 }
                 catch (IOException e)
@@ -169,13 +174,22 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand BookAllCommand => new RelayCommand(
             _ => this.ProcessData(),
-            _ => this.LoadedData.All(x => x.RemoteAccount != null));
+            _ => this.LoadedData.All(x => x.RemoteAccount != null || x.IsExisting));
 
         public ICommand BookMappedCommand => new RelayCommand(
             _ => this.ProcessData(),
             _ => this.LoadedData.Any(x => x.RemoteAccount != null));
 
-        internal void SetupExisting()
+        protected void UpdateIdentifierInLoadedData()
+        {
+            var bookingNumber = this.FirstBookingNumber;
+            foreach (var entry in this.ImportDataFiltered.Where(x => !x.IsExisting))
+            {
+                entry.Identifier = bookingNumber++;
+            }
+        }
+
+        protected void SetupExisting()
         {
             this.ExistingData.Clear();
             this.ExistingData.AddRange(
@@ -184,7 +198,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         x => x.Credit.Any(c => c.Account == this.selectedAccountNumber)
                              || x.Debit.Any(d => d.Account == this.selectedAccountNumber))
                     .Select(
-                        x => new ImportEntryViewModel(this.accounts)
+                        x => new ImportEntryViewModel
                         {
                             Identifier = x.ID,
                             Date = x.Date.ToDateTime(),
@@ -196,16 +210,20 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal void ImportBookings(TextReader reader, Configuration configuration)
         {
-            var dateField = this.SelectedAccount!.ImportMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source
+            var dateField =
+                this.SelectedAccount!.ImportMapping.Columns
+                    .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source
                 ?? "date";
-            var nameField = this.SelectedAccount.ImportMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source
+            var nameField =
+                this.SelectedAccount.ImportMapping.Columns
+                    .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source
                 ?? "name";
-            var textField = this.SelectedAccount.ImportMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
-            var valueField = this.SelectedAccount.ImportMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
+            var textField =
+                this.SelectedAccount.ImportMapping.Columns
+                    .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
+            var valueField =
+                this.SelectedAccount.ImportMapping.Columns
+                    .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
                 ?? "value";
 
             using var csv = new CsvReader(reader, configuration);
@@ -215,9 +233,12 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
+            var filteredAccounts = this.accounts
+                .Where(x => x.ID != this.selectedAccountNumber && x.Type != AccountDefinitionType.Carryforward)
+                .ToList();
             while (csv.Read())
             {
-                this.ImportBooking(csv, dateField, nameField, textField, valueField);
+                this.ImportBooking(csv, dateField, nameField, textField, valueField, filteredAccounts);
             }
         }
 
@@ -226,7 +247,8 @@ namespace lg2de.SimpleAccounting.Presentation
             string dateField,
             string nameField,
             AccountDefinitionImportMappingColumn textField,
-            string valueField)
+            string valueField,
+            IEnumerable<AccountDefinition> filteredAccounts)
         {
             csv.TryGetField(dateField, out DateTime date);
             if (date < this.RangeMin || date > this.RangeMax)
@@ -253,13 +275,9 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
             }
 
-            var item = new ImportEntryViewModel(this.accounts)
+            var item = new ImportEntryViewModel(filteredAccounts)
             {
-                Date = date,
-                Identifier = this.BookingNumber++,
-                Name = name,
-                Text = text,
-                Value = value
+                Date = date, Name = name, Text = text, Value = value
             };
 
             var modelValue = value.ToModelValue();

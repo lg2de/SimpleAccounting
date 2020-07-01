@@ -764,10 +764,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.messageBox,
                 this,
                 this.currentModelJournal!,
-                this.accountingData!.AllAccounts)
-            {
-                BookingNumber = this.GetMaxBookIdent() + 1
-            };
+                this.accountingData!.AllAccounts,
+                this.GetMaxBookIdent() + 1);
             this.windowManager.ShowDialog(importModel);
         }
 
