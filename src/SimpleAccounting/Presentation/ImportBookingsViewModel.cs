@@ -8,6 +8,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -123,6 +124,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     .Where(x => x.Date >= this.StartDate)
                     .OrderBy(x => x.Date));
 
+        public bool IsForceEnglish { get; set; }
+
         [SuppressMessage(
             "Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
         public ICommand LoadDataCommand => new RelayCommand(
@@ -153,7 +156,13 @@ namespace lg2de.SimpleAccounting.Presentation
                     var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
                     using (var reader = new StreamReader(stream, enc1252!))
                     {
-                        this.ImportBookings(reader, new Configuration());
+                        var configuration = new Configuration();
+                        if (this.IsForceEnglish)
+                        {
+                            configuration.CultureInfo = new CultureInfo("en-us");
+                        }
+
+                        this.ImportBookings(reader, configuration);
                     }
 
                     if (!this.LoadedData.Any())
@@ -201,24 +210,19 @@ namespace lg2de.SimpleAccounting.Presentation
             ImportEntryViewModel ToViewModel(AccountingDataJournalBooking entry)
             {
                 var value = entry.Credit.Sum(x => x.Value).ToViewModel();
+                var me = entry.Debit.First();
                 var remotes = entry.Credit;
                 if (entry.Credit.Any(c => c.Account == this.selectedAccountNumber))
                 {
+                    me = entry.Credit.First();
                     remotes = entry.Debit;
                     value = -value;
                 }
 
-                string text;
                 ulong remoteIdentifier = 0;
                 if (remotes.Count == 1)
                 {
-                    var remote = remotes.First();
-                    text = remote.Text;
-                    remoteIdentifier = remote.Account;
-                }
-                else
-                {
-                    text = "<Diverse>";
+                    remoteIdentifier = remotes.First().Account;
                 }
 
                 return new ImportEntryViewModel(this.accounts)
@@ -226,7 +230,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     IsExisting = true,
                     Identifier = entry.ID,
                     Date = entry.Date.ToDateTime(),
-                    Text = text,
+                    Text = me.Text,
                     Name = "<bereits gebucht>",
                     Value = value,
                     RemoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier)
