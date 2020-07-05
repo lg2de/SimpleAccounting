@@ -5,4 +5,5 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("SimpleAccounting.UnitTests")]
+[assembly: InternalsVisibleTo("SimpleAccounting.IntegrationTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

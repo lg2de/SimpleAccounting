@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <!-- ProjectGuid is required for SonarQube -->
+    <ProjectGuid>{507F5D29-96C7-48C2-966C-58342D08A4A7}</ProjectGuid>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>lg2de.SimpleAccounting.IntegrationTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- license is apache 2.0 -->
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <!-- license is MS.NET -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+    <!-- license is BSD-3-Clause -->
+    <PackageReference Include="NSubstitute" Version="4.2.1" />
+    <!-- license is apache 2.0 -->
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SimpleAccounting\SimpleAccounting.csproj" />
+  </ItemGroup>
+
+</Project>
