@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Windows.Input;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
@@ -13,12 +12,6 @@ namespace lg2de.SimpleAccounting.Presentation
     public class ImportEntryViewModel : JournalBaseViewModel
     {
         private AccountDefinition? remoteAccount;
-
-        public ImportEntryViewModel()
-            : this(Enumerable.Empty<AccountDefinition>())
-        {
-            this.IsExisting = true;
-        }
 
         public ImportEntryViewModel(IEnumerable<AccountDefinition> accounts)
         {
@@ -41,7 +34,9 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        public bool IsExisting { get; }
+        public bool IsExisting { get; set; }
+
+        public bool IsCandidate => !this.IsExisting;
 
         public ICommand ResetRemoteAccountCommand => new RelayCommand(
             _ => this.RemoteAccount = null,

@@ -208,14 +208,28 @@ namespace lg2de.SimpleAccounting.Presentation
                     value = -value;
                 }
 
-                var text = remotes.Count == 1 ? remotes.First().Text : "<Diverse>";
-                return new ImportEntryViewModel
+                string text;
+                ulong remoteIdentifier = 0;
+                if (remotes.Count == 1)
                 {
+                    var remote = remotes.First();
+                    text = remote.Text;
+                    remoteIdentifier = remote.Account;
+                }
+                else
+                {
+                    text = "<Diverse>";
+                }
+
+                return new ImportEntryViewModel(this.accounts)
+                {
+                    IsExisting = true,
                     Identifier = entry.ID,
                     Date = entry.Date.ToDateTime(),
                     Text = text,
                     Name = "<bereits gebucht>",
-                    Value = value
+                    Value = value,
+                    RemoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier)
                 };
             }
         }
@@ -289,10 +303,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             var item = new ImportEntryViewModel(filteredAccounts)
             {
-                Date = date,
-                Name = name,
-                Text = text,
-                Value = value
+                Date = date, Name = name, Text = text, Value = value
             };
 
             var modelValue = value.ToModelValue();
@@ -315,10 +326,11 @@ namespace lg2de.SimpleAccounting.Presentation
                 break;
             }
 
-            if (this.ExistingData.Any(x =>
-                x.Date == item.Date
-                && Math.Abs(x.Value - item.Value) < double.Epsilon
-                && x.Text == item.BuildText()))
+            if (this.ExistingData.Any(
+                x =>
+                    x.Date == item.Date
+                    && Math.Abs(x.Value - item.Value) < double.Epsilon
+                    && x.Text == item.BuildText()))
             {
                 // ignore already existing
                 return;
@@ -343,8 +355,10 @@ namespace lg2de.SimpleAccounting.Presentation
                     ID = importing.Identifier,
                     Followup = importing.IsFollowup
                 };
-                var creditValue = new BookingValue { Value = Math.Abs(importing.Value.ToModelValue()) };
-                creditValue.Text = importing.BuildText();
+                var creditValue = new BookingValue
+                {
+                    Text = importing.BuildText(), Value = Math.Abs(importing.Value.ToModelValue())
+                };
 
                 // start debit with clone of credit
                 var debitValue = creditValue.Clone();

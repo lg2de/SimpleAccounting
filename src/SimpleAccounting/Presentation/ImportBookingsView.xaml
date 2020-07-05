@@ -16,6 +16,7 @@
                 <Setter Property="Height" Value="30" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </DockPanel.Resources>
         <TextBlock
             DockPanel.Dock="Top"
@@ -74,13 +75,19 @@
                 <DataGridTemplateColumn
                     Header="Gegenkonto" MinWidth="150">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ComboBox
-                                Margin="0"
-                                ItemsSource="{Binding Accounts}"
-                                SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                                TextSearch.TextPath="Name" />
+                        <DataTemplate DataType="{x:Type local:ImportEntryViewModel}">
+                            <Grid>
+                                <ComboBox
+                                    Margin="0"
+                                    Visibility="{Binding IsCandidate, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    ItemsSource="{Binding Accounts}"
+                                    SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    ItemTemplate="{StaticResource AccountSelectionTemplate}"
+                                    TextSearch.TextPath="Name" />
+                                <ContentControl
+                                    Visibility="{Binding IsExisting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Content="{Binding RemoteAccount}" ContentTemplate="{StaticResource AccountSelectionTemplate}" />
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
