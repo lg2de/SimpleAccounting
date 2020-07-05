@@ -59,11 +59,11 @@ namespace lg2de.SimpleAccounting.Presentation
                             ID = 999,
                             Credit = new List<BookingValue>
                             {
-                                new BookingValue { Account = 100, Text = "End of year" }
+                                new BookingValue { Account = 100, Text = "End of year", Value = 1234 }
                             },
                             Debit = new List<BookingValue>
                             {
-                                new BookingValue { Account = 990, Text = "End of year" }
+                                new BookingValue { Account = 990, Text = "End of year", Value = 1234 }
                             }
                         }
                     }
@@ -90,8 +90,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     Name = "McX",
                     Text = "Shoes",
                     RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
-                    Value = 99.95,
-                    IsFollowup = true
+                    Value = 99.95
                 });
             this.LoadedData.Add(
                 new ImportEntryViewModel(SampleAccounts)
@@ -99,11 +98,12 @@ namespace lg2de.SimpleAccounting.Presentation
                     Date = DateTime.Now + TimeSpan.FromDays(1),
                     Name = "McY",
                     Text = "More Shoes",
-                    Value = 99.95
+                    Value = 159.95,
+                    IsFollowup = true
                 });
 
-            this.UpdateIdentifierInLoadedData();
             this.SetupExisting();
+            this.UpdateIdentifierInLoadedData();
         }
     }
 }

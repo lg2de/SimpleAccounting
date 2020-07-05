@@ -83,13 +83,11 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.selectedAccountNumber = value;
                 this.NotifyOfPropertyChange();
 
-                var bookings = this.Journal.Booking?.Where(
-                    x => x.Credit.Any(c => c.Account == this.selectedAccountNumber) ||
-                         x.Debit.Any(d => d.Account == this.selectedAccountNumber));
-                var last = bookings?.DefaultIfEmpty(null).Max(x => x?.Date);
-                if (last.HasValue)
+                this.SetupExisting();
+                var last = this.ExistingData.LastOrDefault();
+                if (last != null)
                 {
-                    this.StartDate = last.Value.ToDateTime();
+                    this.StartDate = last.Date + TimeSpan.FromDays(1);
                     this.NotifyOfPropertyChange(nameof(this.StartDate));
                 }
             }
@@ -164,7 +162,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     }
 
                     this.UpdateIdentifierInLoadedData();
-                    this.SetupExisting();
+                    this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
                 }
                 catch (IOException e)
                 {
@@ -197,15 +195,29 @@ namespace lg2de.SimpleAccounting.Presentation
                     .Where(
                         x => x.Credit.Any(c => c.Account == this.selectedAccountNumber)
                              || x.Debit.Any(d => d.Account == this.selectedAccountNumber))
-                    .Select(
-                        x => new ImportEntryViewModel
-                        {
-                            Identifier = x.ID,
-                            Date = x.Date.ToDateTime(),
-                            Text = x.Credit.First().Text,
-                            Name = "<bereits gebucht>"
-                        }));
+                    .Select(ToViewModel));
             this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
+
+            ImportEntryViewModel ToViewModel(AccountingDataJournalBooking entry)
+            {
+                var value = entry.Credit.Sum(x => x.Value).ToViewModel();
+                var remotes = entry.Credit;
+                if (entry.Credit.Any(c => c.Account == this.selectedAccountNumber))
+                {
+                    remotes = entry.Debit;
+                    value = -value;
+                }
+
+                var text = remotes.Count == 1 ? remotes.First().Text : "<Diverse>";
+                return new ImportEntryViewModel
+                {
+                    Identifier = entry.ID,
+                    Date = entry.Date.ToDateTime(),
+                    Text = text,
+                    Name = "<bereits gebucht>",
+                    Value = value
+                };
+            }
         }
 
         internal void ImportBookings(TextReader reader, Configuration configuration)
@@ -277,7 +289,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
             var item = new ImportEntryViewModel(filteredAccounts)
             {
-                Date = date, Name = name, Text = text, Value = value
+                Date = date,
+                Name = name,
+                Text = text,
+                Value = value
             };
 
             var modelValue = value.ToModelValue();
@@ -300,6 +315,15 @@ namespace lg2de.SimpleAccounting.Presentation
                 break;
             }
 
+            if (this.ExistingData.Any(x =>
+                x.Date == item.Date
+                && Math.Abs(x.Value - item.Value) < double.Epsilon
+                && x.Text == item.BuildText()))
+            {
+                // ignore already existing
+                return;
+            }
+
             this.LoadedData.Add(item);
         }
 
@@ -320,20 +344,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     Followup = importing.IsFollowup
                 };
                 var creditValue = new BookingValue { Value = Math.Abs(importing.Value.ToModelValue()) };
-
-                // build booking text from name and/or text
-                if (string.IsNullOrWhiteSpace(importing.Text))
-                {
-                    creditValue.Text = importing.Name;
-                }
-                else if (string.IsNullOrWhiteSpace(importing.Name))
-                {
-                    creditValue.Text = importing.Text;
-                }
-                else
-                {
-                    creditValue.Text = $"{importing.Name} - {importing.Text}";
-                }
+                creditValue.Text = importing.BuildText();
 
                 // start debit with clone of credit
                 var debitValue = creditValue.Clone();

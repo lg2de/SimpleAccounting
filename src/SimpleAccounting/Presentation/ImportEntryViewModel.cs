@@ -46,5 +46,21 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand ResetRemoteAccountCommand => new RelayCommand(
             _ => this.RemoteAccount = null,
             _ => this.RemoteAccount != null);
+
+        internal string BuildText()
+        {
+            // build booking text from name and/or text
+            if (string.IsNullOrWhiteSpace(this.Text))
+            {
+                return this.Name;
+            }
+
+            if (string.IsNullOrWhiteSpace(this.Name))
+            {
+                return this.Text;
+            }
+
+            return $"{this.Name} - {this.Text}";
+        }
     }
 }
