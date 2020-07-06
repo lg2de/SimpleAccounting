@@ -18,6 +18,70 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     public class ImportBookingsViewModelTests
     {
         [Fact]
+        public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
+        {
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = project.AllAccounts.ToList();
+            var sut = new ImportBookingsViewModel(
+                null,
+                null,
+                project.Journal.Last(),
+                accounts,
+                0);
+
+            sut.SelectedAccountNumber = 100;
+
+            sut.ImportDataFiltered.Should().BeEmpty("start date should be set after last booking");
+            sut.ExistingData.Should().BeEquivalentTo(
+                new
+                {
+                    Date = new DateTime(2020, 1, 1),
+                    Identifier = 1,
+                    Name = "<bereits gebucht>",
+                    Text = "Open 1",
+                    Value = 1000,
+                    RemoteAccount = new { ID = 990 }
+                },
+                new
+                {
+                    Date = new DateTime(2020, 1, 28),
+                    Identifier = 3,
+                    Name = "<bereits gebucht>",
+                    Text = "Salary",
+                    Value = 200,
+                    RemoteAccount = (AccountDefinition)null
+                },
+                new
+                {
+                    Date = new DateTime(2020, 1, 29),
+                    Identifier = 4,
+                    Name = "<bereits gebucht>",
+                    Text = "Credit rate",
+                    Value = -400,
+                    RemoteAccount = new { ID = 5000 }
+                },
+                new
+                {
+                    Date = new DateTime(2020, 2, 1),
+                    Identifier = 5,
+                    Name = "<bereits gebucht>",
+                    Text = "Shoes",
+                    Value = -50,
+                    RemoteAccount = (AccountDefinition)null
+                },
+                new
+                {
+                    Date = new DateTime(2020, 2, 5),
+                    Identifier = 6,
+                    Name = "<bereits gebucht>",
+                    Text = "Rent to friend",
+                    Value = -99,
+                    RemoteAccount = new { ID = 6000 }
+                });
+        }
+
+        [Fact]
         public void ImportBookings_SampleData_AccountsFiltered()
         {
             AccountingData project = Samples.SampleProject;
@@ -38,10 +102,25 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             AccountingData project = Samples.SampleProject;
             var accounts = project.AllAccounts.ToList();
+            var dataJournal = project.Journal.First();
+            dataJournal.Booking.Add(
+                new AccountingDataJournalBooking
+                {
+                    ID = 1,
+                    Date = 20000115,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Shopping Mall - Shoes", Value = 5000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 600, Text = "Shopping Mall - Shoes", Value = 5000 },
+                    }
+                });
             var sut = new ImportBookingsViewModel(
                 null,
                 null,
-                project.Journal.First(),
+                dataJournal,
                 accounts,
                 0)
             {
@@ -51,10 +130,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             {
                 new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
             };
+            sut.SelectedAccountNumber = sut.SelectedAccount.ID;
 
             var input = @"
 Date;Name;Text;Value
 1999-12-31;NameIgnore;TextIgnore;12.34
+2000-01-15;Shopping Mall;Shoes;-50.00
 2000-12-01;Name1;Text1;12.34
 2000-12-31;Name2;Text2;-42.42
 2001-01-01;Name3;Text3;99.99";
@@ -65,6 +146,7 @@ Date;Name;Text;Value
                     new Configuration { Delimiter = ";", CultureInfo = new CultureInfo("en-us") });
             }
 
+            sut.LoadedData.Should().NotContain(x => x.Name == "Shopping Mall", "entry is already imported");
             sut.LoadedData.Should().BeEquivalentTo(
                 new
                 {
