@@ -49,6 +49,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.RangeMin = this.Journal.DateStart.ToDateTime();
             this.RangeMax = this.Journal.DateEnd.ToDateTime();
+            this.StartDate = this.RangeMin;
 
             // ReSharper disable once VirtualMemberCallInConstructor
             this.DisplayName = "Import von Kontodaten";
@@ -181,7 +182,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand BookAllCommand => new RelayCommand(
             _ => this.ProcessData(),
-            _ => this.LoadedData.All(x => x.RemoteAccount != null || x.IsExisting));
+            _ => this.LoadedData.All(x => x.RemoteAccount != null || x.IsSkip || x.IsExisting));
 
         public ICommand BookMappedCommand => new RelayCommand(
             _ => this.ProcessData(),
@@ -347,6 +348,12 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             foreach (var importing in this.LoadedData)
             {
+                if (importing.IsSkip)
+                {
+                    // ignore
+                    continue;
+                }
+
                 if (importing.RemoteAccount == null)
                 {
                     // mapping missing - abort

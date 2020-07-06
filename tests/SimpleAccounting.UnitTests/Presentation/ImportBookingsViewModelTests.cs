@@ -117,20 +117,18 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                         new BookingValue { Account = 600, Text = "Shopping Mall - Shoes", Value = 5000 },
                     }
                 });
+            var bankAccount = accounts.Single(x => x.Name == "Bank account");
+            bankAccount.ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
+            {
+                new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
+            };
             var sut = new ImportBookingsViewModel(
                 null,
                 null,
                 dataJournal,
                 accounts,
-                0)
-            {
-                SelectedAccount = accounts.Single(x => x.Name == "Bank account")
-            };
-            sut.SelectedAccount.ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
-            {
-                new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
-            };
-            sut.SelectedAccountNumber = sut.SelectedAccount.ID;
+                0) { SelectedAccount = bankAccount };
+            sut.SelectedAccountNumber = bankAccount.ID;
 
             var input = @"
 Date;Name;Text;Value
@@ -157,6 +155,81 @@ Date;Name;Text;Value
                     RemoteAccount = new { ID = 600 }
                 },
                 new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
+        }
+
+        [Fact]
+        public void BookAllCommand_EntryNotMapped_CannotExecute()
+        {
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = project.AllAccounts.ToList();
+            var sut = new ImportBookingsViewModel(
+                null,
+                null,
+                project.Journal.Last(),
+                accounts,
+                0);
+            sut.LoadedData.Add(
+                new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = false, IsExisting = false });
+
+            sut.BookAllCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void BookAllCommand_EntryMapped_CanExecute()
+        {
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = project.AllAccounts.ToList();
+            var sut = new ImportBookingsViewModel(
+                null,
+                null,
+                project.Journal.Last(),
+                accounts,
+                0);
+            sut.LoadedData.Add(
+                new ImportEntryViewModel(accounts)
+                {
+                    RemoteAccount = accounts.First(), IsSkip = false, IsExisting = false
+                });
+
+            sut.BookAllCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void BookAllCommand_EntrySkipped_CanExecute()
+        {
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = project.AllAccounts.ToList();
+            var sut = new ImportBookingsViewModel(
+                null,
+                null,
+                project.Journal.Last(),
+                accounts,
+                0);
+            sut.LoadedData.Add(
+                new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = true, IsExisting = false });
+
+            sut.BookAllCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void BookAllCommand_EntryExisting_CannotExecute()
+        {
+            AccountingData project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = project.AllAccounts.ToList();
+            var sut = new ImportBookingsViewModel(
+                null,
+                null,
+                project.Journal.Last(),
+                accounts,
+                0);
+            sut.LoadedData.Add(
+                new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = false, IsExisting = true });
+
+            sut.BookAllCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]

@@ -12,6 +12,7 @@ namespace lg2de.SimpleAccounting.Presentation
     public class ImportEntryViewModel : JournalBaseViewModel
     {
         private AccountDefinition? remoteAccount;
+        private bool isSkip;
 
         public ImportEntryViewModel(IEnumerable<AccountDefinition> accounts)
         {
@@ -23,6 +24,21 @@ namespace lg2de.SimpleAccounting.Presentation
         public string Name { get; set; } = string.Empty;
 
         public double Value { get; set; }
+
+        public bool IsSkip
+        {
+            get => this.isSkip;
+            set
+            {
+                if (value == this.isSkip)
+                {
+                    return;
+                }
+
+                this.isSkip = value;
+                this.NotifyOfPropertyChange();
+            }
+        }
 
         public AccountDefinition? RemoteAccount
         {

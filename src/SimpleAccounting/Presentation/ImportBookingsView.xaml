@@ -17,6 +17,7 @@
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         </DockPanel.Resources>
         <StackPanel
             DockPanel.Dock="Top"
@@ -88,6 +89,7 @@
                     Header="Betrag"
                     Binding="{Binding Value, StringFormat=\{0:0.00\}}"
                     ElementStyle="{StaticResource ValueGridStyle}" />
+                <DataGridCheckBoxColumn Header="Überspringen" Binding="{Binding IsSkip, UpdateSourceTrigger=PropertyChanged}" />
                 <DataGridTemplateColumn
                     Header="Gegenkonto" MinWidth="150">
                     <DataGridTemplateColumn.CellTemplate>
@@ -96,6 +98,7 @@
                                 <ComboBox
                                     Margin="0"
                                     Visibility="{Binding IsCandidate, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    IsEnabled="{Binding IsSkip, Converter={StaticResource InverseBooleanConverter}}"
                                     ItemsSource="{Binding Accounts}"
                                     SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                     ItemTemplate="{StaticResource AccountSelectionTemplate}"

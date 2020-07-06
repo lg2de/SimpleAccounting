@@ -90,7 +90,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     Name = "McX",
                     Text = "Shoes",
                     RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
-                    Value = 99.95
+                    Value = 99.95,
+                    IsFollowup = true
                 });
             this.LoadedData.Add(
                 new ImportEntryViewModel(SampleAccounts)
@@ -99,7 +100,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     Name = "McY",
                     Text = "More Shoes",
                     Value = 159.95,
-                    IsFollowup = true
+                    IsSkip = true
                 });
 
             this.SetupExisting();
