@@ -33,6 +33,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly ShellViewModel parent;
         private ulong selectedAccountNumber;
         private DateTime startDate;
+        private bool isBusy;
 
         public ImportBookingsViewModel(
             IMessageBox messageBox,
@@ -127,57 +128,41 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool IsForceEnglish { get; set; }
 
+        public bool IsBusy
+        {
+            get => this.isBusy;
+            private set
+            {
+                if (value == this.isBusy)
+                {
+                    return;
+                }
+
+                this.isBusy = value;
+                this.NotifyOfPropertyChange();
+            }
+        }
+
         [SuppressMessage(
             "Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
         public ICommand LoadDataCommand => new RelayCommand(
             _ =>
             {
-                string fileName = string.Empty;
-                try
+                this.IsBusy = true;
+
+                using var openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
-                    using var openFileDialog = new System.Windows.Forms.OpenFileDialog
-                    {
-                        Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
-                    };
+                    Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
+                };
 
-                    if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    {
-                        return;
-                    }
-
-                    // TODO BUSY
-
-                    fileName = openFileDialog.FileName;
-                    this.LoadedData.Clear();
-
-                    // note, the stream is disposed by the reader
-                    var stream = new FileStream(
-                        fileName, FileMode.Open, FileAccess.Read,
-                        FileShare.ReadWrite);
-                    var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-                    using (var reader = new StreamReader(stream, enc1252!))
-                    {
-                        var configuration = new Configuration();
-                        if (this.IsForceEnglish)
-                        {
-                            configuration.CultureInfo = new CultureInfo("en-us");
-                        }
-
-                        this.ImportBookings(reader, configuration);
-                    }
-
-                    if (!this.LoadedData.Any())
-                    {
-                        this.messageBox.Show($"No relevant data found in {openFileDialog.FileName}.", "Import");
-                    }
-
-                    this.UpdateIdentifierInLoadedData();
-                    this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
-                }
-                catch (IOException e)
+                if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 {
-                    this.messageBox.Show($"Failed to load file '{fileName}':\n{e.Message}", "Import");
+                    return;
                 }
+
+                this.OnLoadData(openFileDialog.FileName);
+
+                this.IsBusy = false;
             }, _ => this.SelectedAccount != null);
 
         public ICommand BookAllCommand => new RelayCommand(
@@ -236,6 +221,42 @@ namespace lg2de.SimpleAccounting.Presentation
                     Value = value,
                     RemoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier)
                 };
+            }
+        }
+
+        internal void OnLoadData(string fileName)
+        {
+            try
+            {
+                this.LoadedData.Clear();
+
+                // note, the stream is disposed by the reader
+                var stream = new FileStream(
+                    fileName, FileMode.Open, FileAccess.Read,
+                    FileShare.ReadWrite);
+                var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
+                using (var reader = new StreamReader(stream, enc1252!))
+                {
+                    var configuration = new Configuration();
+                    if (this.IsForceEnglish)
+                    {
+                        configuration.CultureInfo = new CultureInfo("en-us");
+                    }
+
+                    this.ImportBookings(reader, configuration);
+                }
+
+                if (!this.LoadedData.Any())
+                {
+                    this.messageBox.Show($"No relevant data found in {fileName}.", "Import");
+                }
+
+                this.UpdateIdentifierInLoadedData();
+                this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
+            }
+            catch (IOException e)
+            {
+                this.messageBox.Show($"Failed to load file '{fileName}':\n{e.Message}", "Import");
             }
         }
 
@@ -312,7 +333,9 @@ namespace lg2de.SimpleAccounting.Presentation
             };
 
             var modelValue = value.ToModelValue();
-            foreach (var importMapping in this.SelectedAccount!.ImportMapping.Patterns)
+            var patterns = this.SelectedAccount?.ImportMapping?.Patterns
+                           ?? Enumerable.Empty<AccountDefinitionImportMappingPattern>();
+            foreach (var importMapping in patterns)
             {
                 if (!Regex.IsMatch(text, importMapping.Expression))
                 {

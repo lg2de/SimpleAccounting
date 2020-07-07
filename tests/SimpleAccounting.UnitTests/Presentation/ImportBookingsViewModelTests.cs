@@ -100,7 +100,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookings_SampleInput_DataImported()
         {
-            AccountingData project = Samples.SampleProject;
+            var project = Samples.SampleProject;
             var accounts = project.AllAccounts.ToList();
             var dataJournal = project.Journal.First();
             dataJournal.Booking.Add(
@@ -122,13 +122,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             {
                 new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
             };
-            var sut = new ImportBookingsViewModel(
-                null,
-                null,
-                dataJournal,
-                accounts,
-                0) { SelectedAccount = bankAccount };
-            sut.SelectedAccountNumber = bankAccount.ID;
+            var sut = new ImportBookingsViewModel(null, null, dataJournal, accounts, 0)
+            {
+                SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID
+            };
 
             var input = @"
 Date;Name;Text;Value
@@ -152,7 +149,7 @@ Date;Name;Text;Value
                     Name = "Name1",
                     Text = "Text1",
                     Value = 12.34,
-                    RemoteAccount = new { ID = 600 }
+                    RemoteAccount = new { ID = 600 } // because of mapping pattern
                 },
                 new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
         }
