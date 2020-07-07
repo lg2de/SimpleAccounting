@@ -230,7 +230,7 @@ Date;Name;Text;Value
         }
 
         [Fact]
-        public void ProcessData_SampleData_DataConverted()
+        public void ProcessData_SampleData_DataConvertedIntoJournal()
         {
             var parent = new ShellViewModel(null, null, null, null, null, null);
             var project = Samples.SampleProject;
@@ -271,13 +271,23 @@ Date;Name;Text;Value
                     Identifier = 103,
                     Name = "Name",
                     Value = -1,
-                    RemoteAccount = remoteAccount
+                    RemoteAccount = remoteAccount,
+                    IsSkip = true
                 });
             sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts)
                 {
                     Date = new DateTime(year, 1, 3),
                     Identifier = 104,
+                    Name = "Name",
+                    Value = -1,
+                    RemoteAccount = remoteAccount
+                });
+            sut.LoadedData.Add(
+                new ImportEntryViewModel(accounts)
+                {
+                    Date = new DateTime(year, 1, 3),
+                    Identifier = 105,
                     Name = "Ignore",
                     Value = -2,
                     RemoteAccount = null
@@ -304,7 +314,7 @@ Date;Name;Text;Value
                 },
                 new
                 {
-                    Identifier = 103,
+                    Identifier = 104,
                     Text = "Name",
                     Value = 1,
                     CreditAccount = "100 (Bank account)",
