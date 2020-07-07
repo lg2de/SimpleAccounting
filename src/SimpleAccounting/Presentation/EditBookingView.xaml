@@ -9,9 +9,6 @@
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=local:EditBookingDesignViewModel, IsDesignTimeCreatable=True}"
     d:DesignWidth="600" d:DesignHeight="500">
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding DefaultCommand, Mode=OneWay}" />
     </UserControl.InputBindings>
