@@ -8,9 +8,12 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Windows;
     using FluentAssertions;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
+    using NSubstitute;
     using Xunit;
 
     public class ImportBookingsViewModelTests
@@ -82,10 +85,11 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
                 }
             };
 
+            var messageBox = Substitute.For<IMessageBox>();
             var accounts = project.AllAccounts.ToList();
             var dataJournal = project.Journal.First();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
-            var sut = new ImportBookingsViewModel(null, null, dataJournal, accounts, 0)
+            var sut = new ImportBookingsViewModel(messageBox, null, dataJournal, accounts, 0)
             {
                 SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID, IsForceEnglish = true
             };
@@ -105,6 +109,11 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
             sut.LoadedData.Should().BeEquivalentTo(
                 new { Date = new DateTime(2000, 12, 1), Name = "Name1", Text = "Text1", Value = 12.34 },
                 new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
+            messageBox.DidNotReceive().Show(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
         }
     }
 }
