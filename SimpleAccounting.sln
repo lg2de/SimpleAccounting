@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAccounting", "src\Sim
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAccounting.UnitTests", "tests\SimpleAccounting.UnitTests\SimpleAccounting.UnitTests.csproj", "{E77B3647-FBC9-4138-A0D5-C9165EF45417}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAccounting.IntegrationTests", "tests\SimpleAccounting.IntegrationTests\SimpleAccounting.IntegrationTests.csproj", "{507F5D29-96C7-48C2-966C-58342D08A4A7}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{3F74D64E-D629-4AC0-A60B-29ED0C265896}"
 	ProjectSection(SolutionItems) = preProject
 		samples\MainView.png = samples\MainView.png
@@ -46,6 +48,10 @@ Global
 		{E77B3647-FBC9-4138-A0D5-C9165EF45417}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E77B3647-FBC9-4138-A0D5-C9165EF45417}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E77B3647-FBC9-4138-A0D5-C9165EF45417}.Release|Any CPU.Build.0 = Release|Any CPU
+		{507F5D29-96C7-48C2-966C-58342D08A4A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{507F5D29-96C7-48C2-966C-58342D08A4A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{507F5D29-96C7-48C2-966C-58342D08A4A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{507F5D29-96C7-48C2-966C-58342D08A4A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

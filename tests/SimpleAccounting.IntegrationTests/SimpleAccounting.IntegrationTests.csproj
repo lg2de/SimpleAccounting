@@ -2,9 +2,9 @@
 
   <PropertyGroup Label="Globals">
     <!-- ProjectGuid is required for SonarQube -->
-    <ProjectGuid>{E77B3647-FBC9-4138-A0D5-C9165EF45417}</ProjectGuid>
+    <ProjectGuid>{507F5D29-96C7-48C2-966C-58342D08A4A7}</ProjectGuid>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>lg2de.SimpleAccounting.UnitTests</RootNamespace>
+    <RootNamespace>lg2de.SimpleAccounting.IntegrationTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,22 +14,12 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <!-- license is BSD-3-Clause -->
     <PackageReference Include="NSubstitute" Version="4.2.2" />
-    <!-- license is MIT -->
-    <PackageReference Include="OpenCover" Version="4.7.922" />
-    <!-- license is apache 2.0 -->
-    <PackageReference Include="ReportGenerator" Version="4.6.1" />
     <!-- license is apache 2.0 -->
     <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.console" Version="2.4.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <!-- license is MS.PL -->
-    <PackageReference Include="Xunit.StaFact" Version="0.3.18" />
   </ItemGroup>
 
   <ItemGroup>

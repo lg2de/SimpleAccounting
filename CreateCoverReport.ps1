@@ -10,7 +10,7 @@ if (Test-Path $PSScriptRoot\CoverOutput) {
   Remove-Item $PSScriptRoot\CoverOutput -Confirm:$false -Force -Recurse
 }
 $dummy = md $PSScriptRoot\CoverOutput
-$coverageFilter = "+[SimpleAccounting*]* -[SimpleAccounting.UnitTests*]*"
+$coverageFilter = "+[SimpleAccounting*]* -[SimpleAccounting.*Tests*]*"
 $coverageAttributeExclude = "*ExcludeFromCodeCoverage*"
 $coverageFileExclude = "*.designer.cs;*.g.cs"
 $outputFile = "$PSScriptRoot\CoverOutput\coverage.xml"

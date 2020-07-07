@@ -82,28 +82,10 @@ namespace lg2de.SimpleAccounting.Infrastructure
             this.process.Start(info);
         }
 
-        internal bool AskForUpdate(IEnumerable<Release> releases, string currentVersion)
-        {
-            this.newRelease = releases.GetNewRelease(currentVersion);
-            if (this.newRelease == null)
-            {
-                this.messageBox.Show("Sie verwenden die neueste Version.", Caption);
-                return false;
-            }
-
-            var result = this.messageBox.Show(
-                $"Wollen Sie auf die neue Version {this.newRelease.TagName} aktualisieren?",
-                Caption,
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No);
-            return result == MessageBoxResult.Yes;
-        }
-
         [SuppressMessage(
             "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
             Justification = "catch exceptions from external library")]
-        private async Task<IEnumerable<Release>> GetAllReleasesAsync()
+        internal async Task<IEnumerable<Release>> GetAllReleasesAsync()
         {
             return await Task.Run(
                 async () =>
@@ -123,6 +105,24 @@ namespace lg2de.SimpleAccounting.Infrastructure
                         return Enumerable.Empty<Release>();
                     }
                 });
+        }
+
+        internal bool AskForUpdate(IEnumerable<Release> releases, string currentVersion)
+        {
+            this.newRelease = releases.GetNewRelease(currentVersion);
+            if (this.newRelease == null)
+            {
+                this.messageBox.Show("Sie verwenden die neueste Version.", Caption);
+                return false;
+            }
+
+            var result = this.messageBox.Show(
+                $"Wollen Sie auf die neue Version {this.newRelease.TagName} aktualisieren?",
+                Caption,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No);
+            return result == MessageBoxResult.Yes;
         }
     }
 }
