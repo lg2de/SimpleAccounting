@@ -21,6 +21,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
         [Fact]
         public void ImportBookings_SampleInput_DataImported()
         {
+            #region project definition
             var project = new AccountingData
             {
                 Accounts = new List<AccountingDataAccountGroup>
@@ -84,6 +85,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
                     }
                 }
             };
+            #endregion
 
             var messageBox = Substitute.For<IMessageBox>();
             var accounts = project.AllAccounts.ToList();
@@ -97,23 +99,24 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
             var fileName = Path.GetTempFileName();
             var stream = this.GetType().Assembly.GetManifestResourceStream(
                 "lg2de.SimpleAccounting.IntegrationTests.Ressources.import.csv");
-            stream.Should().NotBeNull();
-            using var reader = new StreamReader(stream);
+            stream?.Length.Should().Be(83);
+            using var reader = new StreamReader(stream!);
             var script = reader.ReadToEnd();
             File.WriteAllText(fileName, script);
+            new FileInfo(fileName).Length.Should().Be(stream.Length);
 
             sut.OnLoadData(fileName);
 
             File.Delete(fileName);
 
-            sut.LoadedData.Should().BeEquivalentTo(
-                new { Date = new DateTime(2000, 12, 1), Name = "Name1", Text = "Text1", Value = 12.34 },
-                new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
             messageBox.DidNotReceive().Show(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            sut.LoadedData.Should().BeEquivalentTo(
+                new { Date = new DateTime(2000, 12, 1), Name = "Name1", Text = "Text1", Value = 12.34 },
+                new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
         }
     }
 }

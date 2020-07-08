@@ -282,7 +282,7 @@ namespace lg2de.SimpleAccounting.Presentation
             csv.Read();
             if (!csv.ReadHeader())
             {
-                return;
+                throw new InvalidOperationException("Missing file header.");
             }
 
             var filteredAccounts = this.accounts
