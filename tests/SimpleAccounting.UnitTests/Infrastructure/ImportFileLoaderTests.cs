@@ -29,13 +29,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             {
                 new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
             };
+            bankAccount.ImportMapping.Columns.Single(x => x.Source == "Text").IgnorePattern = "ignore.*this";
             var sut = new ImportFileLoader("dummy", new CultureInfo("en-us"), accounts, bankAccount.ImportMapping);
 
             var input = @"
 Date,Name,Text,Value
 2000-01-15,Shopping Mall,Shoes,-50.00
 2000-12-01,Name1,Text1,12.34
-2000-12-31,Name2,Text2,-42.42";
+2000-12-31,Name2,Text2a ignore only this Text2b,-42.42";
             List<ImportEntryViewModel> result;
             using (var inputStream = new StringReader(input))
             {
@@ -52,7 +53,7 @@ Date,Name,Text,Value
                     Value = 12.34,
                     RemoteAccount = new { ID = 600 } // because of mapping pattern
                 },
-                new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
+                new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2a Text2b", Value = -42.42 });
         }
 
     }

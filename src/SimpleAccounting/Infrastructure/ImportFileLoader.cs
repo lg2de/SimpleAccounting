@@ -23,6 +23,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
         private readonly CultureInfo cultureInfo;
         private readonly string fileName;
         private readonly AccountDefinitionImportMapping importMapping;
+        private readonly Regex duplicateSpaceExpression = new Regex(@"\s+", RegexOptions.Compiled);
 
         private StreamReader? reader;
 
@@ -116,6 +117,8 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 {
                     text = Regex.Replace(text, textField.IgnorePattern, string.Empty);
                 }
+
+                text = this.duplicateSpaceExpression.Replace(text, " ");
             }
 
             var item = new ImportEntryViewModel(this.accounts) { Date = date, Name = name, Text = text, Value = value };
