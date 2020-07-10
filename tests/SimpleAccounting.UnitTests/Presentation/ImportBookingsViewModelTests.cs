@@ -128,17 +128,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             };
 
             var input = @"
-Date;Name;Text;Value
-1999-12-31;NameIgnore;TextIgnore;12.34
-2000-01-15;Shopping Mall;Shoes;-50.00
-2000-12-01;Name1;Text1;12.34
-2000-12-31;Name2;Text2;-42.42
-2001-01-01;Name3;Text3;99.99";
+Date,Name,Text,Value
+1999-12-31,NameIgnore,TextIgnore,12.34
+2000-01-15,Shopping Mall,Shoes,-50.00
+2000-12-01,Name1,Text1,12.34
+2000-12-31,Name2,Text2,-42.42
+2001-01-01,Name3,Text3,99.99";
             using (var inputStream = new StringReader(input))
             {
-                sut.ImportBookings(
-                    inputStream,
-                    new Configuration { Delimiter = ";", CultureInfo = new CultureInfo("en-us") });
+                sut.ImportBookings(inputStream, new CsvConfiguration(new CultureInfo("en-us")));
             }
 
             sut.LoadedData.Should().NotContain(x => x.Name == "Shopping Mall", "entry is already imported");

@@ -240,7 +240,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
                 using (var reader = new StreamReader(stream, enc1252!))
                 {
-                    var configuration = new Configuration();
+                    var configuration = new CsvConfiguration(CultureInfo.CurrentCulture);
                     if (this.IsForceEnglish)
                     {
                         configuration.CultureInfo = new CultureInfo("en-us");
@@ -263,7 +263,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        internal void ImportBookings(TextReader reader, Configuration configuration)
+        internal void ImportBookings(TextReader reader, CsvConfiguration configuration)
         {
             var dateField =
                 this.SelectedAccount!.ImportMapping.Columns
@@ -283,9 +283,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
             using var csv = new CsvReader(reader, configuration);
             csv.Read();
-            if (!csv.ReadHeader())
+            if (!csv.ReadHeader() || csv.Context.HeaderRecord.Length <= 2)
             {
-                throw new InvalidOperationException("Missing file header.");
+                throw new InvalidOperationException("Missing or incomplete file header.");
             }
 
             var filteredAccounts = this.accounts
@@ -308,7 +308,8 @@ namespace lg2de.SimpleAccounting.Presentation
             csv.TryGetField(dateField, out DateTime date);
             if (date < this.RangeMin || date > this.RangeMax)
             {
-                throw new ArgumentException($"Invalid date {date}");
+                // ignore data outside booking year
+                return;
             }
 
             // date and value are checked by RelayCommand
@@ -364,7 +365,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     && x.Text == item.BuildText()))
             {
                 // ignore already existing
-                throw new ArgumentException("Already existing.");
+                return;
             }
 
             this.LoadedData.Add(item);
