@@ -13,6 +13,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
+    using System.Windows.Data;
     using System.Windows.Input;
     using Caliburn.Micro;
     using CsvHelper;
@@ -305,7 +306,7 @@ namespace lg2de.SimpleAccounting.Presentation
             csv.TryGetField(dateField, out DateTime date);
             if (date < this.RangeMin || date > this.RangeMax)
             {
-                return;
+                throw new ArgumentException($"Invalid date {date}");
             }
 
             // date and value are checked by RelayCommand
@@ -361,7 +362,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     && x.Text == item.BuildText()))
             {
                 // ignore already existing
-                return;
+                throw new ArgumentException("Already existing.");
             }
 
             this.LoadedData.Add(item);

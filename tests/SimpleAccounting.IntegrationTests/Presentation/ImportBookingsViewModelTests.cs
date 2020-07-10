@@ -99,11 +99,11 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
             var fileName = Path.GetTempFileName();
             var stream = this.GetType().Assembly.GetManifestResourceStream(
                 "lg2de.SimpleAccounting.IntegrationTests.Ressources.import.csv");
-            stream?.Length.Should().Be(83);
             using var reader = new StreamReader(stream!);
             var script = reader.ReadToEnd();
             File.WriteAllText(fileName, script);
-            new FileInfo(fileName).Length.Should().Be(stream.Length);
+
+            File.ReadAllText(fileName).Should().HaveLength(83);
 
             sut.OnLoadData(fileName);
 
