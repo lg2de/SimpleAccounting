@@ -25,7 +25,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
         private readonly AccountDefinitionImportMapping importMapping;
         private readonly Regex duplicateSpaceExpression = new Regex(@"\s+", RegexOptions.Compiled);
 
-        private StreamReader? reader;
+        private StreamReader? streamReader;
 
         public ImportFileLoader(
             string fileName,
@@ -41,7 +41,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
         public void Dispose()
         {
-            this.reader?.Dispose();
+            this.streamReader?.Dispose();
         }
 
         public IEnumerable<ImportEntryViewModel> Load()
@@ -51,9 +51,9 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 this.fileName, FileMode.Open, FileAccess.Read,
                 FileShare.ReadWrite);
             var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-            this.reader = new StreamReader(stream, enc1252!);
+            this.streamReader = new StreamReader(stream, enc1252!);
             var configuration = new CsvConfiguration(this.cultureInfo);
-            return this.ImportBookings(this.reader, configuration);
+            return this.ImportBookings(this.streamReader, configuration);
         }
 
         internal IEnumerable<ImportEntryViewModel> ImportBookings(TextReader reader, CsvConfiguration configuration)
@@ -83,15 +83,11 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
             while (csv.Read())
             {
-                var item = this.ImportBooking(csv, dateField, nameField, textField, valueField);
-                if (item != null)
-                {
-                    yield return item;
-                }
+                yield return this.ImportBooking(csv, dateField, nameField, textField, valueField);
             }
         }
 
-        internal ImportEntryViewModel? ImportBooking(
+        internal ImportEntryViewModel ImportBooking(
             CsvReader csv,
             string dateField,
             string nameField,
