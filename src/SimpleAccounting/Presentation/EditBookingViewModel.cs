@@ -98,6 +98,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public double BookingValue { get; set; }
 
+        public bool IsOpening { get; set; }
+
+        public bool IsFollowup { get; set; }
+
         public bool IsEasyBookingEnabled => this.DebitSplitAllowed && this.CreditSplitAllowed;
 
         public ulong CreditAccount
@@ -191,7 +195,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var newBooking = new AccountingDataJournalBooking
             {
-                Date = this.Date.ToAccountingDate(), ID = this.BookingIdentifier
+                Date = this.Date.ToAccountingDate(), ID = this.BookingIdentifier, Followup = this.IsFollowup, Opening = this.IsOpening
             };
             var baseValue = new BookingValue { Text = this.BookingText, Value = this.BookingValue.ToModelValue() };
 

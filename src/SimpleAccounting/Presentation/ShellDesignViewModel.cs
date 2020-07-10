@@ -49,7 +49,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 Text = "Booking2",
                 Value = 1.444,
                 CreditAccount = "101",
-                DebitAccount = "401"
+                DebitAccount = "401",
+                IsFollowup = true
             };
             this.FullJournal.Add(journalItem);
 

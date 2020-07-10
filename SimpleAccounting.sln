@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{3F74
 		samples\MainView.png = samples\MainView.png
 		README.md = README.md
 		samples\sample.acml = samples\sample.acml
+		samples\sample.csv = samples\sample.csv
 		samples\TotalsAndBalancesReport.png = samples\TotalsAndBalancesReport.png
 	EndProjectSection
 EndProject

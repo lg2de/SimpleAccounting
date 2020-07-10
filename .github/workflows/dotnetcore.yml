@@ -49,7 +49,7 @@ jobs:
         SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
       shell: pwsh
     - name: Build Debug
-      run: dotnet build --configuration Debug
+      run: dotnet build --configuration Debug --no-restore
     - name: Test with OpenCover
       run: |
         .\CreateCoverReport.ps1
@@ -57,7 +57,7 @@ jobs:
         # bash codecov.sh -f "CoverOutput/coverage.xml" -t ${{ secrets.CODECOV_TOKEN }}
       shell: pwsh
     - name: Build Release
-      run: dotnet build --configuration Release
+      run: dotnet build --configuration Release --no-restore
     - name: Complete SonarScanner
       run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 

@@ -17,6 +17,7 @@
             </Grid.ColumnDefinitions>
             <local:NumberTextBox
                 Grid.Column="0" Grid.Row="0"
+                MinWidth="100"
                 Text="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}" />
             <ComboBox
                 Grid.Column="1" Grid.Row="0"

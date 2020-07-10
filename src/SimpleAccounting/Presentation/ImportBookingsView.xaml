@@ -7,104 +7,151 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
     mc:Ignorable="d"
-    MinWidth="800" MinHeight="600"
+    MinWidth="900" MinHeight="600"
     d:DataContext="{d:DesignInstance Type=local:ImportBookingsDesignViewModel, IsDesignTimeCreatable=True}">
-    <DockPanel>
-        <DockPanel.Resources>
-            <Style TargetType="local:NumberTextBox">
-                <Setter Property="Margin" Value="5" />
-                <Setter Property="Height" Value="30" />
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-            </Style>
-        </DockPanel.Resources>
-        <TextBlock
-            DockPanel.Dock="Top"
-            Padding="5">
-            Hinweise:<LineBreak />
-            Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.<LineBreak />
-            (Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)<LineBreak />
-            Die importierten Empfängernamen und Buchungstexte können korrigiert werden.
-        </TextBlock>
-        <StackPanel
-            DockPanel.Dock="Top"
-            Orientation="Horizontal">
-            <local:NumberTextBox
-                Width="100"
-                Text="{Binding SelectedAccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <ComboBox
-                Width="150"
-                ItemsSource="{Binding ImportAccounts}"
-                SelectedValue="{Binding SelectedAccountNumber, Mode=TwoWay}"
-                SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
-                SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
-            <Button
-                Width="100"
-                Content="Lade Daten"
-                Command="{Binding LoadDataCommand}" />
-            <Button
-                Width="100"
-                Content="Teilweise Buchen"
-                ToolTip="Alle Einträge buchen, die schon einem Gegenkonto zugeordnet sind."
-                Command="{Binding BookMappedCommand}" />
-            <Button
-                Width="100"
-                Content="Alles Buchen"
-                Command="{Binding BookAllCommand}" />
-
-            <Button Content="CloseDummy" IsCancel="True" Width="0" Height="0" />
-        </StackPanel>
-        <DataGrid
-            ItemsSource="{Binding ImportData}"
-            AutoGenerateColumns="False"
-            CanUserResizeColumns="True"
-            CanUserAddRows="False" CanUserDeleteRows="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" />
-                <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" />
-                <DataGridTextColumn Header="Empfänger" Binding="{Binding Name}" Width="200" />
-                <DataGridTextColumn Header="Buchungstext" Binding="{Binding Text}" Width="200" />
-                <DataGridTextColumn
-                    Header="Betrag"
-                    Binding="{Binding Value, StringFormat=\{0:0.00\}}"
-                    ElementStyle="{StaticResource ValueGridStyle}" />
-                <DataGridTemplateColumn
-                    Header="Gegenkonto" MinWidth="150">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ComboBox
-                                Margin="0"
-                                ItemsSource="{Binding Accounts}"
-                                SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                                TextSearch.TextPath="Name" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button
-                                Width="30" Height="30" Padding="0" Margin="0"
-                                Content="X"
-                                ToolTip="Zuordnung zurücksetzen"
-                                Command="{Binding ResetRemoteAccountCommand}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-            <DataGrid.CellStyle>
-                <Style TargetType="{x:Type DataGridCell}">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                <Grid Background="{TemplateBinding Background}">
-                                    <ContentPresenter VerticalAlignment="Center" Margin="2" />
-                                </Grid>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
+    <Grid>
+        <DockPanel>
+            <DockPanel.Resources>
+                <Style TargetType="local:NumberTextBox">
+                    <Setter Property="Margin" Value="5" />
+                    <Setter Property="Height" Value="30" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
                 </Style>
-            </DataGrid.CellStyle>
-        </DataGrid>
-    </DockPanel>
+                <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            </DockPanel.Resources>
+            <StackPanel
+                DockPanel.Dock="Top"
+                Orientation="Horizontal">
+                <TextBlock
+                    Padding="5" Height="74">
+                    Hinweise:<LineBreak />
+                    Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.<LineBreak />
+                    (Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)<LineBreak />
+                    Die importierten Empfängernamen und Buchungstexte können korrigiert werden.
+                </TextBlock>
+                <local:NumberTextBox
+                    Width="100"
+                    Text="{Binding SelectedAccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox
+                    Width="150"
+                    ItemsSource="{Binding ImportAccounts}"
+                    SelectedValue="{Binding SelectedAccountNumber, Mode=TwoWay}"
+                    SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
+                    SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+            </StackPanel>
+            <StackPanel
+                DockPanel.Dock="Top"
+                Orientation="Horizontal">
+                <CheckBox
+                    VerticalAlignment="Center"
+                    IsChecked="{Binding IsForceEnglish}"
+                    Content="Datei im englischen Format" />
+                <Button
+                    Width="100"
+                    Content="Lade Daten"
+                    Command="{Binding LoadDataCommand}" />
+                <TextBlock
+                    VerticalAlignment="Center" Margin="20,0,0,0"
+                    Text="Beginn Import:" />
+                <DatePicker
+                    SelectedDate="{Binding StartDate}"
+                    DisplayDateStart="{Binding RangeMin, Mode=OneWay}" DisplayDateEnd="{Binding RangeMax, Mode=OneWay}"
+                    Height="30"
+                    IsTodayHighlighted="True" />
+            </StackPanel>
+            <StackPanel
+                DockPanel.Dock="Top"
+                Orientation="Horizontal">
+                <Button
+                    Width="100"
+                    Content="Teilweise Buchen"
+                    ToolTip="Alle Einträge buchen, die schon einem Gegenkonto zugeordnet sind."
+                    Command="{Binding BookMappedCommand}" />
+                <Button
+                    Width="100"
+                    Content="Alles Buchen"
+                    Command="{Binding BookAllCommand}" />
+
+                <Button Content="CloseDummy" IsCancel="True" Width="0" Height="0" />
+            </StackPanel>
+            <DataGrid
+                DockPanel.Dock="Bottom"
+                ItemsSource="{Binding ImportDataFiltered}"
+                AutoGenerateColumns="False"
+                CanUserResizeColumns="True"
+                CanUserAddRows="False" CanUserDeleteRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat=\{0:d\}}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Belegnr." Binding="{Binding Identifier}" />
+                    <DataGridTextColumn Header="Empfänger" Binding="{Binding Name}" Width="200" />
+                    <DataGridTextColumn Header="Buchungstext" Binding="{Binding Text}" Width="200" />
+                    <DataGridTextColumn
+                        Header="Betrag"
+                        Binding="{Binding Value, StringFormat=\{0:0.00\}}"
+                        ElementStyle="{StaticResource ValueGridStyle}" />
+                    <DataGridCheckBoxColumn Header="Überspringen"
+                                            Binding="{Binding IsSkip, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTemplateColumn
+                        Header="Gegenkonto" MinWidth="150">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type local:ImportEntryViewModel}">
+                                <Grid>
+                                    <ComboBox
+                                        Margin="0"
+                                        Visibility="{Binding IsCandidate, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        IsEnabled="{Binding IsSkip, Converter={StaticResource InverseBooleanConverter}}"
+                                        ItemsSource="{Binding Accounts}"
+                                        SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        ItemTemplate="{StaticResource AccountSelectionTemplate}"
+                                        TextSearch.TextPath="Name" />
+                                    <ContentControl
+                                        Visibility="{Binding IsExisting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        Content="{Binding RemoteAccount}"
+                                        ContentTemplate="{StaticResource AccountSelectionTemplate}" />
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridCheckBoxColumn Header="Nachverfolgung" Binding="{Binding IsFollowup}" />
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Width="30" Height="30" Padding="0" Margin="0"
+                                    Content="X"
+                                    ToolTip="Zuordnung zurücksetzen"
+                                    Command="{Binding ResetRemoteAccountCommand}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                <DataGrid.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                    <Grid Background="{TemplateBinding Background}">
+                                        <ContentPresenter VerticalAlignment="Center" Margin="2" />
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsExisting}" Value="True">
+                                <Setter Property="Background" Value="LightGray" />
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
+            </DataGrid>
+        </DockPanel>
+        <Grid Background="Gray" Opacity="0.5"
+              Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Rectangle Width="150" Height="50" Fill="White" />
+            <ProgressBar
+                Width="100" Height="20"
+                IsIndeterminate="True" />
+        </Grid>
+    </Grid>
 </UserControl>

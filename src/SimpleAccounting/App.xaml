@@ -9,7 +9,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
-                    <local:AppBootstrapper x:Key="bootstrapper" />
+                    <local:AppBootstrapper x:Key="Bootstrapper" />
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
                     <DataTemplate x:Key="AccountSelectionTemplate">
                         <Grid VerticalAlignment="Stretch" Margin="5">
                             <TextBlock VerticalAlignment="Center">
@@ -23,6 +25,9 @@
                         <Setter Property="Height" Value="30" />
                         <Setter Property="Margin" Value="5" />
                         <Setter Property="VerticalAlignment" Value="Bottom" />
+                    </Style>
+                    <Style TargetType="CheckBox">
+                        <Setter Property="Margin" Value="5" />
                     </Style>
                     <Style TargetType="ComboBox">
                         <Setter Property="Margin" Value="5" />

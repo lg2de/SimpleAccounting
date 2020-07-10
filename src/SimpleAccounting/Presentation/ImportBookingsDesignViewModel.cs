@@ -40,24 +40,71 @@ namespace lg2de.SimpleAccounting.Presentation
                     }
                 }
             },
-            new AccountDefinition { ID = 600, Name = "Shopping" }
+            new AccountDefinition { ID = 600, Name = "Shopping" },
+            new AccountDefinition { ID = 990, Name = "Carryforward" }
         };
 
         public ImportBookingsDesignViewModel()
-            : base(null!, null!, null!, SampleAccounts)
+            : base(
+                null!, null!,
+                new AccountingDataJournal
+                {
+                    DateStart = (uint)(DateTime.Today.Year * 10000 + 101),
+                    DateEnd = (uint)(DateTime.Today.Year * 10000 + 1231),
+                    Booking = new List<AccountingDataJournalBooking>
+                    {
+                        new AccountingDataJournalBooking
+                        {
+                            Date = (uint)(DateTime.Today.Year * 10000 + 1231),
+                            ID = 999,
+                            Credit = new List<BookingValue>
+                            {
+                                new BookingValue { Account = 100, Text = "End of year", Value = 1234 }
+                            },
+                            Debit = new List<BookingValue>
+                            {
+                                new BookingValue { Account = 990, Text = "End of year", Value = 1234 }
+                            }
+                        }
+                    }
+                },
+                SampleAccounts,
+                42)
         {
             this.SelectedAccountNumber = 100;
+            this.StartDate = DateTime.Today;
 
-            var item = new ImportEntryViewModel(SampleAccounts)
-            {
-                Date = DateTime.Now,
-                Identifier = 42,
-                Name = "McX",
-                RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
-                Text = "Shoes",
-                Value = 99.95
-            };
-            this.ImportData.Add(item);
+            this.LoadedData.Add(
+                new ImportEntryViewModel(SampleAccounts)
+                {
+                    Date = DateTime.Now - TimeSpan.FromDays(1),
+                    Name = "Should not be visible!",
+                    Text = "Should not be visible!",
+                    RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
+                    Value = 99.95
+                });
+            this.LoadedData.Add(
+                new ImportEntryViewModel(SampleAccounts)
+                {
+                    Date = DateTime.Now,
+                    Name = "McX",
+                    Text = "Shoes",
+                    RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
+                    Value = 99.95,
+                    IsFollowup = true
+                });
+            this.LoadedData.Add(
+                new ImportEntryViewModel(SampleAccounts)
+                {
+                    Date = DateTime.Now + TimeSpan.FromDays(1),
+                    Name = "McY",
+                    Text = "More Shoes",
+                    Value = 159.95,
+                    IsSkip = true
+                });
+
+            this.SetupExisting();
+            this.UpdateIdentifierInLoadedData();
         }
     }
 }
