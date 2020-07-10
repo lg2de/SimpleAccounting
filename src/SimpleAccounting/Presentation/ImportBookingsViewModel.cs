@@ -9,14 +9,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
-    using System.Text;
-    using System.Text.RegularExpressions;
     using System.Windows.Input;
     using Caliburn.Micro;
-    using CsvHelper;
-    using CsvHelper.Configuration;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
@@ -152,7 +147,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 using var openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
-                    Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
+                    Filter = "Booking data files (*.csv)|*.csv",
+                    RestoreDirectory = true
                 };
 
                 if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
@@ -233,20 +229,35 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.LoadedData.Clear();
 
-                // note, the stream is disposed by the reader
-                var stream = new FileStream(
-                    fileName, FileMode.Open, FileAccess.Read,
-                    FileShare.ReadWrite);
-                var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-                using (var reader = new StreamReader(stream, enc1252!))
+                var cultureInfo = CultureInfo.CurrentUICulture;
+                if (this.IsForceEnglish)
                 {
-                    var configuration = new CsvConfiguration(CultureInfo.CurrentCulture);
-                    if (this.IsForceEnglish)
+                    cultureInfo = new CultureInfo("en-us");
+                }
+
+                var filteredAccounts = this.accounts.Where(
+                    x => x.ID != this.selectedAccountNumber && x.Type != AccountDefinitionType.Carryforward).ToList();
+                using var loader = new ImportFileLoader(fileName, cultureInfo, filteredAccounts, this.SelectedAccount!.ImportMapping);
+
+                foreach (var item in loader.Load())
+                {
+                    if (item.Date < this.RangeMin || item.Date > this.RangeMax)
                     {
-                        configuration.CultureInfo = new CultureInfo("en-us");
+                        // ignore data outside booking year
+                        continue;
                     }
 
-                    this.ImportBookings(reader, configuration);
+                    if (this.ExistingData.Any(
+                        x =>
+                            x.Date == item.Date
+                            && Math.Abs(x.Value - item.Value) < double.Epsilon
+                            && x.Text == item.BuildText()))
+                    {
+                        // ignore already existing
+                        continue;
+                    }
+
+                    this.LoadedData.Add(item);
                 }
 
                 if (!this.LoadedData.Any())
@@ -261,114 +272,6 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.messageBox.Show($"Failed to load file '{fileName}':\n{e.Message}", "Import");
             }
-        }
-
-        internal void ImportBookings(TextReader reader, CsvConfiguration configuration)
-        {
-            var dateField =
-                this.SelectedAccount!.ImportMapping.Columns
-                    .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source
-                ?? "date";
-            var nameField =
-                this.SelectedAccount.ImportMapping.Columns
-                    .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source
-                ?? "name";
-            var textField =
-                this.SelectedAccount.ImportMapping.Columns
-                    .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
-            var valueField =
-                this.SelectedAccount.ImportMapping.Columns
-                    .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
-                ?? "value";
-
-            using var csv = new CsvReader(reader, configuration);
-            csv.Read();
-            if (!csv.ReadHeader() || csv.Context.HeaderRecord.Length <= 2)
-            {
-                throw new InvalidOperationException("Missing or incomplete file header.");
-            }
-
-            var filteredAccounts = this.accounts
-                .Where(x => x.ID != this.selectedAccountNumber && x.Type != AccountDefinitionType.Carryforward)
-                .ToList();
-            while (csv.Read())
-            {
-                this.ImportBooking(csv, dateField, nameField, textField, valueField, filteredAccounts);
-            }
-        }
-
-        internal void ImportBooking(
-            CsvReader csv,
-            string dateField,
-            string nameField,
-            AccountDefinitionImportMappingColumn textField,
-            string valueField,
-            IEnumerable<AccountDefinition> filteredAccounts)
-        {
-            csv.TryGetField(dateField, out DateTime date);
-            if (date < this.RangeMin || date > this.RangeMax)
-            {
-                // ignore data outside booking year
-                return;
-            }
-
-            // date and value are checked by RelayCommand
-            // name and text may be empty
-            csv.TryGetField<double>(valueField, out var value);
-            string name = string.Empty;
-            string text = string.Empty;
-            if (nameField != null)
-            {
-                csv.TryGetField(nameField, out name);
-            }
-
-            if (textField != null)
-            {
-                csv.TryGetField(textField.Source, out text);
-                if (!string.IsNullOrEmpty(textField.IgnorePattern))
-                {
-                    text = Regex.Replace(text, textField.IgnorePattern, string.Empty);
-                }
-            }
-
-            var item = new ImportEntryViewModel(filteredAccounts)
-            {
-                Date = date, Name = name, Text = text, Value = value
-            };
-
-            var modelValue = value.ToModelValue();
-            var patterns = this.SelectedAccount?.ImportMapping?.Patterns
-                           ?? Enumerable.Empty<AccountDefinitionImportMappingPattern>();
-            foreach (var importMapping in patterns)
-            {
-                if (!Regex.IsMatch(text, importMapping.Expression))
-                {
-                    // mapping does not match
-                    continue;
-                }
-
-                if (importMapping.ValueSpecified && modelValue != importMapping.Value)
-                {
-                    // mapping does not match
-                    continue;
-                }
-
-                // use first match
-                item.RemoteAccount = this.accounts.SingleOrDefault(a => a.ID == importMapping.AccountID);
-                break;
-            }
-
-            if (this.ExistingData.Any(
-                x =>
-                    x.Date == item.Date
-                    && Math.Abs(x.Value - item.Value) < double.Epsilon
-                    && x.Text == item.BuildText()))
-            {
-                // ignore already existing
-                return;
-            }
-
-            this.LoadedData.Add(item);
         }
 
         internal void ProcessData()
@@ -395,7 +298,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 };
                 var creditValue = new BookingValue
                 {
-                    Text = importing.BuildText(), Value = Math.Abs(importing.Value.ToModelValue())
+                    Text = importing.BuildText(),
+                    Value = Math.Abs(importing.Value.ToModelValue())
                 };
 
                 // start debit with clone of credit

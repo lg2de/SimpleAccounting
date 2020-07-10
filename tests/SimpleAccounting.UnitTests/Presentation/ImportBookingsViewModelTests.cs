@@ -5,11 +5,7 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
     using System.Linq;
-    using CsvHelper.Configuration;
     using FluentAssertions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
@@ -95,61 +91,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 0);
 
             sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
-        }
-
-        [Fact]
-        public void ImportBookings_SampleInput_DataImported()
-        {
-            var project = Samples.SampleProject;
-            var accounts = project.AllAccounts.ToList();
-            var dataJournal = project.Journal.First();
-            dataJournal.Booking.Add(
-                new AccountingDataJournalBooking
-                {
-                    ID = 1,
-                    Date = 20000115,
-                    Credit = new List<BookingValue>
-                    {
-                        new BookingValue { Account = 100, Text = "Shopping Mall - Shoes", Value = 5000 }
-                    },
-                    Debit = new List<BookingValue>
-                    {
-                        new BookingValue { Account = 600, Text = "Shopping Mall - Shoes", Value = 5000 },
-                    }
-                });
-            var bankAccount = accounts.Single(x => x.Name == "Bank account");
-            bankAccount.ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
-            {
-                new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
-            };
-            var sut = new ImportBookingsViewModel(null, null, dataJournal, accounts, 0)
-            {
-                SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID
-            };
-
-            var input = @"
-Date,Name,Text,Value
-1999-12-31,NameIgnore,TextIgnore,12.34
-2000-01-15,Shopping Mall,Shoes,-50.00
-2000-12-01,Name1,Text1,12.34
-2000-12-31,Name2,Text2,-42.42
-2001-01-01,Name3,Text3,99.99";
-            using (var inputStream = new StringReader(input))
-            {
-                sut.ImportBookings(inputStream, new CsvConfiguration(new CultureInfo("en-us")));
-            }
-
-            sut.LoadedData.Should().NotContain(x => x.Name == "Shopping Mall", "entry is already imported");
-            sut.LoadedData.Should().BeEquivalentTo(
-                new
-                {
-                    Date = new DateTime(2000, 12, 1),
-                    Name = "Name1",
-                    Text = "Text1",
-                    Value = 12.34,
-                    RemoteAccount = new { ID = 600 } // because of mapping pattern
-                },
-                new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
         }
 
         [Fact]

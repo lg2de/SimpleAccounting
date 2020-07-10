@@ -90,6 +90,20 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             var accounts = project.AllAccounts.ToList();
             var dataJournal = project.Journal.First();
+            dataJournal.Booking.Add(
+                new AccountingDataJournalBooking
+                {
+                    ID = 1,
+                    Date = 20000115,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 100, Text = "Shopping Mall - Shoes", Value = 5000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = 600, Text = "Shopping Mall - Shoes", Value = 5000 },
+                    }
+                });
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
             var sut = new ImportBookingsViewModel(messageBox, null, dataJournal, accounts, 0)
             {
@@ -103,8 +117,6 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
             var script = reader.ReadToEnd();
             File.WriteAllText(fileName, script);
 
-            File.ReadAllText(fileName).Should().HaveLength(83);
-
             sut.OnLoadData(fileName);
 
             File.Delete(fileName);
@@ -116,6 +128,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
                 Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(),
                 Arg.Any<MessageBoxOptions>());
+            sut.LoadedData.Should().NotContain(x => x.Name == "Shopping Mall", "entry is already imported");
             sut.LoadedData.Should().BeEquivalentTo(
                 new { Date = new DateTime(2000, 12, 1), Name = "Name1", Text = "Text1", Value = 12.34 },
                 new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
