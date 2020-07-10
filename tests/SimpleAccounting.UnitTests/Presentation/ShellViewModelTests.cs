@@ -505,7 +505,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
             fileSystem.GetDrives().Returns(
-                new[] { (FilePath: "C:\\", Format: "Normal"), (FilePath: "K:\\", Format: "Cryptomator File System") });
+                x =>
+                {
+                    var func1 = new Func<string>(() => "Normal");
+                    var func2 = new Func<string>(() => "Cryptomator File System");
+                    return new[] { (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2) };
+                });
 
             (await sut.Awaiting(x => x.LoadProjectFromFileAsync("K:\\the.fileName")).Should()
                     .CompleteWithinAsync(1.Seconds()))
