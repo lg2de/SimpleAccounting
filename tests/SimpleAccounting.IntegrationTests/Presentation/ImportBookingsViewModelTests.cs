@@ -112,8 +112,10 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
             messageBox.DidNotReceive().Show(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
-                MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+                Arg.Any<MessageBoxButton>(),
+                Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(),
+                Arg.Any<MessageBoxOptions>());
             sut.LoadedData.Should().BeEquivalentTo(
                 new { Date = new DateTime(2000, 12, 1), Name = "Name1", Text = "Text1", Value = 12.34 },
                 new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2", Value = -42.42 });
