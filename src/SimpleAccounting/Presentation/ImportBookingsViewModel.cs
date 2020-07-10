@@ -13,7 +13,6 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
-    using System.Windows.Data;
     using System.Windows.Input;
     using Caliburn.Micro;
     using CsvHelper;
@@ -32,9 +31,9 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly List<AccountDefinition> accounts;
         private readonly IMessageBox messageBox;
         private readonly ShellViewModel parent;
+        private bool isBusy;
         private ulong selectedAccountNumber;
         private DateTime startDate;
-        private bool isBusy;
 
         public ImportBookingsViewModel(
             IMessageBox messageBox,
@@ -225,6 +224,9 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        [SuppressMessage(
+            "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
+            Justification = "Exception while processing external file must not cause crash at all")]
         internal void OnLoadData(string fileName)
         {
             try
@@ -255,7 +257,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.UpdateIdentifierInLoadedData();
                 this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 this.messageBox.Show($"Failed to load file '{fileName}':\n{e.Message}", "Import");
             }
