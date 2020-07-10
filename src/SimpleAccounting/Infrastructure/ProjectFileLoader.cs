@@ -166,8 +166,8 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
             var info = this.fileSystem.GetDrives().SingleOrDefault(
                 x => projectFileName.StartsWith(x.RootPath, StringComparison.InvariantCultureIgnoreCase));
-            if (info.Format != null
-                && info.Format.Contains("cryptomator", StringComparison.InvariantCultureIgnoreCase)
+            string format = info.GetFormat?.Invoke() ?? string.Empty;
+            if (format.Contains("cryptomator", StringComparison.InvariantCultureIgnoreCase)
                 && !this.settings.SecuredDrives.Contains(info.RootPath))
             {
                 this.settings.SecuredDrives.Add(info.RootPath);

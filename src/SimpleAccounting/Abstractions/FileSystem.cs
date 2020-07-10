@@ -50,15 +50,14 @@ namespace lg2de.SimpleAccounting.Abstractions
             return File.ReadAllText(path);
         }
 
-        public IEnumerable<(string RootPath, string Format)> GetDrives()
+        public IEnumerable<(string RootPath, Func<string> GetFormat)> GetDrives()
         {
             foreach (var driveInfo in DriveInfo.GetDrives())
             {
-                (string RootPath, string Format) info;
+                (string RootPath, Func<string> GetFormat) info;
                 try
                 {
-                    // TODO implement cache for DriveFormat which is time consuming
-                    info = (RootPath: driveInfo.RootDirectory.FullName, Format: driveInfo.DriveFormat);
+                    info = (RootPath: driveInfo.RootDirectory.FullName, GetFormat: () => driveInfo.DriveFormat);
                 }
                 catch (IOException)
                 {
