@@ -77,3 +77,6 @@ The roadmap is defined by issues and milestones.
 
 I do not like closed source reuse of my software.
 This is why I decided to license the software under GPLV3.
+
+The application uses several external packages licened unter [MIT](https://opensource.org/licenses/MIT).
+Additionally the package [CsvHelper](https://github.com/JoshClose/CsvHelper) is licensed from Josh Close under [MS-PL](https://opensource.org/licenses/MS-PL).
