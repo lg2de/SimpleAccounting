@@ -175,74 +175,78 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var project = Samples.SampleProject;
             parent.LoadProjectData(project);
             var accounts = project.AllAccounts.ToList();
+            var bankAccount = accounts.Single(x => x.Name == "Bank account");
             var sut = new ImportBookingsViewModel(
                 null,
                 parent,
                 project.Journal.Last(),
                 accounts,
-                0) { SelectedAccount = accounts.Single(x => x.Name == "Bank account") };
-            sut.SelectedAccountNumber = sut.SelectedAccount.ID;
+                0) { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
             var remoteAccount = accounts.Single(x => x.ID == 600);
             int year = DateTime.Today.Year;
-            sut.LoadedData.Add(
-                new ImportEntryViewModel(accounts)
+            sut.StartDate = new DateTime(year, 1, 2);
+            sut.LoadedData.AddRange(
+                new[]
                 {
-                    Date = new DateTime(year, 1, 1),
-                    Identifier = 101,
-                    Name = "Name",
-                    Text = "Text",
-                    Value = 1,
-                    RemoteAccount = remoteAccount
-                });
-            sut.LoadedData.Add(
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 2),
-                    Identifier = 102,
-                    Text = "Text",
-                    Value = 2,
-                    RemoteAccount = remoteAccount
-                });
-            sut.LoadedData.Add(
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 3),
-                    Identifier = 103,
-                    Name = "Name",
-                    Value = -1,
-                    RemoteAccount = remoteAccount,
-                    IsSkip = true
-                });
-            sut.LoadedData.Add(
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 3),
-                    Identifier = 104,
-                    Name = "Name",
-                    Value = -1,
-                    RemoteAccount = remoteAccount
-                });
-            sut.LoadedData.Add(
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 3),
-                    Identifier = 105,
-                    Name = "Ignore",
-                    Value = -2,
-                    RemoteAccount = null
+                    new ImportEntryViewModel(accounts)
+                    {
+                        Date = new DateTime(year, 1, 1),
+                        Identifier = 101,
+                        Name = "Name",
+                        Text = "Text",
+                        Value = 1,
+                        RemoteAccount = remoteAccount
+                    },
+                    new ImportEntryViewModel(accounts)
+                    {
+                        Date = new DateTime(year, 1, 2),
+                        Identifier = 102,
+                        Text = "Text",
+                        Value = 2,
+                        RemoteAccount = remoteAccount
+                    },
+                    new ImportEntryViewModel(accounts)
+                    {
+                        Date = new DateTime(year, 1, 3),
+                        Identifier = 103,
+                        Name = "Name",
+                        Value = -1,
+                        RemoteAccount = remoteAccount,
+                        IsSkip = true
+                    },
+                    new ImportEntryViewModel(accounts)
+                    {
+                        Date = new DateTime(year, 1, 3),
+                        Identifier = 104,
+                        Name = "Name",
+                        Value = -1,
+                        RemoteAccount = remoteAccount
+                    },
+                    new ImportEntryViewModel(accounts)
+                    {
+                        Date = new DateTime(year, 1, 3),
+                        Identifier = 105,
+                        Name = "Ignore",
+                        Value = -2,
+                        RemoteAccount = null
+                    },
+                    new ImportEntryViewModel(accounts)
+                    {
+                        Date = new DateTime(year, 1, 3),
+                        Identifier = 106,
+                        Name = "Ignore too",
+                        Value = -3,
+                        RemoteAccount = remoteAccount
+                    }
                 });
 
             sut.ProcessData();
 
+            // 101 should be skipped because of selected start date
+            // 103 should be skipped because it is configured to be skipped
+            // 105 should be skipped because it is not mapped
+            // 106 should be skipped because it is valid entry AFTER unmapped entry => stop
             parent.FullJournal.Should().BeEquivalentTo(
-                new
-                {
-                    Identifier = 101,
-                    Text = "Name - Text",
-                    Value = 1,
-                    CreditAccount = "600 (Shoes)",
-                    DebitAccount = "100 (Bank account)"
-                },
                 new
                 {
                     Identifier = 102,

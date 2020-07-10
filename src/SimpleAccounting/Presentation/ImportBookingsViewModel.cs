@@ -147,8 +147,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 using var openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
-                    Filter = "Booking data files (*.csv)|*.csv",
-                    RestoreDirectory = true
+                    Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
                 };
 
                 if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
@@ -237,7 +236,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 var filteredAccounts = this.accounts.Where(
                     x => x.ID != this.selectedAccountNumber && x.Type != AccountDefinitionType.Carryforward).ToList();
-                using var loader = new ImportFileLoader(fileName, cultureInfo, filteredAccounts, this.SelectedAccount!.ImportMapping);
+                using var loader = new ImportFileLoader(
+                    fileName, cultureInfo, filteredAccounts, this.SelectedAccount!.ImportMapping);
 
                 foreach (var item in loader.Load())
                 {
@@ -276,7 +276,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal void ProcessData()
         {
-            foreach (var importing in this.LoadedData)
+            foreach (var importing in this.ImportDataFiltered)
             {
                 if (importing.IsSkip)
                 {
@@ -298,8 +298,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 };
                 var creditValue = new BookingValue
                 {
-                    Text = importing.BuildText(),
-                    Value = Math.Abs(importing.Value.ToModelValue())
+                    Text = importing.BuildText(), Value = Math.Abs(importing.Value.ToModelValue())
                 };
 
                 // start debit with clone of credit
