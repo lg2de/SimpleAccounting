@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
     [SuppressMessage(
@@ -34,7 +35,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             var journalItem = new FullJournalViewModel
             {
-                Identifier = 42,
+                Identifier = 41,
                 Date = DateTime.Now,
                 Text = "Booking1",
                 Value = 123.4,
@@ -53,6 +54,27 @@ namespace lg2de.SimpleAccounting.Presentation
                 IsFollowup = true
             };
             this.FullJournal.Add(journalItem);
+            journalItem = new FullJournalViewModel
+            {
+                Identifier = 43,
+                Date = DateTime.Now,
+                Text = "Booking3",
+                Value = 99,
+                CreditAccount = "101",
+                DebitAccount = "401",
+            };
+            this.FullJournal.Add(journalItem);
+            journalItem = new FullJournalViewModel
+            {
+                Identifier = 44,
+                Date = DateTime.Now,
+                Text = "Booking4",
+                Value = -99,
+                CreditAccount = "101",
+                DebitAccount = "401",
+            };
+            this.FullJournal.Add(journalItem);
+            this.FullJournal.UpdateRowHighlighting();
 
             var accountJournalItem = new AccountJournalViewModel
             {
@@ -77,6 +99,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 IsSummary = true, Text = "Summe", CreditValue = 123.4, RemoteAccount = "Div."
             };
             this.AccountJournal.Add(accountJournalItem);
+            this.AccountJournal.UpdateRowHighlighting();
         }
     }
 }
