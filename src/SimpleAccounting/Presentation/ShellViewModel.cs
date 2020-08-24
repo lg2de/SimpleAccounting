@@ -887,6 +887,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.FullJournal.Add(creditItem);
                 }
             }
+
+            this.FullJournal.UpdateRowHighlighting();
         }
 
         private void RefreshAccountList()
@@ -959,6 +961,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.AccountJournal.Add(item);
                 }
             }
+
+            this.AccountJournal.UpdateRowHighlighting();
 
             if (debitSum + creditSum < double.Epsilon)
             {

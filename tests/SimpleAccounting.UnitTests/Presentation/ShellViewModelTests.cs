@@ -214,13 +214,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     DebitAccount = "6000 (Friends debit)"
                 });
             sut.AccountJournal.Should().BeEquivalentTo(
-                new { Text = "Open 1", RemoteAccount = "990 (Carryforward)" },
-                new { Text = "Salary", RemoteAccount = "Diverse" },
-                new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)" },
-                new { Text = "Shoes", RemoteAccount = "Diverse" },
-                new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)" },
-                new { Text = "Summe" },
-                new { Text = "Saldo" });
+                new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", IsEvenRow = false },
+                new { Text = "Salary", RemoteAccount = "Diverse", IsEvenRow = true },
+                new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", IsEvenRow = false },
+                new { Text = "Shoes", RemoteAccount = "Diverse", IsEvenRow = true },
+                new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)", IsEvenRow = false },
+                new { Text = "Summe", IsEvenRow = false },
+                new { Text = "Saldo", IsEvenRow = false });
         }
 
         [Fact]

@@ -89,6 +89,9 @@
                     <Style x:Key="GridRowStyle" TargetType="{x:Type DataGridRow}">
                         <Setter Property="FontSize" Value="11" />
                         <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsEvenRow}" Value="True">
+                                <Setter Property="Background" Value="#FFD0EED0" />
+                            </DataTrigger>
                             <DataTrigger Binding="{Binding IsFollowup}" Value="True">
                                 <Setter Property="Background" Value="LightPink" />
                             </DataTrigger>
@@ -115,7 +118,7 @@
                         DockPanel.Dock="Bottom"
                         ItemsSource="{Binding FullJournal}"
                         SelectedItem="{Binding SelectedFullJournalEntry}"
-                        RowStyle="{StaticResource GridRowStyle}"
+                        RowStyle="{StaticResource GridRowStyle}" GridLinesVisibility="Vertical"
                         AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                         SelectionChanged="OnGridSelectionChanged"
                         IsSynchronizedWithCurrentItem="True">
@@ -149,6 +152,7 @@
                         DockPanel.Dock="Bottom"
                         ItemsSource="{Binding AccountJournal}"
                         SelectedItem="{Binding SelectedAccountJournalEntry}"
+                        GridLinesVisibility="Vertical"
                         AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                         SelectionChanged="OnGridSelectionChanged"
                         IsSynchronizedWithCurrentItem="True">
