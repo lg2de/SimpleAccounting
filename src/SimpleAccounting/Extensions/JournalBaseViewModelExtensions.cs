@@ -28,7 +28,7 @@ namespace lg2de.SimpleAccounting.Extensions
                     lastIdentifier = entry.Identifier;
                 }
 
-                entry.IsEvenRow = isEven;
+                entry.IsEvenRow = entry.Identifier > 0 && isEven;
             }
         }
     }
