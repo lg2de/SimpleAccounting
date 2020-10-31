@@ -15,7 +15,6 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
 
-    [SuppressMessage("ReSharper", "StringLiteralTypo")] // TODO introduce localization
     internal class EditBookingViewModel : Screen
     {
         private readonly ShellViewModel parent;
