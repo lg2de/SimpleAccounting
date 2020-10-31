@@ -26,7 +26,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
     public partial class ShellViewModelTests
     {
-        [Fact]
+        [CulturedFact("en")]
         public void AccountSelectionCommand_SampleBookingsBankAccount_AccountJournalUpdated()
         {
             var sut = CreateSut();
@@ -38,9 +38,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.AccountJournal.Should().BeEquivalentTo(
                 new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
-                new { Text = "Salary", RemoteAccount = "Diverse", CreditValue = 0, DebitValue = 200 },
+                new { Text = "Salary", RemoteAccount = "Various", CreditValue = 0, DebitValue = 200 },
                 new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", CreditValue = 400, DebitValue = 0 },
-                new { Text = "Shoes", RemoteAccount = "Diverse", CreditValue = 50, DebitValue = 0 },
+                new { Text = "Shoes", RemoteAccount = "Various", CreditValue = 50, DebitValue = 0 },
                 new
                 {
                     Text = "Rent to friend",
@@ -48,11 +48,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     CreditValue = 99,
                     DebitValue = 0
                 },
-                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 549, DebitValue = 1200 },
-                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 651 });
+                new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 549, DebitValue = 1200 },
+                new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 651 });
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void AccountSelectionCommand_SampleBookingsSalary_AccountJournalUpdated()
         {
             var sut = CreateSut();
@@ -65,11 +65,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.AccountJournal.Should().BeEquivalentTo(
                 new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 120, DebitValue = 0 },
                 new { Text = "Salary2", RemoteAccount = "100 (Bank account)", CreditValue = 80, DebitValue = 0 },
-                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 },
-                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 });
+                new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 },
+                new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 });
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void AccountSelectionCommand_SampleBookingsShoes_AccountJournalUpdated()
         {
             var sut = CreateSut();
@@ -82,8 +82,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.AccountJournal.Should().BeEquivalentTo(
                 new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 20 },
                 new { Text = "Shoes2", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 30 },
-                new { Text = "Summe", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 },
-                new { Text = "Saldo", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 });
+                new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 },
+                new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 });
         }
 
         [Fact]
@@ -149,7 +149,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             windowManager.Received(1).ShowDialog(Arg.Any<object>());
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void EditAccountCommand_Confirmed_AllDataUpdated()
         {
             var sut = CreateSut(out IWindowManager windowManager);
@@ -192,8 +192,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 sut.AccountJournal.Should().BeEquivalentTo(
                     new { RemoteAccount = "1100 (Bank account)" },
                     new { RemoteAccount = "1100 (Bank account)" },
-                    new { Text = "Summe" },
-                    new { Text = "Saldo" });
+                    new { Text = "Total" },
+                    new { Text = "Balance" });
             }
         }
 
@@ -468,7 +468,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void CloseYearCommand_HappyPath_YearClosedAndNewAdded()
         {
             var sut = CreateSut(out IWindowManager windowManager);
@@ -534,11 +534,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     CreditValue = 0,
                     RemoteAccount = "990 (Carryforward)"
                 },
-                new { Text = "Summe", IsSummary = true, DebitValue = 651, CreditValue = 0 },
-                new { Text = "Saldo", IsSummary = true, DebitValue = 651, CreditValue = 0 });
+                new { Text = "Total", IsSummary = true, DebitValue = 651, CreditValue = 0 },
+                new { Text = "Balance", IsSummary = true, DebitValue = 651, CreditValue = 0 });
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void CloseYearCommand_SecondCarryForwardAccount_OpeningsWithSelectedAccount()
         {
             var sut = CreateSut(out IWindowManager windowManager);
@@ -606,8 +606,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     CreditValue = 0,
                     RemoteAccount = "999 (MyCarryForward)"
                 },
-                new { Text = "Summe", IsSummary = true, DebitValue = 651, CreditValue = 0 },
-                new { Text = "Saldo", IsSummary = true, DebitValue = 651, CreditValue = 0 });
+                new { Text = "Total", IsSummary = true, DebitValue = 651, CreditValue = 0 },
+                new { Text = "Balance", IsSummary = true, DebitValue = 651, CreditValue = 0 });
         }
 
         [Fact]

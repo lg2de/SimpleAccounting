@@ -178,7 +178,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void OnActivate_SampleProject_JournalsUpdates()
         {
             var sut = CreateSut();
@@ -215,12 +215,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 });
             sut.AccountJournal.Should().BeEquivalentTo(
                 new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", IsEvenRow = false },
-                new { Text = "Salary", RemoteAccount = "Diverse", IsEvenRow = true },
+                new { Text = "Salary", RemoteAccount = "Various", IsEvenRow = true },
                 new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", IsEvenRow = false },
-                new { Text = "Shoes", RemoteAccount = "Diverse", IsEvenRow = true },
+                new { Text = "Shoes", RemoteAccount = "Various", IsEvenRow = true },
                 new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)", IsEvenRow = false },
-                new { Text = "Summe", IsEvenRow = false },
-                new { Text = "Saldo", IsEvenRow = false });
+                new { Text = "Total", IsEvenRow = false },
+                new { Text = "Balance", IsEvenRow = false });
         }
 
         [Fact]
@@ -298,7 +298,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             task.Awaiting(x => x).Should().CompleteWithin(1.Seconds());
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void AddBooking_FirstBooking_JournalsUpdated()
         {
             var sut = CreateSut();
@@ -337,8 +337,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     DebitValue = 0.42,
                     RemoteAccount = "990 (Carryforward)"
                 },
-                new { Text = "Summe", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 },
-                new { Text = "Saldo", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 });
+                new { Text = "Total", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 },
+                new { Text = "Balance", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 });
             monitor.Should().RaisePropertyChangeFor(x => x.SelectedAccountJournalEntry);
             sut.SelectedAccountJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
         }
@@ -448,7 +448,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public async Task LoadProjectFromFileAsync_UserWantsAutoSaveFile_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
@@ -473,7 +473,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public async Task LoadProjectFromFileAsync_UserDoesNotWantAutoSaveFileExists_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
@@ -615,7 +615,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.IsDocumentModified.Should().BeTrue();
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public async Task LoadProjectFromFileAsync_UserDoesNotWantSaveCurrentProject_LoadingAborted()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
