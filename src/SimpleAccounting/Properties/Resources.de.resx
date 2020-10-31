@@ -170,4 +170,88 @@ Wollen Sie Speichern?</value>
   <data name="Header_AnnualBalance" xml:space="preserve">
     <value>Jahresbilanz</value>
   </data>
+  <data name="Word_AccountNumber" xml:space="preserve">
+    <value>Kontonummer</value>
+  </data>
+  <data name="Word_AccountName" xml:space="preserve">
+    <value>Kontoname</value>
+  </data>
+  <data name="Word_AccountGroup" xml:space="preserve">
+    <value>Kontogruppe</value>
+  </data>
+  <data name="Word_AccountType" xml:space="preserve">
+    <value>Kontotyp</value>
+  </data>
+  <data name="Word_IsActive" xml:space="preserve">
+    <value>ist aktiv</value>
+  </data>
+  <data name="Word_Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Word_CarriedForwardAccount" xml:space="preserve">
+    <value>Saldovortragskonto</value>
+  </data>
+  <data name="Header_CloseYear" xml:space="preserve">
+    <value>Jahresabschluss</value>
+  </data>
+  <data name="Question_CloseYearX" xml:space="preserve">
+    <value>Wollen Sie das Jahr {0} abschließen?</value>
+  </data>
+  <data name="Word_Splitt" xml:space="preserve">
+    <value>Splitten</value>
+  </data>
+  <data name="Word_BookingText" xml:space="preserve">
+    <value>Buchungstext</value>
+  </data>
+  <data name="Tooltip_SplittBookingValue" xml:space="preserve">
+    <value>Anteiliger Buchungswert des Eintrags</value>
+  </data>
+  <data name="Word_BookingNumber" xml:space="preserve">
+    <value>Buchungsnummer</value>
+  </data>
+  <data name="Label_ValueWithCurrency" xml:space="preserve">
+    <value>Wert (€)</value>
+  </data>
+  <data name="Header_DebitCredit" xml:space="preserve">
+    <value>Soll/Haben</value>
+  </data>
+  <data name="Word_Debit" xml:space="preserve">
+    <value>Soll</value>
+  </data>
+  <data name="Word_Credit" xml:space="preserve">
+    <value>Haben</value>
+  </data>
+  <data name="Word_Income" xml:space="preserve">
+    <value>Einnahme</value>
+  </data>
+  <data name="Word_IncomeType" xml:space="preserve">
+    <value>Einnahmeart</value>
+  </data>
+  <data name="Label_SourceAndRemoteAccount" xml:space="preserve">
+    <value>Herkunft&amp;#10;Gegenkonto</value>
+  </data>
+  <data name="Word_Expense" xml:space="preserve">
+    <value>Ausgabe</value>
+  </data>
+  <data name="Word_ExpenseType" xml:space="preserve">
+    <value>Ausgabeart</value>
+  </data>
+  <data name="Label_DebitAccountRemoteAccount" xml:space="preserve">
+    <value>Belastungskonto&amp;#10;Gegenkonto</value>
+  </data>
+  <data name="Word_OpeningBooking" xml:space="preserve">
+    <value>Eröffnungsbuchung</value>
+  </data>
+  <data name="Word_FollowUp" xml:space="preserve">
+    <value>Nachverfolgung</value>
+  </data>
+  <data name="Action_Book" xml:space="preserve">
+    <value>Buchen (STRG-ENTER)</value>
+  </data>
+  <data name="Action_Save" xml:space="preserve">
+    <value>Speichern (STRG-ENTER)</value>
+  </data>
+  <data name="Action_Close" xml:space="preserve">
+    <value>Schließen (ESC)</value>
+  </data>
 </root>

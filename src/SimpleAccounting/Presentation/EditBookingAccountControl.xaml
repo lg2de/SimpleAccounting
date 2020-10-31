@@ -1,99 +1,101 @@
 ﻿<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
 <UserControl
-    x:Class="lg2de.SimpleAccounting.Presentation.EditBookingAccountControl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
-    mc:Ignorable="d"
-    d:DesignWidth="400" d:DesignHeight="50">
-    <Grid>
-        <Grid Visibility="{Binding SingleRowVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <local:NumberTextBox
-                Grid.Column="0" Grid.Row="0"
-                MinWidth="100"
-                Text="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}" />
-            <ComboBox
-                Grid.Column="1" Grid.Row="0"
-                Grid.ColumnSpan="{Binding AccountSelectionSpan, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-                ItemsSource="{Binding Accounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-                SelectedValue="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-                SelectedIndex="{Binding AccountIndex, Mode=OneWayToSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-                SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                TextSearch.TextPath="Name" />
-            <Button
-                Grid.Column="2" Grid.Row="0"
-                VerticalAlignment="Center"
-                Visibility="{Binding SplitButtonVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-                Content="Splitten"
-                Command="{Binding SplitCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
-        </Grid>
-        <ListView
-            Visibility="{Binding SplitRowsVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-            ItemsSource="{Binding SplitEntries, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-            HorizontalContentAlignment="Stretch">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="Focusable" Value="false"/>
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="35" />
-                            <ColumnDefinition Width="35" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <DockPanel
-                            Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0">
-                            <local:NumberTextBox
-                                DockPanel.Dock="Right"
-                                Width="100" Height="30"
-                                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
-                                Scale="2"
-                                Text="{Binding BookingValue, StringFormat='#0.00'}"
-                                ToolTip="Buchungstext" />
-                            <TextBox
-                                DockPanel.Dock="Left"
-                                Height="30"
-                                Text="{Binding BookingText}"
-                                ToolTip="Anteiliger Buchungswert des Eintrags"/>
-                        </DockPanel>
-                        <local:NumberTextBox
-                            Grid.Column="0" Grid.Row="1"
-                            Text="{Binding AccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <ComboBox
-                            Grid.Column="1" Grid.Row="1"
-                            ItemsSource="{Binding Accounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-                            SelectedValue="{Binding AccountNumber, Mode=TwoWay}"
-                            SelectedIndex="{Binding AccountIndex, Mode=OneWayToSource}"
-                            SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                            TextSearch.TextPath="Name" />
-                        <Button
-                            Grid.Column="2" Grid.Row="1"
-                            Content="+" Width="35" Padding="0" Margin="0" VerticalAlignment="Center"
-                            Command="{Binding AddSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-                            CommandParameter="{Binding .}" />
-                        <Button
-                            Grid.Column="3" Grid.Row="1"
-                            Content="-" Width="35" Padding="0" Margin="0" VerticalAlignment="Center"
-                            Command="{Binding RemoveSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-                            CommandParameter="{Binding .}" />
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+  x:Class="lg2de.SimpleAccounting.Presentation.EditBookingAccountControl"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
+  xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
+  mc:Ignorable="d"
+  d:DesignWidth="400" d:DesignHeight="50">
+  <Grid>
+    <Grid
+      Visibility="{Binding SingleRowVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="2*" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <local:NumberTextBox
+        Grid.Column="0" Grid.Row="0"
+        MinWidth="100"
+        Text="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}" />
+      <ComboBox
+        Grid.Column="1" Grid.Row="0"
+        Grid.ColumnSpan="{Binding AccountSelectionSpan, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+        ItemsSource="{Binding Accounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+        SelectedValue="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+        SelectedIndex="{Binding AccountIndex, Mode=OneWayToSource, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+        SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
+        TextSearch.TextPath="Name" />
+      <Button
+        Grid.Column="2" Grid.Row="0"
+        VerticalAlignment="Center"
+        Visibility="{Binding SplitButtonVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+        Content="{x:Static properties:Resources.Word_Splitt}"
+        Command="{Binding SplitCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
     </Grid>
+    <ListView
+      Visibility="{Binding SplitRowsVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+      ItemsSource="{Binding SplitEntries, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+      HorizontalContentAlignment="Stretch">
+      <ListView.ItemContainerStyle>
+        <Style TargetType="ListViewItem">
+          <Setter Property="Focusable" Value="false" />
+        </Style>
+      </ListView.ItemContainerStyle>
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="2*" />
+              <ColumnDefinition Width="35" />
+              <ColumnDefinition Width="35" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <DockPanel
+              Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0">
+              <local:NumberTextBox
+                DockPanel.Dock="Right"
+                Width="100" Height="30"
+                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+                Scale="2"
+                Text="{Binding BookingValue, StringFormat='#0.00'}"
+                ToolTip="{x:Static properties:Resources.Word_BookingText}" />
+              <TextBox
+                DockPanel.Dock="Left"
+                Height="30"
+                Text="{Binding BookingText}"
+                ToolTip="{x:Static properties:Resources.Tooltip_SplittBookingValue}" />
+            </DockPanel>
+            <local:NumberTextBox
+              Grid.Column="0" Grid.Row="1"
+              Text="{Binding AccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ComboBox
+              Grid.Column="1" Grid.Row="1"
+              ItemsSource="{Binding Accounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+              SelectedValue="{Binding AccountNumber, Mode=TwoWay}"
+              SelectedIndex="{Binding AccountIndex, Mode=OneWayToSource}"
+              SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
+              TextSearch.TextPath="Name" />
+            <Button
+              Grid.Column="2" Grid.Row="1"
+              Content="+" Width="35" Padding="0" Margin="0" VerticalAlignment="Center"
+              Command="{Binding AddSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+              CommandParameter="{Binding .}" />
+            <Button
+              Grid.Column="3" Grid.Row="1"
+              Content="-" Width="35" Padding="0" Margin="0" VerticalAlignment="Center"
+              Command="{Binding RemoveSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+              CommandParameter="{Binding .}" />
+          </Grid>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
+  </Grid>
 </UserControl>

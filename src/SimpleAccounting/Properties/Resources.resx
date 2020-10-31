@@ -173,4 +173,91 @@ Do you want to save?</value>
   <data name="Header_AnnualBalance" xml:space="preserve">
     <value>Annual balance</value>
   </data>
+  <data name="Word_AccountNumber" xml:space="preserve">
+    <value>Account number</value>
+  </data>
+  <data name="Word_AccountName" xml:space="preserve">
+    <value>Account name</value>
+  </data>
+  <data name="Word_AccountGroup" xml:space="preserve">
+    <value>Account group</value>
+  </data>
+  <data name="Word_AccountType" xml:space="preserve">
+    <value>Account type</value>
+  </data>
+  <data name="Word_IsActive" xml:space="preserve">
+    <value>is active</value>
+  </data>
+  <data name="Word_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Word_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Word_CarriedForwardAccount" xml:space="preserve">
+    <value>Carried forward account</value>
+  </data>
+  <data name="Header_CloseYear" xml:space="preserve">
+    <value>Close year</value>
+  </data>
+  <data name="Question_CloseYearX" xml:space="preserve">
+    <value>Do you want to close the year {0}?</value>
+  </data>
+  <data name="Word_Splitt" xml:space="preserve">
+    <value>Splitt</value>
+  </data>
+  <data name="Word_BookingText" xml:space="preserve">
+    <value>Booking text</value>
+  </data>
+  <data name="Tooltip_SplittBookingValue" xml:space="preserve">
+    <value>Proportionate booking value of the entry</value>
+  </data>
+  <data name="Word_BookingNumber" xml:space="preserve">
+    <value>Booking number</value>
+  </data>
+  <data name="Label_ValueWithCurrency" xml:space="preserve">
+    <value>Value (€)</value>
+  </data>
+  <data name="Header_DebitCredit" xml:space="preserve">
+    <value>Debit/Credit</value>
+  </data>
+  <data name="Word_Debit" xml:space="preserve">
+    <value>Debit</value>
+  </data>
+  <data name="Word_Credit" xml:space="preserve">
+    <value>Credit</value>
+  </data>
+  <data name="Word_Income" xml:space="preserve">
+    <value>Income</value>
+  </data>
+  <data name="Word_IncomeType" xml:space="preserve">
+    <value>Income type</value>
+  </data>
+  <data name="Label_SourceAndRemoteAccount" xml:space="preserve">
+    <value>Source&amp;#10;Remote account</value>
+  </data>
+  <data name="Word_Expense" xml:space="preserve">
+    <value>Expense</value>
+  </data>
+  <data name="Word_ExpenseType" xml:space="preserve">
+    <value>Expense type</value>
+  </data>
+  <data name="Label_DebitAccountRemoteAccount" xml:space="preserve">
+    <value>Debit account&amp;#10;Remote account</value>
+  </data>
+  <data name="Word_OpeningBooking" xml:space="preserve">
+    <value>Opening booking</value>
+  </data>
+  <data name="Word_FollowUp" xml:space="preserve">
+    <value>Follow up</value>
+  </data>
+  <data name="Action_Book" xml:space="preserve">
+    <value>Book (CTRL-ENTER)</value>
+  </data>
+  <data name="Action_Save" xml:space="preserve">
+    <value>Save (CTRL-ENTER)</value>
+  </data>
+  <data name="Action_Close" xml:space="preserve">
+    <value>Close (ESC)</value>
+  </data>
 </root>

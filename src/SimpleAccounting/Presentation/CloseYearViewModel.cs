@@ -6,11 +6,13 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
     public class CloseYearViewModel : Screen
     {
@@ -35,8 +37,9 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnInitialize();
 
-            this.DisplayName = "Jahresabschluss";
-            this.InstructionText = $"Wollen Sie das Jahr {this.currentYear.Year} abschließen?";
+            this.DisplayName = Resources.Header_CloseYear;
+            this.InstructionText = string.Format(
+                CultureInfo.CurrentUICulture, Resources.Question_CloseYearX, this.currentYear.Year);
 
             this.RemoteAccount = this.Accounts.FirstOrDefault();
         }
