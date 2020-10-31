@@ -7,13 +7,13 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
     internal class EditBookingViewModel : Screen
     {
@@ -247,7 +247,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             base.OnInitialize();
 
-            this.DisplayName = this.EditMode ? "Buchungseintrag bearbeiten" : "Neue Buchung erstellen";
+            this.DisplayName = this.EditMode ? Resources.Header_EditBooking : Resources.Header_NewBooking;
 
             this.IncomeAccounts = this.Accounts.Where(x => x.Type == AccountDefinitionType.Income).ToList();
 

@@ -420,8 +420,8 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             var result = this.messageBox.Show(
-                "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
-                "Programm beenden",
+                Resources.Question_SaveBeforeProceed,
+                Resources.Header_Shutdown,
                 MessageBoxButton.YesNoCancel);
             if (result == MessageBoxResult.Cancel)
             {
@@ -443,7 +443,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
+                    Filter = Resources.FileDialogFilter, RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -498,7 +498,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Filter = "Accounting project files (*.acml)|*.acml", RestoreDirectory = true
+                Filter = Resources.FileDialogFilter, RestoreDirectory = true
             };
 
             if (openFileDialog.ShowDialog() != DialogResult.OK)
@@ -573,7 +573,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var accountVm = new AccountViewModel
             {
-                DisplayName = "Account erstellen",
+                DisplayName = Resources.Header_CreateAccount,
                 Group = this.accountingData!.Accounts.First(),
                 Groups = this.accountingData.Accounts,
                 IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
@@ -610,7 +610,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             var vm = account.Clone();
-            vm.DisplayName = "Account bearbeiten";
+            vm.DisplayName = Resources.Header_EditAccount;
             var invalidIds = this.AllAccounts.Select(x => x.Identifier).Where(x => x != account.Identifier)
                 .ToList();
             vm.IsValidIdentifierFunc = id => !invalidIds.Contains(id);
@@ -941,7 +941,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     debitSum += item.DebitValue;
                     item.RemoteAccount = booking.Credit.Count == 1
                         ? this.accountingData.GetAccountName(booking.Credit.Single())
-                        : "Diverse";
+                        : Resources.Word_Various;
                     this.AccountJournal.Add(item);
                 }
 
@@ -959,7 +959,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     creditSum += item.CreditValue;
                     item.RemoteAccount = booking.Debit.Count == 1
                         ? this.accountingData.GetAccountName(booking.Debit.Single())
-                        : "Diverse";
+                        : Resources.Word_Various;
                     this.AccountJournal.Add(item);
                 }
             }
@@ -975,14 +975,14 @@ namespace lg2de.SimpleAccounting.Presentation
             var sumItem = new AccountJournalViewModel();
             this.AccountJournal.Add(sumItem);
             sumItem.IsSummary = true;
-            sumItem.Text = "Summe";
+            sumItem.Text = Resources.Word_Total;
             sumItem.DebitValue = debitSum;
             sumItem.CreditValue = creditSum;
 
             var saldoItem = new AccountJournalViewModel();
             this.AccountJournal.Add(saldoItem);
             saldoItem.IsSummary = true;
-            saldoItem.Text = "Saldo";
+            saldoItem.Text = Resources.Word_Balance;
             if (debitSum > creditSum)
             {
                 saldoItem.DebitValue = debitSum - creditSum;
@@ -999,9 +999,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.currentModelJournal!,
                 this.accountingData!.Setup,
                 CultureInfo.CurrentUICulture);
-            const string title = "Journal";
-            report.CreateReport(title);
-            report.ShowPreview(title);
+            report.CreateReport(Resources.Header_Journal);
+            report.ShowPreview(Resources.Header_Journal);
         }
 
         private void OnAccountJournalReport()
@@ -1012,9 +1011,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.accountingData.Setup, CultureInfo.CurrentUICulture);
             report.PageBreakBetweenAccounts =
                 this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
-            const string title = "Kontoblätter";
-            report.CreateReport(title);
-            report.ShowPreview(title);
+            report.CreateReport(Resources.Header_AccountSheets);
+            report.ShowPreview(Resources.Header_AccountSheets);
         }
 
         private void OnTotalsAndBalancesReport()
@@ -1024,9 +1022,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.accountingData!.Accounts,
                 this.accountingData.Setup,
                 CultureInfo.CurrentUICulture);
-            const string title = "Summen und Salden";
-            report.CreateReport(title);
-            report.ShowPreview(title);
+            report.CreateReport(Resources.Header_TotalsAndBalances);
+            report.ShowPreview(Resources.Header_TotalsAndBalances);
         }
 
         private void OnAssetBalancesReport()
@@ -1053,9 +1050,8 @@ namespace lg2de.SimpleAccounting.Presentation
             // ReSharper disable ConstantConditionalAccessQualifier
             this.accountingData.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
             // ReSharper restore ConstantConditionalAccessQualifier
-            const string title = "Bestandskontosalden";
-            report.CreateReport(title);
-            report.ShowPreview(title);
+            report.CreateReport(Resources.Header_AssetBalances);
+            report.ShowPreview(Resources.Header_AssetBalances);
         }
 
         private void OnAnnualBalanceReport()
@@ -1065,7 +1061,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.accountingData!.AllAccounts,
                 this.accountingData.Setup,
                 CultureInfo.CurrentUICulture);
-            const string title = "Jahresbilanz";
+            string title = Resources.Header_AnnualBalance;
             report.CreateReport(title);
             report.ShowPreview(title);
         }

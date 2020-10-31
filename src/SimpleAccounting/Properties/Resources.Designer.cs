@@ -61,20 +61,110 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Date.
+        ///   Looks up a localized string similar to Accounting project files (*.acml)|*.acml.
         /// </summary>
-        public static string Date {
+        public static string FileDialogFilter {
             get {
-                return ResourceManager.GetString("Date", resourceCulture);
+                return ResourceManager.GetString("FileDialogFilter", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Account sheets.
+        /// </summary>
+        public static string Header_AccountSheets {
+            get {
+                return ResourceManager.GetString("Header_AccountSheets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jahresbilanz.
+        /// </summary>
+        public static string Header_AnnualBalance {
+            get {
+                return ResourceManager.GetString("Header_AnnualBalance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset balances.
+        /// </summary>
+        public static string Header_AssetBalances {
+            get {
+                return ResourceManager.GetString("Header_AssetBalances", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create account.
+        /// </summary>
+        public static string Header_CreateAccount {
+            get {
+                return ResourceManager.GetString("Header_CreateAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit account.
+        /// </summary>
+        public static string Header_EditAccount {
+            get {
+                return ResourceManager.GetString("Header_EditAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit booking entry.
+        /// </summary>
+        public static string Header_EditBooking {
+            get {
+                return ResourceManager.GetString("Header_EditBooking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Journal.
+        /// </summary>
+        public static string Header_Journal {
+            get {
+                return ResourceManager.GetString("Header_Journal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create new booking entry.
+        /// </summary>
+        public static string Header_NewBooking {
+            get {
+                return ResourceManager.GetString("Header_NewBooking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings changed.
         /// </summary>
         public static string Header_SettingsChanged {
             get {
                 return ResourceManager.GetString("Header_SettingsChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application shutdown.
+        /// </summary>
+        public static string Header_Shutdown {
+            get {
+                return ResourceManager.GetString("Header_Shutdown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Totals and balances.
+        /// </summary>
+        public static string Header_TotalsAndBalances {
+            get {
+                return ResourceManager.GetString("Header_TotalsAndBalances", resourceCulture);
             }
         }
         
@@ -85,6 +175,52 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Information_CultureChangeRestartRequired {
             get {
                 return ResourceManager.GetString("Information_CultureChangeRestartRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data has been changed.
+        ///Do you want to save?.
+        /// </summary>
+        public static string Question_SaveBeforeProceed {
+            get {
+                return ResourceManager.GetString("Question_SaveBeforeProceed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Balance.
+        /// </summary>
+        public static string Word_Balance {
+            get {
+                return ResourceManager.GetString("Word_Balance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Date.
+        /// </summary>
+        public static string Word_Date {
+            get {
+                return ResourceManager.GetString("Word_Date", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total.
+        /// </summary>
+        public static string Word_Total {
+            get {
+                return ResourceManager.GetString("Word_Total", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Various.
+        /// </summary>
+        public static string Word_Various {
+            get {
+                return ResourceManager.GetString("Word_Various", resourceCulture);
             }
         }
     }

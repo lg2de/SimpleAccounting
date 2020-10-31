@@ -164,7 +164,7 @@
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
               <DataGridTextColumn
-                Header="{x:Static properties:Resources.Date}" Width="60"
+                Header="{x:Static properties:Resources.Word_Date}" Width="60"
                 Binding="{Binding Date, StringFormat=\{0:d\}}"
                 CellStyle="{StaticResource SummaryGridStyle}" />
               <DataGridTextColumn Header="Belegnr." Width="50" Binding="{Binding Identifier}"

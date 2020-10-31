@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Date" xml:space="preserve">
+  <data name="Word_Date" xml:space="preserve">
     <value>Date</value>
   </data>
   <data name="Information_CultureChangeRestartRequired" xml:space="preserve">
@@ -126,5 +126,51 @@ You must restart the application to get setting take effect.</value>
   </data>
   <data name="Header_SettingsChanged" xml:space="preserve">
     <value>Settings changed</value>
+  </data>
+  <data name="Header_Shutdown" xml:space="preserve">
+    <value>Application shutdown</value>
+  </data>
+  <data name="Question_SaveBeforeProceed" xml:space="preserve">
+    <value>Data has been changed.
+Do you want to save?</value>
+  </data>
+  <data name="FileDialogFilter" xml:space="preserve">
+    <value>Accounting project files (*.acml)|*.acml</value>
+  </data>
+  <data name="Word_Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Word_Balance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="Header_EditBooking" xml:space="preserve">
+    <value>Edit booking entry</value>
+  </data>
+  <data name="Header_NewBooking" xml:space="preserve">
+    <value>Create new booking entry</value>
+  </data>
+  <data name="Header_CreateAccount" xml:space="preserve">
+    <value>Create account</value>
+  </data>
+  <data name="Header_EditAccount" xml:space="preserve">
+    <value>Edit account</value>
+  </data>
+  <data name="Word_Various" xml:space="preserve">
+    <value>Various</value>
+  </data>
+  <data name="Header_Journal" xml:space="preserve">
+    <value>Journal</value>
+  </data>
+  <data name="Header_AccountSheets" xml:space="preserve">
+    <value>Account sheets</value>
+  </data>
+  <data name="Header_TotalsAndBalances" xml:space="preserve">
+    <value>Totals and balances</value>
+  </data>
+  <data name="Header_AssetBalances" xml:space="preserve">
+    <value>Asset balances</value>
+  </data>
+  <data name="Header_AnnualBalance" xml:space="preserve">
+    <value>Annual balance</value>
   </data>
 </root>

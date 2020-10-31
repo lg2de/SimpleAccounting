@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Date" xml:space="preserve">
+  <data name="Word_Date" xml:space="preserve">
     <value>Datum</value>
   </data>
   <data name="Information_CultureChangeRestartRequired" xml:space="preserve">
@@ -126,5 +126,48 @@ Sie müssen die Anwendung neu starten, damit die Einstellung wirkt.</value>
   </data>
   <data name="Header_SettingsChanged" xml:space="preserve">
     <value>Einstellungen geändert</value>
+  </data>
+  <data name="Header_Shutdown" xml:space="preserve">
+    <value>Programm beenden</value>
+  </data>
+  <data name="Question_SaveBeforeProceed" xml:space="preserve">
+    <value>Die Datenbasis hat sich geändert.
+Wollen Sie Speichern?</value>
+  </data>
+  <data name="FileDialogFilter" xml:space="preserve">
+    <value>Projektdateien Buchhaltung (*.acml)|*.acml</value>
+  </data>
+  <data name="Word_Total" xml:space="preserve">
+    <value>Summe</value>
+  </data>
+  <data name="Word_Balance" xml:space="preserve">
+    <value>Saldo</value>
+  </data>
+  <data name="Header_EditBooking" xml:space="preserve">
+    <value>Buchungseintrag bearbeiten</value>
+  </data>
+  <data name="Header_NewBooking" xml:space="preserve">
+    <value>Neue Buchung erstellen</value>
+  </data>
+  <data name="Header_CreateAccount" xml:space="preserve">
+    <value>Account erstellen</value>
+  </data>
+  <data name="Header_EditAccount" xml:space="preserve">
+    <value>Account bearbeiten</value>
+  </data>
+  <data name="Word_Various" xml:space="preserve">
+    <value>Diverse</value>
+  </data>
+  <data name="Header_AccountSheets" xml:space="preserve">
+    <value>Kontoblätter</value>
+  </data>
+  <data name="Header_TotalsAndBalances" xml:space="preserve">
+    <value>Summen und Salden</value>
+  </data>
+  <data name="Header_AssetBalances" xml:space="preserve">
+    <value>Bestandskontosalden</value>
+  </data>
+  <data name="Header_AnnualBalance" xml:space="preserve">
+    <value>Jahresbilanz</value>
   </data>
 </root>
