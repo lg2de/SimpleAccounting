@@ -134,7 +134,7 @@ Sie müssen die Anwendung neu starten, damit die Einstellung wirkt.</value>
     <value>Die Datenbasis hat sich geändert.
 Wollen Sie Speichern?</value>
   </data>
-  <data name="FileDialogFilter" xml:space="preserve">
+  <data name="FileFilter_MainProject" xml:space="preserve">
     <value>Projektdateien Buchhaltung (*.acml)|*.acml</value>
   </data>
   <data name="Word_Total" xml:space="preserve">
@@ -197,13 +197,13 @@ Wollen Sie Speichern?</value>
   <data name="Question_CloseYearX" xml:space="preserve">
     <value>Wollen Sie das Jahr {0} abschließen?</value>
   </data>
-  <data name="Word_Splitt" xml:space="preserve">
+  <data name="Word_Split" xml:space="preserve">
     <value>Splitten</value>
   </data>
   <data name="Word_BookingText" xml:space="preserve">
     <value>Buchungstext</value>
   </data>
-  <data name="Tooltip_SplittBookingValue" xml:space="preserve">
+  <data name="Tooltip_SplitBookingValue" xml:space="preserve">
     <value>Anteiliger Buchungswert des Eintrags</value>
   </data>
   <data name="Word_BookingNumber" xml:space="preserve">
@@ -253,5 +253,65 @@ Wollen Sie Speichern?</value>
   </data>
   <data name="Action_Close" xml:space="preserve">
     <value>Schließen (ESC)</value>
+  </data>
+  <data name="ImportData_Notes" xml:space="preserve">
+    <value>Hinweise:
+Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.
+(Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)
+Die importierten Empfängernamen und Buchungstexte können korrigiert werden.</value>
+  </data>
+  <data name="ImportData_FileHasEnglishFormat" xml:space="preserve">
+    <value>Datei im englischen Format</value>
+  </data>
+  <data name="Action_LoadData" xml:space="preserve">
+    <value>Lade Daten</value>
+  </data>
+  <data name="ImportData_StartImport" xml:space="preserve">
+    <value>Beginn Import:</value>
+  </data>
+  <data name="Action_BookPartially" xml:space="preserve">
+    <value>Teilweise Buchen</value>
+  </data>
+  <data name="Tooltip_BookPartially" xml:space="preserve">
+    <value>Alle Einträge buchen, die schon einem Gegenkonto zugeordnet sind.</value>
+  </data>
+  <data name="Action_BookAll" xml:space="preserve">
+    <value>Alles Buchen</value>
+  </data>
+  <data name="Word_BookingNumber_Short" xml:space="preserve">
+    <value>Belegnr.</value>
+  </data>
+  <data name="Word_Recipient" xml:space="preserve">
+    <value>Empfänger</value>
+  </data>
+  <data name="Word_Skip" xml:space="preserve">
+    <value>Überspringen</value>
+  </data>
+  <data name="Word_Value" xml:space="preserve">
+    <value>Betrag</value>
+  </data>
+  <data name="Word_RemoteAccount" xml:space="preserve">
+    <value>Gegenkonto</value>
+  </data>
+  <data name="Word_IsFollowup" xml:space="preserve">
+    <value>Nachverfolgung</value>
+  </data>
+  <data name="Word_ResetAssignment" xml:space="preserve">
+    <value>Zuordnung zurücksetzen</value>
+  </data>
+  <data name="ImportData_Title" xml:space="preserve">
+    <value>Import von Kontodaten</value>
+  </data>
+  <data name="ImportData_FileFilter" xml:space="preserve">
+    <value>Konto-Buchungsdaten (*.csv)|*.csv</value>
+  </data>
+  <data name="ImportData_AlreadyBooked" xml:space="preserve">
+    <value>&lt;bereits gebucht&gt;</value>
+  </data>
+  <data name="ImportData_NoRelevantDataFound" xml:space="preserve">
+    <value>Keine nutzbaren Daten in {0} gefunden.</value>
+  </data>
+  <data name="ImportData_FailedToLoad" xml:space="preserve">
+    <value>Datei '{0}' konnte nicht geladen werden.</value>
   </data>
 </root>

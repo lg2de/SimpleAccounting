@@ -33,7 +33,7 @@
         Grid.Column="2" Grid.Row="0"
         VerticalAlignment="Center"
         Visibility="{Binding SplitButtonVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-        Content="{x:Static properties:Resources.Word_Splitt}"
+        Content="{x:Static properties:Resources.Word_Split}"
         Command="{Binding SplitCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
     </Grid>
     <ListView
@@ -71,7 +71,7 @@
                 DockPanel.Dock="Left"
                 Height="30"
                 Text="{Binding BookingText}"
-                ToolTip="{x:Static properties:Resources.Tooltip_SplittBookingValue}" />
+                ToolTip="{x:Static properties:Resources.Tooltip_SplitBookingValue}" />
             </DockPanel>
             <local:NumberTextBox
               Grid.Column="0" Grid.Row="1"

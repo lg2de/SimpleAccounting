@@ -134,7 +134,7 @@ You must restart the application to get setting take effect.</value>
     <value>Data has been changed.
 Do you want to save?</value>
   </data>
-  <data name="FileDialogFilter" xml:space="preserve">
+  <data name="FileFilter_MainProject" xml:space="preserve">
     <value>Accounting project files (*.acml)|*.acml</value>
   </data>
   <data name="Word_Total" xml:space="preserve">
@@ -203,13 +203,13 @@ Do you want to save?</value>
   <data name="Question_CloseYearX" xml:space="preserve">
     <value>Do you want to close the year {0}?</value>
   </data>
-  <data name="Word_Splitt" xml:space="preserve">
+  <data name="Word_Split" xml:space="preserve">
     <value>Splitt</value>
   </data>
   <data name="Word_BookingText" xml:space="preserve">
     <value>Booking text</value>
   </data>
-  <data name="Tooltip_SplittBookingValue" xml:space="preserve">
+  <data name="Tooltip_SplitBookingValue" xml:space="preserve">
     <value>Proportionate booking value of the entry</value>
   </data>
   <data name="Word_BookingNumber" xml:space="preserve">
@@ -259,5 +259,68 @@ Do you want to save?</value>
   </data>
   <data name="Action_Close" xml:space="preserve">
     <value>Close (ESC)</value>
+  </data>
+  <data name="ImportData_Notes" xml:space="preserve">
+    <value>Notes:
+Select the account to which booking are to be imported.
+(Only accounts that have an import configuration are available for selection).
+The imported recipient names and transaction texts can be modified.</value>
+  </data>
+  <data name="ImportData_FileHasEnglishFormat" xml:space="preserve">
+    <value>File is in English format</value>
+  </data>
+  <data name="Action_LoadData" xml:space="preserve">
+    <value>Load data</value>
+  </data>
+  <data name="ImportData_StartImport" xml:space="preserve">
+    <value>Start import:</value>
+  </data>
+  <data name="Action_BookPartially" xml:space="preserve">
+    <value>Book partially</value>
+  </data>
+  <data name="Tooltip_BookPartially" xml:space="preserve">
+    <value>All entries with assigned remote account will be booked.</value>
+  </data>
+  <data name="Action_BookAll" xml:space="preserve">
+    <value>Book all</value>
+  </data>
+  <data name="Word_BookingNumber_Short" xml:space="preserve">
+    <value>Booking no.</value>
+  </data>
+  <data name="Word_Recipient" xml:space="preserve">
+    <value>Recipient</value>
+  </data>
+  <data name="Word_Skip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="Word_Value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="Word_RemoteAccount" xml:space="preserve">
+    <value>Remote account</value>
+  </data>
+  <data name="Word_IsFollowup" xml:space="preserve">
+    <value>is followup</value>
+  </data>
+  <data name="Word_ResetAssignment" xml:space="preserve">
+    <value>Reset assignment</value>
+  </data>
+  <data name="ImportData_Title" xml:space="preserve">
+    <value>Import of bank account data</value>
+  </data>
+  <data name="ImportData_FileFilter" xml:space="preserve">
+    <value>Booking data files (*.csv)|*.csv</value>
+  </data>
+  <data name="ImportData_AlreadyBooked" xml:space="preserve">
+    <value>&lt;already booked&gt;</value>
+  </data>
+  <data name="ImportData_NoRelevantDataFound" xml:space="preserve">
+    <value>No relevant data found in {0}.</value>
+  </data>
+  <data name="ImportData_MessageTitle" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="ImportData_FailedToLoad" xml:space="preserve">
+    <value>Failed to load file '{0}'.</value>
   </data>
 </root>

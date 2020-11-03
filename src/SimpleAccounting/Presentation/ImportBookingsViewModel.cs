@@ -16,6 +16,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
     [SuppressMessage(
         "Major Code Smell",
@@ -48,7 +49,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.StartDate = this.RangeMin;
 
             // ReSharper disable once VirtualMemberCallInConstructor
-            this.DisplayName = "Import von Kontodaten";
+            this.DisplayName = Resources.ImportData_Title;
         }
 
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
@@ -147,7 +148,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 using var openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
-                    Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
+                    Filter = Resources.ImportData_FileFilter, RestoreDirectory = true
                 };
 
                 if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
@@ -212,7 +213,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     Identifier = entry.ID,
                     Date = entry.Date.ToDateTime(),
                     Text = me.Text,
-                    Name = "<bereits gebucht>",
+                    Name = Resources.ImportData_AlreadyBooked,
                     Value = value,
                     RemoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier)
                 };
@@ -228,6 +229,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.LoadedData.Clear();
 
+                // TODO use all culture configuration
                 var cultureInfo = CultureInfo.CurrentUICulture;
                 if (this.IsForceEnglish)
                 {
@@ -262,7 +264,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 if (!this.LoadedData.Any())
                 {
-                    this.messageBox.Show($"No relevant data found in {fileName}.", "Import");
+                    this.messageBox.Show(
+                        string.Format(CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFound, fileName),
+                        Resources.ImportData_MessageTitle);
                 }
 
                 this.UpdateIdentifierInLoadedData();
@@ -270,7 +274,9 @@ namespace lg2de.SimpleAccounting.Presentation
             }
             catch (Exception e)
             {
-                this.messageBox.Show($"Failed to load file '{fileName}':\n{e.Message}", "Import");
+                string message = string.Format(
+                    CultureInfo.CurrentUICulture, Resources.ImportData_FailedToLoad, fileName) + "\n" + e.Message;
+                this.messageBox.Show(message, Resources.ImportData_MessageTitle);
             }
         }
 

@@ -443,7 +443,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = Resources.FileDialogFilter, RestoreDirectory = true
+                    Filter = Resources.FileFilter_MainProject, RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -498,7 +498,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Filter = Resources.FileDialogFilter, RestoreDirectory = true
+                Filter = Resources.FileFilter_MainProject, RestoreDirectory = true
             };
 
             if (openFileDialog.ShowDialog() != DialogResult.OK)

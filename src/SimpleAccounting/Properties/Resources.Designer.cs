@@ -70,11 +70,38 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Schließen (ESC).
+        ///   Looks up a localized string similar to Book all.
+        /// </summary>
+        public static string Action_BookAll {
+            get {
+                return ResourceManager.GetString("Action_BookAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Book partially.
+        /// </summary>
+        public static string Action_BookPartially {
+            get {
+                return ResourceManager.GetString("Action_BookPartially", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close (ESC).
         /// </summary>
         public static string Action_Close {
             get {
                 return ResourceManager.GetString("Action_Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load data.
+        /// </summary>
+        public static string Action_LoadData {
+            get {
+                return ResourceManager.GetString("Action_LoadData", resourceCulture);
             }
         }
         
@@ -90,9 +117,9 @@ namespace lg2de.SimpleAccounting.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Accounting project files (*.acml)|*.acml.
         /// </summary>
-        public static string FileDialogFilter {
+        public static string FileFilter_MainProject {
             get {
-                return ResourceManager.GetString("FileDialogFilter", resourceCulture);
+                return ResourceManager.GetString("FileFilter_MainProject", resourceCulture);
             }
         }
         
@@ -214,6 +241,90 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;already booked&gt;.
+        /// </summary>
+        public static string ImportData_AlreadyBooked {
+            get {
+                return ResourceManager.GetString("ImportData_AlreadyBooked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load file &apos;{0}&apos;..
+        /// </summary>
+        public static string ImportData_FailedToLoad {
+            get {
+                return ResourceManager.GetString("ImportData_FailedToLoad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Booking data files (*.csv)|*.csv.
+        /// </summary>
+        public static string ImportData_FileFilter {
+            get {
+                return ResourceManager.GetString("ImportData_FileFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File is in English format.
+        /// </summary>
+        public static string ImportData_FileHasEnglishFormat {
+            get {
+                return ResourceManager.GetString("ImportData_FileHasEnglishFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import.
+        /// </summary>
+        public static string ImportData_MessageTitle {
+            get {
+                return ResourceManager.GetString("ImportData_MessageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No relevant data found in {0}..
+        /// </summary>
+        public static string ImportData_NoRelevantDataFound {
+            get {
+                return ResourceManager.GetString("ImportData_NoRelevantDataFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notes:
+        ///Select the account to which booking are to be imported.
+        ///(Only accounts that have an import configuration are available for selection).
+        ///The imported recipient names and transaction texts can be modified..
+        /// </summary>
+        public static string ImportData_Notes {
+            get {
+                return ResourceManager.GetString("ImportData_Notes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start import:.
+        /// </summary>
+        public static string ImportData_StartImport {
+            get {
+                return ResourceManager.GetString("ImportData_StartImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import of bank account data.
+        /// </summary>
+        public static string ImportData_Title {
+            get {
+                return ResourceManager.GetString("ImportData_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have changed the display language.
         ///You must restart the application to get setting take effect..
         /// </summary>
@@ -270,11 +381,20 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All entries with assigned remote account will be booked..
+        /// </summary>
+        public static string Tooltip_BookPartially {
+            get {
+                return ResourceManager.GetString("Tooltip_BookPartially", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Proportionate booking value of the entry.
         /// </summary>
-        public static string Tooltip_SplittBookingValue {
+        public static string Tooltip_SplitBookingValue {
             get {
-                return ResourceManager.GetString("Tooltip_SplittBookingValue", resourceCulture);
+                return ResourceManager.GetString("Tooltip_SplitBookingValue", resourceCulture);
             }
         }
         
@@ -329,6 +449,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_BookingNumber {
             get {
                 return ResourceManager.GetString("Word_BookingNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Booking no..
+        /// </summary>
+        public static string Word_BookingNumber_Short {
+            get {
+                return ResourceManager.GetString("Word_BookingNumber_Short", resourceCulture);
             }
         }
         
@@ -441,6 +570,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to is followup.
+        /// </summary>
+        public static string Word_IsFollowup {
+            get {
+                return ResourceManager.GetString("Word_IsFollowup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         public static string Word_Ok {
@@ -459,11 +597,47 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Recipient.
+        /// </summary>
+        public static string Word_Recipient {
+            get {
+                return ResourceManager.GetString("Word_Recipient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remote account.
+        /// </summary>
+        public static string Word_RemoteAccount {
+            get {
+                return ResourceManager.GetString("Word_RemoteAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset assignment.
+        /// </summary>
+        public static string Word_ResetAssignment {
+            get {
+                return ResourceManager.GetString("Word_ResetAssignment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip.
+        /// </summary>
+        public static string Word_Skip {
+            get {
+                return ResourceManager.GetString("Word_Skip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Splitt.
         /// </summary>
-        public static string Word_Splitt {
+        public static string Word_Split {
             get {
-                return ResourceManager.GetString("Word_Splitt", resourceCulture);
+                return ResourceManager.GetString("Word_Split", resourceCulture);
             }
         }
         
@@ -473,6 +647,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_Total {
             get {
                 return ResourceManager.GetString("Word_Total", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value.
+        /// </summary>
+        public static string Word_Value {
+            get {
+                return ResourceManager.GetString("Word_Value", resourceCulture);
             }
         }
         
