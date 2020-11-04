@@ -153,6 +153,10 @@ namespace lg2de.SimpleAccounting.Presentation
                     icon: MessageBoxImage.Information);
             });
 
+        public bool IsGermanCulture => this.Settings.Culture == "de";
+        public bool IsEnglishCulture => this.Settings.Culture == "en";
+        public bool IsSystemCulture => this.Settings.Culture == string.Empty;
+
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
         public ICommand AddBookingsCommand => new RelayCommand(_ => this.OnAddBookings(), _ => this.IsCurrentYearOpen);

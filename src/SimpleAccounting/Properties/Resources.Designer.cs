@@ -61,6 +61,42 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit account.
+        /// </summary>
+        public static string AccountsContextMenu_EditAccount {
+            get {
+                return ResourceManager.GetString("AccountsContextMenu_EditAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create account.
+        /// </summary>
+        public static string AccountsContextMenu_NewAccount {
+            get {
+                return ResourceManager.GetString("AccountsContextMenu_NewAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh account journal.
+        /// </summary>
+        public static string AccountsContextMenu_RefreshAccountJournal {
+            get {
+                return ResourceManager.GetString("AccountsContextMenu_RefreshAccountJournal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show inactive accounts.
+        /// </summary>
+        public static string AccountsContextMenu_ShowInactiveAccounts {
+            get {
+                return ResourceManager.GetString("AccountsContextMenu_ShowInactiveAccounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Book (CTRL-ENTER).
         /// </summary>
         public static string Action_Book {
@@ -124,6 +160,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account journal &apos;{0}&apos;.
+        /// </summary>
+        public static string Header_AccountJournalX {
+            get {
+                return ResourceManager.GetString("Header_AccountJournalX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Account sheets.
         /// </summary>
         public static string Header_AccountSheets {
@@ -138,6 +183,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Header_AnnualBalance {
             get {
                 return ResourceManager.GetString("Header_AnnualBalance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Journal of booking year.
+        /// </summary>
+        public static string Header_AnnualJournal {
+            get {
+                return ResourceManager.GetString("Header_AnnualJournal", resourceCulture);
             }
         }
         
@@ -362,6 +416,213 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Actions.
+        /// </summary>
+        public static string Menu_Actions {
+            get {
+                return ResourceManager.GetString("Menu_Actions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add booking.
+        /// </summary>
+        public static string Menu_Actions_AddBooking {
+            get {
+                return ResourceManager.GetString("Menu_Actions_AddBooking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close year.
+        /// </summary>
+        public static string Menu_Actions_CloseYear {
+            get {
+                return ResourceManager.GetString("Menu_Actions_CloseYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import bookings.
+        /// </summary>
+        public static string Menu_Actions_ImportBookings {
+            get {
+                return ResourceManager.GetString("Menu_Actions_ImportBookings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New account.
+        /// </summary>
+        public static string Menu_Actions_NewAccount {
+            get {
+                return ResourceManager.GetString("Menu_Actions_NewAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select booking year.
+        /// </summary>
+        public static string Menu_Actions_SelectYear {
+            get {
+                return ResourceManager.GetString("Menu_Actions_SelectYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help.
+        /// </summary>
+        public static string Menu_Help {
+            get {
+                return ResourceManager.GetString("Menu_Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to About.
+        /// </summary>
+        public static string Menu_Help_About {
+            get {
+                return ResourceManager.GetString("Menu_Help_About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check for updates.
+        /// </summary>
+        public static string Menu_Help_CheckUpdate {
+            get {
+                return ResourceManager.GetString("Menu_Help_CheckUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Send feedback.
+        /// </summary>
+        public static string Menu_Help_Feedback {
+            get {
+                return ResourceManager.GetString("Menu_Help_Feedback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project.
+        /// </summary>
+        public static string Menu_Project {
+            get {
+                return ResourceManager.GetString("Menu_Project", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exit.
+        /// </summary>
+        public static string Menu_Project_Exit {
+            get {
+                return ResourceManager.GetString("Menu_Project_Exit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        public static string Menu_Project_New {
+            get {
+                return ResourceManager.GetString("Menu_Project_New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open.
+        /// </summary>
+        public static string Menu_Project_Open {
+            get {
+                return ResourceManager.GetString("Menu_Project_Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last projects.
+        /// </summary>
+        public static string Menu_Project_RecentProjects {
+            get {
+                return ResourceManager.GetString("Menu_Project_RecentProjects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string Menu_Project_Save {
+            get {
+                return ResourceManager.GetString("Menu_Project_Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string Menu_Project_Settings {
+            get {
+                return ResourceManager.GetString("Menu_Project_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reports.
+        /// </summary>
+        public static string Menu_Reports {
+            get {
+                return ResourceManager.GetString("Menu_Reports", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account journal.
+        /// </summary>
+        public static string Menu_Reports_AccountJournal {
+            get {
+                return ResourceManager.GetString("Menu_Reports_AccountJournal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Annual balance.
+        /// </summary>
+        public static string Menu_Reports_AnnualBalance {
+            get {
+                return ResourceManager.GetString("Menu_Reports_AnnualBalance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Asset balance.
+        /// </summary>
+        public static string Menu_Reports_AssetBalance {
+            get {
+                return ResourceManager.GetString("Menu_Reports_AssetBalance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Journal.
+        /// </summary>
+        public static string Menu_Reports_Journal {
+            get {
+                return ResourceManager.GetString("Menu_Reports_Journal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Totals and Balances.
+        /// </summary>
+        public static string Menu_Reports_TotalsAndBalances {
+            get {
+                return ResourceManager.GetString("Menu_Reports_TotalsAndBalances", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to close the year {0}?.
         /// </summary>
         public static string Question_CloseYearX {
@@ -422,6 +683,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_AccountNumber {
             get {
                 return ResourceManager.GetString("Word_AccountNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Accounts.
+        /// </summary>
+        public static string Word_Accounts {
+            get {
+                return ResourceManager.GetString("Word_Accounts", resourceCulture);
             }
         }
         
@@ -498,6 +768,24 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Credit account.
+        /// </summary>
+        public static string Word_CreditAccount {
+            get {
+                return ResourceManager.GetString("Word_CreditAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Credit value.
+        /// </summary>
+        public static string Word_CreditValue {
+            get {
+                return ResourceManager.GetString("Word_CreditValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Date.
         /// </summary>
         public static string Word_Date {
@@ -512,6 +800,24 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_Debit {
             get {
                 return ResourceManager.GetString("Word_Debit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Debit account.
+        /// </summary>
+        public static string Word_DebitAccount {
+            get {
+                return ResourceManager.GetString("Word_DebitAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Credit value.
+        /// </summary>
+        public static string Word_DebitValue {
+            get {
+                return ResourceManager.GetString("Word_DebitValue", resourceCulture);
             }
         }
         
@@ -575,6 +881,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_IsFollowup {
             get {
                 return ResourceManager.GetString("Word_IsFollowup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nummer.
+        /// </summary>
+        public static string Word_Number {
+            get {
+                return ResourceManager.GetString("Word_Number", resourceCulture);
             }
         }
         

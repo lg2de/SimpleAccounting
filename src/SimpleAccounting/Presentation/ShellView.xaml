@@ -32,46 +32,62 @@
             <Setter Property="Command" Value="{Binding Command}" />
           </Style>
         </Menu.Resources>
-        <MenuItem Header="Projekt">
-          <MenuItem Header="Neu" Command="{Binding NewProjectCommand}" />
-          <MenuItem Header="Öffnen" Command="{Binding OpenProjectCommand}" InputGestureText="STRG-O" />
-          <MenuItem Header="Speichern" Command="{Binding SaveProjectCommand}" InputGestureText="STRG-S" />
+        <MenuItem Header="{x:Static properties:Resources.Menu_Project}">
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_New}" Command="{Binding NewProjectCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Open}" Command="{Binding OpenProjectCommand}"
+                    InputGestureText="STRG-O" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Save}" Command="{Binding SaveProjectCommand}"
+                    InputGestureText="STRG-S" />
           <Separator />
           <MenuItem
-            Header="Letzte Projekte"
+            Header="{x:Static properties:Resources.Menu_Project_RecentProjects}"
             ItemsSource="{Binding RecentProjects}"
             ItemContainerStyle="{StaticResource CommandMenuStyle}" />
           <Separator />
-          <MenuItem Header="Einstellungen">
-            <MenuItem Header="Deutsch" Command="{Binding SwitchCultureCommand}" CommandParameter="de" />
-            <MenuItem Header="English" Command="{Binding SwitchCultureCommand}" CommandParameter="en" />
-            <MenuItem Header="&lt;System&gt;" Command="{Binding SwitchCultureCommand}" CommandParameter="" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings}">
+            <MenuItem Header="Deutsch" Command="{Binding SwitchCultureCommand}" CommandParameter="de"
+                      IsCheckable="True" IsChecked="{Binding IsGermanCulture, Mode=OneWay}" />
+            <MenuItem Header="English" Command="{Binding SwitchCultureCommand}" CommandParameter="en"
+                      IsCheckable="True" IsChecked="{Binding IsEnglishCulture, Mode=OneWay}" />
+            <MenuItem Header="&lt;System&gt;" Command="{Binding SwitchCultureCommand}" CommandParameter=""
+                      IsCheckable="True" IsChecked="{Binding IsSystemCulture, Mode=OneWay}" />
           </MenuItem>
-          <MenuItem Header="Beenden" Command="{Binding CloseApplicationCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Exit}"
+                    Command="{Binding CloseApplicationCommand}" />
         </MenuItem>
-        <MenuItem Header="Aktionen">
-          <MenuItem Header="Buchen" Command="{Binding AddBookingsCommand}" InputGestureText="STRG+B" />
-          <MenuItem Header="Buchungen importieren" Command="{Binding ImportBookingsCommand}"
+        <MenuItem Header="{x:Static properties:Resources.Menu_Actions}">
+          <MenuItem Header="{x:Static properties:Resources.Menu_Actions_AddBooking}"
+                    Command="{Binding AddBookingsCommand}" InputGestureText="STRG+B" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Actions_ImportBookings}"
+                    Command="{Binding ImportBookingsCommand}"
                     InputGestureText="STRG-I" />
-          <MenuItem Header="Buchungsjahr abschließen" Command="{Binding CloseYearCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Actions_CloseYear}"
+                    Command="{Binding CloseYearCommand}" />
           <MenuItem
-            Header="Buchungsjahr wählen"
+            Header="{x:Static properties:Resources.Menu_Actions_SelectYear}"
             ItemsSource="{Binding BookingYears}"
             ItemContainerStyle="{StaticResource CommandMenuStyle}" />
           <Separator />
-          <MenuItem Header="Neues Konto" Command="{Binding NewAccountCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Actions_NewAccount}"
+                    Command="{Binding NewAccountCommand}" />
         </MenuItem>
-        <MenuItem Header="Berichte">
-          <MenuItem Header="Journal" Command="{Binding TotalJournalReportCommand}" />
-          <MenuItem Header="Kontenblätter" Command="{Binding AccountJournalReportCommand}" />
-          <MenuItem Header="Summen und Salden" Command="{Binding TotalsAndBalancesReportCommand}" />
-          <MenuItem Header="Bestandskontosalden" Command="{Binding AssetBalancesReportCommand}" />
-          <MenuItem Header="Jahresbilanz" Command="{Binding AnnualBalanceReportCommand}" />
+        <MenuItem Header="{x:Static properties:Resources.Menu_Reports}">
+          <MenuItem Header="{x:Static properties:Resources.Menu_Reports_Journal}"
+                    Command="{Binding TotalJournalReportCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Reports_AccountJournal}"
+                    Command="{Binding AccountJournalReportCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Reports_TotalsAndBalances}"
+                    Command="{Binding TotalsAndBalancesReportCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Reports_AssetBalance}"
+                    Command="{Binding AssetBalancesReportCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Reports_AnnualBalance}"
+                    Command="{Binding AnnualBalanceReportCommand}" />
         </MenuItem>
-        <MenuItem Header="Hilfe">
-          <MenuItem Header="Über" Command="{Binding HelpAboutCommand}" />
-          <MenuItem Header="Problem melden" Command="{Binding HelpFeedbackCommand}" />
-          <MenuItem Header="Auf Update prüfen" Command="{Binding HelpCheckForUpdateCommand}" />
+        <MenuItem Header="{x:Static properties:Resources.Menu_Help}">
+          <MenuItem Header="{x:Static properties:Resources.Menu_Help_About}" Command="{Binding HelpAboutCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Help_Feedback}" Command="{Binding HelpFeedbackCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Help_CheckUpdate}"
+                    Command="{Binding HelpCheckForUpdateCommand}" />
         </MenuItem>
       </Menu>
       <Grid>
@@ -118,8 +134,7 @@
         <DockPanel Grid.Column="0">
           <TextBlock
             DockPanel.Dock="Top"
-            Text="Journal des Buchungsjahres" />
-          <!-- TODO highlight split booking -->
+            Text="{x:Static properties:Resources.Header_AnnualJournal}" />
           <DataGrid
             DockPanel.Dock="Bottom"
             ItemsSource="{Binding FullJournal}"
@@ -129,15 +144,19 @@
             SelectionChanged="OnGridSelectionChanged"
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Datum" Width="60"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_Date}" Width="60"
                                   Binding="{Binding Date, StringFormat=\{0:d\}}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="50" Binding="{Binding Identifier}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200" Binding="{Binding Text}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="50"
+                                  Binding="{Binding Identifier}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200"
+                                  Binding="{Binding Text}" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_Value}" Width="70"
                                   Binding="{Binding Value, StringFormat=\{0:0.00\}}"
                                   ElementStyle="{StaticResource ValueGridStyle}" />
-              <DataGridTextColumn Header="Sollkonto" Width="100" Binding="{Binding DebitAccount}" />
-              <DataGridTextColumn Header="Habenkonto" Width="100" Binding="{Binding CreditAccount}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitAccount}" Width="100"
+                                  Binding="{Binding DebitAccount}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditAccount}" Width="100"
+                                  Binding="{Binding CreditAccount}" />
             </DataGrid.Columns>
             <DataGrid.InputBindings>
               <MouseBinding
@@ -149,11 +168,8 @@
         </DockPanel>
         <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" />
         <DockPanel Grid.Row="0" Grid.Column="2">
-          <TextBlock DockPanel.Dock="Top">
-            <Run Text="Kontenblatt '" />
-            <Run Text="{Binding SelectedAccount.Name}" />
-            <Run Text="'" />
-          </TextBlock>
+          <TextBlock DockPanel.Dock="Top"
+                     Text="{Binding SelectedAccount.Name, StringFormat={x:Static properties:Resources.Header_AccountJournalX}}" />
           <DataGrid
             DockPanel.Dock="Bottom"
             ItemsSource="{Binding AccountJournal}"
@@ -167,16 +183,19 @@
                 Header="{x:Static properties:Resources.Word_Date}" Width="60"
                 Binding="{Binding Date, StringFormat=\{0:d\}}"
                 CellStyle="{StaticResource SummaryGridStyle}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="50" Binding="{Binding Identifier}"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="50"
+                                  Binding="{Binding Identifier}"
                                   CellStyle="{StaticResource SummaryGridStyle}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200" Binding="{Binding Text}" />
-              <DataGridTextColumn Header="Sollwert" Width="70"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200"
+                                  Binding="{Binding Text}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitValue}" Width="70"
                                   Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}"
                                   ElementStyle="{StaticResource ValueGridStyle}" />
-              <DataGridTextColumn Header="Habenwert" Width="70"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditValue}" Width="70"
                                   Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}"
                                   ElementStyle="{StaticResource ValueGridStyle}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_RemoteAccount}" Width="100" Binding="{Binding RemoteAccount}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_RemoteAccount}" Width="100"
+                                  Binding="{Binding RemoteAccount}" />
             </DataGrid.Columns>
             <DataGrid.RowStyle>
               <Style BasedOn="{StaticResource GridRowStyle}" TargetType="{x:Type DataGridRow}">
@@ -201,7 +220,7 @@
         <DockPanel Grid.ColumnSpan="3" Grid.Row="2">
           <TextBlock
             DockPanel.Dock="Left"
-            Text="Konten"
+            Text="{x:Static properties:Resources.Word_Accounts}"
             VerticalAlignment="Center">
             <TextBlock.LayoutTransform>
               <RotateTransform Angle="-90" />
@@ -215,10 +234,11 @@
             IsReadOnly="True"
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Nummer" Binding="{Binding Identifier}" />
-              <DataGridTextColumn Header="Bezeichnung" Binding="{Binding Name}" />
-              <DataGridTextColumn Header="Gruppe" Binding="{Binding Group.Name}" />
-              <DataGridTextColumn Header="Typ" Binding="{Binding Type}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_Number}" Binding="{Binding Identifier}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_AccountName}" Binding="{Binding Name}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_AccountGroup}"
+                                  Binding="{Binding Group.Name}" />
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_AccountType}" Binding="{Binding Type}" />
             </DataGrid.Columns>
             <DataGrid.InputBindings>
               <MouseBinding
@@ -229,20 +249,20 @@
             <DataGrid.ContextMenu>
               <ContextMenu>
                 <MenuItem
-                  Header="Kontenblatt aktualisieren"
+                  Header="{x:Static properties:Resources.AccountsContextMenu_RefreshAccountJournal}"
                   Command="{Binding AccountSelectionCommand}"
                   CommandParameter="{Binding AccountList/}" />
                 <MenuItem
-                  Header="Konto bearbeiten"
+                  Header="{x:Static properties:Resources.AccountsContextMenu_EditAccount}"
                   Command="{Binding EditAccountCommand}"
                   CommandParameter="{Binding AccountList/}" />
                 <Separator />
                 <MenuItem
-                  Header="Konto erstellen"
+                  Header="{x:Static properties:Resources.AccountsContextMenu_NewAccount}"
                   Command="{Binding NewAccountCommand}" />
                 <Separator />
                 <MenuItem
-                  Header="Inaktive Konten anzeigen"
+                  Header="{x:Static properties:Resources.AccountsContextMenu_ShowInactiveAccounts}"
                   IsCheckable="True"
                   IsChecked="{Binding ShowInactiveAccounts}" />
               </ContextMenu>

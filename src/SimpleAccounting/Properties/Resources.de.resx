@@ -314,4 +314,106 @@ Die importierten Empfängernamen und Buchungstexte können korrigiert werden.</v
   <data name="ImportData_FailedToLoad" xml:space="preserve">
     <value>Datei '{0}' konnte nicht geladen werden.</value>
   </data>
+  <data name="Menu_Actions" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="Menu_Actions_AddBooking" xml:space="preserve">
+    <value>Buchen</value>
+  </data>
+  <data name="Menu_Actions_CloseYear" xml:space="preserve">
+    <value>Buchungsjahr abschließen</value>
+  </data>
+  <data name="Menu_Actions_ImportBookings" xml:space="preserve">
+    <value>Buchungen importieren</value>
+  </data>
+  <data name="Menu_Actions_NewAccount" xml:space="preserve">
+    <value>Neues Konto</value>
+  </data>
+  <data name="Menu_Actions_SelectYear" xml:space="preserve">
+    <value>Buchungsjahr wählen</value>
+  </data>
+  <data name="Menu_Help" xml:space="preserve">
+    <value>Hilfe</value>
+  </data>
+  <data name="Menu_Help_About" xml:space="preserve">
+    <value>Über</value>
+  </data>
+  <data name="Menu_Help_CheckUpdate" xml:space="preserve">
+    <value>Auf Update prüfen</value>
+  </data>
+  <data name="Menu_Help_Feedback" xml:space="preserve">
+    <value>Rückmeldung geben</value>
+  </data>
+  <data name="Menu_Project" xml:space="preserve">
+    <value>Projekt</value>
+  </data>
+  <data name="Menu_Project_Exit" xml:space="preserve">
+    <value>Beenden</value>
+  </data>
+  <data name="Menu_Project_New" xml:space="preserve">
+    <value>Neu</value>
+  </data>
+  <data name="Menu_Project_Open" xml:space="preserve">
+    <value>Öffnen</value>
+  </data>
+  <data name="Menu_Project_RecentProjects" xml:space="preserve">
+    <value>Letzte Projekte</value>
+  </data>
+  <data name="Menu_Project_Save" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="Menu_Project_Settings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="Menu_Reports" xml:space="preserve">
+    <value>Berichte</value>
+  </data>
+  <data name="Menu_Reports_AccountJournal" xml:space="preserve">
+    <value>Kontenblätter</value>
+  </data>
+  <data name="Menu_Reports_AnnualBalance" xml:space="preserve">
+    <value>Jahresbilanz</value>
+  </data>
+  <data name="Menu_Reports_AssetBalance" xml:space="preserve">
+    <value>Bestandskontosalden</value>
+  </data>
+  <data name="Menu_Reports_TotalsAndBalances" xml:space="preserve">
+    <value>Summen und Salden</value>
+  </data>
+  <data name="Header_AccountJournalX" xml:space="preserve">
+    <value>Kontenblatt '{0}'</value>
+  </data>
+  <data name="AccountsContextMenu_EditAccount" xml:space="preserve">
+    <value>Konto bearbeiten</value>
+  </data>
+  <data name="AccountsContextMenu_NewAccount" xml:space="preserve">
+    <value>Konto erstellen</value>
+  </data>
+  <data name="AccountsContextMenu_RefreshAccountJournal" xml:space="preserve">
+    <value>Kontenblatt aktualisieren</value>
+  </data>
+  <data name="AccountsContextMenu_ShowInactiveAccounts" xml:space="preserve">
+    <value>Inaktive Konten anzeigen</value>
+  </data>
+  <data name="Header_AnnualJournal" xml:space="preserve">
+    <value>Journal des Buchungsjahres</value>
+  </data>
+  <data name="Word_Accounts" xml:space="preserve">
+    <value>Konten</value>
+  </data>
+  <data name="Word_CreditAccount" xml:space="preserve">
+    <value>Habenkonto</value>
+  </data>
+  <data name="Word_DebitValue" xml:space="preserve">
+    <value>Sollwert</value>
+  </data>
+  <data name="Word_DebitAccount" xml:space="preserve">
+    <value>Sollkonto</value>
+  </data>
+  <data name="Word_CreditValue" xml:space="preserve">
+    <value>Habenwert</value>
+  </data>
+  <data name="Word_Number" xml:space="preserve">
+    <value>Nummer</value>
+  </data>
 </root>
