@@ -696,6 +696,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account sheets.
+        /// </summary>
+        public static string Word_AccountSheets {
+            get {
+                return ResourceManager.GetString("Word_AccountSheets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Account type.
         /// </summary>
         public static string Word_AccountType {
@@ -786,6 +795,16 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Credit
+        ///value.
+        /// </summary>
+        public static string Word_CreditValue_Wrapped {
+            get {
+                return ResourceManager.GetString("Word_CreditValue_Wrapped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Date.
         /// </summary>
         public static string Word_Date {
@@ -813,11 +832,21 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Credit value.
+        ///   Looks up a localized string similar to Debit value.
         /// </summary>
         public static string Word_DebitValue {
             get {
                 return ResourceManager.GetString("Word_DebitValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Debit
+        ///value.
+        /// </summary>
+        public static string Word_DebitValue_Wrapped {
+            get {
+                return ResourceManager.GetString("Word_DebitValue_Wrapped", resourceCulture);
             }
         }
         
@@ -885,11 +914,20 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Nummer.
+        ///   Looks up a localized string similar to Number.
         /// </summary>
         public static string Word_Number {
             get {
                 return ResourceManager.GetString("Word_Number", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No..
+        /// </summary>
+        public static string Word_Number_Short {
+            get {
+                return ResourceManager.GetString("Word_Number_Short", resourceCulture);
             }
         }
         
@@ -912,6 +950,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Page.
+        /// </summary>
+        public static string Word_Page {
+            get {
+                return ResourceManager.GetString("Word_Page", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Recipient.
         /// </summary>
         public static string Word_Recipient {
@@ -926,6 +973,16 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_RemoteAccount {
             get {
                 return ResourceManager.GetString("Word_RemoteAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remote
+        ///account.
+        /// </summary>
+        public static string Word_RemoteAccount_Wrapped {
+            get {
+                return ResourceManager.GetString("Word_RemoteAccount_Wrapped", resourceCulture);
             }
         }
         

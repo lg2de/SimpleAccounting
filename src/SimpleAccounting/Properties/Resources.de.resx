@@ -416,4 +416,25 @@ Die importierten Empfängernamen und Buchungstexte können korrigiert werden.</v
   <data name="Word_Number" xml:space="preserve">
     <value>Nummer</value>
   </data>
+  <data name="Word_AccountSheets" xml:space="preserve">
+    <value>Kontenblätter</value>
+  </data>
+  <data name="Word_Page" xml:space="preserve">
+    <value>Seite</value>
+  </data>
+  <data name="Word_Number_Short" xml:space="preserve">
+    <value>Nr.</value>
+  </data>
+  <data name="Word_DebitValue_Wrapped" xml:space="preserve">
+    <value>Soll-
+wert</value>
+  </data>
+  <data name="Word_CreditValue_Wrapped" xml:space="preserve">
+    <value>Haben-
+wert</value>
+  </data>
+  <data name="Word_RemoteAccount_Wrapped" xml:space="preserve">
+    <value>Gegen-
+konto</value>
+  </data>
 </root>

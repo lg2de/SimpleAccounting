@@ -635,7 +635,7 @@ namespace lg2de.SimpleAccounting.Reports
             nX += relX;
             nY += relY;
 
-            string text = this.currentNode.InnerText;
+            string text = this.currentNode.InnerText.Translate();
             var alignment = align switch
             {
                 "center" => StringAlignment.Center,

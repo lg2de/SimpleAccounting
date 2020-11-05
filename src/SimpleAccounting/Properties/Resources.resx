@@ -428,4 +428,25 @@ The imported recipient names and transaction texts can be modified.</value>
   <data name="AccountsContextMenu_ShowInactiveAccounts" xml:space="preserve">
     <value>Show inactive accounts</value>
   </data>
+  <data name="Word_AccountSheets" xml:space="preserve">
+    <value>Account sheets</value>
+  </data>
+  <data name="Word_Page" xml:space="preserve">
+    <value>Page</value>
+  </data>
+  <data name="Word_Number_Short" xml:space="preserve">
+    <value>No.</value>
+  </data>
+  <data name="Word_DebitValue_Wrapped" xml:space="preserve">
+    <value>Debit
+value</value>
+  </data>
+  <data name="Word_CreditValue_Wrapped" xml:space="preserve">
+    <value>Credit
+value</value>
+  </data>
+  <data name="Word_RemoteAccount_Wrapped" xml:space="preserve">
+    <value>Remote
+account</value>
+  </data>
 </root>
