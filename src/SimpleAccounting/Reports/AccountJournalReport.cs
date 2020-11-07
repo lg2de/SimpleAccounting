@@ -107,7 +107,7 @@ namespace lg2de.SimpleAccounting.Reports
                     totalLineNode.AddTableNode(string.Empty); // remote
                 }
 
-                // saldo
+                // balance
                 XmlNode balanceLineNode = this.PrintDocument.CreateElement("tr");
                 balanceLineNode.SetAttribute("topLine", true);
                 dataNode.AppendChild(balanceLineNode);

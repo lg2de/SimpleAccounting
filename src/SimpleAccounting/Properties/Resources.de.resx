@@ -437,4 +437,23 @@ wert</value>
     <value>Gegen-
 konto</value>
   </data>
+  <data name="Word_Receivables" xml:space="preserve">
+    <value>Forderungen
+</value>
+  </data>
+  <data name="Word_Liabilities" xml:space="preserve">
+    <value>Verbindlichkeiten</value>
+  </data>
+  <data name="Word_Incomes" xml:space="preserve">
+    <value>Einnahmen</value>
+  </data>
+  <data name="Word_Expenses" xml:space="preserve">
+    <value>Ausgaben</value>
+  </data>
+  <data name="Report_AnnualNetProfitAndLoss" xml:space="preserve">
+    <value>Jahresüberschuß/-verlust</value>
+  </data>
+  <data name="Word_Asset" xml:space="preserve">
+    <value>Vermögen</value>
+  </data>
 </root>

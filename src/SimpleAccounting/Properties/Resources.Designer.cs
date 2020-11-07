@@ -642,6 +642,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Annual net profit/loss.
+        /// </summary>
+        public static string Report_AnnualNetProfitAndLoss {
+            get {
+                return ResourceManager.GetString("Report_AnnualNetProfitAndLoss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All entries with assigned remote account will be booked..
         /// </summary>
         public static string Tooltip_BookPartially {
@@ -710,6 +719,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_AccountType {
             get {
                 return ResourceManager.GetString("Word_AccountType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string Word_Asset {
+            get {
+                return ResourceManager.GetString("Word_Asset", resourceCulture);
             }
         }
         
@@ -860,6 +878,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expenses.
+        /// </summary>
+        public static string Word_Expenses {
+            get {
+                return ResourceManager.GetString("Word_Expenses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expense type.
         /// </summary>
         public static string Word_ExpenseType {
@@ -887,6 +914,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Incomes.
+        /// </summary>
+        public static string Word_Incomes {
+            get {
+                return ResourceManager.GetString("Word_Incomes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Income type.
         /// </summary>
         public static string Word_IncomeType {
@@ -910,6 +946,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_IsFollowup {
             get {
                 return ResourceManager.GetString("Word_IsFollowup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Liabilities.
+        /// </summary>
+        public static string Word_Liabilities {
+            get {
+                return ResourceManager.GetString("Word_Liabilities", resourceCulture);
             }
         }
         
@@ -955,6 +1000,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_Page {
             get {
                 return ResourceManager.GetString("Word_Page", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Receivables.
+        /// </summary>
+        public static string Word_Receivables {
+            get {
+                return ResourceManager.GetString("Word_Receivables", resourceCulture);
             }
         }
         
