@@ -1,6 +1,7 @@
 ﻿// from https://github.com/xunit/xunit/tree/main/src/common.tests/CultureAwareTesting
 // licensed by Apache 2.0 https://github.com/xunit/xunit/blob/main/LICENSE
 
+#nullable enable
 // ReSharper disable once CheckNamespace
 namespace Xunit
 {
