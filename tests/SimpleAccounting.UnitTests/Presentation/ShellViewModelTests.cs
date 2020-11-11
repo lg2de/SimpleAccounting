@@ -836,6 +836,5 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             };
             return sut;
         }
-
     }
 }

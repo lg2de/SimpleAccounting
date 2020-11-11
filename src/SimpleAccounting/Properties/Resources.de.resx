@@ -438,8 +438,7 @@ wert</value>
 konto</value>
   </data>
   <data name="Word_Receivables" xml:space="preserve">
-    <value>Forderungen
-</value>
+    <value>Forderungen</value>
   </data>
   <data name="Word_Liabilities" xml:space="preserve">
     <value>Verbindlichkeiten</value>

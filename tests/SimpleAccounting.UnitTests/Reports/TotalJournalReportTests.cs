@@ -16,7 +16,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 
     public class TotalJournalReportTests
     {
-        [Fact]
+        [CulturedFact("en")]
         public void CreateReport_SampleData_Converted()
         {
             AccountingData project = Samples.SampleProject;
