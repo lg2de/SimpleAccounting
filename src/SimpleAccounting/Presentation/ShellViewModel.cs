@@ -27,8 +27,6 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
 
-    [SuppressMessage("ReSharper", "LocalizableElement")]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellViewModel : Conductor<IScreen>, IBusy, IDisposable
     {
         private readonly IApplicationUpdate applicationUpdate;
@@ -382,8 +380,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 return loadResult;
             }
 
-            this.LoadProjectData(loader.ProjectData);
             this.FileName = projectFileName;
+            this.LoadProjectData(loader.ProjectData);
             this.IsDocumentModified = loader.Migrated;
 
             return OperationResult.Completed;
@@ -441,6 +439,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return true;
             }
 
+            // TODO Not saving but continue cannot work correctly this way!?
             return result == MessageBoxResult.No;
         }
 

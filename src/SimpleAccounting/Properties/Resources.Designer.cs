@@ -214,6 +214,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Check for updates.
+        /// </summary>
+        public static string Header_CheckForUpdates {
+            get {
+                return ResourceManager.GetString("Header_CheckForUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Close year.
         /// </summary>
         public static string Header_CloseYear {
@@ -268,6 +277,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Load project.
+        /// </summary>
+        public static string Header_LoadProject {
+            get {
+                return ResourceManager.GetString("Header_LoadProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create new booking entry.
         /// </summary>
         public static string Header_NewBooking {
@@ -313,15 +331,6 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to load file &apos;{0}&apos;..
-        /// </summary>
-        public static string ImportData_FailedToLoad {
-            get {
-                return ResourceManager.GetString("ImportData_FailedToLoad", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to File is in English format.
         /// </summary>
         public static string ImportData_FileHasEnglishFormat {
@@ -342,9 +351,9 @@ namespace lg2de.SimpleAccounting.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No relevant data found in {0}..
         /// </summary>
-        public static string ImportData_NoRelevantDataFound {
+        public static string ImportData_NoRelevantDataFoundInX {
             get {
-                return ResourceManager.GetString("ImportData_NoRelevantDataFound", resourceCulture);
+                return ResourceManager.GetString("ImportData_NoRelevantDataFoundInX", resourceCulture);
             }
         }
         
@@ -385,6 +394,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Information_CultureChangeRestartRequired {
             get {
                 return ResourceManager.GetString("Information_CultureChangeRestartRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load file &apos;{0}&apos;..
+        /// </summary>
+        public static string Information_FailedToLoadX {
+            get {
+                return ResourceManager.GetString("Information_FailedToLoadX", resourceCulture);
             }
         }
         
@@ -632,12 +650,45 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Data has been changed.
+        ///   Looks up a localized string similar to There exists an automatically created backup file for project
+        ///{0}.
+        ///Do you want to load this backup file?
+        ///When answering &apos;No&apos; the backup file will be deleted..
+        /// </summary>
+        public static string Question_LoadAutoSaveProjectFileX {
+            get {
+                return ResourceManager.GetString("Question_LoadAutoSaveProjectFileX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project data has been changed.
         ///Do you want to save?.
         /// </summary>
         public static string Question_SaveBeforeProceed {
             get {
                 return ResourceManager.GetString("Question_SaveBeforeProceed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The project {0} seems to be stored on secured drive.
+        ///(Cryptomator)
+        ///This drive is currently not accessible.
+        ///Do you want to start &apos;Cryptomator&apos;?.
+        /// </summary>
+        public static string Question_StartSecureDriverX {
+            get {
+                return ResourceManager.GetString("Question_StartSecureDriverX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to update to version {0}?.
+        /// </summary>
+        public static string Question_UpdateToVersionX {
+            get {
+                return ResourceManager.GetString("Question_UpdateToVersionX", resourceCulture);
             }
         }
         
@@ -711,6 +762,24 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Tooltip_SplitBookingValue {
             get {
                 return ResourceManager.GetString("Tooltip_SplitBookingValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Querying for newer versions failed:.
+        /// </summary>
+        public static string Update_QueryVersionsFailed {
+            get {
+                return ResourceManager.GetString("Update_QueryVersionsFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have already latest version..
+        /// </summary>
+        public static string Update_UpToDate {
+            get {
+                return ResourceManager.GetString("Update_UpToDate", resourceCulture);
             }
         }
         

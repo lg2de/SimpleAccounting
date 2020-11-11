@@ -131,7 +131,7 @@ You must restart the application to get setting take effect.</value>
     <value>Application shutdown</value>
   </data>
   <data name="Question_SaveBeforeProceed" xml:space="preserve">
-    <value>Data has been changed.
+    <value>Project data has been changed.
 Do you want to save?</value>
   </data>
   <data name="FileFilter_MainProject" xml:space="preserve">
@@ -314,13 +314,13 @@ The imported recipient names and transaction texts can be modified.</value>
   <data name="ImportData_AlreadyBooked" xml:space="preserve">
     <value>&lt;already booked&gt;</value>
   </data>
-  <data name="ImportData_NoRelevantDataFound" xml:space="preserve">
+  <data name="ImportData_NoRelevantDataFoundInX" xml:space="preserve">
     <value>No relevant data found in {0}.</value>
   </data>
   <data name="ImportData_MessageTitle" xml:space="preserve">
     <value>Import</value>
   </data>
-  <data name="ImportData_FailedToLoad" xml:space="preserve">
+  <data name="Information_FailedToLoadX" xml:space="preserve">
     <value>Failed to load file '{0}'.</value>
   </data>
   <data name="Menu_Project" xml:space="preserve">
@@ -494,5 +494,32 @@ booking</value>
   <data name="Word_AccountNumber_Wrapped" xml:space="preserve">
     <value>Account
 number</value>
+  </data>
+  <data name="Header_LoadProject" xml:space="preserve">
+    <value>Load project</value>
+  </data>
+  <data name="Question_StartSecureDriverX" xml:space="preserve">
+    <value>The project {0} seems to be stored on secured drive.
+(Cryptomator)
+This drive is currently not accessible.
+Do you want to start 'Cryptomator'?</value>
+  </data>
+  <data name="Question_LoadAutoSaveProjectFileX" xml:space="preserve">
+    <value>There exists an automatically created backup file for project
+{0}.
+Do you want to load this backup file?
+When answering 'No' the backup file will be deleted.</value>
+  </data>
+  <data name="Header_CheckForUpdates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="Update_QueryVersionsFailed" xml:space="preserve">
+    <value>Querying for newer versions failed:</value>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>You have already latest version.</value>
+  </data>
+  <data name="Question_UpdateToVersionX" xml:space="preserve">
+    <value>Do you want to update to version {0}?</value>
   </data>
 </root>

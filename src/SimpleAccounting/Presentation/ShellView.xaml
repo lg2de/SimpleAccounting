@@ -146,7 +146,7 @@
             <DataGrid.Columns>
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_Date}" Width="60"
                                   Binding="{Binding Date, StringFormat=\{0:d\}}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="50"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="75"
                                   Binding="{Binding Identifier}" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200"
                                   Binding="{Binding Text}" />
@@ -183,15 +183,15 @@
                 Header="{x:Static properties:Resources.Word_Date}" Width="60"
                 Binding="{Binding Date, StringFormat=\{0:d\}}"
                 CellStyle="{StaticResource SummaryGridStyle}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="50"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="75"
                                   Binding="{Binding Identifier}"
                                   CellStyle="{StaticResource SummaryGridStyle}" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200"
                                   Binding="{Binding Text}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitValue}" Width="70"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitValue}" Width="80"
                                   Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}"
                                   ElementStyle="{StaticResource ValueGridStyle}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditValue}" Width="70"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditValue}" Width="80"
                                   Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}"
                                   ElementStyle="{StaticResource ValueGridStyle}" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_RemoteAccount}" Width="100"

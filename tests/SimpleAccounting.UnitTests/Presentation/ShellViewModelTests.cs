@@ -8,7 +8,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -25,7 +24,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using NSubstitute;
     using Xunit;
 
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public partial class ShellViewModelTests
     {
         [Fact]
@@ -453,7 +451,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             messageBox.Show(
-                    Arg.Is<string>(s => s.Contains("automatische Sicherung")), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("automatically created backup file")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
@@ -478,7 +476,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             messageBox.Show(
-                    Arg.Is<string>(s => s.Contains("automatische Sicherung")), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("automatically created backup file")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
@@ -496,6 +494,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.Settings.RecentProject.Should().Be("the.fileName");
             sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
+            fileSystem.Received(1).FileDelete("the.fileName~");
         }
 
         [Fact]
@@ -622,7 +621,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.FileName = "old.fileName";
             sut.IsDocumentModified = true;
             messageBox.Show(
-                    Arg.Is<string>(s => s.Contains("Die Datenbasis hat sich geändert.")), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("Project data has been changed.")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);

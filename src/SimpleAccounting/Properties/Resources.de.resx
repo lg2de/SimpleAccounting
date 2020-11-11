@@ -308,10 +308,10 @@ Die importierten Empfängernamen und Buchungstexte können korrigiert werden.</v
   <data name="ImportData_AlreadyBooked" xml:space="preserve">
     <value>&lt;bereits gebucht&gt;</value>
   </data>
-  <data name="ImportData_NoRelevantDataFound" xml:space="preserve">
+  <data name="ImportData_NoRelevantDataFoundInX" xml:space="preserve">
     <value>Keine nutzbaren Daten in {0} gefunden.</value>
   </data>
-  <data name="ImportData_FailedToLoad" xml:space="preserve">
+  <data name="Information_FailedToLoadX" xml:space="preserve">
     <value>Datei '{0}' konnte nicht geladen werden.</value>
   </data>
   <data name="Menu_Actions" xml:space="preserve">
@@ -482,5 +482,32 @@ Buchung</value>
   <data name="Word_AccountNumber_Wrapped" xml:space="preserve">
     <value>Konto-
 nummer</value>
+  </data>
+  <data name="Header_LoadProject" xml:space="preserve">
+    <value>Projekt laden</value>
+  </data>
+  <data name="Question_StartSecureDriverX" xml:space="preserve">
+    <value>Das Projekt {0} scheint auf einem gesicherten Laufwerk gespeichert zu sein.
+(Cryptomator)
+Dieses Laufwerk ist nicht verfügbar.
+Soll 'Cryptomator' gestartet werden?</value>
+  </data>
+  <data name="Question_LoadAutoSaveProjectFileX" xml:space="preserve">
+    <value>Es existiert eine automatische Sicherung der Projektdatei
+{0}.
+Soll diese geöffnet werden?
+Mit 'Nein' wird diese Sicherung gelöscht.</value>
+  </data>
+  <data name="Header_CheckForUpdates" xml:space="preserve">
+    <value>Update-Prüfung</value>
+  </data>
+  <data name="Update_QueryVersionsFailed" xml:space="preserve">
+    <value>Abfrage neuer Versionen fehlgeschlagen:</value>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>Sie verwenden die neueste Version.</value>
+  </data>
+  <data name="Question_UpdateToVersionX" xml:space="preserve">
+    <value>Wollen Sie auf die neue Version {0} aktualisieren?</value>
   </data>
 </root>

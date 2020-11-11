@@ -135,8 +135,6 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        [SuppressMessage(
-            "Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
         public ICommand LoadDataCommand => new RelayCommand(
             _ =>
             {
@@ -261,7 +259,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (!this.LoadedData.Any())
                 {
                     this.messageBox.Show(
-                        string.Format(CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFound, fileName),
+                        string.Format(CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFoundInX, fileName),
                         Resources.ImportData_MessageTitle);
                 }
 
@@ -271,7 +269,7 @@ namespace lg2de.SimpleAccounting.Presentation
             catch (Exception e)
             {
                 string message = string.Format(
-                    CultureInfo.CurrentUICulture, Resources.ImportData_FailedToLoad, fileName) + "\n" + e.Message;
+                    CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, fileName) + "\n" + e.Message;
                 this.messageBox.Show(message, Resources.ImportData_MessageTitle);
             }
         }
