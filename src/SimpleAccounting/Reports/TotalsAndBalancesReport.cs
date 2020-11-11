@@ -25,17 +25,17 @@ namespace lg2de.SimpleAccounting.Reports
         private int accountsPerGroup;
         private long groupOpeningCredit;
         private long groupOpeningDebit;
-        private long groupSaldoCredit;
-        private long groupSaldoDebit;
-        private long groupSumCredit;
-        private long groupSumDebit;
+        private long groupBalanceCredit;
+        private long groupBalanceDebit;
+        private long groupTotalCredit;
+        private long groupTotalDebit;
 
-        private long totalOpeningCredit;
-        private long totalOpeningDebit;
-        private long totalSaldoCredit;
-        private long totalSaldoDebit;
-        private long totalSumCredit;
-        private long totalSumDebit;
+        private long overallOpeningCredit;
+        private long overallOpeningDebit;
+        private long overallBalanceCredit;
+        private long overallBalanceDebit;
+        private long overallTotalCredit;
+        private long overallTotalDebit;
 
         public TotalsAndBalancesReport(
             AccountingDataJournal yearData,
@@ -56,21 +56,21 @@ namespace lg2de.SimpleAccounting.Reports
 
             XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data");
 
-            this.totalOpeningCredit = 0;
-            this.totalOpeningDebit = 0;
-            this.totalSumCredit = 0;
-            this.totalSumDebit = 0;
-            this.totalSaldoCredit = 0;
-            this.totalSaldoDebit = 0;
+            this.overallOpeningCredit = 0;
+            this.overallOpeningDebit = 0;
+            this.overallTotalCredit = 0;
+            this.overallTotalDebit = 0;
+            this.overallBalanceCredit = 0;
+            this.overallBalanceDebit = 0;
 
             foreach (var accountGroup in this.accountGroups)
             {
                 this.groupOpeningCredit = 0;
                 this.groupOpeningDebit = 0;
-                this.groupSumCredit = 0;
-                this.groupSumDebit = 0;
-                this.groupSaldoCredit = 0;
-                this.groupSaldoDebit = 0;
+                this.groupTotalCredit = 0;
+                this.groupTotalDebit = 0;
+                this.groupBalanceCredit = 0;
+                this.groupBalanceDebit = 0;
                 this.accountsPerGroup = 0;
                 foreach (var account in accountGroup.Account)
                 {
@@ -97,11 +97,11 @@ namespace lg2de.SimpleAccounting.Reports
                 groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningDebit));
                 groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningCredit));
 
-                groupLineNode.AddTableNode(this.FormatValue(this.groupSumDebit));
-                groupLineNode.AddTableNode(this.FormatValue(this.groupSumCredit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupTotalDebit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupTotalCredit));
 
-                groupLineNode.AddTableNode(this.FormatValue(this.groupSaldoDebit));
-                groupLineNode.AddTableNode(this.FormatValue(this.groupSaldoCredit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupBalanceDebit));
+                groupLineNode.AddTableNode(this.FormatValue(this.groupBalanceCredit));
 
                 dataNode.AppendChild(groupLineNode);
             }
@@ -115,14 +115,14 @@ namespace lg2de.SimpleAccounting.Reports
 
             totalLineNode.AddTableNode(string.Empty);
 
-            totalLineNode.AddTableNode(this.FormatValue(this.totalOpeningDebit));
-            totalLineNode.AddTableNode(this.FormatValue(this.totalOpeningCredit));
+            totalLineNode.AddTableNode(this.FormatValue(this.overallOpeningDebit));
+            totalLineNode.AddTableNode(this.FormatValue(this.overallOpeningCredit));
 
-            totalLineNode.AddTableNode(this.FormatValue(this.totalSumDebit));
-            totalLineNode.AddTableNode(this.FormatValue(this.totalSumCredit));
+            totalLineNode.AddTableNode(this.FormatValue(this.overallTotalDebit));
+            totalLineNode.AddTableNode(this.FormatValue(this.overallTotalCredit));
 
-            totalLineNode.AddTableNode(this.FormatValue(this.totalSaldoDebit));
-            totalLineNode.AddTableNode(this.FormatValue(this.totalSaldoCredit));
+            totalLineNode.AddTableNode(this.FormatValue(this.overallBalanceDebit));
+            totalLineNode.AddTableNode(this.FormatValue(this.overallBalanceCredit));
 
             dataNode.AppendChild(totalLineNode);
 
@@ -159,10 +159,10 @@ namespace lg2de.SimpleAccounting.Reports
             var lastBookingDate = this.YearData.Booking
                 .Where(x => x.Debit.Any(a => a.Account == account.ID) || x.Credit.Any(a => a.Account == account.ID))
                 .Select(x => x.Date).DefaultIfEmpty().Max();
-            long saldoCredit = this.YearData.Booking
+            long balanceCredit = this.YearData.Booking
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            long saldoDebit = this.YearData.Booking
+            long balanceDebit = this.YearData.Booking
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
             long openingCredit = this.YearData.Booking
@@ -173,11 +173,11 @@ namespace lg2de.SimpleAccounting.Reports
                 .Where(b => b.Opening)
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            long sumCredit = this.YearData.Booking
+            long totalCredit = this.YearData.Booking
                 .Where(b => !b.Opening)
                 .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
-            long sumDebit = this.YearData.Booking
+            long totalDebit = this.YearData.Booking
                 .Where(b => !b.Opening)
                 .SelectMany(x => x.Debit.Where(y => y.Account == account.ID))
                 .DefaultIfEmpty().Sum(x => x?.Value ?? 0);
@@ -193,15 +193,15 @@ namespace lg2de.SimpleAccounting.Reports
                 openingCredit = 0;
             }
 
-            if (saldoCredit > saldoDebit)
+            if (balanceCredit > balanceDebit)
             {
-                saldoCredit -= saldoDebit;
-                saldoDebit = 0;
+                balanceCredit -= balanceDebit;
+                balanceDebit = 0;
             }
             else
             {
-                saldoDebit -= saldoCredit;
-                saldoCredit = 0;
+                balanceDebit -= balanceCredit;
+                balanceCredit = 0;
             }
 
             XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
@@ -216,27 +216,27 @@ namespace lg2de.SimpleAccounting.Reports
             dataLineNode.AddTableNode(this.FormatValue(openingDebit));
             dataLineNode.AddTableNode(this.FormatValue(openingCredit));
 
-            dataLineNode.AddTableNode(this.FormatValue(sumDebit));
-            dataLineNode.AddTableNode(this.FormatValue(sumCredit));
+            dataLineNode.AddTableNode(this.FormatValue(totalDebit));
+            dataLineNode.AddTableNode(this.FormatValue(totalCredit));
 
-            dataLineNode.AddTableNode(this.FormatValue(saldoDebit));
-            dataLineNode.AddTableNode(this.FormatValue(saldoCredit));
+            dataLineNode.AddTableNode(this.FormatValue(balanceDebit));
+            dataLineNode.AddTableNode(this.FormatValue(balanceCredit));
 
             dataNode.AppendChild(dataLineNode);
 
             this.groupOpeningCredit += openingCredit;
             this.groupOpeningDebit += openingDebit;
-            this.groupSumCredit += sumCredit;
-            this.groupSumDebit += sumDebit;
-            this.groupSaldoCredit += saldoCredit;
-            this.groupSaldoDebit += saldoDebit;
+            this.groupTotalCredit += totalCredit;
+            this.groupTotalDebit += totalDebit;
+            this.groupBalanceCredit += balanceCredit;
+            this.groupBalanceDebit += balanceDebit;
 
-            this.totalOpeningCredit += openingCredit;
-            this.totalOpeningDebit += openingDebit;
-            this.totalSumCredit += sumCredit;
-            this.totalSumDebit += sumDebit;
-            this.totalSaldoCredit += saldoCredit;
-            this.totalSaldoDebit += saldoDebit;
+            this.overallOpeningCredit += openingCredit;
+            this.overallOpeningDebit += openingDebit;
+            this.overallTotalCredit += totalCredit;
+            this.overallTotalDebit += totalDebit;
+            this.overallBalanceCredit += balanceCredit;
+            this.overallBalanceDebit += balanceDebit;
         }
 
         private string FormatValue(long value)

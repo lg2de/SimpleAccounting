@@ -147,6 +147,9 @@ namespace lg2de.SimpleAccounting.Presentation
             cultureName =>
             {
                 this.Settings.Culture = cultureName.ToString();
+                this.NotifyOfPropertyChange(nameof(this.IsGermanCulture));
+                this.NotifyOfPropertyChange(nameof(this.IsEnglishCulture));
+                this.NotifyOfPropertyChange(nameof(this.IsSystemCulture));
                 this.messageBox.Show(
                     Resources.Information_CultureChangeRestartRequired,
                     Resources.Header_SettingsChanged,

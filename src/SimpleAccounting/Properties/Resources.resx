@@ -308,7 +308,7 @@ The imported recipient names and transaction texts can be modified.</value>
   <data name="ImportData_Title" xml:space="preserve">
     <value>Import of bank account data</value>
   </data>
-  <data name="ImportData_FileFilter" xml:space="preserve">
+  <data name="FileFilter_ImportData" xml:space="preserve">
     <value>Booking data files (*.csv)|*.csv</value>
   </data>
   <data name="ImportData_AlreadyBooked" xml:space="preserve">
@@ -428,9 +428,6 @@ The imported recipient names and transaction texts can be modified.</value>
   <data name="AccountsContextMenu_ShowInactiveAccounts" xml:space="preserve">
     <value>Show inactive accounts</value>
   </data>
-  <data name="Word_AccountSheets" xml:space="preserve">
-    <value>Account sheets</value>
-  </data>
   <data name="Word_Page" xml:space="preserve">
     <value>Page</value>
   </data>
@@ -466,5 +463,36 @@ account</value>
   </data>
   <data name="Word_Asset" xml:space="preserve">
     <value>Asset</value>
+  </data>
+  <data name="Word_DebitAccount_Wrapped" xml:space="preserve">
+    <value>Debit
+account</value>
+  </data>
+  <data name="Word_CreditAccount_Wrapped" xml:space="preserve">
+    <value>Credit
+account</value>
+  </data>
+  <data name="Report_LastBooking_Wrapped" xml:space="preserve">
+    <value>Last
+booking</value>
+  </data>
+  <data name="Report_OpeningAssets" xml:space="preserve">
+    <value>Assets</value>
+  </data>
+  <data name="Report_OpeningLiabilities" xml:space="preserve">
+    <value>Liabilities</value>
+  </data>
+  <data name="Word_OpeningBalance" xml:space="preserve">
+    <value>Opening balance</value>
+  </data>
+  <data name="Report_TotalsInTimeRange" xml:space="preserve">
+    <value>Totals in range</value>
+  </data>
+  <data name="Report_BalanceAtTheEnd" xml:space="preserve">
+    <value>Balance at the end</value>
+  </data>
+  <data name="Word_AccountNumber_Wrapped" xml:space="preserve">
+    <value>Account
+number</value>
   </data>
 </root>

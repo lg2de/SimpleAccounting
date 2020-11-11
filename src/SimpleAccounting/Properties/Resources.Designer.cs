@@ -151,6 +151,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Booking data files (*.csv)|*.csv.
+        /// </summary>
+        public static string FileFilter_ImportData {
+            get {
+                return ResourceManager.GetString("FileFilter_ImportData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Accounting project files (*.acml)|*.acml.
         /// </summary>
         public static string FileFilter_MainProject {
@@ -309,15 +318,6 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string ImportData_FailedToLoad {
             get {
                 return ResourceManager.GetString("ImportData_FailedToLoad", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Booking data files (*.csv)|*.csv.
-        /// </summary>
-        public static string ImportData_FileFilter {
-            get {
-                return ResourceManager.GetString("ImportData_FileFilter", resourceCulture);
             }
         }
         
@@ -651,6 +651,52 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Balance at the end.
+        /// </summary>
+        public static string Report_BalanceAtTheEnd {
+            get {
+                return ResourceManager.GetString("Report_BalanceAtTheEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last
+        ///booking.
+        /// </summary>
+        public static string Report_LastBooking_Wrapped {
+            get {
+                return ResourceManager.GetString("Report_LastBooking_Wrapped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assets.
+        /// </summary>
+        public static string Report_OpeningAssets {
+            get {
+                return ResourceManager.GetString("Report_OpeningAssets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Liabilities.
+        /// </summary>
+        public static string Report_OpeningLiabilities {
+            get {
+                return ResourceManager.GetString("Report_OpeningLiabilities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Totals in range.
+        /// </summary>
+        public static string Report_TotalsInTimeRange {
+            get {
+                return ResourceManager.GetString("Report_TotalsInTimeRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All entries with assigned remote account will be booked..
         /// </summary>
         public static string Tooltip_BookPartially {
@@ -696,20 +742,21 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account
+        ///number.
+        /// </summary>
+        public static string Word_AccountNumber_Wrapped {
+            get {
+                return ResourceManager.GetString("Word_AccountNumber_Wrapped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Accounts.
         /// </summary>
         public static string Word_Accounts {
             get {
                 return ResourceManager.GetString("Word_Accounts", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Account sheets.
-        /// </summary>
-        public static string Word_AccountSheets {
-            get {
-                return ResourceManager.GetString("Word_AccountSheets", resourceCulture);
             }
         }
         
@@ -723,7 +770,7 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Asset.
         /// </summary>
         public static string Word_Asset {
             get {
@@ -804,6 +851,16 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Credit
+        ///account.
+        /// </summary>
+        public static string Word_CreditAccount_Wrapped {
+            get {
+                return ResourceManager.GetString("Word_CreditAccount_Wrapped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Credit value.
         /// </summary>
         public static string Word_CreditValue {
@@ -846,6 +903,16 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_DebitAccount {
             get {
                 return ResourceManager.GetString("Word_DebitAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Debit
+        ///account.
+        /// </summary>
+        public static string Word_DebitAccount_Wrapped {
+            get {
+                return ResourceManager.GetString("Word_DebitAccount_Wrapped", resourceCulture);
             }
         }
         
@@ -982,6 +1049,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_Ok {
             get {
                 return ResourceManager.GetString("Word_Ok", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opening balance.
+        /// </summary>
+        public static string Word_OpeningBalance {
+            get {
+                return ResourceManager.GetString("Word_OpeningBalance", resourceCulture);
             }
         }
         

@@ -148,7 +148,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 using var openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
-                    Filter = Resources.ImportData_FileFilter, RestoreDirectory = true
+                    Filter = Resources.FileFilter_ImportData, RestoreDirectory = true
                 };
 
                 if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
