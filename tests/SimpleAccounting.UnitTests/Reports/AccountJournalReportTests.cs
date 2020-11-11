@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.Linq;
     using System.Xml.Linq;
     using System.Xml.XPath;
@@ -28,7 +27,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var setup = new AccountingDataSetup();
-            var sut = new AccountJournalReport(project.Journal.Last(), project.AllAccounts, setup, new CultureInfo("en-us"))
+            var sut = new AccountJournalReport(project.Journal.Last(), project.AllAccounts, setup)
             {
                 PageBreakBetweenAccounts = pageBreakBetweenAccounts
             };

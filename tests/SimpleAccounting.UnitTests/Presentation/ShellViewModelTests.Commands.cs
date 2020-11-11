@@ -618,7 +618,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory.CreateAccountJournal(
                 Arg.Any<AccountingDataJournal>(),
                 Arg.Any<IEnumerable<AccountDefinition>>(),
-                Arg.Any<AccountingDataSetup>(), Arg.Any<CultureInfo>()).Returns(accountJournalReport);
+                Arg.Any<AccountingDataSetup>()).Returns(accountJournalReport);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AccountJournalReportCommand.Execute(null);
@@ -652,8 +652,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory.CreateAnnualBalance(
                 Arg.Any<AccountingDataJournal>(),
                 Arg.Any<IEnumerable<AccountDefinition>>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(annualBalanceReport);
+                Arg.Any<AccountingDataSetup>())
+                .Returns(annualBalanceReport);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AnnualBalanceReportCommand.Execute(null);
@@ -687,8 +687,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory.CreateTotalsAndBalances(
                 Arg.Any<AccountingDataJournal>(),
                 Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(assetBalancesReport);
+                Arg.Any<AccountingDataSetup>())
+                .Returns(assetBalancesReport);
             var project = Samples.SampleProject;
             project.Accounts.Add(
                 new AccountingDataAccountGroup { Name = "EMPTY", Account = new List<AccountDefinition>() });
@@ -701,8 +701,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory.Received(1).CreateTotalsAndBalances(
                 Arg.Any<AccountingDataJournal>(),
                 Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.ToList().All(y => y.Name != "EMPTY")),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>());
+                Arg.Any<AccountingDataSetup>());
         }
 
         [Fact]
@@ -729,8 +728,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var totalJournalReport = Substitute.For<ITotalJournalReport>();
             reportFactory.CreateTotalJournal(
                 Arg.Any<AccountingDataJournal>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(totalJournalReport);
+                Arg.Any<AccountingDataSetup>())
+                .Returns(totalJournalReport);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.TotalJournalReportCommand.Execute(null);
@@ -764,8 +763,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory.CreateTotalsAndBalances(
                 Arg.Any<AccountingDataJournal>(),
                 Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
-                Arg.Any<AccountingDataSetup>(),
-                Arg.Any<CultureInfo>()).Returns(totalsAndBalancesReport);
+                Arg.Any<AccountingDataSetup>())
+                .Returns(totalsAndBalancesReport);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.TotalsAndBalancesReportCommand.Execute(null);

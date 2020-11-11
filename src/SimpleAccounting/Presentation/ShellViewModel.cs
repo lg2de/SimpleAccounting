@@ -1004,8 +1004,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var report = this.reportFactory.CreateTotalJournal(
                 this.currentModelJournal!,
-                this.accountingData!.Setup,
-                CultureInfo.CurrentUICulture);
+                this.accountingData!.Setup);
             report.CreateReport(Resources.Header_Journal);
             report.ShowPreview(Resources.Header_Journal);
         }
@@ -1015,7 +1014,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = this.reportFactory.CreateAccountJournal(
                 this.currentModelJournal!,
                 this.accountingData!.Accounts.SelectMany(a => a.Account),
-                this.accountingData.Setup, CultureInfo.CurrentUICulture);
+                this.accountingData.Setup);
             report.PageBreakBetweenAccounts =
                 this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
             report.CreateReport(Resources.Header_AccountSheets);
@@ -1027,8 +1026,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = this.reportFactory.CreateTotalsAndBalances(
                 this.currentModelJournal!,
                 this.accountingData!.Accounts,
-                this.accountingData.Setup,
-                CultureInfo.CurrentUICulture);
+                this.accountingData.Setup);
             report.CreateReport(Resources.Header_TotalsAndBalances);
             report.ShowPreview(Resources.Header_TotalsAndBalances);
         }
@@ -1052,8 +1050,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = this.reportFactory.CreateTotalsAndBalances(
                 this.currentModelJournal!,
                 accountGroups,
-                this.accountingData.Setup,
-                CultureInfo.CurrentUICulture);
+                this.accountingData.Setup);
             // ReSharper disable ConstantConditionalAccessQualifier
             this.accountingData.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
             // ReSharper restore ConstantConditionalAccessQualifier
@@ -1066,8 +1063,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = this.reportFactory.CreateAnnualBalance(
                 this.currentModelJournal!,
                 this.accountingData!.AllAccounts,
-                this.accountingData.Setup,
-                CultureInfo.CurrentUICulture);
+                this.accountingData.Setup);
             string title = Resources.Header_AnnualBalance;
             report.CreateReport(title);
             report.ShowPreview(title);

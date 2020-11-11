@@ -5,23 +5,18 @@
 namespace lg2de.SimpleAccounting.Reports
 {
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
-    [SuppressMessage(
-        "Major Code Smell",
-        "S4055:Literals should not be passed as localized parameters",
-        Justification = "pending translation")]
     internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
     {
         public const string ResourceName = "TotalsAndBalances.xml";
 
         private readonly List<AccountingDataAccountGroup> accountGroups;
-        private readonly CultureInfo culture;
         private int accountsPerGroup;
         private long groupOpeningCredit;
         private long groupOpeningDebit;
@@ -40,12 +35,10 @@ namespace lg2de.SimpleAccounting.Reports
         public TotalsAndBalancesReport(
             AccountingDataJournal yearData,
             IEnumerable<AccountingDataAccountGroup> accountGroups,
-            AccountingDataSetup setup,
-            CultureInfo culture)
-            : base(ResourceName, setup, yearData, culture)
+            AccountingDataSetup setup)
+            : base(ResourceName, setup, yearData)
         {
             this.accountGroups = accountGroups.ToList();
-            this.culture = culture;
         }
 
         public List<string> Signatures { get; } = new List<string>();
@@ -94,14 +87,14 @@ namespace lg2de.SimpleAccounting.Reports
 
                 groupLineNode.AddTableNode(string.Empty);
 
-                groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningDebit));
-                groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningCredit));
+                groupLineNode.AddTableNode(FormatValue(this.groupOpeningDebit));
+                groupLineNode.AddTableNode(FormatValue(this.groupOpeningCredit));
 
-                groupLineNode.AddTableNode(this.FormatValue(this.groupTotalDebit));
-                groupLineNode.AddTableNode(this.FormatValue(this.groupTotalCredit));
+                groupLineNode.AddTableNode(FormatValue(this.groupTotalDebit));
+                groupLineNode.AddTableNode(FormatValue(this.groupTotalCredit));
 
-                groupLineNode.AddTableNode(this.FormatValue(this.groupBalanceDebit));
-                groupLineNode.AddTableNode(this.FormatValue(this.groupBalanceCredit));
+                groupLineNode.AddTableNode(FormatValue(this.groupBalanceDebit));
+                groupLineNode.AddTableNode(FormatValue(this.groupBalanceCredit));
 
                 dataNode.AppendChild(groupLineNode);
             }
@@ -111,18 +104,18 @@ namespace lg2de.SimpleAccounting.Reports
 
             totalLineNode.AddTableNode(string.Empty);
 
-            totalLineNode.AddTableNode("Total").SetAttribute("align", "right");
+            totalLineNode.AddTableNode(Resources.Word_Total).SetAttribute("align", "right");
 
             totalLineNode.AddTableNode(string.Empty);
 
-            totalLineNode.AddTableNode(this.FormatValue(this.overallOpeningDebit));
-            totalLineNode.AddTableNode(this.FormatValue(this.overallOpeningCredit));
+            totalLineNode.AddTableNode(FormatValue(this.overallOpeningDebit));
+            totalLineNode.AddTableNode(FormatValue(this.overallOpeningCredit));
 
-            totalLineNode.AddTableNode(this.FormatValue(this.overallTotalDebit));
-            totalLineNode.AddTableNode(this.FormatValue(this.overallTotalCredit));
+            totalLineNode.AddTableNode(FormatValue(this.overallTotalDebit));
+            totalLineNode.AddTableNode(FormatValue(this.overallTotalCredit));
 
-            totalLineNode.AddTableNode(this.FormatValue(this.overallBalanceDebit));
-            totalLineNode.AddTableNode(this.FormatValue(this.overallBalanceCredit));
+            totalLineNode.AddTableNode(FormatValue(this.overallBalanceDebit));
+            totalLineNode.AddTableNode(FormatValue(this.overallBalanceCredit));
 
             dataNode.AppendChild(totalLineNode);
 
@@ -144,6 +137,16 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             signatures.ParentNode.RemoveChild(signatures);
+        }
+
+        private static string FormatValue(long value)
+        {
+            if (value <= 0)
+            {
+                return string.Empty;
+            }
+
+            return value.FormatCurrency();
         }
 
         private void ProcessAccount(XmlNode dataNode, AccountDefinition account)
@@ -211,16 +214,16 @@ namespace lg2de.SimpleAccounting.Reports
 
             dataLineNode.AddTableNode(account.Name);
 
-            dataLineNode.AddTableNode(lastBookingDate.ToDateTime().ToString("d", this.culture));
+            dataLineNode.AddTableNode(lastBookingDate.ToDateTime().ToString("d", CultureInfo.CurrentCulture));
 
-            dataLineNode.AddTableNode(this.FormatValue(openingDebit));
-            dataLineNode.AddTableNode(this.FormatValue(openingCredit));
+            dataLineNode.AddTableNode(FormatValue(openingDebit));
+            dataLineNode.AddTableNode(FormatValue(openingCredit));
 
-            dataLineNode.AddTableNode(this.FormatValue(totalDebit));
-            dataLineNode.AddTableNode(this.FormatValue(totalCredit));
+            dataLineNode.AddTableNode(FormatValue(totalDebit));
+            dataLineNode.AddTableNode(FormatValue(totalCredit));
 
-            dataLineNode.AddTableNode(this.FormatValue(balanceDebit));
-            dataLineNode.AddTableNode(this.FormatValue(balanceCredit));
+            dataLineNode.AddTableNode(FormatValue(balanceDebit));
+            dataLineNode.AddTableNode(FormatValue(balanceCredit));
 
             dataNode.AppendChild(dataLineNode);
 
@@ -237,16 +240,6 @@ namespace lg2de.SimpleAccounting.Reports
             this.overallTotalDebit += totalDebit;
             this.overallBalanceCredit += balanceCredit;
             this.overallBalanceDebit += balanceDebit;
-        }
-
-        private string FormatValue(long value)
-        {
-            if (value <= 0)
-            {
-                return string.Empty;
-            }
-
-            return value.FormatCurrency(this.culture);
         }
     }
 }

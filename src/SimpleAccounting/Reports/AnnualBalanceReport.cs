@@ -13,11 +13,6 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
-    [SuppressMessage(
-        "Major Code Smell",
-        "S4055:Literals should not be passed as localized parameters",
-        Justification = "pending translation")]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     [SuppressMessage("ReSharper", "CommentTypo")]
     internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
     {
@@ -25,17 +20,14 @@ namespace lg2de.SimpleAccounting.Reports
         private const string FourthColumnExpression = "../columns/column[position()=4]";
 
         private readonly List<AccountDefinition> allAccounts;
-        private readonly CultureInfo culture;
 
         public AnnualBalanceReport(
             AccountingDataJournal yearData,
             IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup,
-            CultureInfo culture)
-            : base(ResourceName, setup, yearData, culture)
+            AccountingDataSetup setup)
+            : base(ResourceName, setup, yearData)
         {
             this.allAccounts = accounts.ToList();
-            this.culture = culture;
         }
 
         public void CreateReport(string title)
@@ -49,7 +41,7 @@ namespace lg2de.SimpleAccounting.Reports
             this.ProcessExpenses(out var totalExpense);
 
             var balanceNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"balance\"]");
-            balanceNode.InnerText = (totalIncome + totalExpense).FormatCurrency(this.culture);
+            balanceNode.InnerText = (totalIncome + totalExpense).FormatCurrency();
 
             // receivables / Forderungen
             // liabilities / Verbindlichkeiten
@@ -78,7 +70,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression);
-            balanceElement.InnerText = totalIncome.FormatCurrency(this.culture);
+            balanceElement.InnerText = totalIncome.FormatCurrency();
         }
 
         private void ProcessExpenses(out long totalExpense)
@@ -100,7 +92,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression);
-            balanceElement.InnerText = totalExpense.FormatCurrency(this.culture);
+            balanceElement.InnerText = totalExpense.FormatCurrency();
         }
 
         private void ProcessReceivablesAndLiabilities(out long totalReceivable, out long totalLiability)
@@ -128,9 +120,9 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var balanceElement = receivableNode.SelectSingleNode(FourthColumnExpression);
-            balanceElement.InnerText = totalReceivable.FormatCurrency(this.culture);
+            balanceElement.InnerText = totalReceivable.FormatCurrency();
             balanceElement = liabilityNode.SelectSingleNode(FourthColumnExpression);
-            balanceElement.InnerText = totalLiability.FormatCurrency(this.culture);
+            balanceElement.InnerText = totalLiability.FormatCurrency();
         }
 
         private void ProcessAssets(long totalReceivable, long totalLiability)
@@ -164,7 +156,7 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression);
-            balanceElement.InnerText = totalAccount.FormatCurrency(this.culture);
+            balanceElement.InnerText = totalAccount.FormatCurrency();
         }
 
         private long GetAccountBalance(AccountDefinition account, bool creditFromDebit)
@@ -186,7 +178,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         private XmlNode CreateAccountBalanceNode(AccountDefinition account, long balance)
         {
-            string accountText = account.ID.ToString(this.culture).PadLeft(5, '0') + " " + account.Name;
+            string accountText = account.ID.ToString(CultureInfo.CurrentCulture).PadLeft(5, '0') + " " + account.Name;
 
             return this.CreateBalanceNode(accountText, balance);
         }
@@ -203,7 +195,7 @@ namespace lg2de.SimpleAccounting.Reports
             dataLineNode.AppendChild(dataItemNode);
 
             dataItemNode = dataItemNode.Clone();
-            dataItemNode.InnerText = balance.FormatCurrency(this.culture);
+            dataItemNode.InnerText = balance.FormatCurrency();
             dataLineNode.AppendChild(dataItemNode);
 
             return dataLineNode;

@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.Reports
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
@@ -14,16 +13,11 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
-    [SuppressMessage(
-        "Major Code Smell",
-        "S4055:Literals should not be passed as localized parameters",
-        Justification = "pending translation")]
     internal class AccountJournalReport : ReportBase, IAccountJournalReport
     {
         public const string ResourceName = "AccountJournal.xml";
 
         private readonly IEnumerable<AccountDefinition> accounts;
-        private readonly CultureInfo culture;
         private double creditTotal;
         private double debitTotal;
         private bool firstAccount;
@@ -31,12 +25,10 @@ namespace lg2de.SimpleAccounting.Reports
         public AccountJournalReport(
             AccountingDataJournal yearData,
             IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup,
-            CultureInfo culture) // TODO use CulturedFact instead
-            : base(ResourceName, setup, yearData, culture)
+            AccountingDataSetup setup)
+            : base(ResourceName, setup, yearData)
         {
             this.accounts = accounts.OrderBy(a => a.ID);
-            this.culture = culture;
         }
 
         /// <summary>
@@ -102,8 +94,8 @@ namespace lg2de.SimpleAccounting.Reports
                     totalLineNode.AddTableNode(Resources.Word_Total).SetAttribute("align", "right");
                     totalLineNode.AddTableNode(string.Empty); // id
                     totalLineNode.AddTableNode(string.Empty); // text
-                    totalLineNode.AddTableNode(this.debitTotal.FormatCurrency(this.culture));
-                    totalLineNode.AddTableNode(this.creditTotal.FormatCurrency(this.culture));
+                    totalLineNode.AddTableNode(this.debitTotal.FormatCurrency());
+                    totalLineNode.AddTableNode(this.creditTotal.FormatCurrency());
                     totalLineNode.AddTableNode(string.Empty); // remote
                 }
 
@@ -116,13 +108,13 @@ namespace lg2de.SimpleAccounting.Reports
                 balanceLineNode.AddTableNode(string.Empty); // text
                 if (this.debitTotal > this.creditTotal)
                 {
-                    balanceLineNode.AddTableNode((this.debitTotal - this.creditTotal).FormatCurrency(this.culture));
+                    balanceLineNode.AddTableNode((this.debitTotal - this.creditTotal).FormatCurrency());
                     balanceLineNode.AddTableNode(string.Empty);
                 }
                 else
                 {
                     balanceLineNode.AddTableNode(string.Empty);
-                    balanceLineNode.AddTableNode((this.creditTotal - this.debitTotal).FormatCurrency(this.culture));
+                    balanceLineNode.AddTableNode((this.creditTotal - this.debitTotal).FormatCurrency());
                 }
 
                 // empty remote account column
@@ -159,7 +151,7 @@ namespace lg2de.SimpleAccounting.Reports
         {
             XmlNode lineTemplate = this.PrintDocument.CreateElement("tr");
             lineTemplate.SetAttribute("topLine", true);
-            lineTemplate.AddTableNode(entry.Date.ToDateTime().ToString("d", this.culture));
+            lineTemplate.AddTableNode(entry.Date.ToDateTime().ToString("d", CultureInfo.CurrentCulture));
             lineTemplate.AddTableNode(entry.ID.ToString(CultureInfo.InvariantCulture));
 
             var debitEntries = entry.Debit.Where(x => x.Account == accountIdentifier);
@@ -168,7 +160,7 @@ namespace lg2de.SimpleAccounting.Reports
                 var lineNode = lineTemplate.Clone();
                 lineNode.AddTableNode(debitEntry.Text);
                 double debitValue = Convert.ToDouble(debitEntry.Value) / 100;
-                lineNode.AddTableNode(debitValue.FormatCurrency(this.culture));
+                lineNode.AddTableNode(debitValue.FormatCurrency());
                 this.debitTotal += debitValue;
                 lineNode.AddTableNode(string.Empty);
                 lineNode.AddTableNode(
@@ -185,7 +177,7 @@ namespace lg2de.SimpleAccounting.Reports
                 lineNode.AddTableNode(creditEntry.Text);
                 lineNode.AddTableNode(string.Empty);
                 double creditValue = Convert.ToDouble(creditEntry.Value) / 100;
-                lineNode.AddTableNode(creditValue.FormatCurrency(this.culture));
+                lineNode.AddTableNode(creditValue.FormatCurrency());
                 this.creditTotal += creditValue;
                 lineNode.AddTableNode(
                     entry.Debit.Count == 1

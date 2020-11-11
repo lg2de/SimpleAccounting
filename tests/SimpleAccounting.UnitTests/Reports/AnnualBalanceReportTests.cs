@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
-    using System.Globalization;
     using System.Linq;
     using System.Xml.Linq;
     using System.Xml.XPath;
@@ -27,8 +26,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var sut = new AnnualBalanceReport(
                 journal,
                 project.AllAccounts,
-                setup,
-                new CultureInfo("en-us"));
+                setup);
 
             sut.CreateReport("dummy");
 

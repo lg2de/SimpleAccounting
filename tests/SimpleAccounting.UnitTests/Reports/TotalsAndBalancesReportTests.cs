@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
-    using System.Globalization;
     using System.Linq;
     using System.Xml.Linq;
     using System.Xml.XPath;
@@ -23,7 +22,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var setup = new AccountingDataSetup();
             AccountingDataJournal journal = project.Journal.Last();
-            var sut = new TotalsAndBalancesReport(journal, project.Accounts, setup, new CultureInfo("en-us"));
+            var sut = new TotalsAndBalancesReport(journal, project.Accounts, setup);
 
             sut.CreateReport("dummy");
 
@@ -139,7 +138,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             AccountingData project = Samples.SampleProject;
             var setup = new AccountingDataSetup();
             AccountingDataJournal journal = project.Journal.Last();
-            var sut = new TotalsAndBalancesReport(journal, project.Accounts, setup, new CultureInfo("en-us"));
+            var sut = new TotalsAndBalancesReport(journal, project.Accounts, setup);
             sut.Signatures.Add("The Name");
 
             sut.CreateReport("dummy");
