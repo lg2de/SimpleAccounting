@@ -117,6 +117,23 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .BeFalse("default instance does not contain modified document");
         }
 
+        [CulturedFact("en")]
+        public void SwitchCultureCommand_DummyLanguage_MessageBoxShownAndConfigurationUpdated()
+        {
+            var sut = CreateSut(out IMessageBox messageBox);
+
+            sut.SwitchCultureCommand.Execute("dummy");
+
+            messageBox.Received(1).Show(
+                Arg.Is<string>(x => x.Contains("must restart the application")),
+                Arg.Any<string>(),
+                icon: MessageBoxImage.Information);
+            sut.Settings.Culture.Should().Be("dummy");
+            sut.IsGermanCulture.Should().BeFalse();
+            sut.IsEnglishCulture.Should().BeFalse();
+            sut.IsSystemCulture.Should().BeFalse();
+        }
+
         [Fact]
         public void NewAccountCommand_AccountCreatedAndSorted()
         {
