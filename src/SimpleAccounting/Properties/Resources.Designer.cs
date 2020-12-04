@@ -407,7 +407,8 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Debit account&amp;#10;Remote account.
+        ///   Looks up a localized string similar to Debit account
+        ///(Remote account).
         /// </summary>
         public static string Label_DebitAccountRemoteAccount {
             get {
@@ -416,7 +417,8 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Source&amp;#10;Remote account.
+        ///   Looks up a localized string similar to Source
+        ///(Remote account).
         /// </summary>
         public static string Label_SourceAndRemoteAccount {
             get {

@@ -228,7 +228,8 @@ Wollen Sie Speichern?</value>
     <value>Einnahmeart</value>
   </data>
   <data name="Label_SourceAndRemoteAccount" xml:space="preserve">
-    <value>Herkunft&amp;#10;Gegenkonto</value>
+    <value>Herkunft
+(Gegenkonto)</value>
   </data>
   <data name="Word_Expense" xml:space="preserve">
     <value>Ausgabe</value>
@@ -237,7 +238,8 @@ Wollen Sie Speichern?</value>
     <value>Ausgabeart</value>
   </data>
   <data name="Label_DebitAccountRemoteAccount" xml:space="preserve">
-    <value>Belastungskonto&amp;#10;Gegenkonto</value>
+    <value>Belastungskonto
+(Gegenkonto)</value>
   </data>
   <data name="Word_OpeningBooking" xml:space="preserve">
     <value>Eröffnungsbuchung</value>
