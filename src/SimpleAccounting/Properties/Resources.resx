@@ -389,7 +389,7 @@ The imported recipient names and transaction texts can be modified.</value>
     <value>About</value>
   </data>
   <data name="Menu_Help_Feedback" xml:space="preserve">
-    <value>Send feedback</value>
+    <value>Create feedback</value>
   </data>
   <data name="Menu_Help_CheckUpdate" xml:space="preserve">
     <value>Check for updates</value>
