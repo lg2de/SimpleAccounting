@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
     using System;
-    using System.Globalization;
     using System.Linq;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Reports;
@@ -17,8 +16,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     {
         private class TestReport : ReportBase
         {
-            public TestReport(AccountingDataJournal yearData, CultureInfo culture)
-                : base(AnnualBalanceReport.ResourceName, new AccountingDataSetup(), yearData, culture)
+            public TestReport(AccountingDataJournal yearData)
+                : base(AnnualBalanceReport.ResourceName, new AccountingDataSetup(), yearData)
             {
                 this.Printer = this.TestingPrinter = Substitute.For<IXmlPrinter>();
             }
@@ -35,8 +34,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         public void ShowPreview_DocumentName_PrintingNameCorrect()
         {
             var sut = new TestReport(
-                Samples.SampleProject.Journal.Last(),
-                new CultureInfo("en-us"));
+                Samples.SampleProject.Journal.Last());
             sut.SetPrintingDate(new DateTime(2020, 2, 29));
 
             sut.ShowPreview("DocumentName");

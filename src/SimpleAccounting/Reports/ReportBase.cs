@@ -14,25 +14,22 @@ namespace lg2de.SimpleAccounting.Reports
     internal class ReportBase
     {
         protected const int TitleSize = 10;
-        private readonly CultureInfo culture;
         private readonly AccountingDataSetup setup;
 
         protected ReportBase(
             string resourceName,
             AccountingDataSetup setup,
-            AccountingDataJournal yearData,
-            CultureInfo culture)
+            AccountingDataJournal yearData)
         {
             this.setup = setup;
             this.YearData = yearData;
-            this.culture = culture;
 
             this.Printer.LoadDocument(resourceName);
         }
 
         protected IXmlPrinter Printer { get; set; } = new XmlPrinter();
 
-        protected AccountingDataJournal YearData { get; private set; }
+        protected AccountingDataJournal YearData { get; }
 
         protected DateTime PrintingDate { get; set; } = DateTime.Now;
 
@@ -71,13 +68,13 @@ namespace lg2de.SimpleAccounting.Reports
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"range\"]");
             if (textNode != null)
             {
-                string startDate = this.YearData.DateStart.ToDateTime().ToString("d", this.culture);
-                string endDate = this.YearData.DateEnd.ToDateTime().ToString("d", this.culture);
+                string startDate = this.YearData.DateStart.ToDateTime().ToString("d", CultureInfo.CurrentCulture);
+                string endDate = this.YearData.DateEnd.ToDateTime().ToString("d", CultureInfo.CurrentCulture);
                 textNode.InnerText = $"{startDate} - {endDate}";
             }
 
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"date\"]");
-            textNode.InnerText = this.setup?.Location + ", " + DateTime.Now.ToString("D", this.culture);
+            textNode.InnerText = this.setup?.Location + ", " + DateTime.Now.ToString("D", CultureInfo.CurrentCulture);
         }
     }
 }

@@ -407,7 +407,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         }
 
         [Fact]
-        public void TransformDocument_MoveAbsolutAndRelative_CursorUpdated()
+        public void TransformDocument_MoveAbsoluteAndRelative_CursorUpdated()
         {
             var sut = new XmlPrinter();
             sut.LoadXml("<root><move absX=\"10\" absY=\"20\" relX=\"3\" relY=\"4\" /></root>");

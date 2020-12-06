@@ -118,410 +118,398 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Word_Date" xml:space="preserve">
-    <value>Date</value>
+    <value>Datum</value>
   </data>
   <data name="Information_CultureChangeRestartRequired" xml:space="preserve">
-    <value>You have changed the display language.
-You must restart the application to get setting take effect.</value>
+    <value>Sie haben die Anzeigesprache geändert.
+Sie müssen die Anwendung neu starten, damit die Einstellung wirkt.</value>
   </data>
   <data name="Header_SettingsChanged" xml:space="preserve">
-    <value>Settings changed</value>
+    <value>Einstellungen geändert</value>
   </data>
   <data name="Header_Shutdown" xml:space="preserve">
-    <value>Application shutdown</value>
+    <value>Programm beenden</value>
   </data>
   <data name="Question_SaveBeforeProceed" xml:space="preserve">
-    <value>Project data has been changed.
-Do you want to save?</value>
+    <value>Die Datenbasis hat sich geändert.
+Wollen Sie Speichern?</value>
   </data>
   <data name="FileFilter_MainProject" xml:space="preserve">
-    <value>Accounting project files (*.acml)|*.acml</value>
+    <value>Projektdateien Buchhaltung (*.acml)|*.acml</value>
   </data>
   <data name="Word_Total" xml:space="preserve">
-    <value>Total</value>
+    <value>Summe</value>
   </data>
   <data name="Word_Balance" xml:space="preserve">
-    <value>Balance</value>
+    <value>Saldo</value>
   </data>
   <data name="Header_EditBooking" xml:space="preserve">
-    <value>Edit booking entry</value>
+    <value>Buchungseintrag bearbeiten</value>
   </data>
   <data name="Header_NewBooking" xml:space="preserve">
-    <value>Create new booking entry</value>
+    <value>Neue Buchung erstellen</value>
   </data>
   <data name="Header_CreateAccount" xml:space="preserve">
-    <value>Create account</value>
+    <value>Account erstellen</value>
   </data>
   <data name="Header_EditAccount" xml:space="preserve">
-    <value>Edit account</value>
+    <value>Account bearbeiten</value>
   </data>
   <data name="Word_Various" xml:space="preserve">
-    <value>Various</value>
-  </data>
-  <data name="Header_Journal" xml:space="preserve">
-    <value>Journal</value>
+    <value>Diverse</value>
   </data>
   <data name="Header_AccountSheets" xml:space="preserve">
-    <value>Account sheets</value>
+    <value>Kontoblätter</value>
   </data>
   <data name="Header_TotalsAndBalances" xml:space="preserve">
-    <value>Totals and balances</value>
+    <value>Summen und Salden</value>
   </data>
   <data name="Header_AssetBalances" xml:space="preserve">
-    <value>Asset balances</value>
+    <value>Bestandskontosalden</value>
   </data>
   <data name="Header_AnnualBalance" xml:space="preserve">
-    <value>Annual balance</value>
+    <value>Jahresbilanz</value>
   </data>
   <data name="Word_AccountNumber" xml:space="preserve">
-    <value>Account number</value>
+    <value>Kontonummer</value>
   </data>
   <data name="Word_AccountName" xml:space="preserve">
-    <value>Account name</value>
+    <value>Kontoname</value>
   </data>
   <data name="Word_AccountGroup" xml:space="preserve">
-    <value>Account group</value>
+    <value>Kontogruppe</value>
   </data>
   <data name="Word_AccountType" xml:space="preserve">
-    <value>Account type</value>
+    <value>Kontotyp</value>
   </data>
   <data name="Word_IsActive" xml:space="preserve">
-    <value>is active</value>
-  </data>
-  <data name="Word_Ok" xml:space="preserve">
-    <value>OK</value>
+    <value>ist aktiv</value>
   </data>
   <data name="Word_Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Abbrechen</value>
   </data>
   <data name="Word_CarriedForwardAccount" xml:space="preserve">
-    <value>Carried forward account</value>
+    <value>Saldovortragskonto</value>
   </data>
   <data name="Header_CloseYear" xml:space="preserve">
-    <value>Close year</value>
+    <value>Jahresabschluss</value>
   </data>
   <data name="Question_CloseYearX" xml:space="preserve">
-    <value>Do you want to close the year {0}?</value>
+    <value>Wollen Sie das Jahr {0} abschließen?</value>
   </data>
   <data name="Word_Split" xml:space="preserve">
-    <value>Splitt</value>
+    <value>Splitten</value>
   </data>
   <data name="Word_BookingText" xml:space="preserve">
-    <value>Booking text</value>
+    <value>Buchungstext</value>
   </data>
   <data name="Tooltip_SplitBookingValue" xml:space="preserve">
-    <value>Proportionate booking value of the entry</value>
+    <value>Anteiliger Buchungsbetrag des Eintrags</value>
   </data>
   <data name="Word_BookingNumber" xml:space="preserve">
-    <value>Booking number</value>
+    <value>Buchungsnummer</value>
   </data>
   <data name="Label_ValueWithCurrency" xml:space="preserve">
-    <value>Value (€)</value>
+    <value>Betrag (€)</value>
   </data>
   <data name="Header_DebitCredit" xml:space="preserve">
-    <value>Debit/Credit</value>
+    <value>Soll/Haben</value>
   </data>
   <data name="Word_Debit" xml:space="preserve">
-    <value>Debit</value>
+    <value>Soll</value>
   </data>
   <data name="Word_Credit" xml:space="preserve">
-    <value>Credit</value>
+    <value>Haben</value>
   </data>
   <data name="Word_Income" xml:space="preserve">
-    <value>Income</value>
+    <value>Einnahme</value>
   </data>
   <data name="Word_IncomeType" xml:space="preserve">
-    <value>Income type</value>
+    <value>Einnahmeart</value>
   </data>
   <data name="Label_SourceAndRemoteAccount" xml:space="preserve">
-    <value>Source
-(Remote account)</value>
+    <value>Herkunft
+(Gegenkonto)</value>
   </data>
   <data name="Word_Expense" xml:space="preserve">
-    <value>Expense</value>
+    <value>Ausgabe</value>
   </data>
   <data name="Word_ExpenseType" xml:space="preserve">
-    <value>Expense type</value>
+    <value>Ausgabeart</value>
   </data>
   <data name="Label_DebitAccountRemoteAccount" xml:space="preserve">
-    <value>Debit account
-(Remote account)</value>
+    <value>Belastungskonto
+(Gegenkonto)</value>
   </data>
   <data name="Word_OpeningBooking" xml:space="preserve">
-    <value>Opening booking</value>
+    <value>Eröffnungsbuchung</value>
   </data>
   <data name="Word_FollowUp" xml:space="preserve">
-    <value>Follow up</value>
+    <value>Nachverfolgung</value>
   </data>
   <data name="Action_Book" xml:space="preserve">
-    <value>Book (CTRL-ENTER)</value>
+    <value>Buchen (STRG-ENTER)</value>
   </data>
   <data name="Action_Save" xml:space="preserve">
-    <value>Save (CTRL-ENTER)</value>
+    <value>Speichern (STRG-ENTER)</value>
   </data>
   <data name="Action_Close" xml:space="preserve">
-    <value>Close (ESC)</value>
+    <value>Schließen (ESC)</value>
   </data>
   <data name="ImportData_Notes" xml:space="preserve">
-    <value>Notes:
-Select the account to which booking are to be imported.
-(Only accounts that have an import configuration are available for selection).
-The imported recipient names and transaction texts can be modified.</value>
+    <value>Hinweise:
+Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.
+(Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)
+Die importierten Empfängernamen und Buchungstexte können korrigiert werden.</value>
   </data>
   <data name="ImportData_FileHasEnglishFormat" xml:space="preserve">
-    <value>File is in English format</value>
+    <value>Datei im englischen Format</value>
   </data>
   <data name="Action_LoadData" xml:space="preserve">
-    <value>Load data</value>
+    <value>Lade Daten</value>
   </data>
   <data name="ImportData_StartImport" xml:space="preserve">
-    <value>Start import:</value>
+    <value>Beginn Import:</value>
   </data>
   <data name="Action_BookPartially" xml:space="preserve">
-    <value>Book partially</value>
+    <value>Teilweise Buchen</value>
   </data>
   <data name="Tooltip_BookPartially" xml:space="preserve">
-    <value>All entries with assigned remote account will be booked.</value>
+    <value>Alle Einträge buchen, die schon einem Gegenkonto zugeordnet sind.</value>
   </data>
   <data name="Action_BookAll" xml:space="preserve">
-    <value>Book all</value>
+    <value>Alles Buchen</value>
   </data>
   <data name="Word_BookingNumber_Short" xml:space="preserve">
-    <value>Booking no.</value>
+    <value>Belegnr.</value>
   </data>
   <data name="Word_Recipient" xml:space="preserve">
-    <value>Recipient</value>
+    <value>Empfänger</value>
   </data>
   <data name="Word_Skip" xml:space="preserve">
-    <value>Skip</value>
+    <value>Überspringen</value>
   </data>
   <data name="Word_Value" xml:space="preserve">
-    <value>Value</value>
+    <value>Betrag</value>
   </data>
   <data name="Word_RemoteAccount" xml:space="preserve">
-    <value>Remote account</value>
+    <value>Gegenkonto</value>
   </data>
   <data name="Word_IsFollowup" xml:space="preserve">
-    <value>is followup</value>
+    <value>Nachverfolgung</value>
   </data>
   <data name="Word_ResetAssignment" xml:space="preserve">
-    <value>Reset assignment</value>
+    <value>Zuordnung zurücksetzen</value>
   </data>
   <data name="ImportData_Title" xml:space="preserve">
-    <value>Import of bank account data</value>
+    <value>Import von Kontodaten</value>
   </data>
   <data name="FileFilter_ImportData" xml:space="preserve">
-    <value>Booking data files (*.csv)|*.csv</value>
+    <value>Konto-Buchungsdaten (*.csv)|*.csv</value>
   </data>
   <data name="ImportData_AlreadyBooked" xml:space="preserve">
-    <value>&lt;already booked&gt;</value>
+    <value>&lt;bereits gebucht&gt;</value>
   </data>
   <data name="ImportData_NoRelevantDataFoundInX" xml:space="preserve">
-    <value>No relevant data found in {0}.</value>
-  </data>
-  <data name="ImportData_MessageTitle" xml:space="preserve">
-    <value>Import</value>
+    <value>Keine nutzbaren Daten in {0} gefunden.</value>
   </data>
   <data name="Information_FailedToLoadX" xml:space="preserve">
-    <value>Failed to load file '{0}'.</value>
-  </data>
-  <data name="Menu_Project" xml:space="preserve">
-    <value>Project</value>
-  </data>
-  <data name="Menu_Project_New" xml:space="preserve">
-    <value>New</value>
-  </data>
-  <data name="Menu_Project_Open" xml:space="preserve">
-    <value>Open</value>
-  </data>
-  <data name="Menu_Project_Save" xml:space="preserve">
-    <value>Save</value>
-  </data>
-  <data name="Menu_Project_RecentProjects" xml:space="preserve">
-    <value>Last projects</value>
-  </data>
-  <data name="Menu_Project_Settings" xml:space="preserve">
-    <value>Settings</value>
-  </data>
-  <data name="Menu_Project_Exit" xml:space="preserve">
-    <value>Exit</value>
+    <value>Datei '{0}' konnte nicht geladen werden.</value>
   </data>
   <data name="Menu_Actions" xml:space="preserve">
-    <value>Actions</value>
+    <value>Aktionen</value>
   </data>
   <data name="Menu_Actions_AddBooking" xml:space="preserve">
-    <value>Add booking</value>
-  </data>
-  <data name="Menu_Actions_ImportBookings" xml:space="preserve">
-    <value>Import bookings</value>
+    <value>Buchen</value>
   </data>
   <data name="Menu_Actions_CloseYear" xml:space="preserve">
-    <value>Close year</value>
+    <value>Buchungsjahr abschließen</value>
   </data>
-  <data name="Menu_Actions_SelectYear" xml:space="preserve">
-    <value>Select booking year</value>
+  <data name="Menu_Actions_ImportBookings" xml:space="preserve">
+    <value>Buchungen importieren</value>
   </data>
   <data name="Menu_Actions_NewAccount" xml:space="preserve">
-    <value>New account</value>
+    <value>Neues Konto</value>
   </data>
-  <data name="Menu_Reports" xml:space="preserve">
-    <value>Reports</value>
-  </data>
-  <data name="Menu_Reports_Journal" xml:space="preserve">
-    <value>Journal</value>
-  </data>
-  <data name="Menu_Reports_AccountJournal" xml:space="preserve">
-    <value>Account journal</value>
-  </data>
-  <data name="Menu_Reports_TotalsAndBalances" xml:space="preserve">
-    <value>Totals and Balances</value>
-  </data>
-  <data name="Menu_Reports_AssetBalance" xml:space="preserve">
-    <value>Asset balance</value>
-  </data>
-  <data name="Menu_Reports_AnnualBalance" xml:space="preserve">
-    <value>Annual balance</value>
+  <data name="Menu_Actions_SelectYear" xml:space="preserve">
+    <value>Buchungsjahr wählen</value>
   </data>
   <data name="Menu_Help" xml:space="preserve">
-    <value>Help</value>
+    <value>Hilfe</value>
   </data>
   <data name="Menu_Help_About" xml:space="preserve">
-    <value>About</value>
-  </data>
-  <data name="Menu_Help_Feedback" xml:space="preserve">
-    <value>Create feedback</value>
+    <value>Über</value>
   </data>
   <data name="Menu_Help_CheckUpdate" xml:space="preserve">
-    <value>Check for updates</value>
+    <value>Auf Update prüfen</value>
   </data>
-  <data name="Header_AnnualJournal" xml:space="preserve">
-    <value>Journal of booking year</value>
+  <data name="Menu_Help_Feedback" xml:space="preserve">
+    <value>Rückmeldung geben</value>
   </data>
-  <data name="Word_DebitAccount" xml:space="preserve">
-    <value>Debit account</value>
+  <data name="Menu_Project" xml:space="preserve">
+    <value>Projekt</value>
   </data>
-  <data name="Word_CreditAccount" xml:space="preserve">
-    <value>Credit account</value>
+  <data name="Menu_Project_Exit" xml:space="preserve">
+    <value>Beenden</value>
+  </data>
+  <data name="Menu_Project_New" xml:space="preserve">
+    <value>Neu</value>
+  </data>
+  <data name="Menu_Project_Open" xml:space="preserve">
+    <value>Öffnen</value>
+  </data>
+  <data name="Menu_Project_RecentProjects" xml:space="preserve">
+    <value>Letzte Projekte</value>
+  </data>
+  <data name="Menu_Project_Save" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="Menu_Project_Settings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="Menu_Reports" xml:space="preserve">
+    <value>Berichte</value>
+  </data>
+  <data name="Menu_Reports_AccountJournal" xml:space="preserve">
+    <value>Kontenblätter</value>
+  </data>
+  <data name="Menu_Reports_AnnualBalance" xml:space="preserve">
+    <value>Jahresbilanz</value>
+  </data>
+  <data name="Menu_Reports_AssetBalance" xml:space="preserve">
+    <value>Bestandskontosalden</value>
+  </data>
+  <data name="Menu_Reports_TotalsAndBalances" xml:space="preserve">
+    <value>Summen und Salden</value>
   </data>
   <data name="Header_AccountJournalX" xml:space="preserve">
-    <value>Account journal '{0}'</value>
-  </data>
-  <data name="Word_DebitValue" xml:space="preserve">
-    <value>Debit value</value>
-  </data>
-  <data name="Word_CreditValue" xml:space="preserve">
-    <value>Credit value</value>
-  </data>
-  <data name="Word_Accounts" xml:space="preserve">
-    <value>Accounts</value>
-  </data>
-  <data name="Word_Number" xml:space="preserve">
-    <value>Number</value>
-  </data>
-  <data name="AccountsContextMenu_RefreshAccountJournal" xml:space="preserve">
-    <value>Refresh account journal</value>
+    <value>Kontenblatt '{0}'</value>
   </data>
   <data name="AccountsContextMenu_EditAccount" xml:space="preserve">
-    <value>Edit account</value>
+    <value>Konto bearbeiten</value>
   </data>
   <data name="AccountsContextMenu_NewAccount" xml:space="preserve">
-    <value>Create account</value>
+    <value>Konto erstellen</value>
+  </data>
+  <data name="AccountsContextMenu_RefreshAccountJournal" xml:space="preserve">
+    <value>Kontenblatt aktualisieren</value>
   </data>
   <data name="AccountsContextMenu_ShowInactiveAccounts" xml:space="preserve">
-    <value>Show inactive accounts</value>
+    <value>Inaktive Konten anzeigen</value>
   </data>
-  <data name="Word_Page" xml:space="preserve">
-    <value>Page</value>
+  <data name="Header_AnnualJournal" xml:space="preserve">
+    <value>Journal des Buchungsjahres</value>
   </data>
-  <data name="Word_Number_Short" xml:space="preserve">
-    <value>No.</value>
-  </data>
-  <data name="Word_DebitValue_Wrapped" xml:space="preserve">
-    <value>Debit
-value</value>
-  </data>
-  <data name="Word_CreditValue_Wrapped" xml:space="preserve">
-    <value>Credit
-value</value>
-  </data>
-  <data name="Word_RemoteAccount_Wrapped" xml:space="preserve">
-    <value>Remote
-account</value>
-  </data>
-  <data name="Word_Receivables" xml:space="preserve">
-    <value>Receivables</value>
-  </data>
-  <data name="Word_Liabilities" xml:space="preserve">
-    <value>Liabilities</value>
-  </data>
-  <data name="Word_Incomes" xml:space="preserve">
-    <value>Incomes</value>
-  </data>
-  <data name="Word_Expenses" xml:space="preserve">
-    <value>Expenses</value>
-  </data>
-  <data name="Report_AnnualNetProfitAndLoss" xml:space="preserve">
-    <value>Annual net profit/loss</value>
-  </data>
-  <data name="Word_Asset" xml:space="preserve">
-    <value>Asset</value>
-  </data>
-  <data name="Word_DebitAccount_Wrapped" xml:space="preserve">
-    <value>Debit
-account</value>
+  <data name="Word_Accounts" xml:space="preserve">
+    <value>Konten</value>
   </data>
   <data name="Word_CreditAccount_Wrapped" xml:space="preserve">
-    <value>Credit
-account</value>
+    <value>Haben-
+konto</value>
+  </data>
+  <data name="Word_DebitValue" xml:space="preserve">
+    <value>Sollbetrag</value>
+  </data>
+  <data name="Word_DebitAccount" xml:space="preserve">
+    <value>Sollkonto</value>
+  </data>
+  <data name="Word_CreditValue" xml:space="preserve">
+    <value>Habenbetrag</value>
+  </data>
+  <data name="Word_Number" xml:space="preserve">
+    <value>Nummer</value>
+  </data>
+  <data name="Word_Page" xml:space="preserve">
+    <value>Seite</value>
+  </data>
+  <data name="Word_Number_Short" xml:space="preserve">
+    <value>Nr.</value>
+  </data>
+  <data name="Word_DebitValue_Wrapped" xml:space="preserve">
+    <value>Soll-
+betrag</value>
+  </data>
+  <data name="Word_CreditValue_Wrapped" xml:space="preserve">
+    <value>Haben-
+betrag</value>
+  </data>
+  <data name="Word_RemoteAccount_Wrapped" xml:space="preserve">
+    <value>Gegen-
+konto</value>
+  </data>
+  <data name="Word_Receivables" xml:space="preserve">
+    <value>Forderungen</value>
+  </data>
+  <data name="Word_Liabilities" xml:space="preserve">
+    <value>Verbindlichkeiten</value>
+  </data>
+  <data name="Word_Incomes" xml:space="preserve">
+    <value>Einnahmen</value>
+  </data>
+  <data name="Word_Expenses" xml:space="preserve">
+    <value>Ausgaben</value>
+  </data>
+  <data name="Report_AnnualNetProfitAndLoss" xml:space="preserve">
+    <value>Jahresüberschuß/-verlust</value>
+  </data>
+  <data name="Word_Asset" xml:space="preserve">
+    <value>Vermögen</value>
+  </data>
+  <data name="Word_DebitAccount_Wrapped" xml:space="preserve">
+    <value>Soll-
+konto</value>
+  </data>
+  <data name="Word_CreditAccount" xml:space="preserve">
+    <value>Habenkonto</value>
   </data>
   <data name="Report_LastBooking_Wrapped" xml:space="preserve">
-    <value>Last
-booking</value>
+    <value>Letzte
+Buchung</value>
   </data>
   <data name="Report_OpeningAssets" xml:space="preserve">
-    <value>Assets</value>
+    <value>Aktiva</value>
   </data>
   <data name="Report_OpeningLiabilities" xml:space="preserve">
-    <value>Liabilities</value>
+    <value>Passiva</value>
   </data>
   <data name="Word_OpeningBalance" xml:space="preserve">
-    <value>Opening balance</value>
+    <value>Eröffnungsbilanz</value>
   </data>
   <data name="Report_TotalsInTimeRange" xml:space="preserve">
-    <value>Totals in range</value>
+    <value>Summen im Zeitraum</value>
   </data>
   <data name="Report_BalanceAtTheEnd" xml:space="preserve">
-    <value>Balance at the end</value>
+    <value>Saldo am Ende</value>
   </data>
   <data name="Word_AccountNumber_Wrapped" xml:space="preserve">
-    <value>Account
-number</value>
+    <value>Konto-
+nummer</value>
   </data>
   <data name="Header_LoadProject" xml:space="preserve">
-    <value>Load project</value>
+    <value>Projekt laden</value>
   </data>
   <data name="Question_StartSecureDriverX" xml:space="preserve">
-    <value>The project {0} seems to be stored on secured drive.
+    <value>Das Projekt {0} scheint auf einem gesicherten Laufwerk gespeichert zu sein.
 (Cryptomator)
-This drive is currently not accessible.
-Do you want to start 'Cryptomator'?</value>
+Dieses Laufwerk ist nicht verfügbar.
+Soll 'Cryptomator' gestartet werden?</value>
   </data>
   <data name="Question_LoadAutoSaveProjectFileX" xml:space="preserve">
-    <value>There exists an automatically created backup file for project
+    <value>Es existiert eine automatische Sicherung der Projektdatei
 {0}.
-Do you want to load this backup file?
-When answering 'No' the backup file will be deleted.</value>
+Soll diese geöffnet werden?
+Mit 'Nein' wird diese Sicherung gelöscht.</value>
   </data>
   <data name="Header_CheckForUpdates" xml:space="preserve">
-    <value>Check for updates</value>
+    <value>Update-Prüfung</value>
   </data>
   <data name="Update_QueryVersionsFailed" xml:space="preserve">
-    <value>Querying for newer versions failed:</value>
+    <value>Abfrage neuer Versionen fehlgeschlagen:</value>
   </data>
   <data name="Update_UpToDate" xml:space="preserve">
-    <value>You have already latest version.</value>
+    <value>Sie verwenden die neueste Version.</value>
   </data>
   <data name="Question_UpdateToVersionX" xml:space="preserve">
-    <value>Do you want to update to version {0}?</value>
+    <value>Wollen Sie auf die neue Version {0} aktualisieren?</value>
   </data>
 </root>

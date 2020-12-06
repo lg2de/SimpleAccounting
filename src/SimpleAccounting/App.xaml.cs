@@ -26,6 +26,12 @@ namespace lg2de.SimpleAccounting
             Justification = "FP")]
         private void ApplicationStartup(object sender, StartupEventArgs e)
         {
+            if (!string.IsNullOrEmpty(Settings.Default.Culture))
+            {
+                var culture = CultureInfo.GetCultureInfo(Settings.Default.Culture);
+                CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = culture;
+            }
+
             // set control culture according to system culture
             // https://stackoverflow.com/questions/4041197/how-to-set-and-change-the-culture-in-wpf
             FrameworkElement.LanguageProperty.OverrideMetadata(

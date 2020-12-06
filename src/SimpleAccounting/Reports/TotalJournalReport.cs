@@ -4,30 +4,21 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-    [SuppressMessage(
-        "Major Code Smell",
-        "S4055:Literals should not be passed as localized parameters",
-        Justification = "pending translation")]
     internal class TotalJournalReport : ReportBase, ITotalJournalReport
     {
         public const string ResourceName = "TotalJournal.xml";
 
-        private readonly CultureInfo culture;
-
         public TotalJournalReport(
             AccountingDataJournal yearData,
-            AccountingDataSetup setup,
-            CultureInfo culture)
-            : base(ResourceName, setup, yearData, culture)
+            AccountingDataSetup setup)
+            : base(ResourceName, setup, yearData)
         {
-            this.culture = culture;
         }
 
         public void CreateReport(string title)
@@ -41,7 +32,7 @@ namespace lg2de.SimpleAccounting.Reports
             {
                 XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
                 dataLineNode.SetAttribute("topLine", true);
-                dataLineNode.AddTableNode(entry.Date.ToDateTime().ToString("d", this.culture));
+                dataLineNode.AddTableNode(entry.Date.ToDateTime().ToString("d", CultureInfo.CurrentCulture));
                 dataLineNode.AddTableNode(entry.ID.ToString(CultureInfo.InvariantCulture));
 
                 if (entry.Debit.Count == 1
@@ -53,10 +44,10 @@ namespace lg2de.SimpleAccounting.Reports
                     dataLineNode.AddTableNode(debit.Text);
                     string strAccountNumber = debit.Account.ToString(CultureInfo.InvariantCulture);
                     dataLineNode.AddTableNode(strAccountNumber);
-                    dataLineNode.AddTableNode(debit.Value.FormatCurrency(this.culture));
+                    dataLineNode.AddTableNode(debit.Value.FormatCurrency());
                     strAccountNumber = credit.Account.ToString(CultureInfo.InvariantCulture);
                     dataLineNode.AddTableNode(strAccountNumber);
-                    dataLineNode.AddTableNode(credit.Value.FormatCurrency(this.culture));
+                    dataLineNode.AddTableNode(credit.Value.FormatCurrency());
                     dataNode.AppendChild(dataLineNode);
                     continue;
                 }
@@ -66,7 +57,7 @@ namespace lg2de.SimpleAccounting.Reports
                     dataLineNode.AddTableNode(debitEntry.Text);
                     string strAccountNumber = debitEntry.Account.ToString(CultureInfo.InvariantCulture);
                     dataLineNode.AddTableNode(strAccountNumber);
-                    dataLineNode.AddTableNode(debitEntry.Value.FormatCurrency(this.culture));
+                    dataLineNode.AddTableNode(debitEntry.Value.FormatCurrency());
                     dataLineNode.AddTableNode(string.Empty);
                     dataLineNode.AddTableNode(string.Empty);
                     dataNode.AppendChild(dataLineNode);
@@ -83,7 +74,7 @@ namespace lg2de.SimpleAccounting.Reports
                     dataLineNode.AddTableNode(string.Empty);
                     string strAccountNumber = creditEntry.Account.ToString(CultureInfo.InvariantCulture);
                     dataLineNode.AddTableNode(strAccountNumber);
-                    dataLineNode.AddTableNode(creditEntry.Value.FormatCurrency(this.culture));
+                    dataLineNode.AddTableNode(creditEntry.Value.FormatCurrency());
                     dataNode.AppendChild(dataLineNode);
 
                     dataLineNode = this.PrintDocument.CreateElement("tr");

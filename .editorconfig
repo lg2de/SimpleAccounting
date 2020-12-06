@@ -199,6 +199,14 @@ dotnet_naming_style.begins_with_i.capitalization=pascal_case
 # ReSharper properties
 resharper_csharp_insert_final_newline=true
 
+# XAML files
+[*.xaml]
+
+# Indentation and spacing
+indent_size=2
+indent_style=space
+tab_width=2
+
 # PowerShell files
 [*.ps1]
 

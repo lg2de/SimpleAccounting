@@ -8,7 +8,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -25,7 +24,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using NSubstitute;
     using Xunit;
 
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public partial class ShellViewModelTests
     {
         [Fact]
@@ -178,7 +176,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void OnActivate_SampleProject_JournalsUpdates()
         {
             var sut = CreateSut();
@@ -215,12 +213,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 });
             sut.AccountJournal.Should().BeEquivalentTo(
                 new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", IsEvenRow = false },
-                new { Text = "Salary", RemoteAccount = "Diverse", IsEvenRow = true },
+                new { Text = "Salary", RemoteAccount = "Various", IsEvenRow = true },
                 new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", IsEvenRow = false },
-                new { Text = "Shoes", RemoteAccount = "Diverse", IsEvenRow = true },
+                new { Text = "Shoes", RemoteAccount = "Various", IsEvenRow = true },
                 new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)", IsEvenRow = false },
-                new { Text = "Summe", IsEvenRow = false },
-                new { Text = "Saldo", IsEvenRow = false });
+                new { Text = "Total", IsEvenRow = false },
+                new { Text = "Balance", IsEvenRow = false });
         }
 
         [Fact]
@@ -298,7 +296,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             task.Awaiting(x => x).Should().CompleteWithin(1.Seconds());
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void AddBooking_FirstBooking_JournalsUpdated()
         {
             var sut = CreateSut();
@@ -337,8 +335,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     DebitValue = 0.42,
                     RemoteAccount = "990 (Carryforward)"
                 },
-                new { Text = "Summe", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 },
-                new { Text = "Saldo", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 });
+                new { Text = "Total", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 },
+                new { Text = "Balance", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 });
             monitor.Should().RaisePropertyChangeFor(x => x.SelectedAccountJournalEntry);
             sut.SelectedAccountJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
         }
@@ -448,12 +446,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public async Task LoadProjectFromFileAsync_UserWantsAutoSaveFile_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             messageBox.Show(
-                    Arg.Is<string>(s => s.Contains("automatische Sicherung")), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("automatically created backup file")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
@@ -473,12 +471,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public async Task LoadProjectFromFileAsync_UserDoesNotWantAutoSaveFileExists_AutoSaveFileLoaded()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             messageBox.Show(
-                    Arg.Is<string>(s => s.Contains("automatische Sicherung")), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("automatically created backup file")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
@@ -496,6 +494,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.Settings.RecentProject.Should().Be("the.fileName");
             sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
+            fileSystem.Received(1).FileDelete("the.fileName~");
         }
 
         [Fact]
@@ -615,14 +614,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.IsDocumentModified.Should().BeTrue();
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public async Task LoadProjectFromFileAsync_UserDoesNotWantSaveCurrentProject_LoadingAborted()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             sut.FileName = "old.fileName";
             sut.IsDocumentModified = true;
             messageBox.Show(
-                    Arg.Is<string>(s => s.Contains("Die Datenbasis hat sich geändert.")), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("Project data has been changed.")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);
@@ -836,6 +835,5 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             };
             return sut;
         }
-
     }
 }

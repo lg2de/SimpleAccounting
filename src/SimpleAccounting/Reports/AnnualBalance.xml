@@ -2,63 +2,63 @@
 <!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
 <xEport paperSize="A4" left="20" top="15" bottom="15" right="20">
   <font size="20" />
-  <text absX="85" align="center">Jahresbilanz</text>
+  <text absX="85" align="center">@Header_AnnualBalance@</text>
   <move relY="10" />
   <font size="10" />
-  <text ID="firm" absX="85" align="center">Firm</text>
+  <text ID="firm" absX="85" align="center">-Firm-</text>
   <move relY="5" />
-  <text ID="yearName" absX="85" align="center">Year</text>
+  <text ID="yearName" absX="85" align="center">-Year-</text>
   <move relY="10" />
   <font size="8" />
   <table lineHeight="4">
     <columns>
-      <column width="40">Einnahmen</column>
+      <column width="40">@Word_Incomes@</column>
       <column width="80" />
       <column width="20" align="right" />
-      <column width="20" align="right">Saldo</column>
+      <column width="20" align="right">@Word_Balance@</column>
     </columns>
     <data target="income" />
   </table>
   <move relY="10" />
   <table lineHeight="4">
     <columns>
-      <column width="40">Ausgaben</column>
+      <column width="40">@Word_Expenses@</column>
       <column width="80" />
       <column width="20" align="right" />
-      <column width="20" align="right">Saldo</column>
+      <column width="20" align="right">@Word_Balance@</column>
     </columns>
     <data target="expense" />
   </table>
   <move relY="10" />
-  <text>Jahresüberschuß/-verlust</text>
-  <text ID="saldo" absX="160" align="right">xxx</text>
+  <text>@Report_AnnualNetProfitAndLoss@</text>
+  <text ID="balance" absX="160" align="right">xxx</text>
   <move relY="20" />
   <table lineHeight="4">
     <columns>
-      <column width="40">Forderungen</column>
+      <column width="40">@Word_Receivables@</column>
       <column width="80" />
       <column width="20" align="right" />
-      <column width="20" align="right">Saldo</column>
+      <column width="20" align="right">@Word_Balance@</column>
     </columns>
     <data target="receivable" />
   </table>
   <move relY="10" />
   <table lineHeight="4">
     <columns>
-      <column width="40">Verbindlichkeiten</column>
+      <column width="40">@Word_Liabilities@</column>
       <column width="80" />
       <column width="20" align="right" />
-      <column width="20" align="right">Saldo</column>
+      <column width="20" align="right">@Word_Balance@</column>
     </columns>
     <data target="liability" />
   </table>
   <move relY="20" />
   <table lineHeight="4">
     <columns>
-      <column width="40">Vermögen</column>
+      <column width="40">@Word_Asset@</column>
       <column width="80" />
       <column width="20" align="right" />
-      <column width="20" align="right">Saldo</column>
+      <column width="20" align="right">@Word_Balance@</column>
     </columns>
     <data target="asset" />
   </table>

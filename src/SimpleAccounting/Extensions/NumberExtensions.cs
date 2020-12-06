@@ -5,20 +5,21 @@
 namespace lg2de.SimpleAccounting.Extensions
 {
     using System;
+    using System.Globalization;
 
     internal static class NumberExtensions
     {
         private const double ConversionFactor = 100.0;
 
-        public static string FormatCurrency(this double value, IFormatProvider formatProvider)
+        public static string FormatCurrency(this double value)
         {
             // formats the specified value as currency (without currency symbol)
-            return value.ToString("0.00", formatProvider);
+            return value.ToString("0.00", CultureInfo.CurrentCulture);
         }
 
-        public static string FormatCurrency(this long value, IFormatProvider formatProvider)
+        public static string FormatCurrency(this long value)
         {
-            return (value / ConversionFactor).FormatCurrency(formatProvider);
+            return (value / ConversionFactor).FormatCurrency();
         }
 
         public static long ToModelValue(this double value)

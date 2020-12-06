@@ -16,11 +16,8 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
-    [SuppressMessage(
-        "Major Code Smell",
-        "S4055:Literals should not be passed as localized parameters",
-        Justification = "pending translation")]
     internal class ImportBookingsViewModel : Screen
     {
         private readonly List<AccountDefinition> accounts;
@@ -48,7 +45,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.StartDate = this.RangeMin;
 
             // ReSharper disable once VirtualMemberCallInConstructor
-            this.DisplayName = "Import von Kontodaten";
+            this.DisplayName = Resources.ImportData_Title;
         }
 
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
@@ -138,8 +135,6 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        [SuppressMessage(
-            "Critical Code Smell", "S3353:Unchanged local variables should be \"const\"", Justification = "FP")]
         public ICommand LoadDataCommand => new RelayCommand(
             _ =>
             {
@@ -147,7 +142,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 using var openFileDialog = new System.Windows.Forms.OpenFileDialog
                 {
-                    Filter = "Booking data files (*.csv)|*.csv", RestoreDirectory = true
+                    Filter = Resources.FileFilter_ImportData, RestoreDirectory = true
                 };
 
                 if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
@@ -212,7 +207,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     Identifier = entry.ID,
                     Date = entry.Date.ToDateTime(),
                     Text = me.Text,
-                    Name = "<bereits gebucht>",
+                    Name = Resources.ImportData_AlreadyBooked,
                     Value = value,
                     RemoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier)
                 };
@@ -228,6 +223,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.LoadedData.Clear();
 
+                // TODO use all culture configuration
                 var cultureInfo = CultureInfo.CurrentUICulture;
                 if (this.IsForceEnglish)
                 {
@@ -262,7 +258,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 if (!this.LoadedData.Any())
                 {
-                    this.messageBox.Show($"No relevant data found in {fileName}.", "Import");
+                    this.messageBox.Show(
+                        string.Format(CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFoundInX, fileName),
+                        Resources.ImportData_MessageTitle);
                 }
 
                 this.UpdateIdentifierInLoadedData();
@@ -270,7 +268,9 @@ namespace lg2de.SimpleAccounting.Presentation
             }
             catch (Exception e)
             {
-                this.messageBox.Show($"Failed to load file '{fileName}':\n{e.Message}", "Import");
+                string message = string.Format(
+                    CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, fileName) + "\n" + e.Message;
+                this.messageBox.Show(message, Resources.ImportData_MessageTitle);
             }
         }
 

@@ -55,6 +55,5 @@ Date,Name,Text,Value
                 },
                 new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2a Text2b", Value = -42.42 });
         }
-
     }
 }

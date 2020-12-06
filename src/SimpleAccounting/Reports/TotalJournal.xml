@@ -3,32 +3,28 @@
 <xEport paperSize="A4" left="20" top="15" bottom="15" right="20">
   <pageTexts>
     <font size="8">
-      <text absX="85" absY="-5" align="center">- Journal -</text>
-      <text absX="85" absY="270" align="center">- Seite {page} -</text>
+      <text absX="85" absY="-5" align="center">- @Header_Journal@ -</text>
+      <text absX="85" absY="270" align="center">- @Word_Page@ {page} -</text>
     </font>
   </pageTexts>
   <font size="20" />
-  <text absX="85" align="center">Journal</text>
+  <text absX="85" align="center">@Header_Journal@</text>
   <move relY="10" />
   <font size="10" />
-  <text ID="firm" absX="85" align="center">Firm</text>
+  <text ID="firm" absX="85" align="center">-Firm-</text>
   <move relY="5" />
-  <text ID="range" absX="85" align="center">Time Range</text>
+  <text ID="range" absX="85" align="center">-TimeRange-</text>
   <move relY="10" />
   <font size="8" />
   <table lineHeight="4">
     <columns lineHeight="8">
-      <column width="20" rightLine="true">Datum</column>
-      <column width="10" rightLine="true">Nr. </column>
-      <column width="80" rightLine="true">Buchungstext</column>
-      <column width="15" rightLine="true" align="right">Soll-
-konto</column>
-      <column width="15" rightLine="true" align="right">Soll-
-betrag</column>
-      <column width="15" rightLine="true" align="right">Haben-
-konto</column>
-      <column width="15" align="right">Haben-
-betrag</column>
+      <column width="20" rightLine="true">@Word_Date@</column>
+      <column width="10" rightLine="true">@Word_Number_Short@</column>
+      <column width="80" rightLine="true">@Word_BookingText@</column>
+      <column width="15" rightLine="true" align="right">@Word_DebitAccount_Wrapped@</column>
+      <column width="15" rightLine="true" align="right">@Word_DebitValue_Wrapped@</column>
+      <column width="15" rightLine="true" align="right">@Word_CreditAccount_Wrapped@</column>
+      <column width="15" align="right">@Word_CreditValue_Wrapped@</column>
     </columns>
     <data />
   </table>

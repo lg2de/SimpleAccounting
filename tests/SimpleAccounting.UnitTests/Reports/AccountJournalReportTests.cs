@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.Linq;
     using System.Xml.Linq;
     using System.Xml.XPath;
@@ -17,11 +16,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     using lg2de.SimpleAccounting.UnitTests.Presentation;
     using Xunit;
 
-    //[SuppressMessage("ReSharper", "UseStringInterpolation")]
     [SuppressMessage("ReSharper", "UseStringInterpolation")]
     public class AccountJournalReportTests
     {
-        [Theory]
+        [CulturedTheory("en")]
         [InlineData(true)]
         [InlineData(false)]
         public void CreateReport_SampleData_Converted(bool pageBreakBetweenAccounts)
@@ -29,7 +27,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var setup = new AccountingDataSetup();
-            var sut = new AccountJournalReport(project.Journal.Last(), project.AllAccounts, setup, new CultureInfo("en-us"))
+            var sut = new AccountJournalReport(project.Journal.Last(), project.AllAccounts, setup)
             {
                 PageBreakBetweenAccounts = pageBreakBetweenAccounts
             };
@@ -54,7 +52,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>Salary</td>
     <td>200.00</td>
     <td />
-    <td>Diverse</td>
+    <td>Various</td>
   </tr>
   <tr topLine=""True"">
     <td>1/29/{0}</td>
@@ -70,7 +68,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>Shoes</td>
     <td />
     <td>50.00</td>
-    <td>Diverse</td>
+    <td>Various</td>
   </tr>
   <tr topLine=""True"">
     <td>2/5/{0}</td>
@@ -81,7 +79,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>6000</td>
   </tr>
   <tr topLine=""True"">
-    <td align=""right"">Summen</td>
+    <td align=""right"">Total</td>
     <td />
     <td />
     <td>1200.00</td>
@@ -89,7 +87,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
   <tr topLine=""True"">
-    <td align=""right"">Saldo</td>
+    <td align=""right"">Balance</td>
     <td />
     <td />
     <td>651.00</td>
@@ -116,7 +114,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>100</td>
   </tr>
   <tr topLine=""True"">
-    <td align=""right"">Saldo</td>
+    <td align=""right"">Balance</td>
     <td />
     <td />
     <td />
@@ -143,7 +141,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>100</td>
   </tr>
   <tr topLine=""True"">
-    <td align=""right"">Saldo</td>
+    <td align=""right"">Balance</td>
     <td />
     <td />
     <td>50.00</td>
@@ -170,7 +168,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>5000</td>
   </tr>
   <tr topLine=""True"">
-    <td align=""right"">Summen</td>
+    <td align=""right"">Total</td>
     <td />
     <td />
     <td>3000.00</td>
@@ -178,7 +176,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
   <tr topLine=""True"">
-    <td align=""right"">Saldo</td>
+    <td align=""right"">Balance</td>
     <td />
     <td />
     <td>2000.00</td>
@@ -205,7 +203,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>100</td>
   </tr>
   <tr topLine=""True"">
-    <td align=""right"">Summen</td>
+    <td align=""right"">Total</td>
     <td />
     <td />
     <td>400.00</td>
@@ -213,7 +211,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
   <tr topLine=""True"">
-    <td align=""right"">Saldo</td>
+    <td align=""right"">Balance</td>
     <td />
     <td />
     <td />
@@ -232,7 +230,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>100</td>
   </tr>
   <tr topLine=""True"">
-    <td align=""right"">Saldo</td>
+    <td align=""right"">Balance</td>
     <td />
     <td />
     <td>99.00</td>

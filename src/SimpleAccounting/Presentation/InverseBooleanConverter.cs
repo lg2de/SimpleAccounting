@@ -10,7 +10,6 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Windows.Data;
 
     [ValueConversion(typeof(bool), typeof(bool))]
-    [SuppressMessage("ReSharper", "LocalizableElement")]
     public class InverseBooleanConverter : IValueConverter
     {
         public object Convert(
@@ -18,7 +17,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             if (targetType != typeof(bool))
             {
-                throw new ArgumentException("The target must be a boolean.", nameof(parameter));
+                throw new ArgumentException(@"The target must be a boolean.", nameof(parameter));
             }
 
             return !(bool)value;
