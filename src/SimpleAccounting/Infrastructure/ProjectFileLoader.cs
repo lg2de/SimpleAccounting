@@ -6,7 +6,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
 {
     using System;
     using System.Collections.Specialized;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -14,11 +14,6 @@ namespace lg2de.SimpleAccounting.Infrastructure
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
-    [SuppressMessage(
-        "Major Code Smell",
-        "S4055:Literals should not be passed as localized parameters")]
-    [SuppressMessage("ReSharper", "LocalizableElement")]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ProjectFileLoader
     {
         private const int MaxRecentProjects = 10;
@@ -28,7 +23,6 @@ namespace lg2de.SimpleAccounting.Infrastructure
         private readonly IProcess processApi;
         private readonly Settings settings;
 
-        [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition", Justification = "FP")]
         public ProjectFileLoader(IMessageBox messageBox, IFileSystem fileSystem, IProcess processApi, Settings settings)
         {
             this.messageBox = messageBox;
@@ -75,7 +69,10 @@ namespace lg2de.SimpleAccounting.Infrastructure
             }
             catch (InvalidOperationException e)
             {
-                this.messageBox.Show($"Failed to load file '{projectFileName}':\n{e.Message}", "Load");
+                string message =
+                    string.Format(CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, projectFileName)
+                    + $"\n{e.Message}";
+                this.messageBox.Show(message, Resources.Header_LoadProject);
                 return OperationResult.Failed;
             }
         }
@@ -98,11 +95,11 @@ namespace lg2de.SimpleAccounting.Infrastructure
             }
 
             MessageBoxResult result = this.messageBox.Show(
-                $"Das Projekt {projectFileName} scheint auf einem gesicherten Laufwerk gespeichert zu sein.\n"
-                + "(Cryptomator)\n"
-                + "Dieses Laufwerk ist nicht verfügbar.\n"
-                + "Soll 'Cryptomator' gestartet werden?",
-                "Projekt laden",
+                string.Format(
+                    CultureInfo.CurrentUICulture,
+                    Resources.Question_StartSecureDriverX,
+                    projectFileName),
+                Resources.Header_LoadProject,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question,
                 MessageBoxResult.Yes);
@@ -133,11 +130,11 @@ namespace lg2de.SimpleAccounting.Infrastructure
             if (this.fileSystem.FileExists(autoSaveFileName))
             {
                 result = this.messageBox.Show(
-                    "Es existiert eine automatische Sicherung der Projektdatei\n"
-                    + $"{projectFileName}.\n"
-                    + "Soll diese geöffnet werden?\n"
-                    + "Mit 'Nein' wird diese Sicherung gelöscht.",
-                    "Projekt öffnen",
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        Resources.Question_LoadAutoSaveProjectFileX,
+                        projectFileName),
+                    Resources.Header_LoadProject,
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
 

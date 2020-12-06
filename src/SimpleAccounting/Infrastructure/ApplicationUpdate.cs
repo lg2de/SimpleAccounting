@@ -8,22 +8,18 @@ namespace lg2de.SimpleAccounting.Infrastructure
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Properties;
     using Octokit;
 
-    [SuppressMessage(
-        "Major Code Smell",
-        "S4055:Literals should not be passed as localized parameters")]
-    [SuppressMessage("ReSharper", "LocalizableElement")]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ApplicationUpdate : IApplicationUpdate
     {
-        private const string Caption = "Update-Prüfung";
         private readonly IFileSystem fileSystem;
         private readonly IMessageBox messageBox;
         private readonly IProcess process;
@@ -99,8 +95,8 @@ namespace lg2de.SimpleAccounting.Infrastructure
                     catch (Exception exception)
                     {
                         this.messageBox.Show(
-                            $"Abfrage neuer Versionen fehlgeschlagen:\n{exception.Message}",
-                            Caption,
+                            Resources.Update_QueryVersionsFailed + $"\n{exception.Message}",
+                            Resources.Header_CheckForUpdates,
                             icon: MessageBoxImage.Error);
                         return Enumerable.Empty<Release>();
                     }
@@ -110,15 +106,17 @@ namespace lg2de.SimpleAccounting.Infrastructure
         internal bool AskForUpdate(IEnumerable<Release> releases, string currentVersion)
         {
             this.newRelease = releases.GetNewRelease(currentVersion);
+            string caption = Resources.Header_CheckForUpdates;
             if (this.newRelease == null)
             {
-                this.messageBox.Show("Sie verwenden die neueste Version.", Caption);
+                this.messageBox.Show(Resources.Update_UpToDate, caption);
                 return false;
             }
 
             var result = this.messageBox.Show(
-                $"Wollen Sie auf die neue Version {this.newRelease.TagName} aktualisieren?",
-                Caption,
+                string.Format(
+                    CultureInfo.CurrentUICulture, Resources.Question_UpdateToVersionX, this.newRelease.TagName),
+                caption,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question,
                 MessageBoxResult.No);

@@ -4,11 +4,11 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
-    using System.Globalization;
     using System.Linq;
     using System.Xml.Linq;
     using System.Xml.XPath;
     using FluentAssertions;
+    using FluentAssertions.Execution;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Reports;
     using lg2de.SimpleAccounting.UnitTests.Presentation;
@@ -16,7 +16,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 
     public class AnnualBalanceReportTests
     {
-        [Fact]
+        [CulturedFact("en")]
         public void CreateReport_SampleData_Converted()
         {
             AccountingData project = Samples.SampleProject;
@@ -26,12 +26,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var sut = new AnnualBalanceReport(
                 journal,
                 project.AllAccounts,
-                setup,
-                new CultureInfo("en-us"));
+                setup);
 
             sut.CreateReport("dummy");
 
-            //using var _ = new AssertionScope();
+            using var _ = new AssertionScope();
 
             sut.DocumentForTests.XPathSelectElement("//text[@ID='saldo']")?.Value.Should().Be("150.00");
 
@@ -88,12 +87,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   </tr>
   <tr>
     <td />
-    <td>Forderungen</td>
+    <td>Receivables</td>
     <td>99.00</td>
   </tr>
   <tr>
     <td />
-    <td>Verbindlichkeiten</td>
+    <td>Liabilities</td>
     <td>-2600.00</td>
   </tr>
 </data>";

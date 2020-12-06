@@ -16,7 +16,7 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
 
-    [SuppressMessage("Minor Code Smell", "S1192:String literals should not be duplicated", Justification = "<Pending>")]
+    [SuppressMessage("Minor Code Smell", "S1192:String literals should not be duplicated")] // TODO fix S1192
     internal class XmlPrinter : IXmlPrinter
     {
         private const int A4Width = 210;
@@ -635,7 +635,7 @@ namespace lg2de.SimpleAccounting.Reports
             nX += relX;
             nY += relY;
 
-            string text = this.currentNode.InnerText;
+            string text = this.currentNode.InnerText.Translate();
             var alignment = align switch
             {
                 "center" => StringAlignment.Center,

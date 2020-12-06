@@ -45,7 +45,7 @@ namespace lg2de.SimpleAccounting.Extensions
             var attribute = node.Attributes.GetNamedItem(name);
             if (attribute == null)
             {
-                return defaultValue;
+                return defaultValue!;
             }
 
             Type returnType = typeof(T);

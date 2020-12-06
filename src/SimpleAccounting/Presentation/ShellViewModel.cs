@@ -26,34 +26,27 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
-    using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
-    using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
-    [SuppressMessage( // TODO introduce localization
-        "Major Code Smell",
-        "S4055:Literals should not be passed as localized parameters")]
-    [SuppressMessage("ReSharper", "LocalizableElement")]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellViewModel : Conductor<IScreen>, IBusy, IDisposable
     {
-        private readonly IWindowManager windowManager;
-        private readonly IReportFactory reportFactory;
         private readonly IApplicationUpdate applicationUpdate;
-        private readonly IMessageBox messageBox;
         private readonly IFileSystem fileSystem;
+        private readonly IMessageBox messageBox;
         private readonly IProcess processApi;
+        private readonly IReportFactory reportFactory;
         private readonly string version;
+        private readonly IWindowManager windowManager;
 
         private AccountingData? accountingData;
 
         private Task autoSaveTask = Task.CompletedTask;
         private CancellationTokenSource? cancellationTokenSource;
         private AccountingDataJournal? currentModelJournal;
+        private bool isBusy;
         private AccountViewModel? selectedAccount;
         private AccountJournalViewModel? selectedAccountJournalEntry;
         private FullJournalViewModel? selectedFullJournalEntry;
         private bool showInactiveAccounts;
-        private bool isBusy;
 
         public ShellViewModel(
             IWindowManager windowManager,
@@ -71,8 +64,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.processApi = processApi;
 
             this.version = this.GetType().Assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-                ?? "UNKNOWN";
+                               .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+                           ?? "UNKNOWN";
         }
 
         public ObservableCollection<MenuViewModel> RecentProjects { get; }
@@ -148,6 +141,23 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand SaveProjectCommand => new RelayCommand(_ => this.SaveProject(), _ => this.IsDocumentModified);
 
+        public ICommand SwitchCultureCommand => new RelayCommand(
+            cultureName =>
+            {
+                this.Settings.Culture = cultureName.ToString();
+                this.NotifyOfPropertyChange(nameof(this.IsGermanCulture));
+                this.NotifyOfPropertyChange(nameof(this.IsEnglishCulture));
+                this.NotifyOfPropertyChange(nameof(this.IsSystemCulture));
+                this.messageBox.Show(
+                    Resources.Information_CultureChangeRestartRequired,
+                    Resources.Header_SettingsChanged,
+                    icon: MessageBoxImage.Information);
+            });
+
+        public bool IsGermanCulture => this.Settings.Culture == "de";
+        public bool IsEnglishCulture => this.Settings.Culture == "en";
+        public bool IsSystemCulture => this.Settings.Culture == string.Empty;
+
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
         public ICommand AddBookingsCommand => new RelayCommand(_ => this.OnAddBookings(), _ => this.IsCurrentYearOpen);
@@ -197,21 +207,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand EditAccountCommand => new RelayCommand(this.OnEditAccount);
 
-        public bool IsBusy
-        {
-            get => this.isBusy;
-            set
-            {
-                if (value == this.isBusy)
-                {
-                    return;
-                }
-
-                this.isBusy = value;
-                this.NotifyOfPropertyChange();
-            }
-        }
-
         internal Settings Settings { get; set; } = Settings.Default;
 
         internal string FileName { get; set; } = string.Empty;
@@ -234,6 +229,21 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 return !this.currentModelJournal.Closed;
+            }
+        }
+
+        public bool IsBusy
+        {
+            get => this.isBusy;
+            set
+            {
+                if (value == this.isBusy)
+                {
+                    return;
+                }
+
+                this.isBusy = value;
+                this.NotifyOfPropertyChange();
             }
         }
 
@@ -354,30 +364,6 @@ namespace lg2de.SimpleAccounting.Presentation
             this.SelectedAccountJournalEntry = this.AccountJournal.FirstOrDefault(x => x.Identifier == booking.ID);
         }
 
-        private async Task OnCheckForUpdateAsync()
-        {
-            if (!await this.applicationUpdate.IsUpdateAvailableAsync(this.version))
-            {
-                return;
-            }
-
-            if (!this.CheckSaveProject())
-            {
-                return;
-            }
-
-            // starts separate process to update application in-place
-            // Now we need to close this application.
-            this.applicationUpdate.StartUpdateProcess();
-
-            // The user was asked whether saving the project (CheckSaveProject).
-            // It may have answered "No". So, the project may still be modified.
-            // We do not want to ask again, and he doesn't want to save.
-            this.IsDocumentModified = false;
-
-            this.TryClose();
-        }
-
         internal async Task<OperationResult> LoadProjectFromFileAsync(string projectFileName)
         {
             if (!this.CheckSaveProject())
@@ -394,8 +380,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 return loadResult;
             }
 
-            this.LoadProjectData(loader.ProjectData);
             this.FileName = projectFileName;
+            this.LoadProjectData(loader.ProjectData);
             this.IsDocumentModified = loader.Migrated;
 
             return OperationResult.Completed;
@@ -439,8 +425,8 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             var result = this.messageBox.Show(
-                "Die Datenbasis hat sich geändert.\nWollen Sie Speichern?",
-                "Programm beenden",
+                Resources.Question_SaveBeforeProceed,
+                Resources.Header_Shutdown,
                 MessageBoxButton.YesNoCancel);
             if (result == MessageBoxResult.Cancel)
             {
@@ -453,6 +439,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return true;
             }
 
+            // TODO Not saving but continue cannot work correctly this way!?
             return result == MessageBoxResult.No;
         }
 
@@ -462,8 +449,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Accounting project files (*.acml)|*.acml",
-                    RestoreDirectory = true
+                    Filter = Resources.FileFilter_MainProject, RestoreDirectory = true
                 };
 
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -490,12 +476,35 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        private async Task OnCheckForUpdateAsync()
+        {
+            if (!await this.applicationUpdate.IsUpdateAvailableAsync(this.version))
+            {
+                return;
+            }
+
+            if (!this.CheckSaveProject())
+            {
+                return;
+            }
+
+            // starts separate process to update application in-place
+            // Now we need to close this application.
+            this.applicationUpdate.StartUpdateProcess();
+
+            // The user was asked whether saving the project (CheckSaveProject).
+            // It may have answered "No". So, the project may still be modified.
+            // We do not want to ask again, and he doesn't want to save.
+            this.IsDocumentModified = false;
+
+            this.TryClose();
+        }
+
         private void OnOpenProject()
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Filter = "Accounting project files (*.acml)|*.acml",
-                RestoreDirectory = true
+                Filter = Resources.FileFilter_MainProject, RestoreDirectory = true
             };
 
             if (openFileDialog.ShowDialog() != DialogResult.OK)
@@ -570,7 +579,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var accountVm = new AccountViewModel
             {
-                DisplayName = "Account erstellen",
+                DisplayName = Resources.Header_CreateAccount,
                 Group = this.accountingData!.Accounts.First(),
                 Groups = this.accountingData.Accounts,
                 IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
@@ -607,7 +616,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             var vm = account.Clone();
-            vm.DisplayName = "Account bearbeiten";
+            vm.DisplayName = Resources.Header_EditAccount;
             var invalidIds = this.AllAccounts.Select(x => x.Identifier).Where(x => x != account.Identifier)
                 .ToList();
             vm.IsValidIdentifierFunc = id => !invalidIds.Contains(id);
@@ -664,8 +673,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this,
                 this.currentModelJournal!.DateStart.ToDateTime(),
                 this.currentModelJournal.DateEnd.ToDateTime(),
-                editMode: false)
-            { BookingIdentifier = this.GetMaxBookIdent() + 1 };
+                editMode: false) { BookingIdentifier = this.GetMaxBookIdent() + 1 };
             var allAccounts = this.accountingData!.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
@@ -674,10 +682,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 .Select(
                     t => new BookingTemplate
                     {
-                        Text = t.Text,
-                        Credit = t.Credit,
-                        Debit = t.Debit,
-                        Value = t.Value.ToViewModel()
+                        Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value.ToViewModel()
                     })
                 .ToList().ForEach(bookingModel.BindingTemplates.Add);
             // ReSharper restore ConstantConditionalAccessQualifier
@@ -855,7 +860,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
             foreach (var booking in this.currentModelJournal.Booking.OrderBy(b => b.Date))
             {
-                var item = new FullJournalViewModel { Date = booking.Date.ToDateTime(), Identifier = booking.ID, IsFollowup = booking.Followup };
+                var item = new FullJournalViewModel
+                {
+                    Date = booking.Date.ToDateTime(), Identifier = booking.ID, IsFollowup = booking.Followup
+                };
                 var debitAccounts = booking.Debit;
                 var creditAccounts = booking.Credit;
                 if (debitAccounts.Count == 1 && creditAccounts.Count == 1)
@@ -887,6 +895,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.FullJournal.Add(creditItem);
                 }
             }
+
+            this.FullJournal.UpdateRowHighlighting();
         }
 
         private void RefreshAccountList()
@@ -937,7 +947,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     debitSum += item.DebitValue;
                     item.RemoteAccount = booking.Credit.Count == 1
                         ? this.accountingData.GetAccountName(booking.Credit.Single())
-                        : "Diverse";
+                        : Resources.Word_Various;
                     this.AccountJournal.Add(item);
                 }
 
@@ -955,10 +965,12 @@ namespace lg2de.SimpleAccounting.Presentation
                     creditSum += item.CreditValue;
                     item.RemoteAccount = booking.Debit.Count == 1
                         ? this.accountingData.GetAccountName(booking.Debit.Single())
-                        : "Diverse";
+                        : Resources.Word_Various;
                     this.AccountJournal.Add(item);
                 }
             }
+
+            this.AccountJournal.UpdateRowHighlighting();
 
             if (debitSum + creditSum < double.Epsilon)
             {
@@ -969,14 +981,14 @@ namespace lg2de.SimpleAccounting.Presentation
             var sumItem = new AccountJournalViewModel();
             this.AccountJournal.Add(sumItem);
             sumItem.IsSummary = true;
-            sumItem.Text = "Summe";
+            sumItem.Text = Resources.Word_Total;
             sumItem.DebitValue = debitSum;
             sumItem.CreditValue = creditSum;
 
             var saldoItem = new AccountJournalViewModel();
             this.AccountJournal.Add(saldoItem);
             saldoItem.IsSummary = true;
-            saldoItem.Text = "Saldo";
+            saldoItem.Text = Resources.Word_Balance;
             if (debitSum > creditSum)
             {
                 saldoItem.DebitValue = debitSum - creditSum;
@@ -991,11 +1003,9 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var report = this.reportFactory.CreateTotalJournal(
                 this.currentModelJournal!,
-                this.accountingData!.Setup,
-                CultureInfo.CurrentUICulture);
-            const string title = "Journal";
-            report.CreateReport(title);
-            report.ShowPreview(title);
+                this.accountingData!.Setup);
+            report.CreateReport(Resources.Header_Journal);
+            report.ShowPreview(Resources.Header_Journal);
         }
 
         private void OnAccountJournalReport()
@@ -1003,12 +1013,11 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = this.reportFactory.CreateAccountJournal(
                 this.currentModelJournal!,
                 this.accountingData!.Accounts.SelectMany(a => a.Account),
-                this.accountingData.Setup, CultureInfo.CurrentUICulture);
+                this.accountingData.Setup);
             report.PageBreakBetweenAccounts =
                 this.accountingData.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
-            const string title = "Kontoblätter";
-            report.CreateReport(title);
-            report.ShowPreview(title);
+            report.CreateReport(Resources.Header_AccountSheets);
+            report.ShowPreview(Resources.Header_AccountSheets);
         }
 
         private void OnTotalsAndBalancesReport()
@@ -1016,11 +1025,9 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = this.reportFactory.CreateTotalsAndBalances(
                 this.currentModelJournal!,
                 this.accountingData!.Accounts,
-                this.accountingData.Setup,
-                CultureInfo.CurrentUICulture);
-            const string title = "Summen und Salden";
-            report.CreateReport(title);
-            report.ShowPreview(title);
+                this.accountingData.Setup);
+            report.CreateReport(Resources.Header_TotalsAndBalances);
+            report.ShowPreview(Resources.Header_TotalsAndBalances);
         }
 
         private void OnAssetBalancesReport()
@@ -1042,14 +1049,12 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = this.reportFactory.CreateTotalsAndBalances(
                 this.currentModelJournal!,
                 accountGroups,
-                this.accountingData.Setup,
-                CultureInfo.CurrentUICulture);
+                this.accountingData.Setup);
             // ReSharper disable ConstantConditionalAccessQualifier
             this.accountingData.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
             // ReSharper restore ConstantConditionalAccessQualifier
-            const string title = "Bestandskontosalden";
-            report.CreateReport(title);
-            report.ShowPreview(title);
+            report.CreateReport(Resources.Header_AssetBalances);
+            report.ShowPreview(Resources.Header_AssetBalances);
         }
 
         private void OnAnnualBalanceReport()
@@ -1057,9 +1062,8 @@ namespace lg2de.SimpleAccounting.Presentation
             var report = this.reportFactory.CreateAnnualBalance(
                 this.currentModelJournal!,
                 this.accountingData!.AllAccounts,
-                this.accountingData.Setup,
-                CultureInfo.CurrentUICulture);
-            const string title = "Jahresbilanz";
+                this.accountingData.Setup);
+            string title = Resources.Header_AnnualBalance;
             report.CreateReport(title);
             report.ShowPreview(title);
         }

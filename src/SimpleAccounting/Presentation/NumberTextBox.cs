@@ -20,7 +20,7 @@ namespace lg2de.SimpleAccounting.Presentation
     {
         public static readonly DependencyProperty ScaleProperty =
             DependencyProperty.Register(
-                "Scale", typeof(uint),
+                nameof(Scale), typeof(uint),
                 typeof(NumberTextBox),
                 new FrameworkPropertyMetadata((uint)0, OnScaleChanged));
 

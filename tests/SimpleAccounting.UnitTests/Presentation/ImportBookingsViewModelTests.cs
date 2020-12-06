@@ -13,7 +13,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
     public class ImportBookingsViewModelTests
     {
-        [Fact]
+        [CulturedFact("en")]
         public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
         {
             AccountingData project = Samples.SampleProject;
@@ -34,7 +34,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Date = new DateTime(2020, 1, 1),
                     Identifier = 1,
-                    Name = "<bereits gebucht>",
+                    Name = "<already booked>",
                     Text = "Open 1",
                     Value = 1000,
                     RemoteAccount = new { ID = 990 }
@@ -43,7 +43,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Date = new DateTime(2020, 1, 28),
                     Identifier = 3,
-                    Name = "<bereits gebucht>",
+                    Name = "<already booked>",
                     Text = "Salary",
                     Value = 200,
                     RemoteAccount = (AccountDefinition)null
@@ -52,7 +52,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Date = new DateTime(2020, 1, 29),
                     Identifier = 4,
-                    Name = "<bereits gebucht>",
+                    Name = "<already booked>",
                     Text = "Credit rate",
                     Value = -400,
                     RemoteAccount = new { ID = 5000 }
@@ -61,7 +61,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Date = new DateTime(2020, 2, 1),
                     Identifier = 5,
-                    Name = "<bereits gebucht>",
+                    Name = "<already booked>",
                     Text = "Shoes",
                     Value = -50,
                     RemoteAccount = (AccountDefinition)null
@@ -70,7 +70,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Date = new DateTime(2020, 2, 5),
                     Identifier = 6,
-                    Name = "<bereits gebucht>",
+                    Name = "<already booked>",
                     Text = "Rent to friend",
                     Value = -99,
                     RemoteAccount = new { ID = 6000 }

@@ -9,6 +9,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
     public class JournalBaseViewModel : PropertyChangedBase
     {
+        private bool isEvenRow;
+
         protected JournalBaseViewModel()
         {
         }
@@ -20,5 +22,20 @@ namespace lg2de.SimpleAccounting.Presentation
         public string Text { get; set; } = string.Empty;
 
         public bool IsFollowup { get; set; }
+
+        public bool IsEvenRow
+        {
+            get => this.isEvenRow;
+            set
+            {
+                if (value == this.isEvenRow)
+                {
+                    return;
+                }
+
+                this.isEvenRow = value;
+                this.NotifyOfPropertyChange();
+            }
+        }
     }
 }

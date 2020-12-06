@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
-    using System.Globalization;
     using System.Linq;
     using System.Xml.Linq;
     using System.Xml.XPath;
@@ -16,14 +15,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 
     public class TotalJournalReportTests
     {
-        [Fact]
+        [CulturedFact("en")]
         public void CreateReport_SampleData_Converted()
         {
             AccountingData project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var setup = new AccountingDataSetup();
             AccountingDataJournal journal = project.Journal.Last();
-            var sut = new TotalJournalReport(journal, setup, new CultureInfo("en-us"));
+            var sut = new TotalJournalReport(journal, setup);
 
             sut.CreateReport("dummy");
 
