@@ -39,7 +39,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 
             sut.ShowPreview("DocumentName");
 
-            sut.TestingPrinter.Received(1).PrintDocument("2020-02-29 DocumentName 2020");
+            var year = Samples.SampleProject.Journal.Last().Year;
+            sut.TestingPrinter.Received(1).PrintDocument($"2020-02-29 DocumentName {year}");
         }
     }
 }
