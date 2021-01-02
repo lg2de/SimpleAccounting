@@ -10,7 +10,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Authors>Lukas Grützmacher</Authors>
-    <Copyright>Copyright © 2007-2020</Copyright>
+    <Copyright>Copyright © 2007-2021</Copyright>
     <InformationalVersion>DEVEL</InformationalVersion>
     <ApplicationIcon>App.ico</ApplicationIcon>
   </PropertyGroup>

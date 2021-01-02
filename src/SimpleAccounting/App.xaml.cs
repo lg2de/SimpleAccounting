@@ -4,8 +4,12 @@
 
 namespace lg2de.SimpleAccounting
 {
+    using System.Configuration;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
     using System.Windows;
     using System.Windows.Markup;
     using lg2de.SimpleAccounting.Properties;
@@ -18,6 +22,18 @@ namespace lg2de.SimpleAccounting
             // upgrade settings from older versions
             var settings = Settings.Default;
             settings.Upgrade();
+
+            var provider = Settings.Default.Providers.OfType<LocalFileSettingsProvider>().FirstOrDefault();
+            var fileName = provider?.GetType().GetField(
+                    "_prevLocalConfigFileName",
+                    BindingFlags.Instance | BindingFlags.NonPublic)?
+                .GetValue(provider) as string;
+            if (File.Exists(fileName))
+            {
+                // delete configuration of old version
+                // ReSharper disable once AssignNullToNotNullAttribute
+                Directory.Delete(Path.GetDirectoryName(fileName), recursive: true);
+            }
         }
 
         [SuppressMessage(
