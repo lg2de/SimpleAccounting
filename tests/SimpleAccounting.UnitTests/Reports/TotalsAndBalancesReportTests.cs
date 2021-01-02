@@ -26,12 +26,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 
             sut.CreateReport("dummy");
 
-            var expected = @"
+            var year = Samples.SampleProject.Journal.Last().Year;
+            var expected = $@"
 <data>
   <tr topLine=""True"">
     <td>100</td>
     <td>Bank account</td>
-    <td>2/5/2020</td>
+    <td>2/5/{year}</td>
     <td>1000.00</td>
     <td></td>
     <td>200.00</td>
@@ -42,7 +43,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   <tr topLine=""True"">
     <td>400</td>
     <td>Salary</td>
-    <td>1/28/2020</td>
+    <td>1/28/{year}</td>
     <td></td>
     <td></td>
     <td></td>
@@ -53,7 +54,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   <tr topLine=""True"">
     <td>600</td>
     <td>Shoes</td>
-    <td>2/1/2020</td>
+    <td>2/1/{year}</td>
     <td></td>
     <td></td>
     <td>50.00</td>
@@ -64,7 +65,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   <tr topLine=""True"">
     <td>990</td>
     <td>Carryforward</td>
-    <td>1/1/2020</td>
+    <td>1/1/{year}</td>
     <td>2000.00</td>
     <td></td>
     <td></td>
@@ -86,7 +87,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   <tr topLine=""True"">
     <td>5000</td>
     <td>Bank credit</td>
-    <td>1/29/2020</td>
+    <td>1/29/{year}</td>
     <td></td>
     <td>3000.00</td>
     <td>400.00</td>
@@ -97,7 +98,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   <tr topLine=""True"">
     <td>6000</td>
     <td>Friends debit</td>
-    <td>2/5/2020</td>
+    <td>2/5/{year}</td>
     <td></td>
     <td></td>
     <td>99.00</td>

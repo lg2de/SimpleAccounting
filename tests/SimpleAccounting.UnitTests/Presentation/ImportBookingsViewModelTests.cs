@@ -28,11 +28,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.SelectedAccountNumber = 100;
 
+            var year = Convert.ToInt32(Samples.SampleProject.Journal.Last().Year);
             sut.ImportDataFiltered.Should().BeEmpty("start date should be set after last booking");
             sut.ExistingData.Should().BeEquivalentTo(
                 new
                 {
-                    Date = new DateTime(2020, 1, 1),
+                    Date = new DateTime(year, 1, 1),
                     Identifier = 1,
                     Name = "<already booked>",
                     Text = "Open 1",
@@ -41,7 +42,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 },
                 new
                 {
-                    Date = new DateTime(2020, 1, 28),
+                    Date = new DateTime(year, 1, 28),
                     Identifier = 3,
                     Name = "<already booked>",
                     Text = "Salary",
@@ -50,7 +51,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 },
                 new
                 {
-                    Date = new DateTime(2020, 1, 29),
+                    Date = new DateTime(year, 1, 29),
                     Identifier = 4,
                     Name = "<already booked>",
                     Text = "Credit rate",
@@ -59,7 +60,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 },
                 new
                 {
-                    Date = new DateTime(2020, 2, 1),
+                    Date = new DateTime(year, 2, 1),
                     Identifier = 5,
                     Name = "<already booked>",
                     Text = "Shoes",
@@ -68,7 +69,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 },
                 new
                 {
-                    Date = new DateTime(2020, 2, 5),
+                    Date = new DateTime(year, 2, 5),
                     Identifier = 6,
                     Name = "<already booked>",
                     Text = "Rent to friend",
