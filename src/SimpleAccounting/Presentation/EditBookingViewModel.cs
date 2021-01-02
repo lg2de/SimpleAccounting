@@ -23,12 +23,28 @@ namespace lg2de.SimpleAccounting.Presentation
         private ulong debitAccount;
         private BookingTemplate? selectedTemplate;
 
-        public EditBookingViewModel(ShellViewModel parent, DateTime dateStart, DateTime dateEnd, bool editMode = false)
+        public EditBookingViewModel(
+            ShellViewModel parent,
+            DateTime date,
+            DateTime dateStart,
+            DateTime dateEnd,
+            bool editMode = false)
         {
             this.EditMode = editMode;
             this.parent = parent;
+            this.Date = date;
             this.DateStart = dateStart;
             this.DateEnd = dateEnd;
+
+            if (this.Date > this.DateEnd)
+            {
+                this.Date = this.DateEnd;
+            }
+
+            if (this.Date < this.DateStart)
+            {
+                this.Date = this.DateStart;
+            }
 
             this.CreditSplitEntries.CollectionChanged +=
                 (sender, args) =>
@@ -58,7 +74,11 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public List<AccountDefinition> ExpenseRemoteAccounts { get; private set; } = new List<AccountDefinition>();
 
-        public DateTime Date { get; set; } = DateTime.Today;
+        public DateTime Date { get; set; }
+
+        public DateTime DateStart { get; }
+
+        public DateTime DateEnd { get; }
 
         public ulong BookingIdentifier { get; set; }
 
@@ -185,10 +205,6 @@ namespace lg2de.SimpleAccounting.Presentation
                     this.AddCommand.Execute(null);
                 }
             });
-
-        internal DateTime DateStart { get; }
-
-        internal DateTime DateEnd { get; }
 
         public AccountingDataJournalBooking CreateJournalEntry()
         {

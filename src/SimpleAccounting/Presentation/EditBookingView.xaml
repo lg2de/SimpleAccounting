@@ -51,7 +51,9 @@
     </Grid.Resources>
     <DatePicker
       Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0"
-      SelectedDate="{Binding Date}" />
+      SelectedDate="{Binding Date}"
+      DisplayDateStart="{Binding DateStart, Mode=OneWay}"
+      DisplayDateEnd="{Binding DateEnd, Mode=OneWay}" />
     <TextBlock
       Grid.Column="2" Grid.Row="0"
       HorizontalAlignment="Right" VerticalAlignment="Center"

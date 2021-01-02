@@ -669,11 +669,15 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void OnAddBookings()
         {
+            var yearStart = this.currentModelJournal!.DateStart.ToDateTime();
+            var yearEnd = this.currentModelJournal.DateEnd.ToDateTime();
             var bookingModel = new EditBookingViewModel(
                 this,
-                this.currentModelJournal!.DateStart.ToDateTime(),
-                this.currentModelJournal.DateEnd.ToDateTime(),
-                editMode: false) { BookingIdentifier = this.GetMaxBookIdent() + 1 };
+                DateTime.Today,
+                yearStart,
+                yearEnd,
+                editMode: false)
+            { BookingIdentifier = this.GetMaxBookIdent() + 1 };
             var allAccounts = this.accountingData!.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
@@ -707,12 +711,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
             var bookingModel = new EditBookingViewModel(
                 this,
+                journalEntry.Date.ToDateTime(),
                 this.currentModelJournal!.DateStart.ToDateTime(),
                 this.currentModelJournal.DateEnd.ToDateTime(),
                 editMode: true)
             {
                 BookingIdentifier = journalEntry.ID,
-                Date = journalEntry.Date.ToDateTime(),
                 IsFollowup = journalEntry.Followup,
                 IsOpening = journalEntry.Opening
             };
