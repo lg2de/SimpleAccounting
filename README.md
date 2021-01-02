@@ -77,3 +77,5 @@ This is why I decided to license the software under GPLV3.
 
 The application uses several external packages licened unter [MIT](https://opensource.org/licenses/MIT).
 Additionally the package [CsvHelper](https://github.com/JoshClose/CsvHelper) is licensed from Josh Close under [MS-PL](https://opensource.org/licenses/MS-PL).
+
+For the unit tests additional packages are used licensed under [Apache 2.0](https://licenses.nuget.org/Apache-2.0), [MS-PL](https://opensource.org/licenses/MS-PL), and [BSD-3-Clause](https://licenses.nuget.org/BSD-3-Clause).
