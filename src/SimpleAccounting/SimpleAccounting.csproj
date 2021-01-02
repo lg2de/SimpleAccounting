@@ -12,6 +12,7 @@
     <Authors>Lukas Grützmacher</Authors>
     <Copyright>Copyright © 2007-2020</Copyright>
     <InformationalVersion>DEVEL</InformationalVersion>
+    <ApplicationIcon>App.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

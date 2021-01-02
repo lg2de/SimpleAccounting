@@ -10,7 +10,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
     using FluentAssertions;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Infrastructure;
-    using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.UnitTests.Extensions;
     using NSubstitute;
     using Xunit;
