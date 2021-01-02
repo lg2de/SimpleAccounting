@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+  create:
     tags:
       - '*'
   pull_request:
