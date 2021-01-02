@@ -39,7 +39,8 @@
     <ListView
       Visibility="{Binding SplitRowsVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
       ItemsSource="{Binding SplitEntries, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-      HorizontalContentAlignment="Stretch">
+      HorizontalContentAlignment="Stretch"
+      KeyboardNavigation.TabNavigation="Continue">
       <ListView.ItemContainerStyle>
         <Style TargetType="ListViewItem">
           <Setter Property="Focusable" Value="false" />
@@ -58,21 +59,25 @@
               <RowDefinition Height="*" />
               <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <DockPanel
+            <Grid
               Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <TextBox
+                Grid.Column="0"
+                Height="30"
+                Text="{Binding BookingText}"
+                ToolTip="{x:Static properties:Resources.Tooltip_SplitBookingValue}" />
               <local:NumberTextBox
-                DockPanel.Dock="Right"
+                Grid.Column="1"
                 Width="100" Height="30"
                 HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
                 Scale="2"
                 Text="{Binding BookingValue, StringFormat='#0.00'}"
                 ToolTip="{x:Static properties:Resources.Word_BookingText}" />
-              <TextBox
-                DockPanel.Dock="Left"
-                Height="30"
-                Text="{Binding BookingText}"
-                ToolTip="{x:Static properties:Resources.Tooltip_SplitBookingValue}" />
-            </DockPanel>
+            </Grid>
             <local:NumberTextBox
               Grid.Column="0" Grid.Row="1"
               Text="{Binding AccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
