@@ -9,8 +9,8 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=security_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 
 **SimpleAccounting** is a simple software for accounting.
-It supports double-entry accounting including different reports.
-Bookings can be imported from text files.
+It supports double-entry accounting including split bookings and several reports.
+Bookings can be imported from text files (CSV).
 
 I started `SimpleAccounting` around 2005, only for my personal use to manage accounts and balances of a small club.
 In 2019, I met a colleague from another small club who was looking for a simple solution to get an overview of the balances of several logical and real accounts.
@@ -21,7 +21,7 @@ So I decided to rework my solution to make it usable for others and open source.
 
 The name says it all. The software is as simple as possible. 
 
-It probably does not follow all rules and laws of double-entry accounting, e.g. the software does not protect accounting entries from changes.
+It probably does not follow all rules and laws of double-entry accounting, e.g. the software does not protect accounting entries from changes. Instead it is explicitly possible to change existing entries.
 The data is stored in readable XML format and can be changed manually.
 
 The software focuses on journal and balance sheet reporting.
@@ -29,7 +29,7 @@ The software focuses on journal and balance sheet reporting.
 ## Features
 
 * Data management for double-entry accounting, stored as XML (see [example](./samples/sample.acml)) and defined using [XSD](./docs/AccountingData.xsd)
-* User interface for the management of accounts, the creation of entries, the listing of account journals
+* User interface (English and German) for the management of accounts, the creation and modification of entries, the listing of account journals
 * Support for split booking entries, either on credit or debit side
 * Import of booking entries from CSV files incl. semi-automatic assignment of offsetting accounts
 * Printable reports for full journal, account journal, accounts and balances, and annual financial statements
@@ -43,7 +43,7 @@ Some screenshots for first impression:
 ## Getting started
 
 The application is based on [.NET Core 3](https://dotnet.microsoft.com/download/dotnet-core/3.1).
-Please download and install the Runtime in version [3.1](https://dotnet.microsoft.com/download/dotnet-core/thank-you/runtime-desktop-3.1.5-windows-x64-installer) or above.
+Please download and install the Runtime in version [3.1](https://dotnet.microsoft.com/download/dotnet-core/thank-you/runtime-desktop-3.1.10-windows-x64-installer) or above.
 
 Download the `SimpleAccounting` package from the [release page](https://github.com/lg2de/SimpleAccounting/releases).
 Extract the ZIP archive into your preferred destination directory.
@@ -63,9 +63,6 @@ I am German and have no experience with English names for the financial world.
 So I'm pretty sure that some of the words I use are confusing for native speakers.
 Maybe you want to help with the better naming?
 
-Also, the user interface is completely in German.
-Maybe you want to help with the introduction of a localized user interface?
-
 ## Roadmap
 
 The public releases are [available](https://github.com/lg2de/SimpleAccounting/releases).
@@ -80,3 +77,5 @@ This is why I decided to license the software under GPLV3.
 
 The application uses several external packages licened unter [MIT](https://opensource.org/licenses/MIT).
 Additionally the package [CsvHelper](https://github.com/JoshClose/CsvHelper) is licensed from Josh Close under [MS-PL](https://opensource.org/licenses/MS-PL).
+
+For the unit tests additional packages are used licensed under [Apache 2.0](https://licenses.nuget.org/Apache-2.0), [MS-PL](https://opensource.org/licenses/MS-PL), and [BSD-3-Clause](https://licenses.nuget.org/BSD-3-Clause).
