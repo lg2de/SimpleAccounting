@@ -17,10 +17,6 @@ namespace lg2de.SimpleAccounting
     [ExcludeFromCodeCoverage]
     public partial class App
     {
-        [SuppressMessage(
-            "Major Code Smell",
-            "S3011:Reflection should not be used to increase accessibility of classes, methods, or fields",
-            Justification = "work-around")]
         public App()
         {
             // upgrade settings from older versions
