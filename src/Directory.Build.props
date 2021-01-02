@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)..\SimpleAccounting.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)..\.sonarlint\lg2de_simpleaccountingcsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,9 +16,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
 
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\SonarLint.xml">
-      <Link>Properties\SonarLint.xml</Link>
-    </AdditionalFiles>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\.sonarlint\lg2de_simpleaccounting\CSharp\SonarLint.xml" Link="Properties\SonarLint.xml" />
   </ItemGroup>
 
 </Project>
