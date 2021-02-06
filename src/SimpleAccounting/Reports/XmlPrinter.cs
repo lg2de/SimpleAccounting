@@ -431,7 +431,7 @@ namespace lg2de.SimpleAccounting.Reports
             XmlNode tableNode, int tableLineHeight, XmlNodeList columnNodes,
             XmlNodeList dataNodes, int nodeIndex)
         {
-            const int maxLength = 40;
+            const int maxLength = 50;
 
             var dataNode = dataNodes[nodeIndex];
 

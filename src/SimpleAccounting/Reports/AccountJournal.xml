@@ -20,7 +20,7 @@
     <columns lineHeight="8">
       <column width="20" rightLine="true">@Word_Date@</column>
       <column width="10" rightLine="true">@Word_Number_Short@</column>
-      <column width="80" rightLine="true">@Word_BookingText@</column>
+      <column width="95" rightLine="true">@Word_BookingText@</column>
       <column width="15" rightLine="true" align="right">@Word_DebitValue_Wrapped@</column>
       <column width="15" rightLine="true" align="right">@Word_CreditValue_Wrapped@</column>
       <column width="15" align="right">@Word_RemoteAccount_Wrapped@</column>
