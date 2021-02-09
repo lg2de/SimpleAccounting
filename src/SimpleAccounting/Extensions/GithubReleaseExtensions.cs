@@ -11,7 +11,7 @@ namespace lg2de.SimpleAccounting.Extensions
 
     internal static class GithubReleaseExtensions
     {
-        public static Release GetNewRelease(this IEnumerable<Release> releases, string currentVersion)
+        public static Release? GetNewRelease(this IEnumerable<Release> releases, string currentVersion)
         {
             bool isPreRelease = currentVersion.Contains("beta", StringComparison.InvariantCultureIgnoreCase);
             var candidates = releases.Where(x => !x.Draft);
@@ -59,6 +59,5 @@ namespace lg2de.SimpleAccounting.Extensions
                 return false;
             }
         }
-
     }
 }

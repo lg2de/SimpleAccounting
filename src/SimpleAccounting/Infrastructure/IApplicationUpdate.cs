@@ -10,6 +10,6 @@ namespace lg2de.SimpleAccounting.Infrastructure
     {
         Task<bool> IsUpdateAvailableAsync(string currentVersion);
 
-        void StartUpdateProcess();
+        bool StartUpdateProcess();
     }
 }

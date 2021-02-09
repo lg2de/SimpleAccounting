@@ -100,7 +100,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi);
+            processApi.Start(Arg.Any<ProcessStartInfo>())
+                .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c ping 127.0.0.1")));
+            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi)
+            {
+                WaitTimeMilliseconds = 0
+            };
             var releases = GithubReleaseExtensionTests.CreateRelease("2.1");
             messageBox.Show(
                     Arg.Any<string>(),
@@ -110,7 +115,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
                 .Returns(MessageBoxResult.Yes);
             sut.AskForUpdate(releases, "2.0").Should().BeTrue();
 
-            sut.StartUpdateProcess();
+            sut.StartUpdateProcess().Should().BeTrue();
 
             fileSystem.Received(1).WriteAllTextIntoFile(
                 Arg.Is<string>(x => x.Contains(Path.GetTempPath())), Arg.Any<string>());

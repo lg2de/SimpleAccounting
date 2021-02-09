@@ -524,4 +524,7 @@ When answering 'No' the backup file will be deleted.</value>
   <data name="Question_UpdateToVersionX" xml:space="preserve">
     <value>Do you want to update to version {0}?</value>
   </data>
+  <data name="Update_ProcessFailed" xml:space="preserve">
+    <value>The update process failed with exit code {0}.</value>
+  </data>
 </root>

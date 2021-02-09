@@ -4,13 +4,17 @@
   [Parameter(Mandatory=$true)][int]$processId
 )
 
-$tempFile = $env:TEMP + "\package.zip"
-Remove-Item $tempFile -ErrorAction SilentlyContinue
-
-Write-Host Waiting for current application to finish...
-Wait-Process -Id $processId -ErrorAction SilentlyContinue
+$ErrorActionPreference = "Stop"
 
 try {
+  Write-Host Updating SimpleAccounting...
+
+  $tempFile = $env:TEMP + "\package.zip"
+  Remove-Item $tempFile -ErrorAction SilentlyContinue
+
+  Write-Host Waiting for current application to finish...
+  Wait-Process -Id $processId -ErrorAction SilentlyContinue
+
   Write-Host Download new release...
   Write-Host $assetUrl
   Invoke-WebRequest -Uri $assetUrl -OutFile $tempFile

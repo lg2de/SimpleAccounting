@@ -490,7 +490,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
             // starts separate process to update application in-place
             // Now we need to close this application.
-            this.applicationUpdate.StartUpdateProcess();
+            if (!this.applicationUpdate.StartUpdateProcess())
+            {
+                return;
+            }
 
             // The user was asked whether saving the project (CheckSaveProject).
             // It may have answered "No". So, the project may still be modified.
