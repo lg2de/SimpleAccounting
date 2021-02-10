@@ -10,6 +10,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
     using FluentAssertions;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Infrastructure;
+    using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.UnitTests.Extensions;
     using NSubstitute;
     using Xunit;
@@ -120,6 +121,26 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             fileSystem.Received(1).WriteAllTextIntoFile(
                 Arg.Is<string>(x => x.Contains(Path.GetTempPath())), Arg.Any<string>());
             processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(i => i.FileName == "powershell"));
+        }
+
+        [Fact]
+        public void StartUpdateProcess_UpdateProcessFailed_UpdateAborted()
+        {
+            var messageBox = Substitute.For<IMessageBox>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            processApi.Start(Arg.Any<ProcessStartInfo>())
+                .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c exit 5")));
+            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi)
+            {
+                WaitTimeMilliseconds = 1000
+            };
+            var releases = GithubReleaseExtensionTests.CreateRelease("2.1");
+            sut.AskForUpdate(releases, "2.0");
+
+            sut.StartUpdateProcess().Should().BeFalse();
+            messageBox.Received(1).Show(
+                Arg.Is<string>(s => s.Contains(" 5 ")), Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
         }
     }
 }

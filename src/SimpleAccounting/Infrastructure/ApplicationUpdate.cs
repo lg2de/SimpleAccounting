@@ -85,7 +85,8 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 return true;
             }
 
-            var message = string.Format(Resources.Update_ProcessFailed, updateProcess.ExitCode);
+            var message = string.Format(
+                CultureInfo.CurrentUICulture, Resources.Update_ProcessFailed, updateProcess.ExitCode);
             this.messageBox.Show(message, Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
             return false;
         }
@@ -125,9 +126,10 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 return false;
             }
 
+            string message = string.Format(
+                CultureInfo.CurrentUICulture, Resources.Question_UpdateToVersionX, this.newRelease.TagName);
             var result = this.messageBox.Show(
-                string.Format(
-                    CultureInfo.CurrentUICulture, Resources.Question_UpdateToVersionX, this.newRelease.TagName),
+                message,
                 caption,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question,
