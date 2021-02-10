@@ -123,7 +123,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(i => i.FileName == "powershell"));
         }
 
-        [Fact]
+        [CulturedFact("en")]
         public void StartUpdateProcess_UpdateProcessFailed_UpdateAborted()
         {
             var messageBox = Substitute.For<IMessageBox>();
@@ -140,7 +140,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
 
             sut.StartUpdateProcess().Should().BeFalse();
             messageBox.Received(1).Show(
-                Arg.Is<string>(s => s.Contains(" 5 ")), Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
+                Arg.Is<string>(s => s.Contains("code 5.")), Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
         }
     }
 }
