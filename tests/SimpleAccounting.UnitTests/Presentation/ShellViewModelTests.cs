@@ -634,19 +634,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [UIFact]
         public async Task InvokeLoadProjectFile_HappyPath_BusyIndicatorChanged()
         {
-            IWindowManager windowManager = Substitute.For<IWindowManager>();
-            IReportFactory reportFactory = Substitute.For<IReportFactory>();
-            IApplicationUpdate applicationUpdate = Substitute.For<IApplicationUpdate>();
-            IMessageBox messageBox = Substitute.For<IMessageBox>();
-            IFileSystem fileSystem = Substitute.For<IFileSystem>();
-            IProcess processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings()
-            };
+            var sut = CreateSut();
             long counter = 0;
             var tcs = new TaskCompletionSource<bool>();
+            
+            // Because awaiting "ExecuteUIThread" does not really await the action
+            // we need to wait for two property changed events.
+            var values = new List<bool>();
             sut.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName != "IsBusy")
@@ -654,6 +648,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     return;
                 }
 
+                values.Add(sut.IsBusy);
                 if (Interlocked.Increment(ref counter) == 2)
                 {
                     tcs.SetResult(true);
@@ -663,6 +658,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.InvokeLoadProjectFile("dummy");
 
             await tcs.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds(), "IsBusy should change twice");
+            values.Should().Equal(true, false);
         }
         
         [Fact]
