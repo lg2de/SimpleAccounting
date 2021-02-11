@@ -1,5 +1,5 @@
 // <copyright>
-//     Copyright (c) Lukas Grützmacher. All rights reserved.
+//     Copyright (c) Lukas GrÃ¼tzmacher. All rights reserved.
 // </copyright>
 
 namespace lg2de.SimpleAccounting.Presentation
@@ -217,7 +217,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
 
-        private string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
+        internal string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
 
         private bool IsCurrentYearOpen
         {
@@ -364,6 +364,17 @@ namespace lg2de.SimpleAccounting.Presentation
             this.SelectedAccountJournalEntry = this.AccountJournal.FirstOrDefault(x => x.Identifier == booking.ID);
         }
 
+        internal void InvokeLoadProjectFile(string fileName)
+        {
+            this.IsBusy = true;
+            Task.Run(
+                async () =>
+                {
+                    await this.LoadProjectFromFileAsync(fileName);
+                    await Execute.OnUIThreadAsync(() => this.IsBusy = false);
+                });
+        }
+        
         internal async Task<OperationResult> LoadProjectFromFileAsync(string projectFileName)
         {
             if (!this.CheckSaveProject())
@@ -512,14 +523,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            this.IsBusy = true;
-            string fileName = openFileDialog.FileName;
-            Task.Run(
-                async () =>
-                {
-                    await this.LoadProjectFromFileAsync(fileName);
-                    await Execute.OnUIThreadAsync(() => this.IsBusy = false);
-                });
+            this.InvokeLoadProjectFile(openFileDialog.FileName);
         }
 
         private void BuildRecentProjectsMenu()
