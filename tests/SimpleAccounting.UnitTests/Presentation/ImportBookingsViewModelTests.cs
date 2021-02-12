@@ -247,7 +247,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             // 103 should be skipped because it is configured to be skipped
             // 105 should be skipped because it is not mapped
             // 106 should be skipped because it is valid entry AFTER unmapped entry => stop
-            parent.FullJournal.Should().BeEquivalentTo(
+            parent.FullJournal.Items.Should().BeEquivalentTo(
                 new
                 {
                     Identifier = 102,

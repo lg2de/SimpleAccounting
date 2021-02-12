@@ -196,7 +196,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new { Name = "Bank credit" },
                 new { Name = "Friends debit" });
 
-            sut.FullJournal.Should().BeEquivalentTo(
+            sut.FullJournal.Items.Should().BeEquivalentTo(
                 new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
                 new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
                 new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
@@ -310,11 +310,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
             };
 
-            using var monitor = sut.Monitor();
+            using var fullJournalMonitor = sut.FullJournal.Monitor();
+            using var accountJournalMonitor = sut.Monitor();
             sut.AddBooking(booking);
 
             using var _ = new AssertionScope();
-            sut.FullJournal.Should().BeEquivalentTo(
+            sut.FullJournal.Items.Should().BeEquivalentTo(
                 new
                 {
                     Identifier = 4567,
@@ -324,8 +325,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     CreditAccount = "990 (Carryforward)",
                     DebitAccount = "100 (Bank account)"
                 });
-            monitor.Should().RaisePropertyChangeFor(x => x.SelectedFullJournalEntry);
-            sut.SelectedFullJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
+            fullJournalMonitor.Should().RaisePropertyChangeFor(x => x.SelectedItem);
+            sut.FullJournal.SelectedItem.Should().BeEquivalentTo(new { Identifier = 4567 });
             sut.AccountJournal.Should().BeEquivalentTo(
                 new
                 {
@@ -338,7 +339,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 },
                 new { Text = "Total", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 },
                 new { Text = "Balance", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 });
-            monitor.Should().RaisePropertyChangeFor(x => x.SelectedAccountJournalEntry);
+            accountJournalMonitor.Should().RaisePropertyChangeFor(x => x.SelectedAccountJournalEntry);
             sut.SelectedAccountJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
         }
 

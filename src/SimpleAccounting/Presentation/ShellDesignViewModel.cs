@@ -15,6 +15,7 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage(
         "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
         Justification = "Design view model defines useful values")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellDesignViewModel : ShellViewModel
     {
         public ShellDesignViewModel()
@@ -33,7 +34,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.AccountList.Add(accountItem);
             this.SelectedAccount = accountItem;
 
-            var journalItem = new FullJournalViewModel
+            var journalItem = new FullJournalItemViewModel
             {
                 Identifier = 41,
                 Date = DateTime.Now,
@@ -42,8 +43,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditAccount = "100",
                 DebitAccount = "400"
             };
-            this.FullJournal.Add(journalItem);
-            journalItem = new FullJournalViewModel
+            this.FullJournal.Items.Add(journalItem);
+            journalItem = new FullJournalItemViewModel
             {
                 Identifier = 42,
                 Date = DateTime.Now,
@@ -53,8 +54,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 DebitAccount = "401",
                 IsFollowup = true
             };
-            this.FullJournal.Add(journalItem);
-            journalItem = new FullJournalViewModel
+            this.FullJournal.Items.Add(journalItem);
+            journalItem = new FullJournalItemViewModel
             {
                 Identifier = 43,
                 Date = DateTime.Now,
@@ -63,8 +64,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditAccount = "101",
                 DebitAccount = "401",
             };
-            this.FullJournal.Add(journalItem);
-            journalItem = new FullJournalViewModel
+            this.FullJournal.Items.Add(journalItem);
+            journalItem = new FullJournalItemViewModel
             {
                 Identifier = 44,
                 Date = DateTime.Now,
@@ -73,10 +74,10 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditAccount = "101",
                 DebitAccount = "401",
             };
-            this.FullJournal.Add(journalItem);
-            this.FullJournal.UpdateRowHighlighting();
+            this.FullJournal.Items.Add(journalItem);
+            this.FullJournal.Items.UpdateRowHighlighting();
 
-            var accountJournalItem = new AccountJournalViewModel
+            var accountJournalItem = new AccountJournalItemViewModel
             {
                 Identifier = 42,
                 Date = DateTime.Now,
@@ -85,7 +86,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 RemoteAccount = "Div."
             };
             this.AccountJournal.Add(accountJournalItem);
-            accountJournalItem = new AccountJournalViewModel
+            accountJournalItem = new AccountJournalItemViewModel
             {
                 Identifier = 44,
                 Date = DateTime.Now,
@@ -94,7 +95,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 RemoteAccount = "Div."
             };
             this.AccountJournal.Add(accountJournalItem);
-            accountJournalItem = new AccountJournalViewModel
+            accountJournalItem = new AccountJournalItemViewModel
             {
                 IsSummary = true, Text = "Summe", CreditValue = 123.4, RemoteAccount = "Div."
             };

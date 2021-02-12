@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -23,6 +24,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using NSubstitute;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public partial class ShellViewModelTests
     {
         [CulturedFact("en")]
@@ -93,7 +95,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.NewProjectCommand.Execute(null);
 
             sut.AccountList.Should().NotBeEmpty();
-            sut.FullJournal.Should().BeEmpty();
+            sut.FullJournal.Items.Should().BeEmpty();
             sut.AccountJournal.Should().BeEmpty();
         }
 
@@ -202,7 +204,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 sut.IsDocumentModified.Should().BeTrue();
                 sut.AccountList.Select(x => x.Name).Should().Equal(
                     "Salary", "Shoes", "Carryforward", "Bank account", "Bank credit", "Friends debit");
-                sut.FullJournal.Should().BeEquivalentTo(
+                sut.FullJournal.Items.Should().BeEquivalentTo(
                     new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
                     new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });
                 sut.AccountJournal.Should().BeEquivalentTo(
@@ -295,7 +297,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.EditBookingCommand.Execute(sut.FullJournal.Last());
+            sut.EditBookingCommand.Execute(sut.FullJournal.Items.Last());
 
             using var _ = new AssertionScope();
             sut.IsDocumentModified.Should().BeFalse("the project remains unchanged");
@@ -314,7 +316,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.EditBookingCommand.Execute(sut.FullJournal.First(x => x.Identifier == 3));
+            sut.EditBookingCommand.Execute(sut.FullJournal.Items.First(x => x.Identifier == 3));
 
             using var _ = new AssertionScope();
             vm.CreditSplitEntries.Should().BeEquivalentTo(
@@ -332,7 +334,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.EditBookingCommand.Execute(sut.FullJournal.First(x => x.Identifier == 5));
+            sut.EditBookingCommand.Execute(sut.FullJournal.Items.First(x => x.Identifier == 5));
 
             using var _ = new AssertionScope();
             vm.DebitSplitEntries.Should().BeEquivalentTo(
@@ -357,11 +359,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.EditBookingCommand.Execute(sut.FullJournal.Last());
+            sut.EditBookingCommand.Execute(sut.FullJournal.Items.Last());
 
             using var _ = new AssertionScope();
             sut.IsDocumentModified.Should().BeTrue("the project changed");
-            sut.FullJournal.Last().Should().BeEquivalentTo(
+            sut.FullJournal.Items.Last().Should().BeEquivalentTo(
                 new
                 {
                     Identifier = 106,
@@ -512,7 +514,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var _ = new AssertionScope();
             sut.BookingYears.Select(x => x.Header).Should()
                 .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
-            sut.FullJournal.Should().BeEquivalentTo(
+            sut.FullJournal.Items.Should().BeEquivalentTo(
                 new
                 {
                     Identifier = 1,
@@ -584,7 +586,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var _ = new AssertionScope();
             sut.BookingYears.Select(x => x.Header).Should()
                 .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
-            sut.FullJournal.Should().BeEquivalentTo(
+            sut.FullJournal.Items.Should().BeEquivalentTo(
                 new
                 {
                     Identifier = 1,
@@ -647,7 +649,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AccountJournalReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
+            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
 
             sut.AccountJournalReportCommand.CanExecute(null).Should().BeTrue();
         }
@@ -682,7 +684,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AnnualBalanceReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
+            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
 
             sut.AnnualBalanceReportCommand.CanExecute(null).Should().BeTrue();
         }
@@ -724,7 +726,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AssetBalancesReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
+            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
 
             sut.AssetBalancesReportCommand.CanExecute(null).Should().BeTrue();
         }
@@ -758,7 +760,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void TotalJournalReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
+            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
 
             sut.TotalJournalReportCommand.CanExecute(null).Should().BeTrue();
         }
@@ -793,7 +795,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void TotalsAndBalancesReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Add(new FullJournalViewModel());
+            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
 
             sut.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeTrue();
         }

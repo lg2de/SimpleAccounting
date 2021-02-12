@@ -11,7 +11,7 @@ namespace lg2de.SimpleAccounting.Extensions
 
     public static class JournalBaseViewModelExtensions
     {
-        public static void UpdateRowHighlighting([NotNull] this IEnumerable<JournalBaseViewModel> journal)
+        public static void UpdateRowHighlighting([NotNull] this IEnumerable<JournalItemBaseViewModel> journal)
         {
             if (journal == null)
             {

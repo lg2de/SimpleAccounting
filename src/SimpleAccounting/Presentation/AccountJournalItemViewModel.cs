@@ -6,7 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using System.Windows;
 
-    public class AccountJournalViewModel : JournalBaseViewModel
+    public class AccountJournalItemViewModel : JournalItemBaseViewModel
     {
         public double CreditValue { get; set; }
 

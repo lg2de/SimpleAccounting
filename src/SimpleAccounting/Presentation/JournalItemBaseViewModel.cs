@@ -7,11 +7,11 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using Caliburn.Micro;
 
-    public class JournalBaseViewModel : PropertyChangedBase
+    public class JournalItemBaseViewModel : PropertyChangedBase
     {
         private bool isEvenRow;
 
-        protected JournalBaseViewModel()
+        protected JournalItemBaseViewModel()
         {
         }
 

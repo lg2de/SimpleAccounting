@@ -137,8 +137,8 @@
             Text="{x:Static properties:Resources.Header_AnnualJournal}" />
           <DataGrid
             DockPanel.Dock="Bottom"
-            ItemsSource="{Binding FullJournal}"
-            SelectedItem="{Binding SelectedFullJournalEntry}"
+            ItemsSource="{Binding FullJournal.Items}"
+            SelectedItem="{Binding FullJournal.SelectedItem}"
             RowStyle="{StaticResource GridRowStyle}" GridLinesVisibility="Vertical"
             AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
             SelectionChanged="OnGridSelectionChanged"
@@ -162,7 +162,7 @@
               <MouseBinding
                 MouseAction="LeftDoubleClick"
                 Command="{Binding EditBookingCommand}"
-                CommandParameter="{Binding FullJournal/}" />
+                CommandParameter="{Binding FullJournal.Items/}" />
             </DataGrid.InputBindings>
           </DataGrid>
         </DockPanel>

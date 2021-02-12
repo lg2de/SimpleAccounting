@@ -44,8 +44,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private AccountingDataJournal? currentModelJournal;
         private bool isBusy;
         private AccountViewModel? selectedAccount;
-        private AccountJournalViewModel? selectedAccountJournalEntry;
-        private FullJournalViewModel? selectedFullJournalEntry;
+        private AccountJournalItemViewModel? selectedAccountJournalEntry;
         private bool showInactiveAccounts;
 
         public ShellViewModel(
@@ -79,6 +78,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<AccountViewModel> AccountList { get; }
             = new ObservableCollection<AccountViewModel>();
 
+        public FullJournalViewModel FullJournal { get; } = new FullJournalViewModel();
+        
         public AccountViewModel? SelectedAccount
         {
             get => this.selectedAccount;
@@ -99,23 +100,10 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        public ObservableCollection<FullJournalViewModel> FullJournal { get; }
-            = new ObservableCollection<FullJournalViewModel>();
+        public ObservableCollection<AccountJournalItemViewModel> AccountJournal { get; }
+            = new ObservableCollection<AccountJournalItemViewModel>();
 
-        public FullJournalViewModel? SelectedFullJournalEntry
-        {
-            get => this.selectedFullJournalEntry;
-            set
-            {
-                this.selectedFullJournalEntry = value;
-                this.NotifyOfPropertyChange();
-            }
-        }
-
-        public ObservableCollection<AccountJournalViewModel> AccountJournal { get; }
-            = new ObservableCollection<AccountJournalViewModel>();
-
-        public AccountJournalViewModel? SelectedAccountJournalEntry
+        public AccountJournalItemViewModel? SelectedAccountJournalEntry
         {
             get => this.selectedAccountJournalEntry;
             set
@@ -171,19 +159,19 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.CloseYear(), _ => this.IsCurrentYearOpen);
 
         public ICommand TotalJournalReportCommand => new RelayCommand(
-            _ => this.OnTotalJournalReport(), _ => this.FullJournal.Any());
+            _ => this.OnTotalJournalReport(), _ => this.FullJournal.Items.Any());
 
         public ICommand AccountJournalReportCommand => new RelayCommand(
-            _ => this.OnAccountJournalReport(), _ => this.FullJournal.Any());
+            _ => this.OnAccountJournalReport(), _ => this.FullJournal.Items.Any());
 
         public ICommand TotalsAndBalancesReportCommand => new RelayCommand(
-            _ => this.OnTotalsAndBalancesReport(), _ => this.FullJournal.Any());
+            _ => this.OnTotalsAndBalancesReport(), _ => this.FullJournal.Items.Any());
 
         public ICommand AssetBalancesReportCommand => new RelayCommand(
-            _ => this.OnAssetBalancesReport(), _ => this.FullJournal.Any());
+            _ => this.OnAssetBalancesReport(), _ => this.FullJournal.Items.Any());
 
         public ICommand AnnualBalanceReportCommand => new RelayCommand(
-            _ => this.OnAnnualBalanceReport(), _ => this.FullJournal.Any());
+            _ => this.OnAnnualBalanceReport(), _ => this.FullJournal.Items.Any());
 
         public ICommand HelpAboutCommand => new RelayCommand(
             _ => this.processApi.Start(new ProcessStartInfo(Defines.ProjectUrl) { UseShellExecute = true }));
@@ -352,7 +340,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.RefreshFullJournal();
             }
 
-            this.SelectedFullJournalEntry = this.FullJournal.FirstOrDefault(x => x.Identifier == booking.ID);
+            this.FullJournal.SelectedItem = this.FullJournal.Items.FirstOrDefault(x => x.Identifier == booking.ID);
 
             if (booking.Debit.All(x => x.Account != this.SelectedAccount?.Identifier)
                 && booking.Credit.All(x => x.Account != this.SelectedAccount?.Identifier))
@@ -699,7 +687,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void OnEditBooking(object commandParameter)
         {
-            if (!(commandParameter is JournalBaseViewModel journalViewModel))
+            if (!(commandParameter is JournalItemBaseViewModel journalViewModel))
             {
                 return;
             }
@@ -857,56 +845,6 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        // TODO move to FullJournalViewModel
-        private void RefreshFullJournal()
-        {
-            this.FullJournal.Clear();
-            if (this.currentModelJournal?.Booking == null)
-            {
-                return;
-            }
-
-            foreach (var booking in this.currentModelJournal.Booking.OrderBy(b => b.Date))
-            {
-                var item = new FullJournalViewModel
-                {
-                    Date = booking.Date.ToDateTime(), Identifier = booking.ID, IsFollowup = booking.Followup
-                };
-                var debitAccounts = booking.Debit;
-                var creditAccounts = booking.Credit;
-                if (debitAccounts.Count == 1 && creditAccounts.Count == 1)
-                {
-                    var debit = debitAccounts[0];
-                    item.Text = debit.Text;
-                    item.Value = debit.Value.ToViewModel();
-                    item.DebitAccount = this.accountingData!.GetAccountName(debit);
-                    item.CreditAccount = this.accountingData.GetAccountName(creditAccounts[0]);
-                    this.FullJournal.Add(item);
-                    continue;
-                }
-
-                foreach (var debitEntry in debitAccounts)
-                {
-                    var debitItem = item.Clone();
-                    debitItem.Text = debitEntry.Text;
-                    debitItem.Value = debitEntry.Value.ToViewModel();
-                    debitItem.DebitAccount = this.accountingData!.GetAccountName(debitEntry);
-                    this.FullJournal.Add(debitItem);
-                }
-
-                foreach (var creditEntry in creditAccounts)
-                {
-                    var creditItem = item.Clone();
-                    creditItem.Text = creditEntry.Text;
-                    creditItem.Value = creditEntry.Value.ToViewModel();
-                    creditItem.CreditAccount = this.accountingData!.GetAccountName(creditEntry);
-                    this.FullJournal.Add(creditItem);
-                }
-            }
-
-            this.FullJournal.UpdateRowHighlighting();
-        }
-
         private void RefreshAccountList()
         {
             IEnumerable<AccountViewModel> accounts = this.AllAccounts;
@@ -921,7 +859,13 @@ namespace lg2de.SimpleAccounting.Presentation
             sorted.ForEach(this.AccountList.Add);
         }
 
-        // TODO move to AccountJournalViewModel
+        // TODO move all data to model storage class
+        private void RefreshFullJournal()
+        {
+            this.FullJournal.Refresh(this.currentModelJournal?.Booking, this.accountingData!);
+        }
+        
+        // TODO move to AccountJournalItemViewModel
         private void RefreshAccountJournal()
         {
             this.AccountJournal.Clear();
@@ -944,7 +888,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var debitEntries = booking.Debit.Where(x => x.Account == accountNumber);
                 foreach (var debitEntry in debitEntries)
                 {
-                    var item = new AccountJournalViewModel
+                    var item = new AccountJournalItemViewModel
                     {
                         Identifier = booking.ID,
                         Date = booking.Date.ToDateTime(),
@@ -962,7 +906,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var creditEntries = booking.Credit.Where(x => x.Account == accountNumber);
                 foreach (var creditEntry in creditEntries)
                 {
-                    var item = new AccountJournalViewModel
+                    var item = new AccountJournalItemViewModel
                     {
                         Identifier = booking.ID,
                         Date = booking.Date.ToDateTime(),
@@ -986,14 +930,14 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var sumItem = new AccountJournalViewModel();
+            var sumItem = new AccountJournalItemViewModel();
             this.AccountJournal.Add(sumItem);
             sumItem.IsSummary = true;
             sumItem.Text = Resources.Word_Total;
             sumItem.DebitValue = debitSum;
             sumItem.CreditValue = creditSum;
 
-            var saldoItem = new AccountJournalViewModel();
+            var saldoItem = new AccountJournalItemViewModel();
             this.AccountJournal.Add(saldoItem);
             saldoItem.IsSummary = true;
             saldoItem.Text = Resources.Word_Balance;
