@@ -172,8 +172,8 @@
                      Text="{Binding SelectedAccount.Name, StringFormat={x:Static properties:Resources.Header_AccountJournalX}}" />
           <DataGrid
             DockPanel.Dock="Bottom"
-            ItemsSource="{Binding AccountJournal}"
-            SelectedItem="{Binding SelectedAccountJournalEntry}"
+            ItemsSource="{Binding AccountJournal.Items}"
+            SelectedItem="{Binding AccountJournal.SelectedItem}"
             GridLinesVisibility="Vertical"
             AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
             SelectionChanged="OnGridSelectionChanged"
@@ -210,7 +210,7 @@
               <MouseBinding
                 MouseAction="LeftDoubleClick"
                 Command="{Binding EditBookingCommand}"
-                CommandParameter="{Binding AccountJournal/}" />
+                CommandParameter="{Binding AccountJournal.Items/}" />
             </DataGrid.InputBindings>
           </DataGrid>
         </DockPanel>

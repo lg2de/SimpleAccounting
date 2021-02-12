@@ -37,7 +37,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 100));
 
-            sut.AccountJournal.Should().BeEquivalentTo(
+            sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
                 new { Text = "Salary", RemoteAccount = "Various", CreditValue = 0, DebitValue = 200 },
                 new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", CreditValue = 400, DebitValue = 0 },
@@ -63,7 +63,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 400));
 
-            sut.AccountJournal.Should().BeEquivalentTo(
+            sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 120, DebitValue = 0 },
                 new { Text = "Salary2", RemoteAccount = "100 (Bank account)", CreditValue = 80, DebitValue = 0 },
                 new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 },
@@ -80,7 +80,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 600));
 
-            sut.AccountJournal.Should().BeEquivalentTo(
+            sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 20 },
                 new { Text = "Shoes2", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 30 },
                 new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 },
@@ -96,7 +96,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.AccountList.Should().NotBeEmpty();
             sut.FullJournal.Items.Should().BeEmpty();
-            sut.AccountJournal.Should().BeEmpty();
+            sut.AccountJournal.Items.Should().BeEmpty();
         }
 
         [Fact]
@@ -207,7 +207,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 sut.FullJournal.Items.Should().BeEquivalentTo(
                     new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
                     new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });
-                sut.AccountJournal.Should().BeEquivalentTo(
+                sut.AccountJournal.Items.Should().BeEquivalentTo(
                     new { RemoteAccount = "1100 (Bank account)" },
                     new { RemoteAccount = "1100 (Bank account)" },
                     new { Text = "Total" },
@@ -542,7 +542,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     CreditAccount = "990 (Carryforward)",
                     DebitAccount = "6000 (Friends debit)"
                 });
-            sut.AccountJournal.Should().BeEquivalentTo(
+            sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new
                 {
                     Identifier = 1,
@@ -614,7 +614,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     CreditAccount = "999 (MyCarryForward)",
                     DebitAccount = "6000 (Friends debit)"
                 });
-            sut.AccountJournal.Should().BeEquivalentTo(
+            sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new
                 {
                     Identifier = 1,

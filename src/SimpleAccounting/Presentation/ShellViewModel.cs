@@ -44,7 +44,6 @@ namespace lg2de.SimpleAccounting.Presentation
         private AccountingDataJournal? currentModelJournal;
         private bool isBusy;
         private AccountViewModel? selectedAccount;
-        private AccountJournalItemViewModel? selectedAccountJournalEntry;
         private bool showInactiveAccounts;
 
         public ShellViewModel(
@@ -79,6 +78,8 @@ namespace lg2de.SimpleAccounting.Presentation
             = new ObservableCollection<AccountViewModel>();
 
         public FullJournalViewModel FullJournal { get; } = new FullJournalViewModel();
+
+        public AccountJournalViewModel AccountJournal { get; } = new AccountJournalViewModel();
         
         public AccountViewModel? SelectedAccount
         {
@@ -97,19 +98,6 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.showInactiveAccounts = value;
                 this.RefreshAccountList();
-            }
-        }
-
-        public ObservableCollection<AccountJournalItemViewModel> AccountJournal { get; }
-            = new ObservableCollection<AccountJournalItemViewModel>();
-
-        public AccountJournalItemViewModel? SelectedAccountJournalEntry
-        {
-            get => this.selectedAccountJournalEntry;
-            set
-            {
-                this.selectedAccountJournalEntry = value;
-                this.NotifyOfPropertyChange();
             }
         }
 
@@ -349,7 +337,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.RefreshAccountJournal();
-            this.SelectedAccountJournalEntry = this.AccountJournal.FirstOrDefault(x => x.Identifier == booking.ID);
+            this.AccountJournal.SelectedItem = this.AccountJournal.Items.FirstOrDefault(x => x.Identifier == booking.ID);
         }
 
         internal void InvokeLoadProjectFile(string fileName)
@@ -808,7 +796,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var firstBooking = this.currentModelJournal.Booking?.FirstOrDefault();
             if (!this.AccountList.Any())
             {
-                this.AccountJournal.Clear();
+                this.AccountJournal.Items.Clear();
                 return;
             }
 
@@ -865,90 +853,14 @@ namespace lg2de.SimpleAccounting.Presentation
             this.FullJournal.Refresh(this.currentModelJournal?.Booking, this.accountingData!);
         }
         
-        // TODO move to AccountJournalItemViewModel
         private void RefreshAccountJournal()
         {
-            this.AccountJournal.Clear();
-            if (this.accountingData == null
-                || this.currentModelJournal?.Booking == null
-                || this.SelectedAccount == null)
+            if (this.SelectedAccount == null)
             {
                 return;
             }
-
-            var accountNumber = this.SelectedAccount.Identifier;
-            double creditSum = 0;
-            double debitSum = 0;
-            var relevantBookings = this.currentModelJournal
-                .Booking.Where(b => b.Credit.Any(x => x.Account == accountNumber))
-                .Concat(this.currentModelJournal.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)))
-                .OrderBy(x => x.Date).ThenBy(x => x.ID);
-            foreach (var booking in relevantBookings)
-            {
-                var debitEntries = booking.Debit.Where(x => x.Account == accountNumber);
-                foreach (var debitEntry in debitEntries)
-                {
-                    var item = new AccountJournalItemViewModel
-                    {
-                        Identifier = booking.ID,
-                        Date = booking.Date.ToDateTime(),
-                        Text = debitEntry.Text,
-                        DebitValue = debitEntry.Value.ToViewModel()
-                    };
-
-                    debitSum += item.DebitValue;
-                    item.RemoteAccount = booking.Credit.Count == 1
-                        ? this.accountingData.GetAccountName(booking.Credit.Single())
-                        : Resources.Word_Various;
-                    this.AccountJournal.Add(item);
-                }
-
-                var creditEntries = booking.Credit.Where(x => x.Account == accountNumber);
-                foreach (var creditEntry in creditEntries)
-                {
-                    var item = new AccountJournalItemViewModel
-                    {
-                        Identifier = booking.ID,
-                        Date = booking.Date.ToDateTime(),
-                        Text = creditEntry.Text,
-                        CreditValue = creditEntry.Value.ToViewModel()
-                    };
-
-                    creditSum += item.CreditValue;
-                    item.RemoteAccount = booking.Debit.Count == 1
-                        ? this.accountingData.GetAccountName(booking.Debit.Single())
-                        : Resources.Word_Various;
-                    this.AccountJournal.Add(item);
-                }
-            }
-
-            this.AccountJournal.UpdateRowHighlighting();
-
-            if (debitSum + creditSum < double.Epsilon)
-            {
-                // no summary required
-                return;
-            }
-
-            var sumItem = new AccountJournalItemViewModel();
-            this.AccountJournal.Add(sumItem);
-            sumItem.IsSummary = true;
-            sumItem.Text = Resources.Word_Total;
-            sumItem.DebitValue = debitSum;
-            sumItem.CreditValue = creditSum;
-
-            var saldoItem = new AccountJournalItemViewModel();
-            this.AccountJournal.Add(saldoItem);
-            saldoItem.IsSummary = true;
-            saldoItem.Text = Resources.Word_Balance;
-            if (debitSum > creditSum)
-            {
-                saldoItem.DebitValue = debitSum - creditSum;
-            }
-            else
-            {
-                saldoItem.CreditValue = creditSum - debitSum;
-            }
+            
+            this.AccountJournal.Refresh(this.currentModelJournal?.Booking, this.accountingData!, this.SelectedAccount.Identifier);
         }
 
         private void OnTotalJournalReport()

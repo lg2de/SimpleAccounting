@@ -212,7 +212,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     CreditAccount = "100 (Bank account)",
                     DebitAccount = "6000 (Friends debit)"
                 });
-            sut.AccountJournal.Should().BeEquivalentTo(
+            sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", IsEvenRow = false },
                 new { Text = "Salary", RemoteAccount = "Various", IsEvenRow = true },
                 new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", IsEvenRow = false },
@@ -311,7 +311,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             };
 
             using var fullJournalMonitor = sut.FullJournal.Monitor();
-            using var accountJournalMonitor = sut.Monitor();
+            using var accountJournalMonitor = sut.AccountJournal.Monitor();
             sut.AddBooking(booking);
 
             using var _ = new AssertionScope();
@@ -327,7 +327,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 });
             fullJournalMonitor.Should().RaisePropertyChangeFor(x => x.SelectedItem);
             sut.FullJournal.SelectedItem.Should().BeEquivalentTo(new { Identifier = 4567 });
-            sut.AccountJournal.Should().BeEquivalentTo(
+            sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new
                 {
                     Identifier = 4567,
@@ -339,8 +339,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 },
                 new { Text = "Total", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 },
                 new { Text = "Balance", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 });
-            accountJournalMonitor.Should().RaisePropertyChangeFor(x => x.SelectedAccountJournalEntry);
-            sut.SelectedAccountJournalEntry.Should().BeEquivalentTo(new { Identifier = 4567 });
+            accountJournalMonitor.Should().RaisePropertyChangeFor(x => x.SelectedItem);
+            sut.AccountJournal.SelectedItem.Should().BeEquivalentTo(new { Identifier = 4567 });
         }
 
         [Fact]

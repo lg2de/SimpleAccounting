@@ -85,7 +85,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditValue = 123.4,
                 RemoteAccount = "Div."
             };
-            this.AccountJournal.Add(accountJournalItem);
+            this.AccountJournal.Items.Add(accountJournalItem);
             accountJournalItem = new AccountJournalItemViewModel
             {
                 Identifier = 44,
@@ -94,13 +94,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditValue = 1.222,
                 RemoteAccount = "Div."
             };
-            this.AccountJournal.Add(accountJournalItem);
+            this.AccountJournal.Items.Add(accountJournalItem);
             accountJournalItem = new AccountJournalItemViewModel
             {
                 IsSummary = true, Text = "Summe", CreditValue = 123.4, RemoteAccount = "Div."
             };
-            this.AccountJournal.Add(accountJournalItem);
-            this.AccountJournal.UpdateRowHighlighting();
+            this.AccountJournal.Items.Add(accountJournalItem);
+            this.AccountJournal.Items.UpdateRowHighlighting();
         }
     }
 }
