@@ -181,7 +181,8 @@ namespace lg2de.SimpleAccounting.Presentation
             _ =>
             {
                 var newBooking = this.CreateJournalEntry();
-                this.parent.AddBooking(newBooking);
+                this.parent.ProjectData.AddBooking(newBooking);
+                this.parent.RebuildJournals(newBooking.ID, newBooking.ContainsAccount);
 
                 // update for next booking
                 this.BookingIdentifier++;
@@ -210,7 +211,10 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var newBooking = new AccountingDataJournalBooking
             {
-                Date = this.Date.ToAccountingDate(), ID = this.BookingIdentifier, Followup = this.IsFollowup, Opening = this.IsOpening
+                Date = this.Date.ToAccountingDate(),
+                ID = this.BookingIdentifier,
+                Followup = this.IsFollowup,
+                Opening = this.IsOpening
             };
             var baseValue = new BookingValue { Text = this.BookingText, Value = this.BookingValue.ToModelValue() };
 
@@ -275,7 +279,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.ExpenseRemoteAccounts =
                 this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense).ToList();
-
         }
 
         private bool IsDataValid()

@@ -51,11 +51,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
             sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
             sut.LoadProjectData(new AccountingData());
-            sut.IsDocumentModified = true;
+            sut.ProjectData.IsModified = true;
             await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
 
             using var _ = new AssertionScope();
-            sut.IsDocumentModified.Should().BeTrue();
+            sut.ProjectData.IsModified.Should().BeTrue();
             fileSystem.Received(1).WriteAllTextIntoFile("new.project~", Arg.Any<string>());
         }
 
@@ -86,13 +86,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Do(x => fileSaved.SetResult(true));
             ((IActivate)sut).Activate();
             await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
-            sut.IsDocumentModified = true;
+            sut.ProjectData.IsModified = true;
 
             await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(
                 1.Seconds(), "file should be saved by auto-save task");
 
             using var _ = new AssertionScope();
-            sut.IsDocumentModified.Should().BeTrue("the project is ONLY auto-saved and not saved to real project file");
+            sut.ProjectData.IsModified.Should()
+                .BeTrue("the project is ONLY auto-saved and not saved to real project file");
             sut.AccountList.Should().BeEquivalentTo(new { Name = "TheAccount" });
             fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project", Arg.Any<string>());
             fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
@@ -125,7 +126,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Do(x => fileSaved.SetResult(true));
             ((IActivate)sut).Activate();
             await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
-            sut.IsDocumentModified = false;
+            sut.ProjectData.IsModified = false;
 
             var delayTask = Task.Delay(200.Milliseconds());
             var completedTask = await Task.WhenAny(fileSaved.Task, delayTask);
@@ -312,7 +313,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var fullJournalMonitor = sut.FullJournal.Monitor();
             using var accountJournalMonitor = sut.AccountJournal.Monitor();
-            sut.AddBooking(booking);
+            sut.ProjectData.AddBooking(booking);
+            sut.RebuildJournals(booking.ID, booking.ContainsAccount);
 
             using var _ = new AssertionScope();
             sut.FullJournal.Items.Should().BeEquivalentTo(
@@ -347,7 +349,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void CheckSaveProject_AnswerNo_NotSavedAndReturnsTrue()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
-            sut.IsDocumentModified = true;
+            sut.ProjectData.IsModified = true;
             messageBox.Show(
                     Arg.Any<string>(), Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
@@ -368,7 +370,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void CheckSaveProject_AnswerYes_SavedAndReturnsTrue()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
-            sut.IsDocumentModified = true;
+            sut.ProjectData.IsModified = true;
             messageBox.Show(
                     Arg.Any<string>(), Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
@@ -400,12 +402,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);
             var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
-            {
-                Settings = new Settings(),
-                IsDocumentModified = true
-            };
+                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi);
             sut.LoadProjectData(Samples.SampleProject);
+            sut.ProjectData.IsModified = true;
 
             sut.CheckSaveProject().Should().BeFalse();
 
@@ -435,7 +434,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut();
             long counter = 0;
             var tcs = new TaskCompletionSource<bool>();
-            
+
             // Because awaiting "ExecuteUIThread" does not really await the action
             // we need to wait for two property changed events.
             var values = new List<bool>();
@@ -458,7 +457,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             await tcs.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds(), "IsBusy should change twice");
             values.Should().Equal(true, false);
         }
-        
+
         [Fact]
         public async Task LoadProjectFromFileAsync_HappyPath_FileLoaded()
         {
@@ -472,7 +471,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
-            sut.IsDocumentModified.Should().BeFalse();
+            sut.ProjectData.IsModified.Should().BeFalse();
             sut.Settings.RecentProject.Should().Be("the.fileName");
             sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
@@ -497,7 +496,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
-            sut.IsDocumentModified.Should().BeTrue("changes are (still) not yet saved");
+            sut.ProjectData.IsModified.Should().BeTrue("changes are (still) not yet saved");
             sut.Settings.RecentProject.Should().Be("the.fileName");
             sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
@@ -522,7 +521,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("the.fileName");
-            sut.IsDocumentModified.Should().BeFalse();
+            sut.ProjectData.IsModified.Should().BeFalse();
             sut.Settings.RecentProject.Should().Be("the.fileName");
             sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
@@ -643,7 +642,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
-            sut.IsDocumentModified.Should().BeTrue();
+            sut.ProjectData.IsModified.Should().BeTrue();
         }
 
         [CulturedFact("en")]
@@ -651,7 +650,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             sut.FileName = "old.fileName";
-            sut.IsDocumentModified = true;
+            sut.ProjectData.IsModified = true;
             messageBox.Show(
                     Arg.Is<string>(s => s.Contains("Project data has been changed.")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
@@ -666,7 +665,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             sut.FileName.Should().Be("old.fileName", "the new file was not loaded");
-            sut.IsDocumentModified.Should().BeTrue("changes are (still) not yet saved");
+            sut.ProjectData.IsModified.Should().BeTrue("changes are (still) not yet saved");
             fileSystem.DidNotReceive().ReadAllTextFromFile("the.fileName");
         }
 
@@ -751,12 +750,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             invokedWith.Should().BeTrue();
         }
-        
+
         [Fact]
         public void CanClose_ModifiedProjectAbort_CloseRejected()
         {
             var sut = CreateSut();
-            sut.IsDocumentModified = true;
+            sut.ProjectData.IsModified = true;
             bool? invokedWith = null;
             void Callback(bool value) => invokedWith = value;
 
@@ -764,7 +763,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             invokedWith.Should().BeFalse();
         }
-        
+
         [Fact]
         public void CanClose_AutoSaveFileExists_FileRemoved()
         {
@@ -778,7 +777,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             invokedWith.Should().BeTrue();
             fileSystem.Received(1).FileDelete(sut.AutoSaveFileName);
         }
-        
+
         [Fact]
         public void Dispose_HappyPath_Completed()
         {

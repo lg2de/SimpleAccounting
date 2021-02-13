@@ -5,18 +5,22 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using Caliburn.Micro;
-    using JetBrains.Annotations;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
     public class AccountJournalViewModel : Screen
     {
+        private readonly ProjectData projectData;
         private AccountJournalItemViewModel? selectedItem;
+
+        public AccountJournalViewModel(ProjectData projectData)
+        {
+            this.projectData = projectData;
+        }
 
         public ObservableCollection<AccountJournalItemViewModel> Items { get; }
             = new ObservableCollection<AccountJournalItemViewModel>();
@@ -30,29 +34,28 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.NotifyOfPropertyChange();
             }
         }
-        
-        public void Refresh(
-            IReadOnlyCollection<AccountingDataJournalBooking>? bookings,
-            [NotNull] AccountingData accountingData,
-            ulong accountNumber)
+
+        public void Rebuild(ulong accountNumber)
         {
-            if (accountingData == null)
+            if (this.projectData.All == null)
             {
-                throw new ArgumentNullException(nameof(accountingData));
+                throw new InvalidOperationException("The project is not loaded correctly.");
             }
 
             this.Items.Clear();
-            if (bookings == null)
+            if (this.projectData.CurrentYear?.Booking == null)
             {
                 return;
             }
 
             double creditSum = 0;
             double debitSum = 0;
-            var relevantBookings = bookings
-                .Where(b => b.Credit.Any(x => x.Account == accountNumber))
-                .Concat(bookings.Where(b => b.Debit.Any(x => x.Account == accountNumber)))
-                .OrderBy(x => x.Date).ThenBy(x => x.ID);
+            var relevantBookings =
+                this.projectData.CurrentYear.Booking
+                    .Where(b => b.Credit.Any(x => x.Account == accountNumber))
+                    .Concat(
+                        this.projectData.CurrentYear.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)))
+                    .OrderBy(x => x.Date).ThenBy(x => x.ID);
             foreach (var booking in relevantBookings)
             {
                 var debitEntries = booking.Debit.Where(x => x.Account == accountNumber);
@@ -68,7 +71,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                     debitSum += item.DebitValue;
                     item.RemoteAccount = booking.Credit.Count == 1
-                        ? accountingData.GetAccountName(booking.Credit.Single())
+                        ? this.projectData.All.GetAccountName(booking.Credit.Single())
                         : Resources.Word_Various;
                     this.Items.Add(item);
                 }
@@ -86,7 +89,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                     creditSum += item.CreditValue;
                     item.RemoteAccount = booking.Debit.Count == 1
-                        ? accountingData.GetAccountName(booking.Debit.Single())
+                        ? this.projectData.All.GetAccountName(booking.Debit.Single())
                         : Resources.Word_Various;
                     this.Items.Add(item);
                 }
@@ -119,6 +122,11 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 saldoItem.CreditValue = creditSum - debitSum;
             }
+        }
+
+        public void Select(ulong bookingId)
+        {
+            this.SelectedItem = this.Items.FirstOrDefault(x => x.Identifier == bookingId);
         }
     }
 }

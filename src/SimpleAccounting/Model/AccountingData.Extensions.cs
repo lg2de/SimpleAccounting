@@ -83,7 +83,8 @@ namespace lg2de.SimpleAccounting.Model
             return result;
         }
 
-        internal AccountingDataJournal CloseYear(AccountingDataJournal currentModelJournal, AccountDefinition carryForwardAccount)
+        internal AccountingDataJournal CloseYear(
+            AccountingDataJournal currentModelJournal, AccountDefinition carryForwardAccount)
         {
             currentModelJournal.Closed = true;
 
@@ -135,8 +136,7 @@ namespace lg2de.SimpleAccounting.Model
                 newYearJournal.Booking.Add(newBooking);
                 var newDebit = new BookingValue
                 {
-                    Value = Math.Abs(creditAmount - debitAmount),
-                    Text = $"Eröffnungsbetrag {bookingId}"
+                    Value = Math.Abs(creditAmount - debitAmount), Text = $"Eröffnungsbetrag {bookingId}"
                 };
                 newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };
@@ -218,6 +218,15 @@ namespace lg2de.SimpleAccounting.Model
             }
 
             return anyAccountFixed;
+        }
+    }
+
+    public partial class AccountingDataJournalBooking
+    {
+        internal bool ContainsAccount(ulong accountNumber)
+        {
+            return this.Debit.Any(x => x.Account == accountNumber)
+                   || this.Credit.Any(x => x.Account == accountNumber);
         }
     }
 

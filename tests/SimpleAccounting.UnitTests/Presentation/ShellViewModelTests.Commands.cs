@@ -104,7 +104,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
             sut.LoadProjectData(Samples.SampleProject);
-            sut.IsDocumentModified = true;
+            sut.ProjectData.IsModified = true;
 
             sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
         }
@@ -163,7 +163,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.EditAccountCommand.Execute(sut.AccountList.First());
 
-            sut.IsDocumentModified.Should().BeFalse();
+            sut.ProjectData.IsModified.Should().BeFalse();
             windowManager.Received(1).ShowDialog(Arg.Any<object>());
         }
 
@@ -186,7 +186,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
                 Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
             };
-            sut.AddBooking(booking);
+            sut.ProjectData.CurrentYear!.Booking.Add(booking);
             booking = new AccountingDataJournalBooking
             {
                 Date = DateTime.Now.ToAccountingDate(),
@@ -194,14 +194,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Credit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Back", Value = 5 } },
                 Debit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Back", Value = 5 } }
             };
-            sut.AddBooking(booking);
+            sut.ProjectData.CurrentYear!.Booking.Add(booking);
             sut.AccountSelectionCommand.Execute(sut.AccountList.FirstOrDefault(x => x.Identifier == 990));
 
             sut.EditAccountCommand.Execute(sut.AccountList.First());
 
             using (new AssertionScope())
             {
-                sut.IsDocumentModified.Should().BeTrue();
+                sut.ProjectData.IsModified.Should().BeTrue();
                 sut.AccountList.Select(x => x.Name).Should().Equal(
                     "Salary", "Shoes", "Carryforward", "Bank account", "Bank credit", "Friends debit");
                 sut.FullJournal.Items.Should().BeEquivalentTo(
@@ -223,7 +223,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.EditAccountCommand.Execute(null);
 
-            sut.IsDocumentModified.Should().BeFalse();
+            sut.ProjectData.IsModified.Should().BeFalse();
             windowManager.DidNotReceive().ShowDialog(Arg.Any<object>());
         }
 
@@ -300,7 +300,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.EditBookingCommand.Execute(sut.FullJournal.Items.Last());
 
             using var _ = new AssertionScope();
-            sut.IsDocumentModified.Should().BeFalse("the project remains unchanged");
+            sut.ProjectData.IsModified.Should().BeFalse("the project remains unchanged");
             vm.BookingIdentifier.Should().Be(6);
             vm.BookingText.Should().Be("Rent to friend");
             vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts.Where(x => x.Active));
@@ -362,14 +362,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.EditBookingCommand.Execute(sut.FullJournal.Items.Last());
 
             using var _ = new AssertionScope();
-            sut.IsDocumentModified.Should().BeTrue("the project changed");
+            sut.ProjectData.IsModified.Should().BeTrue("the project changed");
             sut.FullJournal.Items.Last().Should().BeEquivalentTo(
-                new
-                {
-                    Identifier = 106,
-                    Value = 199.0,
-                    Text = "Rent to friend Paul"
-                });
+                new { Identifier = 106, Value = 199.0, Text = "Rent to friend Paul" });
         }
 
         [Fact]
@@ -383,7 +378,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.EditBookingCommand.Execute(null);
 
             using var _ = new AssertionScope();
-            sut.IsDocumentModified.Should().BeFalse("the project remains unchanged");
+            sut.ProjectData.IsModified.Should().BeFalse("the project remains unchanged");
             windowManager.DidNotReceive().ShowDialog(Arg.Any<object>());
         }
 
@@ -668,9 +663,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IReportFactory reportFactory);
             var annualBalanceReport = Substitute.For<IAnnualBalanceReport>();
             reportFactory.CreateAnnualBalance(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<IEnumerable<AccountDefinition>>(),
-                Arg.Any<AccountingDataSetup>())
+                    Arg.Any<AccountingDataJournal>(),
+                    Arg.Any<IEnumerable<AccountDefinition>>(),
+                    Arg.Any<AccountingDataSetup>())
                 .Returns(annualBalanceReport);
             sut.LoadProjectData(Samples.SampleProject);
 
@@ -703,9 +698,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IReportFactory reportFactory);
             var assetBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
             reportFactory.CreateTotalsAndBalances(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
-                Arg.Any<AccountingDataSetup>())
+                    Arg.Any<AccountingDataJournal>(),
+                    Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
+                    Arg.Any<AccountingDataSetup>())
                 .Returns(assetBalancesReport);
             var project = Samples.SampleProject;
             project.Accounts.Add(
@@ -745,8 +740,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IReportFactory reportFactory);
             var totalJournalReport = Substitute.For<ITotalJournalReport>();
             reportFactory.CreateTotalJournal(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<AccountingDataSetup>())
+                    Arg.Any<AccountingDataJournal>(),
+                    Arg.Any<AccountingDataSetup>())
                 .Returns(totalJournalReport);
             sut.LoadProjectData(Samples.SampleProject);
 
@@ -779,9 +774,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IReportFactory reportFactory);
             var totalsAndBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
             reportFactory.CreateTotalsAndBalances(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
-                Arg.Any<AccountingDataSetup>())
+                    Arg.Any<AccountingDataJournal>(),
+                    Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
+                    Arg.Any<AccountingDataSetup>())
                 .Returns(totalsAndBalancesReport);
             sut.LoadProjectData(Samples.SampleProject);
 
@@ -861,7 +856,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IApplicationUpdate applicationUpdate);
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
-            sut.IsDocumentModified = true;
+            sut.ProjectData.IsModified = true;
 
             sut.HelpCheckForUpdateCommand.Execute(null);
 

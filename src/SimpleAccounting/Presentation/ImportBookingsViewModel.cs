@@ -259,7 +259,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (!this.LoadedData.Any())
                 {
                     this.messageBox.Show(
-                        string.Format(CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFoundInX, fileName),
+                        string.Format(
+                            CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFoundInX, fileName),
                         Resources.ImportData_MessageTitle);
                 }
 
@@ -318,7 +319,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 newBooking.Credit = new List<BookingValue> { creditValue };
                 newBooking.Debit = new List<BookingValue> { debitValue };
-                this.parent.AddBooking(newBooking);
+                this.parent.ProjectData.AddBooking(newBooking);
+                this.parent.RebuildJournals(newBooking.ID, newBooking.ContainsAccount);
             }
 
             this.TryClose();

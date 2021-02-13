@@ -5,17 +5,21 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using Caliburn.Micro;
-    using JetBrains.Annotations;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
     public class FullJournalViewModel : Screen
     {
+        private readonly ProjectData projectData;
         private FullJournalItemViewModel? selectedItem;
+
+        public FullJournalViewModel(ProjectData projectData)
+        {
+            this.projectData = projectData;
+        }
 
         public ObservableCollection<FullJournalItemViewModel> Items { get; }
             = new ObservableCollection<FullJournalItemViewModel>();
@@ -30,20 +34,20 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        public void Refresh(IEnumerable<AccountingDataJournalBooking>? bookings, [NotNull] AccountingData accountingData)
+        public void Rebuild()
         {
-            if (accountingData == null)
+            if (this.projectData.All == null)
             {
-                throw new ArgumentNullException(nameof(accountingData));
+                throw new InvalidOperationException("The project is not loaded correctly.");
             }
 
             this.Items.Clear();
-            if (bookings == null)
+            if (this.projectData.CurrentYear?.Booking == null)
             {
                 return;
             }
 
-            foreach (var booking in bookings.OrderBy(b => b.Date))
+            foreach (var booking in this.projectData.CurrentYear.Booking.OrderBy(b => b.Date))
             {
                 var item = new FullJournalItemViewModel
                 {
@@ -56,8 +60,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debit = debitAccounts[0];
                     item.Text = debit.Text;
                     item.Value = debit.Value.ToViewModel();
-                    item.DebitAccount = accountingData.GetAccountName(debit);
-                    item.CreditAccount = accountingData.GetAccountName(creditAccounts[0]);
+                    item.DebitAccount = this.projectData.All.GetAccountName(debit);
+                    item.CreditAccount = this.projectData.All.GetAccountName(creditAccounts[0]);
                     this.Items.Add(item);
                     continue;
                 }
@@ -67,7 +71,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debitItem = item.Clone();
                     debitItem.Text = debitEntry.Text;
                     debitItem.Value = debitEntry.Value.ToViewModel();
-                    debitItem.DebitAccount = accountingData.GetAccountName(debitEntry);
+                    debitItem.DebitAccount = this.projectData.All.GetAccountName(debitEntry);
                     this.Items.Add(debitItem);
                 }
 
@@ -76,12 +80,17 @@ namespace lg2de.SimpleAccounting.Presentation
                     var creditItem = item.Clone();
                     creditItem.Text = creditEntry.Text;
                     creditItem.Value = creditEntry.Value.ToViewModel();
-                    creditItem.CreditAccount = accountingData.GetAccountName(creditEntry);
+                    creditItem.CreditAccount = this.projectData.All.GetAccountName(creditEntry);
                     this.Items.Add(creditItem);
                 }
             }
 
             this.Items.UpdateRowHighlighting();
+        }
+
+        public void Select(ulong bookingId)
+        {
+            this.SelectedItem = this.Items.FirstOrDefault(x => x.Identifier == bookingId);
         }
     }
 }
