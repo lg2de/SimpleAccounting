@@ -64,6 +64,21 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.FullJournal = new FullJournalViewModel(this.ProjectData);
             this.AccountJournal = new AccountJournalViewModel(this.ProjectData);
+
+            this.ProjectData.JournalChanged += (sender, args) =>
+            {
+                this.FullJournal.Rebuild();
+                this.FullJournal.Select(args.ChangedBookingId);
+
+                if (this.SelectedAccount == null
+                    || !args.AffectedAccounts.Contains(this.SelectedAccount.Identifier))
+                {
+                    return;
+                }
+
+                this.AccountJournal.Rebuild(this.SelectedAccount.Identifier);
+                this.AccountJournal.Select(args.ChangedBookingId);
+            };
         }
 
         public ObservableCollection<MenuViewModel> RecentProjects { get; }
@@ -309,20 +324,6 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.cancellationTokenSource?.Dispose();
             }
-        }
-
-        internal void RebuildJournals(ulong bookingId, Func<ulong, bool> accountJournalAffected)
-        {
-            this.FullJournal.Rebuild();
-            this.FullJournal.Select(bookingId);
-
-            if (!accountJournalAffected(this.SelectedAccount!.Identifier))
-            {
-                return;
-            }
-
-            this.RefreshAccountJournal();
-            this.AccountJournal.Select(bookingId);
         }
 
         internal void InvokeLoadProjectFile(string fileName)
@@ -644,7 +645,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var yearStart = this.ProjectData.CurrentYear!.DateStart.ToDateTime();
             var yearEnd = this.ProjectData.CurrentYear.DateEnd.ToDateTime();
             var bookingModel = new EditBookingViewModel(
-                this,
+                this.ProjectData,
                 DateTime.Today,
                 yearStart,
                 yearEnd,
@@ -683,7 +684,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var journalEntry = this.ProjectData.CurrentYear!.Booking[journalIndex];
 
             var bookingModel = new EditBookingViewModel(
-                this,
+                this.ProjectData,
                 journalEntry.Date.ToDateTime(),
                 this.ProjectData.CurrentYear!.DateStart.ToDateTime(),
                 this.ProjectData.CurrentYear.DateEnd.ToDateTime(),
@@ -730,10 +731,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             // replace entry
             journalEntry = bookingModel.CreateJournalEntry();
-            this.ProjectData.CurrentYear!.Booking[journalIndex] = journalEntry;
-
-            this.ProjectData.IsModified = true;
-            this.RebuildJournals(journalEntry.ID, journalEntry.ContainsAccount);
+            this.ProjectData.UpdateBooking(journalIndex, journalEntry);
         }
 
         // TODO move to ProjectData
@@ -741,7 +739,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var importModel = new ImportBookingsViewModel(
                 this.messageBox,
-                this,
+                this.ProjectData,
                 this.ProjectData.CurrentYear!,
                 this.ProjectData.All!.AllAccounts,
                 this.ProjectData.MaxBookIdent + 1);

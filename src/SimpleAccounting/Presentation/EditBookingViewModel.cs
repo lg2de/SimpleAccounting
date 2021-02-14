@@ -17,21 +17,21 @@ namespace lg2de.SimpleAccounting.Presentation
 
     internal class EditBookingViewModel : Screen
     {
-        private readonly ShellViewModel parent;
+        private readonly ProjectData projectData;
 
         private ulong creditAccount;
         private ulong debitAccount;
         private BookingTemplate? selectedTemplate;
 
         public EditBookingViewModel(
-            ShellViewModel parent,
+            ProjectData projectData,
             DateTime date,
             DateTime dateStart,
             DateTime dateEnd,
             bool editMode = false)
         {
             this.EditMode = editMode;
-            this.parent = parent;
+            this.projectData = projectData;
             this.Date = date;
             this.DateStart = dateStart;
             this.DateEnd = dateEnd;
@@ -181,8 +181,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ =>
             {
                 var newBooking = this.CreateJournalEntry();
-                this.parent.ProjectData.AddBooking(newBooking);
-                this.parent.RebuildJournals(newBooking.ID, newBooking.ContainsAccount);
+                this.projectData.AddBooking(newBooking);
 
                 // update for next booking
                 this.BookingIdentifier++;

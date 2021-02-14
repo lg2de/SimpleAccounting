@@ -314,7 +314,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var fullJournalMonitor = sut.FullJournal.Monitor();
             using var accountJournalMonitor = sut.AccountJournal.Monitor();
             sut.ProjectData.AddBooking(booking);
-            sut.RebuildJournals(booking.ID, booking.ContainsAccount);
 
             using var _ = new AssertionScope();
             sut.FullJournal.Items.Should().BeEquivalentTo(

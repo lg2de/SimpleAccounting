@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Model
 {
+    using System;
     using System.Linq;
 
     /// <summary>
@@ -16,6 +17,8 @@ namespace lg2de.SimpleAccounting.Model
     // TODO remove all ? if possible.
     public class ProjectData
     {
+        public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
+
         public string FileName { get; set; } = string.Empty;
 
         public AccountingData? All { get; set; }
@@ -53,7 +56,29 @@ namespace lg2de.SimpleAccounting.Model
         public void AddBooking(AccountingDataJournalBooking booking)
         {
             this.CurrentYear!.Booking.Add(booking);
+
             this.IsModified = true;
+
+            var affectedAccounts = booking
+                .Credit.Select(x => x.Account)
+                .Concat(booking.Debit.Select(x => x.Account))
+                .Distinct();
+            this.JournalChanged?.Invoke(this, new JournalChangedEventArgs(booking.ID, affectedAccounts.ToList()));
+        }
+
+        // TODO temporary index to be removed
+        internal void UpdateBooking(int temporaryIndex, AccountingDataJournalBooking booking)
+        {
+            //var index = this.CurrentYear!.Booking.FindIndex(x => x.ID == booking.ID)
+            this.CurrentYear.Booking[temporaryIndex] = booking;
+
+            this.IsModified = true;
+
+            var affectedAccounts = booking
+                .Credit.Select(x => x.Account)
+                .Concat(booking.Debit.Select(x => x.Account))
+                .Distinct();
+            this.JournalChanged?.Invoke(this, new JournalChangedEventArgs(booking.ID, affectedAccounts.ToList()));
         }
     }
 }

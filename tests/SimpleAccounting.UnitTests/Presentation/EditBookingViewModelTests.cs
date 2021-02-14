@@ -59,7 +59,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var parent = new ShellViewModel(
                 windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi);
             parent.LoadProjectData(Samples.SampleProject);
-            var sut = new EditBookingViewModel(parent, YearBegin, YearBegin, YearEnd);
+            var sut = new EditBookingViewModel(parent.ProjectData, YearBegin, YearBegin, YearEnd);
 
             var oldNumber = sut.BookingIdentifier;
             sut.CreditAccount = 100;
@@ -93,10 +93,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
             {
-                BookingIdentifier = 1,
-                BookingText = "abc",
-                DebitIndex = 2,
-                BookingValue = 42
+                BookingIdentifier = 1, BookingText = "abc", DebitIndex = 2, BookingValue = 42
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -107,10 +104,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
             {
-                BookingIdentifier = 1,
-                BookingText = "abc",
-                CreditIndex = 1,
-                BookingValue = 42
+                BookingIdentifier = 1, BookingText = "abc", CreditIndex = 1, BookingValue = 42
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -121,10 +115,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
             {
-                BookingText = "abc",
-                CreditIndex = 1,
-                DebitIndex = 2,
-                BookingValue = 42
+                BookingText = "abc", CreditIndex = 1, DebitIndex = 2, BookingValue = 42
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -135,10 +126,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
             {
-                BookingIdentifier = 1,
-                CreditIndex = 1,
-                DebitIndex = 2,
-                BookingValue = 42
+                BookingIdentifier = 1, CreditIndex = 1, DebitIndex = 2, BookingValue = 42
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -149,10 +137,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
             {
-                BookingIdentifier = 1,
-                BookingText = "abc",
-                CreditIndex = 1,
-                DebitIndex = 2
+                BookingIdentifier = 1, BookingText = "abc", CreditIndex = 1, DebitIndex = 2
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -200,8 +185,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -220,8 +211,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 BookingValue = 3,
                 DebitSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -240,8 +237,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 BookingValue = 3,
                 DebitSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -260,8 +263,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 1, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 1, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -280,8 +289,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "", BookingValue = 1, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -300,8 +315,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = -1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = -1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -320,8 +341,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 0, AccountNumber = 100 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = 0, AccountNumber = 100
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -340,8 +367,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 BookingValue = 4,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -377,16 +410,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.ExpenseRemoteAccounts.Should().NotBeEmpty();
         }
 
-
         [Fact]
         public void SelectedTemplate_SetNull_PropertiesUnchanged()
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
             {
-                CreditAccount = 1,
-                DebitAccount = 2,
-                BookingText = "default",
-                BookingValue = 42
+                CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42
             };
             sut.Accounts.Add(new AccountDefinition { ID = 1 });
             sut.Accounts.Add(new AccountDefinition { ID = 2 });
@@ -407,10 +436,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
             {
-                CreditAccount = 1,
-                DebitAccount = 2,
-                BookingText = "default",
-                BookingValue = 42
+                CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42
             };
             sut.Accounts.Add(new AccountDefinition { ID = 1 });
             sut.Accounts.Add(new AccountDefinition { ID = 2 });
@@ -431,10 +457,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
             {
-                CreditAccount = 1,
-                DebitAccount = 2,
-                BookingText = "default",
-                BookingValue = 42
+                CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42
             };
             sut.Accounts.Add(new AccountDefinition { ID = 1 });
             sut.Accounts.Add(new AccountDefinition { ID = 2 });

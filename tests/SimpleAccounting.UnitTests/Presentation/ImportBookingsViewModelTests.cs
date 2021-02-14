@@ -179,7 +179,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
             var sut = new ImportBookingsViewModel(
                 null,
-                parent,
+                parent.ProjectData,
                 project.Journal.Last(),
                 accounts,
                 0) { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };

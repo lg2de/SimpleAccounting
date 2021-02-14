@@ -221,15 +221,6 @@ namespace lg2de.SimpleAccounting.Model
         }
     }
 
-    public partial class AccountingDataJournalBooking
-    {
-        internal bool ContainsAccount(ulong accountNumber)
-        {
-            return this.Debit.Any(x => x.Account == accountNumber)
-                   || this.Credit.Any(x => x.Account == accountNumber);
-        }
-    }
-
     public partial class AccountDefinition
     {
         internal string FormatName()

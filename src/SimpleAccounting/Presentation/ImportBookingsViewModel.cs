@@ -22,20 +22,20 @@ namespace lg2de.SimpleAccounting.Presentation
     {
         private readonly List<AccountDefinition> accounts;
         private readonly IMessageBox messageBox;
-        private readonly ShellViewModel parent;
+        private readonly ProjectData projectData;
         private bool isBusy;
         private ulong selectedAccountNumber;
         private DateTime startDate;
 
         public ImportBookingsViewModel(
             IMessageBox messageBox,
-            ShellViewModel parent,
+            ProjectData projectData,
             AccountingDataJournal journal,
             IEnumerable<AccountDefinition> accounts,
             ulong firstBookingNumber)
         {
             this.messageBox = messageBox;
-            this.parent = parent;
+            this.projectData = projectData;
             this.Journal = journal;
             this.accounts = accounts.ToList();
             this.FirstBookingNumber = firstBookingNumber;
@@ -319,8 +319,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 newBooking.Credit = new List<BookingValue> { creditValue };
                 newBooking.Debit = new List<BookingValue> { debitValue };
-                this.parent.ProjectData.AddBooking(newBooking);
-                this.parent.RebuildJournals(newBooking.ID, newBooking.ContainsAccount);
+                this.projectData.AddBooking(newBooking);
             }
 
             this.TryClose();
