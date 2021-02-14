@@ -141,15 +141,17 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
-        public ICommand AddBookingsCommand => new RelayCommand(_ => this.OnAddBookings(), _ => this.IsCurrentYearOpen);
+        public ICommand AddBookingsCommand => new RelayCommand(
+            _ => this.OnAddBookings(), _ => this.ProjectData.IsCurrentYearOpen);
 
-        public ICommand EditBookingCommand => new RelayCommand(this.OnEditBooking, _ => this.IsCurrentYearOpen);
+        public ICommand EditBookingCommand => new RelayCommand(
+            this.OnEditBooking, _ => this.ProjectData.IsCurrentYearOpen);
 
         public ICommand ImportBookingsCommand => new RelayCommand(
-            _ => this.OnImportBookings(), _ => this.IsCurrentYearOpen);
+            _ => this.OnImportBookings(), _ => this.ProjectData.IsCurrentYearOpen);
 
         public ICommand CloseYearCommand => new RelayCommand(
-            _ => this.CloseYear(), _ => this.IsCurrentYearOpen);
+            _ => this.CloseYear(), _ => this.ProjectData.IsCurrentYearOpen);
 
         public ICommand TotalJournalReportCommand => new RelayCommand(
             _ => this.OnTotalJournalReport(), _ => this.FullJournal.Items.Any());
@@ -198,20 +200,6 @@ namespace lg2de.SimpleAccounting.Presentation
         internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
 
         internal string AutoSaveFileName => Defines.GetAutoSaveFileName(this.ProjectData.FileName);
-
-        // TODO move to ProjectData
-        private bool IsCurrentYearOpen
-        {
-            get
-            {
-                if (this.ProjectData.CurrentYear == null)
-                {
-                    return false;
-                }
-
-                return !this.ProjectData.CurrentYear.Closed;
-            }
-        }
 
         public bool IsBusy
         {

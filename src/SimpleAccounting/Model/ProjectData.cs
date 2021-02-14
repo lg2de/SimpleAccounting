@@ -22,6 +22,19 @@ namespace lg2de.SimpleAccounting.Model
 
         public bool IsModified { get; set; }
 
+        internal bool IsCurrentYearOpen
+        {
+            get
+            {
+                if (this.CurrentYear == null)
+                {
+                    return false;
+                }
+
+                return !this.CurrentYear.Closed;
+            }
+        }
+
         public void AddBooking(AccountingDataJournalBooking booking)
         {
             this.CurrentYear!.Booking.Add(booking);
