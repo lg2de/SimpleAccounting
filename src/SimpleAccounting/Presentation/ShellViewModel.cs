@@ -370,7 +370,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.UpdateBookingYears();
 
             this.AllAccounts.Clear();
-            foreach (var accountGroup in this.ProjectData.All.Accounts ?? new List<AccountingDataAccountGroup>())
+            foreach (var accountGroup in this.ProjectData.All.Accounts)
             {
                 foreach (var account in accountGroup.Account)
                 {
@@ -785,11 +785,6 @@ namespace lg2de.SimpleAccounting.Presentation
         private void UpdateBookingYears()
         {
             this.BookingYears.Clear();
-            if (this.ProjectData.All?.Journal == null)
-            {
-                return;
-            }
-
             foreach (var year in this.ProjectData.All.Journal)
             {
                 var menu = new MenuViewModel(
