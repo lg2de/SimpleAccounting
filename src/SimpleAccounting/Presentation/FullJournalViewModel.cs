@@ -36,16 +36,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public void Rebuild()
         {
-            if (this.projectData.All == null)
-            {
-                throw new InvalidOperationException("The project is not loaded correctly.");
-            }
-
             this.Items.Clear();
-            if (this.projectData.CurrentYear?.Booking == null)
-            {
-                return;
-            }
 
             foreach (var booking in this.projectData.CurrentYear.Booking.OrderBy(b => b.Date))
             {

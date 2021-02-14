@@ -29,7 +29,7 @@ namespace lg2de.SimpleAccounting.Model
             this.windowManager = windowManager;
             this.messageBox = messageBox;
 
-            this.all = new AccountingData().Init();
+            this.all = new AccountingData();
             this.CurrentYear = this.all.Journal.SafeGetLatest();
         }
 
@@ -51,18 +51,7 @@ namespace lg2de.SimpleAccounting.Model
 
         public bool IsModified { get; set; }
 
-        internal ulong MaxBookIdent
-        {
-            get
-            {
-                if (this.CurrentYear?.Booking == null || !this.CurrentYear.Booking.Any())
-                {
-                    return 0;
-                }
-
-                return this.CurrentYear.Booking.Max(b => b.ID);
-            }
-        }
+        internal ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
 
         public void AddBooking(AccountingDataJournalBooking booking)
         {
@@ -70,32 +59,24 @@ namespace lg2de.SimpleAccounting.Model
 
             this.IsModified = true;
 
-            var affectedAccounts = booking
-                .Credit.Select(x => x.Account)
-                .Concat(booking.Debit.Select(x => x.Account))
-                .Distinct();
-            this.JournalChanged?.Invoke(this, new JournalChangedEventArgs(booking.ID, affectedAccounts.ToList()));
-        }
-
-        public void ShowImportDialog()
-        {
-            var importModel = new ImportBookingsViewModel(this.messageBox, this);
-            this.windowManager.ShowDialog(importModel);
+            this.JournalChanged(this, new JournalChangedEventArgs(booking.ID, booking.GetAccounts()));
         }
 
         // TODO temporary index to be removed
-        internal void UpdateBooking(int temporaryIndex, AccountingDataJournalBooking booking)
+        public void UpdateBooking(int temporaryIndex, AccountingDataJournalBooking booking)
         {
             //var index = this.CurrentYear.Booking.FindIndex(x => x.ID == booking.ID)
             this.CurrentYear.Booking[temporaryIndex] = booking;
 
             this.IsModified = true;
 
-            var affectedAccounts = booking
-                .Credit.Select(x => x.Account)
-                .Concat(booking.Debit.Select(x => x.Account))
-                .Distinct();
-            this.JournalChanged?.Invoke(this, new JournalChangedEventArgs(booking.ID, affectedAccounts.ToList()));
+            this.JournalChanged(this, new JournalChangedEventArgs(booking.ID, booking.GetAccounts()));
+        }
+
+        public void ShowImportDialog()
+        {
+            var importModel = new ImportBookingsViewModel(this.messageBox, this);
+            this.windowManager.ShowDialog(importModel);
         }
     }
 }

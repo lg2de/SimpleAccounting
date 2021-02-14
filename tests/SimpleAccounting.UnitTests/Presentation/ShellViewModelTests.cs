@@ -50,7 +50,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             ((IActivate)sut).Activate();
             sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
-            sut.LoadProjectData(new AccountingData().Init());
+            sut.LoadProjectData(new AccountingData());
             sut.ProjectData.IsModified = true;
             await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
 
@@ -344,6 +344,29 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.AccountJournal.SelectedItem.Should().BeEquivalentTo(new { Identifier = 4567 });
         }
 
+        [CulturedFact("en")]
+        public void AddBooking_BookingWithoutCurrentAccount_AccountJournalUnchanged()
+        {
+            var sut = CreateSut();
+            sut.LoadProjectData(Samples.SampleProject);
+            var booking = new AccountingDataJournalBooking
+            {
+                Date = Samples.BaseDate + 401,
+                ID = 4567,
+                Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
+                Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
+            };
+            sut.SelectedAccount = sut.AccountList.Last();
+
+            using var monitor1 = sut.AccountJournal.Monitor();
+            using var monitor2 = sut.AccountJournal.Items.Monitor();
+            sut.ProjectData.AddBooking(booking);
+
+            using var _ = new AssertionScope();
+            monitor1.Should().NotRaisePropertyChangeFor(x => x.SelectedItem);
+            monitor2.Should().NotRaise(nameof(sut.AccountJournal.Items.CollectionChanged));
+        }
+
         [Fact]
         public void CheckSaveProject_AnswerNo_NotSavedAndReturnsTrue()
         {
@@ -630,10 +653,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task LoadProjectFromFileAsync_MigrationRequired_ProjectModified()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            var accountingData = new AccountingData
-            {
-                Years = new List<AccountingDataYear> { new AccountingDataYear { Name = 2020 } }
-            };
+            var accountingData = new AccountingData();
+            accountingData.Years = new List<AccountingDataYear> { new AccountingDataYear { Name = 2020 } };
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 

@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    using System;
     using System.Collections.ObjectModel;
     using System.Linq;
     using Caliburn.Micro;
@@ -37,25 +36,16 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public void Rebuild(ulong accountNumber)
         {
-            if (this.projectData.All == null)
-            {
-                throw new InvalidOperationException("The project is not loaded correctly.");
-            }
-
             this.Items.Clear();
-            if (this.projectData.CurrentYear?.Booking == null)
-            {
-                return;
-            }
 
-            double creditSum = 0;
-            double debitSum = 0;
             var relevantBookings =
                 this.projectData.CurrentYear.Booking
                     .Where(b => b.Credit.Any(x => x.Account == accountNumber))
                     .Concat(
                         this.projectData.CurrentYear.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)))
                     .OrderBy(x => x.Date).ThenBy(x => x.ID);
+            double creditSum = 0;
+            double debitSum = 0;
             foreach (var booking in relevantBookings)
             {
                 var debitEntries = booking.Debit.Where(x => x.Account == accountNumber);

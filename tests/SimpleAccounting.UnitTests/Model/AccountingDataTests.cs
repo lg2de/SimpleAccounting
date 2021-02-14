@@ -145,18 +145,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
 
             sut.Migrate();
 
-            var expectation = new AccountingData
+            var expectation = new
             {
-                Journal = new List<AccountingDataJournal>
+                Journal = new[]
                 {
-                    new AccountingDataJournal
-                    {
-                        Year = "2001", DateStart = 20010101, DateEnd = 20011231, Closed = true
-                    },
-                    new AccountingDataJournal
-                    {
-                        Year = "2002", DateStart = 20020101, DateEnd = 20021231, Closed = false
-                    }
+                    new { Year = "2001", DateStart = 20010101, DateEnd = 20011231, Closed = true },
+                    new { Year = "2002", DateStart = 20020101, DateEnd = 20021231, Closed = false }
                 }
             };
             sut.Should().BeEquivalentTo(expectation);
@@ -173,10 +167,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                     {
                         Account = new List<AccountDefinition>
                         {
-                            new AccountDefinition
-                            {
-                                ID = 100, Type = AccountDefinitionType.Asset
-                            },
+                            new AccountDefinition { ID = 100, Type = AccountDefinitionType.Asset },
                             new AccountDefinition
                             {
                                 ID = 999, Type = AccountDefinitionType.Carryforward

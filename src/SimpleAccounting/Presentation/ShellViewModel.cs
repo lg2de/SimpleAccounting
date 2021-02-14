@@ -108,6 +108,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.selectedAccount = value;
                 this.NotifyOfPropertyChange();
+                this.RefreshAccountJournal();
             }
         }
 
@@ -199,7 +200,6 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (o is AccountViewModel account)
                 {
                     this.SelectedAccount = account;
-                    this.RefreshAccountJournal();
                 }
             });
 
@@ -775,12 +775,10 @@ namespace lg2de.SimpleAccounting.Presentation
                     .Concat(firstBooking.Debit.Select(x => x.Account))
                     .Min();
                 this.SelectedAccount = this.AccountList.Single(x => x.Identifier == firstAccount);
-                this.RefreshAccountJournal();
             }
             else
             {
                 this.SelectedAccount = this.AccountList.First();
-                this.RefreshAccountJournal();
             }
         }
 

@@ -21,6 +21,12 @@ namespace lg2de.SimpleAccounting.Model
 
         private string schema = DefaultXsiSchemaLocation;
 
+        public AccountingData()
+        {
+            this.Accounts = new List<AccountingDataAccountGroup>();
+            this.Journal = new List<AccountingDataJournal>();
+        }
+
         [XmlAttribute("schemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
         [SuppressMessage(
             "Minor Code Smell",
@@ -37,14 +43,6 @@ namespace lg2de.SimpleAccounting.Model
                     this.schema = DefaultXsiSchemaLocation;
                 }
             }
-        }
-
-        public AccountingData Init()
-        {
-            this.Accounts ??= new List<AccountingDataAccountGroup>();
-            this.Journal ??= new List<AccountingDataJournal>();
-
-            return this;
         }
 
         internal IEnumerable<AccountDefinition> AllAccounts =>
@@ -188,7 +186,10 @@ namespace lg2de.SimpleAccounting.Model
                 var journal = this.Journal.SingleOrDefault(x => x.Year == oldYearName);
                 if (journal == null)
                 {
-                    journal = new AccountingDataJournal { Year = oldYearName };
+                    journal = new AccountingDataJournal
+                    {
+                        Year = oldYearName, Booking = new List<AccountingDataJournalBooking>()
+                    };
                     this.Journal.Add(journal);
                 }
 
@@ -229,15 +230,10 @@ namespace lg2de.SimpleAccounting.Model
         }
     }
 
-    public static class AccountDataJournalExtensions
+    internal static class AccountDataJournalExtensions
     {
-        public static AccountingDataJournal SafeGetLatest([NotNull] this IList<AccountingDataJournal> journals)
+        public static AccountingDataJournal SafeGetLatest(this IList<AccountingDataJournal> journals)
         {
-            if (journals == null)
-            {
-                throw new ArgumentNullException(nameof(journals));
-            }
-
             if (journals.Count == 0)
             {
                 var today = DateTime.Today;
@@ -254,6 +250,18 @@ namespace lg2de.SimpleAccounting.Model
             }
 
             return journals.Last();
+        }
+    }
+
+    public partial class AccountingDataJournalBooking
+    {
+        internal IReadOnlyCollection<ulong> GetAccounts()
+        {
+            return this
+                .Credit.Select(x => x.Account)
+                .Concat(this.Debit.Select(x => x.Account))
+                .Distinct()
+                .ToList();
         }
     }
 
