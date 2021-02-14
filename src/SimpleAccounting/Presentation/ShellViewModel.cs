@@ -648,7 +648,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 DateTime.Today,
                 yearStart,
                 yearEnd,
-                editMode: false) { BookingIdentifier = this.GetMaxBookIdent() + 1 };
+                editMode: false) { BookingIdentifier = this.ProjectData.MaxBookIdent + 1 };
             var allAccounts = this.ProjectData.All!.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
@@ -744,19 +744,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 this,
                 this.ProjectData.CurrentYear!,
                 this.ProjectData.All!.AllAccounts,
-                this.GetMaxBookIdent() + 1);
+                this.ProjectData.MaxBookIdent + 1);
             this.windowManager.ShowDialog(importModel);
-        }
-
-        // TODO move to ProjectData
-        private ulong GetMaxBookIdent()
-        {
-            if (this.ProjectData.CurrentYear?.Booking == null || !this.ProjectData.CurrentYear.Booking.Any())
-            {
-                return 0;
-            }
-
-            return this.ProjectData.CurrentYear.Booking.Max(b => b.ID);
         }
 
         private void CloseYear()

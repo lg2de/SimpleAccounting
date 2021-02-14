@@ -4,6 +4,8 @@
 
 namespace lg2de.SimpleAccounting.Model
 {
+    using System.Linq;
+
     /// <summary>
     ///     Implements the storage for all data of the current project.
     /// </summary>
@@ -21,6 +23,19 @@ namespace lg2de.SimpleAccounting.Model
         public AccountingDataJournal? CurrentYear { get; set; }
 
         public bool IsModified { get; set; }
+
+        internal ulong MaxBookIdent
+        {
+            get
+            {
+                if (this.CurrentYear?.Booking == null || !this.CurrentYear.Booking.Any())
+                {
+                    return 0;
+                }
+
+                return this.CurrentYear.Booking.Max(b => b.ID);
+            }
+        }
 
         internal bool IsCurrentYearOpen
         {
