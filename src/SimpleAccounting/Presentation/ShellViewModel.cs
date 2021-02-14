@@ -113,7 +113,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                this.FileName = "<new>";
+                this.ProjectData.FileName = "<new>";
                 this.LoadProjectData(AccountingData.GetTemplateProject());
             });
 
@@ -191,16 +191,13 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal Settings Settings { get; set; } = Settings.Default;
 
-        // TODO move to ProjectData
-        internal string FileName { get; set; } = string.Empty;
-
         internal ProjectData ProjectData { get; } = new ProjectData();
 
         internal Task LoadingTask { get; private set; } = Task.CompletedTask;
 
         internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
 
-        internal string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
+        internal string AutoSaveFileName => Defines.GetAutoSaveFileName(this.ProjectData.FileName);
 
         // TODO move to ProjectData
         private bool IsCurrentYearOpen
@@ -368,7 +365,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return loadResult;
             }
 
-            this.FileName = projectFileName;
+            this.ProjectData.FileName = projectFileName;
             this.LoadProjectData(loader.ProjectData);
             this.ProjectData.IsModified = loader.Migrated;
 
@@ -436,7 +433,7 @@ namespace lg2de.SimpleAccounting.Presentation
         // TODO move to ProjectData
         internal void SaveProject()
         {
-            if (this.FileName == "<new>")
+            if (this.ProjectData.FileName == "<new>")
             {
                 using var saveFileDialog = new SaveFileDialog
                 {
@@ -448,17 +445,17 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                this.FileName = saveFileDialog.FileName;
+                this.ProjectData.FileName = saveFileDialog.FileName;
             }
 
-            DateTime fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
-            string backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
-            if (this.fileSystem.FileExists(this.FileName))
+            DateTime fileDate = this.fileSystem.GetLastWriteTime(this.ProjectData.FileName);
+            string backupFileName = $"{this.ProjectData.FileName}.{fileDate:yyyyMMddHHmmss}";
+            if (this.fileSystem.FileExists(this.ProjectData.FileName))
             {
-                this.fileSystem.FileMove(this.FileName, backupFileName);
+                this.fileSystem.FileMove(this.ProjectData.FileName, backupFileName);
             }
 
-            this.fileSystem.WriteAllTextIntoFile(this.FileName, this.ProjectData.All!.Serialize());
+            this.fileSystem.WriteAllTextIntoFile(this.ProjectData.FileName, this.ProjectData.All!.Serialize());
             this.ProjectData.IsModified = false;
 
             if (this.fileSystem.FileExists(this.AutoSaveFileName))
@@ -554,9 +551,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void UpdateDisplayName()
         {
-            this.DisplayName = string.IsNullOrEmpty(this.FileName) || this.ProjectData.CurrentYear == null
+            this.DisplayName = string.IsNullOrEmpty(this.ProjectData.FileName) || this.ProjectData.CurrentYear == null
                 ? $"SimpleAccounting {this.version}"
-                : $"SimpleAccounting {this.version} - {this.FileName} - {this.ProjectData.CurrentYear.Year}";
+                : $"SimpleAccounting {this.version} - {this.ProjectData.FileName} - {this.ProjectData.CurrentYear.Year}";
         }
 
         // TODO move to ProjectData or AccountsViewModel

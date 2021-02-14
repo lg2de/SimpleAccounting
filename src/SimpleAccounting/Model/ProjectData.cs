@@ -14,6 +14,8 @@ namespace lg2de.SimpleAccounting.Model
     // TODO remove all ? if possible.
     public class ProjectData
     {
+        public string FileName { get; set; } = string.Empty;
+
         public AccountingData? All { get; set; }
 
         public AccountingDataJournal? CurrentYear { get; set; }

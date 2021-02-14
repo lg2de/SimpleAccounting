@@ -42,7 +42,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IFileSystem fileSystem);
             sut.AutoSaveInterval = 100.Milliseconds();
-            sut.FileName = "new.project";
+            sut.ProjectData.FileName = "new.project";
             var fileSaved = new TaskCompletionSource<bool>();
             fileSystem
                 .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
@@ -470,7 +470,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Which.Should().Be(OperationResult.Completed);
 
             using var _ = new AssertionScope();
-            sut.FileName.Should().Be("the.fileName");
+            sut.ProjectData.FileName.Should().Be("the.fileName");
             sut.ProjectData.IsModified.Should().BeFalse();
             sut.Settings.RecentProject.Should().Be("the.fileName");
             sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
@@ -495,7 +495,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Which.Should().Be(OperationResult.Completed);
 
             using var _ = new AssertionScope();
-            sut.FileName.Should().Be("the.fileName");
+            sut.ProjectData.FileName.Should().Be("the.fileName");
             sut.ProjectData.IsModified.Should().BeTrue("changes are (still) not yet saved");
             sut.Settings.RecentProject.Should().Be("the.fileName");
             sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
@@ -520,7 +520,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Which.Should().Be(OperationResult.Completed);
 
             using var _ = new AssertionScope();
-            sut.FileName.Should().Be("the.fileName");
+            sut.ProjectData.FileName.Should().Be("the.fileName");
             sut.ProjectData.IsModified.Should().BeFalse();
             sut.Settings.RecentProject.Should().Be("the.fileName");
             sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
@@ -649,7 +649,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task LoadProjectFromFileAsync_UserDoesNotWantSaveCurrentProject_LoadingAborted()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
-            sut.FileName = "old.fileName";
+            sut.ProjectData.FileName = "old.fileName";
             sut.ProjectData.IsModified = true;
             messageBox.Show(
                     Arg.Is<string>(s => s.Contains("Project data has been changed.")), Arg.Any<string>(),
@@ -664,7 +664,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Which.Should().Be(OperationResult.Aborted);
 
             using var _ = new AssertionScope();
-            sut.FileName.Should().Be("old.fileName", "the new file was not loaded");
+            sut.ProjectData.FileName.Should().Be("old.fileName", "the new file was not loaded");
             sut.ProjectData.IsModified.Should().BeTrue("changes are (still) not yet saved");
             fileSystem.DidNotReceive().ReadAllTextFromFile("the.fileName");
         }
@@ -677,7 +677,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var fileName = "project.name";
             fileSystem.FileExists(fileName + "~").Returns(true);
             sut.LoadProjectData(Samples.SampleProject);
-            sut.FileName = fileName;
+            sut.ProjectData.FileName = fileName;
 
             sut.SaveProject();
 
@@ -708,7 +708,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var fileName = "project.name";
             fileSystem.FileExists(fileName).Returns(true);
             sut.LoadProjectData(Samples.SampleProject);
-            sut.FileName = fileName;
+            sut.ProjectData.FileName = fileName;
 
             sut.SaveProject();
 
