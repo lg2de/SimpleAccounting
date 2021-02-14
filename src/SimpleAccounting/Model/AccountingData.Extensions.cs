@@ -39,6 +39,14 @@ namespace lg2de.SimpleAccounting.Model
             }
         }
 
+        public AccountingData Init()
+        {
+            this.Accounts ??= new List<AccountingDataAccountGroup>();
+            this.Journal ??= new List<AccountingDataJournal>();
+
+            return this;
+        }
+
         internal IEnumerable<AccountDefinition> AllAccounts =>
             this.Accounts?.SelectMany(g => g.Account) ?? Enumerable.Empty<AccountDefinition>();
 
@@ -218,6 +226,34 @@ namespace lg2de.SimpleAccounting.Model
             }
 
             return anyAccountFixed;
+        }
+    }
+
+    public static class AccountDataJournalExtensions
+    {
+        public static AccountingDataJournal SafeGetLatest([NotNull] this IList<AccountingDataJournal> journals)
+        {
+            if (journals == null)
+            {
+                throw new ArgumentNullException(nameof(journals));
+            }
+
+            if (journals.Count == 0)
+            {
+                var today = DateTime.Today;
+                const int december = 12;
+                const int decemberLast = 31;
+                journals.Add(
+                    new AccountingDataJournal
+                    {
+                        Year = today.Year.ToString(CultureInfo.InvariantCulture),
+                        DateStart = new DateTime(today.Year, 1, 1).ToAccountingDate(),
+                        DateEnd = new DateTime(today.Year, december, decemberLast).ToAccountingDate(),
+                        Booking = new List<AccountingDataJournalBooking>()
+                    });
+            }
+
+            return journals.Last();
         }
     }
 

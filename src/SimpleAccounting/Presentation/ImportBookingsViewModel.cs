@@ -29,19 +29,15 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ImportBookingsViewModel(
             IMessageBox messageBox,
-            ProjectData projectData,
-            AccountingDataJournal journal,
-            IEnumerable<AccountDefinition> accounts,
-            ulong firstBookingNumber)
+            ProjectData projectData)
         {
             this.messageBox = messageBox;
             this.projectData = projectData;
-            this.Journal = journal;
-            this.accounts = accounts.ToList();
-            this.FirstBookingNumber = firstBookingNumber;
+            this.accounts = projectData.All.AllAccounts.ToList();
+            this.FirstBookingNumber = projectData.MaxBookIdent + 1;
 
-            this.RangeMin = this.Journal.DateStart.ToDateTime();
-            this.RangeMax = this.Journal.DateEnd.ToDateTime();
+            this.RangeMin = this.projectData.CurrentYear.DateStart.ToDateTime();
+            this.RangeMax = this.projectData.CurrentYear.DateEnd.ToDateTime();
             this.StartDate = this.RangeMin;
 
             // ReSharper disable once VirtualMemberCallInConstructor
@@ -61,9 +57,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public DateTime RangeMax { get; }
 
-        public AccountingDataJournal Journal { get; }
-
-        public ulong FirstBookingNumber { get; }
+        private ulong FirstBookingNumber { get; }
 
         public ulong SelectedAccountNumber
         {
@@ -176,7 +170,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.ExistingData.Clear();
             this.ExistingData.AddRange(
-                this.Journal.Booking
+                this.projectData.CurrentYear.Booking
                     .Where(
                         x => x.Credit.Any(c => c.Account == this.selectedAccountNumber)
                              || x.Debit.Any(d => d.Account == this.selectedAccountNumber))

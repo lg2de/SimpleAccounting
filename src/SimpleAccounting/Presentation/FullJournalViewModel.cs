@@ -11,7 +11,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-    public class FullJournalViewModel : Screen
+    internal class FullJournalViewModel : Screen
     {
         private readonly ProjectData projectData;
         private FullJournalItemViewModel? selectedItem;

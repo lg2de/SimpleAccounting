@@ -50,7 +50,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             ((IActivate)sut).Activate();
             sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
-            sut.LoadProjectData(new AccountingData());
+            sut.LoadProjectData(new AccountingData().Init());
             sut.ProjectData.IsModified = true;
             await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
 

@@ -62,6 +62,8 @@ namespace lg2de.SimpleAccounting.Presentation
                                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                            ?? "UNKNOWN";
 
+            // TODO make ProjectData injectable
+            this.ProjectData = new ProjectData(this.windowManager, this.messageBox);
             this.FullJournal = new FullJournalViewModel(this.ProjectData);
             this.AccountJournal = new AccountJournalViewModel(this.ProjectData);
 
@@ -157,16 +159,16 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
         public ICommand AddBookingsCommand => new RelayCommand(
-            _ => this.OnAddBookings(), _ => this.ProjectData.IsCurrentYearOpen);
+            _ => this.OnAddBookings(), _ => !this.ProjectData.CurrentYear.Closed);
 
         public ICommand EditBookingCommand => new RelayCommand(
-            this.OnEditBooking, _ => this.ProjectData.IsCurrentYearOpen);
+            this.OnEditBooking, _ => !this.ProjectData.CurrentYear.Closed);
 
         public ICommand ImportBookingsCommand => new RelayCommand(
-            _ => this.OnImportBookings(), _ => this.ProjectData.IsCurrentYearOpen);
+            _ => this.ProjectData.ShowImportDialog(), _ => !this.ProjectData.CurrentYear.Closed);
 
         public ICommand CloseYearCommand => new RelayCommand(
-            _ => this.CloseYear(), _ => this.ProjectData.IsCurrentYearOpen);
+            _ => this.CloseYear(), _ => !this.ProjectData.CurrentYear.Closed);
 
         public ICommand TotalJournalReportCommand => new RelayCommand(
             _ => this.OnTotalJournalReport(), _ => this.FullJournal.Items.Any());
@@ -208,7 +210,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal Settings Settings { get; set; } = Settings.Default;
 
-        internal ProjectData ProjectData { get; } = new ProjectData();
+        internal ProjectData ProjectData { get; }
 
         internal Task LoadingTask { get; private set; } = Task.CompletedTask;
 
@@ -444,7 +446,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.fileSystem.FileMove(this.ProjectData.FileName, backupFileName);
             }
 
-            this.fileSystem.WriteAllTextIntoFile(this.ProjectData.FileName, this.ProjectData.All!.Serialize());
+            this.fileSystem.WriteAllTextIntoFile(this.ProjectData.FileName, this.ProjectData.All.Serialize());
             this.ProjectData.IsModified = false;
 
             if (this.fileSystem.FileExists(this.AutoSaveFileName))
@@ -529,7 +531,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         continue;
                     }
 
-                    this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.ProjectData.All!.Serialize());
+                    this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.ProjectData.All.Serialize());
                 }
             }
             catch (OperationCanceledException)
@@ -551,7 +553,7 @@ namespace lg2de.SimpleAccounting.Presentation
             var accountVm = new AccountViewModel
             {
                 DisplayName = Resources.Header_CreateAccount,
-                Group = this.ProjectData.All!.Accounts.First(),
+                Group = this.ProjectData.All.Accounts.First(),
                 Groups = this.ProjectData.All.Accounts,
                 IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
             };
@@ -599,7 +601,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             // update database
-            var accountData = this.ProjectData.All!.AllAccounts.Single(x => x.ID == account.Identifier);
+            var accountData = this.ProjectData.All.AllAccounts.Single(x => x.ID == account.Identifier);
             accountData.Name = vm.Name;
             accountData.Type = vm.Type;
             accountData.Active = vm.IsActivated;
@@ -642,7 +644,7 @@ namespace lg2de.SimpleAccounting.Presentation
         // TODO move to ProjectData
         private void OnAddBookings()
         {
-            var yearStart = this.ProjectData.CurrentYear!.DateStart.ToDateTime();
+            var yearStart = this.ProjectData.CurrentYear.DateStart.ToDateTime();
             var yearEnd = this.ProjectData.CurrentYear.DateEnd.ToDateTime();
             var bookingModel = new EditBookingViewModel(
                 this.ProjectData,
@@ -650,7 +652,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 yearStart,
                 yearEnd,
                 editMode: false) { BookingIdentifier = this.ProjectData.MaxBookIdent + 1 };
-            var allAccounts = this.ProjectData.All!.AllAccounts;
+            var allAccounts = this.ProjectData.All.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
             // ReSharper disable ConstantConditionalAccessQualifier
@@ -674,19 +676,19 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             var journalIndex =
-                this.ProjectData.CurrentYear!.Booking.FindIndex(x => x.ID == journalViewModel.Identifier);
+                this.ProjectData.CurrentYear.Booking.FindIndex(x => x.ID == journalViewModel.Identifier);
             if (journalIndex < 0)
             {
                 // summary item selected => ignore
                 return;
             }
 
-            var journalEntry = this.ProjectData.CurrentYear!.Booking[journalIndex];
+            var journalEntry = this.ProjectData.CurrentYear.Booking[journalIndex];
 
             var bookingModel = new EditBookingViewModel(
                 this.ProjectData,
                 journalEntry.Date.ToDateTime(),
-                this.ProjectData.CurrentYear!.DateStart.ToDateTime(),
+                this.ProjectData.CurrentYear.DateStart.ToDateTime(),
                 this.ProjectData.CurrentYear.DateEnd.ToDateTime(),
                 editMode: true)
             {
@@ -720,7 +722,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 bookingModel.BookingText = journalViewModel.Text;
             }
 
-            var allAccounts = this.ProjectData.All!.AllAccounts;
+            var allAccounts = this.ProjectData.All.AllAccounts;
             bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
             var result = this.windowManager.ShowDialog(bookingModel);
@@ -734,22 +736,10 @@ namespace lg2de.SimpleAccounting.Presentation
             this.ProjectData.UpdateBooking(journalIndex, journalEntry);
         }
 
-        // TODO move to ProjectData
-        private void OnImportBookings()
-        {
-            var importModel = new ImportBookingsViewModel(
-                this.messageBox,
-                this.ProjectData,
-                this.ProjectData.CurrentYear!,
-                this.ProjectData.All!.AllAccounts,
-                this.ProjectData.MaxBookIdent + 1);
-            this.windowManager.ShowDialog(importModel);
-        }
-
         private void CloseYear()
         {
-            var viewModel = new CloseYearViewModel(this.ProjectData.CurrentYear!);
-            this.ProjectData.All!.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward)
+            var viewModel = new CloseYearViewModel(this.ProjectData.CurrentYear);
+            this.ProjectData.All.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward)
                 .ToList().ForEach(viewModel.Accounts.Add);
 
             var result = this.windowManager.ShowDialog(viewModel);
@@ -758,7 +748,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var newYearJournal = this.ProjectData.All.CloseYear(this.ProjectData.CurrentYear!, viewModel.RemoteAccount);
+            var newYearJournal = this.ProjectData.All.CloseYear(this.ProjectData.CurrentYear, viewModel.RemoteAccount);
 
             this.ProjectData.IsModified = true;
             this.SelectBookingYear(newYearJournal.Year);
@@ -768,7 +758,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void SelectBookingYear(string newYearName)
         {
-            this.ProjectData.CurrentYear = this.ProjectData.All!.Journal.Single(y => y.Year == newYearName);
+            this.ProjectData.CurrentYear = this.ProjectData.All.Journal.Single(y => y.Year == newYearName);
             this.UpdateDisplayName();
             this.FullJournal.Rebuild();
             var firstBooking = this.ProjectData.CurrentYear.Booking?.FirstOrDefault();
@@ -839,8 +829,8 @@ namespace lg2de.SimpleAccounting.Presentation
         private void OnTotalJournalReport()
         {
             var report = this.reportFactory.CreateTotalJournal(
-                this.ProjectData.CurrentYear!,
-                this.ProjectData.All!.Setup);
+                this.ProjectData.CurrentYear,
+                this.ProjectData.All.Setup);
             report.CreateReport(Resources.Header_Journal);
             report.ShowPreview(Resources.Header_Journal);
         }
@@ -848,8 +838,8 @@ namespace lg2de.SimpleAccounting.Presentation
         private void OnAccountJournalReport()
         {
             var report = this.reportFactory.CreateAccountJournal(
-                this.ProjectData.CurrentYear!,
-                this.ProjectData.All!.Accounts.SelectMany(a => a.Account),
+                this.ProjectData.CurrentYear,
+                this.ProjectData.All.Accounts.SelectMany(a => a.Account),
                 this.ProjectData.All.Setup);
             report.PageBreakBetweenAccounts =
                 this.ProjectData.All.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
@@ -860,8 +850,8 @@ namespace lg2de.SimpleAccounting.Presentation
         private void OnTotalsAndBalancesReport()
         {
             var report = this.reportFactory.CreateTotalsAndBalances(
-                this.ProjectData.CurrentYear!,
-                this.ProjectData.All!.Accounts,
+                this.ProjectData.CurrentYear,
+                this.ProjectData.All.Accounts,
                 this.ProjectData.All.Setup);
             report.CreateReport(Resources.Header_TotalsAndBalances);
             report.ShowPreview(Resources.Header_TotalsAndBalances);
@@ -870,7 +860,7 @@ namespace lg2de.SimpleAccounting.Presentation
         private void OnAssetBalancesReport()
         {
             var accountGroups = new List<AccountingDataAccountGroup>();
-            foreach (var group in this.ProjectData.All!.Accounts)
+            foreach (var group in this.ProjectData.All.Accounts)
             {
                 var assertAccounts = group.Account
                     .Where(a => a.Type == AccountDefinitionType.Asset).ToList();
@@ -884,7 +874,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             var report = this.reportFactory.CreateTotalsAndBalances(
-                this.ProjectData.CurrentYear!,
+                this.ProjectData.CurrentYear,
                 accountGroups,
                 this.ProjectData.All.Setup);
             // ReSharper disable ConstantConditionalAccessQualifier
@@ -897,8 +887,8 @@ namespace lg2de.SimpleAccounting.Presentation
         private void OnAnnualBalanceReport()
         {
             var report = this.reportFactory.CreateAnnualBalance(
-                this.ProjectData.CurrentYear!,
-                this.ProjectData.All!.AllAccounts,
+                this.ProjectData.CurrentYear,
+                this.ProjectData.All.AllAccounts,
                 this.ProjectData.All.Setup);
             string title = Resources.Header_AnnualBalance;
             report.CreateReport(title);

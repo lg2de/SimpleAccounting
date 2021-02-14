@@ -238,14 +238,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AddBookingsCommand_NoProject_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.AddBookingsCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
         public void AddBookingsCommand_OpenYear_CanExecute()
         {
             var sut = CreateSut();
@@ -416,14 +408,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void ImportBookingsCommand_NoProject_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.ImportBookingsCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
         public void ImportBookingsCommand_OpenYear_CanExecute()
         {
             var sut = CreateSut();
@@ -471,14 +455,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.CloseYearCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void CloseYearCommand_EmptyProject_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
         }
 
         [CulturedFact("en")]

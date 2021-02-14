@@ -12,7 +12,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
-    public class AccountJournalViewModel : Screen
+    internal class AccountJournalViewModel : Screen
     {
         private readonly ProjectData projectData;
         private AccountJournalItemViewModel? selectedItem;

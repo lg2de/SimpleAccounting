@@ -44,9 +44,10 @@ namespace lg2de.SimpleAccounting.Presentation
             new AccountDefinition { ID = 990, Name = "Carryforward" }
         };
 
-        public ImportBookingsDesignViewModel()
-            : base(
-                null!, null!,
+        private static readonly AccountingData SampleData = new AccountingData
+        {
+            Journal = new List<AccountingDataJournal>
+            {
                 new AccountingDataJournal
                 {
                     DateStart = (uint)(DateTime.Today.Year * 10000 + 101),
@@ -59,17 +60,31 @@ namespace lg2de.SimpleAccounting.Presentation
                             ID = 999,
                             Credit = new List<BookingValue>
                             {
-                                new BookingValue { Account = 100, Text = "End of year", Value = 1234 }
+                                new BookingValue
+                                {
+                                    Account = 100, Text = "End of year", Value = 1234
+                                }
                             },
                             Debit = new List<BookingValue>
                             {
-                                new BookingValue { Account = 990, Text = "End of year", Value = 1234 }
+                                new BookingValue
+                                {
+                                    Account = 990, Text = "End of year", Value = 1234
+                                }
                             }
                         }
                     }
-                },
-                SampleAccounts,
-                42)
+                }
+            },
+            Accounts = new List<AccountingDataAccountGroup>
+            {
+                new AccountingDataAccountGroup { Account = SampleAccounts }
+            }
+        };
+
+        public ImportBookingsDesignViewModel()
+            : base(
+                null!, new ProjectData(null!, null!) { All = SampleData })
         {
             this.SelectedAccountNumber = 100;
             this.StartDate = DateTime.Today;
