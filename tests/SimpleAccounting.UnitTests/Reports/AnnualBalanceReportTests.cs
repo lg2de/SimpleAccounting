@@ -4,13 +4,12 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
-    using System.Linq;
     using System.Xml.Linq;
     using System.Xml.XPath;
     using FluentAssertions;
     using FluentAssertions.Execution;
-    using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Reports;
+    using lg2de.SimpleAccounting.UnitTests.Model;
     using lg2de.SimpleAccounting.UnitTests.Presentation;
     using Xunit;
 
@@ -19,14 +18,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         [CulturedFact("en")]
         public void CreateReport_SampleData_Converted()
         {
-            AccountingData project = Samples.SampleProject;
-            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            var setup = new AccountingDataSetup();
-            AccountingDataJournal journal = project.Journal.Last();
-            var sut = new AnnualBalanceReport(
-                journal,
-                project.AllAccounts,
-                setup);
+            var projectData = Samples.SampleProjectData;
+            projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
+            var sut = new AnnualBalanceReport(projectData);
 
             sut.CreateReport("dummy");
 

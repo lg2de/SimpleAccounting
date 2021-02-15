@@ -7,7 +7,6 @@ namespace lg2de.SimpleAccounting.Model
     using System;
     using System.Linq;
     using Caliburn.Micro;
-    using JetBrains.Annotations;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Presentation;
@@ -23,28 +22,28 @@ namespace lg2de.SimpleAccounting.Model
     {
         private readonly IWindowManager windowManager;
         private readonly IMessageBox messageBox;
-        private AccountingData all;
+        private AccountingData storage;
 
         public ProjectData(IWindowManager windowManager, IMessageBox messageBox)
         {
             this.windowManager = windowManager;
             this.messageBox = messageBox;
 
-            this.all = new AccountingData();
-            this.CurrentYear = this.all.Journal.SafeGetLatest();
+            this.storage = new AccountingData();
+            this.CurrentYear = this.storage.Journal.SafeGetLatest();
         }
 
         public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
 
         public string FileName { get; set; } = string.Empty;
 
-        public AccountingData All
+        public AccountingData Storage
         {
-            get => this.all;
+            get => this.storage;
             set
             {
-                this.all = value;
-                this.CurrentYear = this.All.Journal.SafeGetLatest();
+                this.storage = value;
+                this.CurrentYear = this.Storage.Journal.SafeGetLatest();
             }
         }
 
@@ -67,10 +66,10 @@ namespace lg2de.SimpleAccounting.Model
         {
             var bookingModel =
                 new EditBookingViewModel(this, DateTime.Today, editMode: false);
-            var allAccounts = this.All.AllAccounts;
+            var allAccounts = this.Storage.AllAccounts;
             bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
-            this.All.Setup?.BookingTemplates?.Template
+            this.Storage.Setup?.BookingTemplates?.Template
                 .Select(
                     t => new BookingTemplate
                     {
@@ -128,7 +127,7 @@ namespace lg2de.SimpleAccounting.Model
                 bookingModel.BookingText = theDebit.Text;
             }
 
-            var allAccounts = this.All.AllAccounts;
+            var allAccounts = this.Storage.AllAccounts;
             bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
             var result = this.windowManager.ShowDialog(bookingModel);

@@ -16,8 +16,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     {
         private class TestReport : ReportBase
         {
-            public TestReport(AccountingDataJournal yearData)
-                : base(AnnualBalanceReport.ResourceName, new AccountingDataSetup(), yearData)
+            public TestReport(ProjectData projectData)
+                : base(AnnualBalanceReport.ResourceName, projectData)
             {
                 this.Printer = this.TestingPrinter = Substitute.For<IXmlPrinter>();
             }
@@ -33,8 +33,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         [Fact]
         public void ShowPreview_DocumentName_PrintingNameCorrect()
         {
-            var sut = new TestReport(
-                Samples.SampleProject.Journal.Last());
+            var sut = new TestReport(Samples.SampleProjectData);
             sut.SetPrintingDate(new DateTime(2020, 2, 29));
 
             sut.ShowPreview("DocumentName");

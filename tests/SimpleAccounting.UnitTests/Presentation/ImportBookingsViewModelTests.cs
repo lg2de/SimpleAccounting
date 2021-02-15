@@ -16,9 +16,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [CulturedFact("en")]
         public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
         {
-            var projectData = new ProjectData(null, null) { All = Samples.SampleProject };
+            var projectData = new ProjectData(null, null) { Storage = Samples.SampleProject };
             var sut = new ImportBookingsViewModel(null, projectData);
-            projectData.All.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
 
             sut.SelectedAccountNumber = 100;
 
@@ -75,8 +75,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookings_SampleData_AccountsFiltered()
         {
-            var projectData = new ProjectData(null, null) { All = Samples.SampleProject };
-            projectData.All.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var projectData = new ProjectData(null, null) { Storage = Samples.SampleProject };
+            projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var sut = new ImportBookingsViewModel(null, projectData);
 
             sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
@@ -85,9 +85,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookAllCommand_EntryNotMapped_CannotExecute()
         {
-            var projectData = new ProjectData(null, null) { All = Samples.SampleProject };
-            projectData.All.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            var accounts = projectData.All.AllAccounts.ToList();
+            var projectData = new ProjectData(null, null) { Storage = Samples.SampleProject };
+            projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = projectData.Storage.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(null, projectData);
             sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = false, IsExisting = false });
@@ -98,9 +98,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookAllCommand_EntryMapped_CanExecute()
         {
-            var projectData = new ProjectData(null, null) { All = Samples.SampleProject };
-            projectData.All.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            var accounts = projectData.All.AllAccounts.ToList();
+            var projectData = new ProjectData(null, null) { Storage = Samples.SampleProject };
+            projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = projectData.Storage.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(null, projectData);
             sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts)
@@ -114,9 +114,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookAllCommand_EntrySkipped_CanExecute()
         {
-            var projectData = new ProjectData(null, null) { All = Samples.SampleProject };
-            projectData.All.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            var accounts = projectData.All.AllAccounts.ToList();
+            var projectData = new ProjectData(null, null) { Storage = Samples.SampleProject };
+            projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = projectData.Storage.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(null, projectData);
             sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = true, IsExisting = false });
@@ -127,9 +127,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookAllCommand_EntryExisting_CannotExecute()
         {
-            var projectData = new ProjectData(null, null) { All = Samples.SampleProject };
-            projectData.All.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            var accounts = projectData.All.AllAccounts.ToList();
+            var projectData = new ProjectData(null, null) { Storage = Samples.SampleProject };
+            projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var accounts = projectData.Storage.AllAccounts.ToList();
             var sut = new ImportBookingsViewModel(null, projectData);
             sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = false, IsExisting = true });

@@ -604,10 +604,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IReportFactory reportFactory);
             var accountJournalReport = Substitute.For<IAccountJournalReport>();
-            reportFactory.CreateAccountJournal(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Any<IEnumerable<AccountDefinition>>(),
-                Arg.Any<AccountingDataSetup>()).Returns(accountJournalReport);
+            reportFactory.CreateAccountJournal(sut.ProjectData).Returns(accountJournalReport);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AccountJournalReportCommand.Execute(null);
@@ -638,11 +635,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IReportFactory reportFactory);
             var annualBalanceReport = Substitute.For<IAnnualBalanceReport>();
-            reportFactory.CreateAnnualBalance(
-                    Arg.Any<AccountingDataJournal>(),
-                    Arg.Any<IEnumerable<AccountDefinition>>(),
-                    Arg.Any<AccountingDataSetup>())
-                .Returns(annualBalanceReport);
+            reportFactory.CreateAnnualBalance(sut.ProjectData).Returns(annualBalanceReport);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.AnnualBalanceReportCommand.Execute(null);
@@ -674,9 +667,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IReportFactory reportFactory);
             var assetBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
             reportFactory.CreateTotalsAndBalances(
-                    Arg.Any<AccountingDataJournal>(),
-                    Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
-                    Arg.Any<AccountingDataSetup>())
+                    sut.ProjectData,
+                    Arg.Any<IEnumerable<AccountingDataAccountGroup>>())
                 .Returns(assetBalancesReport);
             var project = Samples.SampleProject;
             project.Accounts.Add(
@@ -688,9 +680,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             assetBalancesReport.Received(1)
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
             reportFactory.Received(1).CreateTotalsAndBalances(
-                Arg.Any<AccountingDataJournal>(),
-                Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.ToList().All(y => y.Name != "EMPTY")),
-                Arg.Any<AccountingDataSetup>());
+                sut.ProjectData,
+                Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.ToList().All(y => y.Name != "EMPTY")));
         }
 
         [Fact]
@@ -715,10 +706,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IReportFactory reportFactory);
             var totalJournalReport = Substitute.For<ITotalJournalReport>();
-            reportFactory.CreateTotalJournal(
-                    Arg.Any<AccountingDataJournal>(),
-                    Arg.Any<AccountingDataSetup>())
-                .Returns(totalJournalReport);
+            reportFactory.CreateTotalJournal(sut.ProjectData).Returns(totalJournalReport);
             sut.LoadProjectData(Samples.SampleProject);
 
             sut.TotalJournalReportCommand.Execute(null);
@@ -750,9 +738,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IReportFactory reportFactory);
             var totalsAndBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
             reportFactory.CreateTotalsAndBalances(
-                    Arg.Any<AccountingDataJournal>(),
-                    Arg.Any<IEnumerable<AccountingDataAccountGroup>>(),
-                    Arg.Any<AccountingDataSetup>())
+                    sut.ProjectData,
+                    Arg.Any<IEnumerable<AccountingDataAccountGroup>>())
                 .Returns(totalsAndBalancesReport);
             sut.LoadProjectData(Samples.SampleProject);
 

@@ -84,7 +84,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ImportBookingsDesignViewModel()
             : base(
-                null!, new ProjectData(null!, null!) { All = SampleData })
+                null!, new ProjectData(null!, null!) { Storage = SampleData })
         {
             this.SelectedAccountNumber = 100;
             this.StartDate = DateTime.Today;

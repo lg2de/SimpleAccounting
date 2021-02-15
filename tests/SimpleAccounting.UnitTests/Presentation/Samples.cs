@@ -7,7 +7,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Model;
+    using NSubstitute;
 
     internal class Samples
     {
@@ -117,6 +120,16 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                         }
                     }
                 };
+            }
+        }
+
+        public static ProjectData SampleProjectData
+        {
+            get
+            {
+                var windowManager = Substitute.For<IWindowManager>();
+                var messageBox = Substitute.For<IMessageBox>();
+                return new ProjectData(windowManager, messageBox) { Storage = SampleProject };
             }
         }
 

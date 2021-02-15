@@ -9,23 +9,13 @@ namespace lg2de.SimpleAccounting.Reports
 
     internal interface IReportFactory
     {
-        IAccountJournalReport CreateAccountJournal(
-            AccountingDataJournal journal,
-            IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup);
+        IAccountJournalReport CreateAccountJournal(ProjectData projectData);
 
-        ITotalJournalReport CreateTotalJournal(
-            AccountingDataJournal journal,
-            AccountingDataSetup setup);
+        ITotalJournalReport CreateTotalJournal(ProjectData projectData);
 
-        IAnnualBalanceReport CreateAnnualBalance(
-            AccountingDataJournal journal,
-            IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup);
+        IAnnualBalanceReport CreateAnnualBalance(ProjectData projectData);
 
         ITotalsAndBalancesReport CreateTotalsAndBalances(
-            AccountingDataJournal journal,
-            IEnumerable<AccountingDataAccountGroup> accounts,
-            AccountingDataSetup setup);
+            ProjectData projectData, IEnumerable<AccountingDataAccountGroup> accounts);
     }
 }

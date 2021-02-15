@@ -33,7 +33,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.messageBox = messageBox;
             this.projectData = projectData;
-            this.accounts = projectData.All.AllAccounts.ToList();
+            this.accounts = projectData.Storage.AllAccounts.ToList();
             this.FirstBookingNumber = projectData.MaxBookIdent + 1;
 
             this.RangeMin = this.projectData.CurrentYear.DateStart.ToDateTime();

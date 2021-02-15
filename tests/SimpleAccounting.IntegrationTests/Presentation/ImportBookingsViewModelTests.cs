@@ -107,7 +107,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             var accounts = project.AllAccounts.ToList();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
-            var projectData = new ProjectData(null, null) { All = project };
+            var projectData = new ProjectData(null, null) { Storage = project };
             var sut = new ImportBookingsViewModel(messageBox, projectData)
             {
                 SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID, IsForceEnglish = true

@@ -33,10 +33,9 @@ namespace lg2de.SimpleAccounting.Reports
         private long overallTotalDebit;
 
         public TotalsAndBalancesReport(
-            AccountingDataJournal yearData,
-            IEnumerable<AccountingDataAccountGroup> accountGroups,
-            AccountingDataSetup setup)
-            : base(ResourceName, setup, yearData)
+            ProjectData projectData,
+            IEnumerable<AccountingDataAccountGroup> accountGroups)
+            : base(ResourceName, projectData)
         {
             this.accountGroups = accountGroups.ToList();
         }

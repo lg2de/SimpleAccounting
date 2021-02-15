@@ -18,11 +18,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         [CulturedFact("en")]
         public void CreateReport_SampleData_Converted()
         {
-            AccountingData project = Samples.SampleProject;
-            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            var setup = new AccountingDataSetup();
-            AccountingDataJournal journal = project.Journal.Last();
-            var sut = new TotalJournalReport(journal, setup);
+            var projectData = Samples.SampleProjectData;
+            projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
+            var sut = new TotalJournalReport(projectData);
 
             sut.CreateReport("dummy");
 
@@ -30,7 +28,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var expected = $@"
 <data>
   <tr topLine=""True"">
-    <td>1/1/{year}</td>
+    <td>1/1/{
+                    year
+                }</td>
     <td>1</td>
     <td>Open 1</td>
     <td>100</td>
@@ -39,7 +39,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>1000.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>1/1/{year}</td>
+    <td>1/1/{
+                    year
+                }</td>
     <td>2</td>
     <td>Open 2</td>
     <td>990</td>
@@ -48,7 +50,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>3000.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>1/28/{year}</td>
+    <td>1/28/{
+                    year
+                }</td>
     <td>3</td>
     <td>Salary</td>
     <td>100</td>
@@ -75,7 +79,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>80.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>1/29/{year}</td>
+    <td>1/29/{
+                    year
+                }</td>
     <td>4</td>
     <td>Credit rate</td>
     <td>5000</td>
@@ -84,7 +90,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>400.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>2/1/{year}</td>
+    <td>2/1/{
+                    year
+                }</td>
     <td>5</td>
     <td>Shoes1</td>
     <td>600</td>
@@ -111,7 +119,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>50.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>2/5/{year}</td>
+    <td>2/5/{
+                    year
+                }</td>
     <td>6</td>
     <td>Rent to friend</td>
     <td>6000</td>

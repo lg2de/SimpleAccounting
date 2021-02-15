@@ -21,13 +21,10 @@ namespace lg2de.SimpleAccounting.Reports
 
         private readonly List<AccountDefinition> allAccounts;
 
-        public AnnualBalanceReport(
-            AccountingDataJournal yearData,
-            IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup)
-            : base(ResourceName, setup, yearData)
+        public AnnualBalanceReport(ProjectData projectData)
+            : base(ResourceName, projectData)
         {
-            this.allAccounts = accounts.ToList();
+            this.allAccounts = projectData.Storage.AllAccounts.ToList();
         }
 
         public void CreateReport(string title)

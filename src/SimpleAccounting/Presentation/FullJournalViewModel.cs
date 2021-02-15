@@ -51,8 +51,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debit = debitAccounts[0];
                     item.Text = debit.Text;
                     item.Value = debit.Value.ToViewModel();
-                    item.DebitAccount = this.projectData.All.GetAccountName(debit);
-                    item.CreditAccount = this.projectData.All.GetAccountName(creditAccounts[0]);
+                    item.DebitAccount = this.projectData.Storage.GetAccountName(debit);
+                    item.CreditAccount = this.projectData.Storage.GetAccountName(creditAccounts[0]);
                     this.Items.Add(item);
                     continue;
                 }
@@ -62,7 +62,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     var debitItem = item.Clone();
                     debitItem.Text = debitEntry.Text;
                     debitItem.Value = debitEntry.Value.ToViewModel();
-                    debitItem.DebitAccount = this.projectData.All.GetAccountName(debitEntry);
+                    debitItem.DebitAccount = this.projectData.Storage.GetAccountName(debitEntry);
                     this.Items.Add(debitItem);
                 }
 
@@ -71,7 +71,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     var creditItem = item.Clone();
                     creditItem.Text = creditEntry.Text;
                     creditItem.Value = creditEntry.Value.ToViewModel();
-                    creditItem.CreditAccount = this.projectData.All.GetAccountName(creditEntry);
+                    creditItem.CreditAccount = this.projectData.Storage.GetAccountName(creditEntry);
                     this.Items.Add(creditItem);
                 }
             }

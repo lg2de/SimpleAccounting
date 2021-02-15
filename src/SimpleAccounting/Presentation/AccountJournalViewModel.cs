@@ -61,7 +61,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                     debitSum += item.DebitValue;
                     item.RemoteAccount = booking.Credit.Count == 1
-                        ? this.projectData.All.GetAccountName(booking.Credit.Single())
+                        ? this.projectData.Storage.GetAccountName(booking.Credit.Single())
                         : Resources.Word_Various;
                     this.Items.Add(item);
                 }
@@ -79,7 +79,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                     creditSum += item.CreditValue;
                     item.RemoteAccount = booking.Debit.Count == 1
-                        ? this.projectData.All.GetAccountName(booking.Debit.Single())
+                        ? this.projectData.Storage.GetAccountName(booking.Debit.Single())
                         : Resources.Word_Various;
                     this.Items.Add(item);
                 }

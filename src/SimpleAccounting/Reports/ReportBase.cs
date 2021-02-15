@@ -16,13 +16,10 @@ namespace lg2de.SimpleAccounting.Reports
         protected const int TitleSize = 10;
         private readonly AccountingDataSetup setup;
 
-        protected ReportBase(
-            string resourceName,
-            AccountingDataSetup setup,
-            AccountingDataJournal yearData)
+        protected ReportBase(string resourceName, ProjectData projectData)
         {
-            this.setup = setup;
-            this.YearData = yearData;
+            this.setup = projectData.Storage.Setup;
+            this.YearData = projectData.CurrentYear;
 
             this.Printer.LoadDocument(resourceName);
         }
