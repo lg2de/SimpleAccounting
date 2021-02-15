@@ -9,7 +9,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     using FluentAssertions;
     using FluentAssertions.Execution;
     using lg2de.SimpleAccounting.Reports;
-    using lg2de.SimpleAccounting.UnitTests.Model;
     using lg2de.SimpleAccounting.UnitTests.Presentation;
     using Xunit;
 
