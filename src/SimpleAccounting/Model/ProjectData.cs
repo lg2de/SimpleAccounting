@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Model
     using Caliburn.Micro;
     using JetBrains.Annotations;
     using lg2de.SimpleAccounting.Abstractions;
+    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Presentation;
 
     /// <summary>
@@ -62,15 +63,93 @@ namespace lg2de.SimpleAccounting.Model
             this.JournalChanged(this, new JournalChangedEventArgs(booking.ID, booking.GetAccounts()));
         }
 
-        // TODO temporary index to be removed
-        public void UpdateBooking(int temporaryIndex, AccountingDataJournalBooking booking)
+        public void ShowAddBookingDialog(bool showInactiveAccounts)
         {
-            //var index = this.CurrentYear.Booking.FindIndex(x => x.ID == booking.ID)
-            this.CurrentYear.Booking[temporaryIndex] = booking;
+            var bookingModel = new EditBookingViewModel(
+                this,
+                DateTime.Today,
+                this.CurrentYear.DateStart.ToDateTime(),
+                this.CurrentYear.DateEnd.ToDateTime(),
+                editMode: false) { BookingIdentifier = this.MaxBookIdent + 1 };
+            var allAccounts = this.All.AllAccounts;
+            bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
+
+            this.All.Setup?.BookingTemplates?.Template
+                .Select(
+                    t => new BookingTemplate
+                    {
+                        Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value.ToViewModel()
+                    })
+                .ToList().ForEach(bookingModel.BindingTemplates.Add);
+
+            this.windowManager.ShowDialog(bookingModel);
+        }
+
+        public void ShowEditBookingDialog(ulong bookingId, bool showInactiveAccounts)
+        {
+            var journalIndex =
+                this.CurrentYear.Booking.FindIndex(x => { return x.ID == bookingId; });
+            if (journalIndex < 0)
+            {
+                // summary item selected => ignore
+                return;
+            }
+
+            var journalEntry = this.CurrentYear.Booking[journalIndex];
+
+            var bookingModel = new EditBookingViewModel(
+                this,
+                journalEntry.Date.ToDateTime(),
+                this.CurrentYear.DateStart.ToDateTime(),
+                this.CurrentYear.DateEnd.ToDateTime(),
+                editMode: true)
+            {
+                BookingIdentifier = journalEntry.ID,
+                IsFollowup = journalEntry.Followup,
+                IsOpening = journalEntry.Opening
+            };
+
+            if (journalEntry.Credit.Count > 1)
+            {
+                journalEntry.Credit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.CreditSplitEntries.Add);
+                var theDebit = journalEntry.Debit.First();
+                bookingModel.DebitAccount = theDebit.Account;
+                bookingModel.BookingText = theDebit.Text;
+                bookingModel.BookingValue = theDebit.Value.ToViewModel();
+            }
+            else if (journalEntry.Debit.Count > 1)
+            {
+                journalEntry.Debit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.DebitSplitEntries.Add);
+                var theCredit = journalEntry.Credit.First();
+                bookingModel.CreditAccount = theCredit.Account;
+                bookingModel.BookingText = theCredit.Text;
+                bookingModel.BookingValue = theCredit.Value.ToViewModel();
+            }
+            else
+            {
+                var theDebit = journalEntry.Debit.First();
+                bookingModel.DebitAccount = theDebit.Account;
+                bookingModel.BookingValue = theDebit.Value.ToViewModel();
+                bookingModel.CreditAccount = journalEntry.Credit.First().Account;
+                bookingModel.BookingText = theDebit.Text;
+            }
+
+            var allAccounts = this.All.AllAccounts;
+            bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
+
+            var result = this.windowManager.ShowDialog(bookingModel);
+            if (result != true)
+            {
+                return;
+            }
+
+            // replace entry
+            journalEntry = bookingModel.CreateJournalEntry();
+            this.CurrentYear.Booking[journalIndex] = journalEntry;
 
             this.IsModified = true;
 
-            this.JournalChanged(this, new JournalChangedEventArgs(booking.ID, booking.GetAccounts()));
+            this.JournalChanged(this, new JournalChangedEventArgs(journalEntry.ID, journalEntry.GetAccounts()));
         }
 
         public void ShowImportDialog()

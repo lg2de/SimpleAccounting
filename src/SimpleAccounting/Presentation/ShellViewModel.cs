@@ -160,7 +160,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
         public ICommand AddBookingsCommand => new RelayCommand(
-            _ => this.OnAddBookings(), _ => !this.ProjectData.CurrentYear.Closed);
+            _ => this.ProjectData.ShowAddBookingDialog(this.ShowInactiveAccounts),
+            _ => !this.ProjectData.CurrentYear.Closed);
 
         public ICommand EditBookingCommand => new RelayCommand(
             this.OnEditBooking, _ => !this.ProjectData.CurrentYear.Closed);
@@ -641,33 +642,6 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        // TODO move to ProjectData
-        private void OnAddBookings()
-        {
-            var yearStart = this.ProjectData.CurrentYear.DateStart.ToDateTime();
-            var yearEnd = this.ProjectData.CurrentYear.DateEnd.ToDateTime();
-            var bookingModel = new EditBookingViewModel(
-                this.ProjectData,
-                DateTime.Today,
-                yearStart,
-                yearEnd,
-                editMode: false) { BookingIdentifier = this.ProjectData.MaxBookIdent + 1 };
-            var allAccounts = this.ProjectData.All.AllAccounts;
-            bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
-
-            // ReSharper disable ConstantConditionalAccessQualifier
-            this.ProjectData.All.Setup?.BookingTemplates?.Template
-                .Select(
-                    t => new BookingTemplate
-                    {
-                        Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value.ToViewModel()
-                    })
-                .ToList().ForEach(bookingModel.BindingTemplates.Add);
-            // ReSharper restore ConstantConditionalAccessQualifier
-            this.windowManager.ShowDialog(bookingModel);
-        }
-
-        // TODO move to ProjectData
         private void OnEditBooking(object commandParameter)
         {
             if (!(commandParameter is JournalItemBaseViewModel journalViewModel))
@@ -675,65 +649,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var journalIndex =
-                this.ProjectData.CurrentYear.Booking.FindIndex(x => x.ID == journalViewModel.Identifier);
-            if (journalIndex < 0)
-            {
-                // summary item selected => ignore
-                return;
-            }
-
-            var journalEntry = this.ProjectData.CurrentYear.Booking[journalIndex];
-
-            var bookingModel = new EditBookingViewModel(
-                this.ProjectData,
-                journalEntry.Date.ToDateTime(),
-                this.ProjectData.CurrentYear.DateStart.ToDateTime(),
-                this.ProjectData.CurrentYear.DateEnd.ToDateTime(),
-                editMode: true)
-            {
-                BookingIdentifier = journalEntry.ID,
-                IsFollowup = journalEntry.Followup,
-                IsOpening = journalEntry.Opening
-            };
-
-            if (journalEntry.Credit.Count > 1)
-            {
-                journalEntry.Credit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.CreditSplitEntries.Add);
-                var theDebit = journalEntry.Debit.First();
-                bookingModel.DebitAccount = theDebit.Account;
-                bookingModel.BookingText = theDebit.Text;
-                bookingModel.BookingValue = theDebit.Value.ToViewModel();
-            }
-            else if (journalEntry.Debit.Count > 1)
-            {
-                journalEntry.Debit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.DebitSplitEntries.Add);
-                var theCredit = journalEntry.Credit.First();
-                bookingModel.CreditAccount = theCredit.Account;
-                bookingModel.BookingText = theCredit.Text;
-                bookingModel.BookingValue = theCredit.Value.ToViewModel();
-            }
-            else
-            {
-                var theDebit = journalEntry.Debit.First();
-                bookingModel.DebitAccount = theDebit.Account;
-                bookingModel.BookingValue = theDebit.Value.ToViewModel();
-                bookingModel.CreditAccount = journalEntry.Credit.First().Account;
-                bookingModel.BookingText = journalViewModel.Text;
-            }
-
-            var allAccounts = this.ProjectData.All.AllAccounts;
-            bookingModel.Accounts.AddRange(this.ShowInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
-
-            var result = this.windowManager.ShowDialog(bookingModel);
-            if (result != true)
-            {
-                return;
-            }
-
-            // replace entry
-            journalEntry = bookingModel.CreateJournalEntry();
-            this.ProjectData.UpdateBooking(journalIndex, journalEntry);
+            this.ProjectData.ShowEditBookingDialog(journalViewModel.Identifier, this.ShowInactiveAccounts);
         }
 
         private void CloseYear()
