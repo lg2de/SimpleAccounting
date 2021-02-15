@@ -65,12 +65,8 @@ namespace lg2de.SimpleAccounting.Model
 
         public void ShowAddBookingDialog(bool showInactiveAccounts)
         {
-            var bookingModel = new EditBookingViewModel(
-                this,
-                DateTime.Today,
-                this.CurrentYear.DateStart.ToDateTime(),
-                this.CurrentYear.DateEnd.ToDateTime(),
-                editMode: false) { BookingIdentifier = this.MaxBookIdent + 1 };
+            var bookingModel =
+                new EditBookingViewModel(this, DateTime.Today, editMode: false);
             var allAccounts = this.All.AllAccounts;
             bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
 
@@ -100,8 +96,6 @@ namespace lg2de.SimpleAccounting.Model
             var bookingModel = new EditBookingViewModel(
                 this,
                 journalEntry.Date.ToDateTime(),
-                this.CurrentYear.DateStart.ToDateTime(),
-                this.CurrentYear.DateEnd.ToDateTime(),
                 editMode: true)
             {
                 BookingIdentifier = journalEntry.ID,

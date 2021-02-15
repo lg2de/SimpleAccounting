@@ -17,7 +17,7 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class EditBookingDesignViewModel : EditBookingViewModel
     {
         public EditBookingDesignViewModel()
-            : base(null!, DateTime.Now, DateTime.Now, DateTime.Now, editMode: false)
+            : base(new ProjectData(null!, null!), DateTime.Now, editMode: false)
         {
             this.BookingIdentifier = 42;
             this.BookingText = "shoes";
@@ -28,7 +28,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 new AccountDefinition { ID = 600, Name = "Shopping", Type = AccountDefinitionType.Expense });
 
             this.DebitSplitEntries.Add(new SplitBookingViewModel { AccountNumber = 600, BookingText = "Booking1" });
-            this.DebitSplitEntries.Add(new SplitBookingViewModel { AccountNumber = 600, BookingText = "Booking2"  });
+            this.DebitSplitEntries.Add(new SplitBookingViewModel { AccountNumber = 600, BookingText = "Booking2" });
             this.CreditAccount = 100;
         }
     }

@@ -23,18 +23,15 @@ namespace lg2de.SimpleAccounting.Presentation
         private ulong debitAccount;
         private BookingTemplate? selectedTemplate;
 
-        public EditBookingViewModel(
-            ProjectData projectData,
-            DateTime date,
-            DateTime dateStart,
-            DateTime dateEnd,
-            bool editMode = false)
+        public EditBookingViewModel(ProjectData projectData, DateTime date, bool editMode = false)
         {
-            this.EditMode = editMode;
             this.projectData = projectData;
             this.Date = date;
-            this.DateStart = dateStart;
-            this.DateEnd = dateEnd;
+            this.EditMode = editMode;
+
+            this.DateStart = this.projectData.CurrentYear.DateStart.ToDateTime();
+            this.DateEnd = this.projectData.CurrentYear.DateEnd.ToDateTime();
+            this.BookingIdentifier = this.projectData.MaxBookIdent + 1;
 
             if (this.Date > this.DateEnd)
             {
