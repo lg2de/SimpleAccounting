@@ -94,7 +94,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var _ = new AssertionScope();
             sut.ProjectData.IsModified.Should()
                 .BeTrue("the project is ONLY auto-saved and not saved to real project file");
-            sut.AccountList.Should().BeEquivalentTo(new { Name = "TheAccount" });
+            sut.Accounts.AccountList.Should().BeEquivalentTo(new { Name = "TheAccount" });
             fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project", Arg.Any<string>());
             fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
         }
@@ -189,7 +189,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
 
             using var _ = new AssertionScope();
-            sut.AccountList.Should().BeEquivalentTo(
+            sut.Accounts.AccountList.Should().BeEquivalentTo(
                 new { Name = "Bank account" },
                 new { Name = "Salary" },
                 new { Name = "Shoes" },
@@ -356,7 +356,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
                 Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
             };
-            sut.SelectedAccount = sut.AccountList.Last();
+            sut.Accounts.SelectedAccount = sut.Accounts.AccountList.Last();
 
             using var monitor1 = sut.AccountJournal.Monitor();
             using var monitor2 = sut.AccountJournal.Items.Monitor();
@@ -653,8 +653,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task LoadProjectFromFileAsync_MigrationRequired_ProjectModified()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            var accountingData = new AccountingData();
-            accountingData.Years = new List<AccountingDataYear> { new AccountingDataYear { Name = 2020 } };
+            var accountingData = new AccountingData
+            {
+                Years = new List<AccountingDataYear> { new AccountingDataYear { Name = 2020 } }
+            };
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 
@@ -745,11 +747,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.ShowInactiveAccounts = true;
+            sut.Accounts.ShowInactiveAccounts = true;
 
             using var _ = new AssertionScope();
 
-            sut.AccountList.Should().BeEquivalentTo(
+            sut.Accounts.AccountList.Should().BeEquivalentTo(
                 new { Name = "Bank account" },
                 new { Name = "Salary" },
                 new { Name = "Shoes" },

@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
@@ -24,16 +25,31 @@ namespace lg2de.SimpleAccounting.Presentation
             var menuItem = new MenuViewModel("c:\\Test.acml", null!);
             this.RecentProjects.Add(menuItem);
 
-            var accountItem = new AccountViewModel
-            {
-                Identifier = 100,
-                Name = "Kasse",
-                Group = new AccountingDataAccountGroup { Name = "Bestandskonten" },
-                Type = AccountDefinitionType.Asset
-            };
-            this.AccountList.Add(accountItem);
-            this.SelectedAccount = accountItem;
+            this.LoadAccounts();
+            this.LoadJournal();
+        }
 
+        private void LoadAccounts()
+        {
+            this.Accounts.LoadAccounts(
+                new List<AccountingDataAccountGroup>
+                {
+                    new AccountingDataAccountGroup
+                    {
+                        Name = "Bestandskonten",
+                        Account = new List<AccountDefinition>
+                        {
+                            new AccountDefinition
+                            {
+                                ID = 100, Name = "Kasse", Type = AccountDefinitionType.Asset
+                            }
+                        }
+                    }
+                });
+        }
+
+        private void LoadJournal()
+        {
             var journalItem = new FullJournalItemViewModel
             {
                 Identifier = 41,

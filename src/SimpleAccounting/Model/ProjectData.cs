@@ -15,13 +15,13 @@ namespace lg2de.SimpleAccounting.Model
     ///     Implements the storage for all data of the current project.
     /// </summary>
     /// <remarks>
-    ///     It contains the persistent data according to <see cref="AccountingData"/>
+    ///     It contains the persistent data according to <see cref="AccountingData" />
     ///     as well as the current state of the project.
     /// </remarks>
     internal class ProjectData
     {
-        private readonly IWindowManager windowManager;
         private readonly IMessageBox messageBox;
+        private readonly IWindowManager windowManager;
         private AccountingData storage;
 
         public ProjectData(IWindowManager windowManager, IMessageBox messageBox)
@@ -32,8 +32,6 @@ namespace lg2de.SimpleAccounting.Model
             this.storage = new AccountingData();
             this.CurrentYear = this.storage.Journal.SafeGetLatest();
         }
-
-        public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
 
         public string FileName { get; set; } = string.Empty;
 
@@ -52,6 +50,8 @@ namespace lg2de.SimpleAccounting.Model
         public bool IsModified { get; set; }
 
         internal ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
+
+        public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
 
         public void AddBooking(AccountingDataJournalBooking booking)
         {
@@ -149,6 +149,12 @@ namespace lg2de.SimpleAccounting.Model
         {
             var importModel = new ImportBookingsViewModel(this.messageBox, this);
             this.windowManager.ShowDialog(importModel);
+        }
+
+        public void TriggerJournalChanged()
+        {
+            this.JournalChanged(
+                this, new JournalChangedEventArgs(0, this.storage.AllAccounts.Select(x => x.ID).ToList()));
         }
     }
 }

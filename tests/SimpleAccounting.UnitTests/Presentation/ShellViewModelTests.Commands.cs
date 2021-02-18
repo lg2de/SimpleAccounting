@@ -35,7 +35,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 100));
+            sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 100));
 
             sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
@@ -61,7 +61,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 400));
+            sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 400));
 
             sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 120, DebitValue = 0 },
@@ -78,7 +78,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.LoadProjectData(project);
 
-            sut.AccountSelectionCommand.Execute(sut.AccountList.Single(x => x.Identifier == 600));
+            sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 600));
 
             sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 20 },
@@ -94,7 +94,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.NewProjectCommand.Execute(null);
 
-            sut.AccountList.Should().NotBeEmpty();
+            sut.Accounts.AccountList.Should().NotBeEmpty();
             sut.FullJournal.Items.Should().BeEmpty();
             sut.AccountJournal.Items.Should().BeEmpty();
         }
@@ -151,7 +151,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.NewAccountCommand.Execute(null);
 
-            sut.AccountList.Select(x => x.Name).Should().Equal(
+            sut.Accounts.AccountList.Select(x => x.Name).Should().Equal(
                 "Bank account", "Salary", "New Account", "Shoes", "Carryforward", "Bank credit", "Friends debit");
         }
 
@@ -161,7 +161,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IWindowManager windowManager);
             sut.LoadProjectData(Samples.SampleProject);
 
-            sut.EditAccountCommand.Execute(sut.AccountList.First());
+            sut.EditAccountCommand.Execute(sut.Accounts.AccountList.First());
 
             sut.ProjectData.IsModified.Should().BeFalse();
             windowManager.Received(1).ShowDialog(Arg.Any<object>());
@@ -195,14 +195,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Debit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Back", Value = 5 } }
             };
             sut.ProjectData.CurrentYear!.Booking.Add(booking);
-            sut.AccountSelectionCommand.Execute(sut.AccountList.FirstOrDefault(x => x.Identifier == 990));
+            sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.FirstOrDefault(x => x.Identifier == 990));
 
-            sut.EditAccountCommand.Execute(sut.AccountList.First());
+            sut.EditAccountCommand.Execute(sut.Accounts.AccountList.First());
 
             using (new AssertionScope())
             {
                 sut.ProjectData.IsModified.Should().BeTrue();
-                sut.AccountList.Select(x => x.Name).Should().Equal(
+                sut.Accounts.AccountList.Select(x => x.Name).Should().Equal(
                     "Salary", "Shoes", "Carryforward", "Bank account", "Bank credit", "Friends debit");
                 sut.FullJournal.Items.Should().BeEquivalentTo(
                     new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
@@ -254,7 +254,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             EditBookingViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
             sut.LoadProjectData(Samples.SampleProject);
-            sut.ShowInactiveAccounts = true;
+            sut.Accounts.ShowInactiveAccounts = true;
 
             sut.AddBookingsCommand.Execute(null);
 
@@ -270,7 +270,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             EditBookingViewModel vm = null;
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
             sut.LoadProjectData(Samples.SampleProject);
-            sut.ShowInactiveAccounts = false;
+            sut.Accounts.ShowInactiveAccounts = false;
 
             sut.AddBookingsCommand.Execute(null);
 

@@ -169,7 +169,7 @@
         <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" />
         <DockPanel Grid.Row="0" Grid.Column="2">
           <TextBlock DockPanel.Dock="Top"
-                     Text="{Binding SelectedAccount.Name, StringFormat={x:Static properties:Resources.Header_AccountJournalX}}" />
+                     Text="{Binding Accounts.SelectedAccount.Name, StringFormat={x:Static properties:Resources.Header_AccountJournalX}}" />
           <DataGrid
             DockPanel.Dock="Bottom"
             ItemsSource="{Binding AccountJournal.Items}"
@@ -228,7 +228,7 @@
           </TextBlock>
           <DataGrid
             DockPanel.Dock="Right"
-            ItemsSource="{Binding AccountList}"
+            ItemsSource="{Binding Accounts.AccountList}"
             AutoGenerateColumns="False"
             CanUserAddRows="False"
             IsReadOnly="True"
@@ -243,19 +243,19 @@
             <DataGrid.InputBindings>
               <MouseBinding
                 MouseAction="LeftDoubleClick"
-                Command="{Binding AccountSelectionCommand}"
-                CommandParameter="{Binding AccountList/}" />
+                Command="{Binding Accounts.AccountSelectionCommand}"
+                CommandParameter="{Binding Accounts.AccountList/}" />
             </DataGrid.InputBindings>
             <DataGrid.ContextMenu>
               <ContextMenu>
                 <MenuItem
                   Header="{x:Static properties:Resources.AccountsContextMenu_RefreshAccountJournal}"
-                  Command="{Binding AccountSelectionCommand}"
-                  CommandParameter="{Binding AccountList/}" />
+                  Command="{Binding Accounts.AccountSelectionCommand}"
+                  CommandParameter="{Binding Accounts.AccountList/}" />
                 <MenuItem
                   Header="{x:Static properties:Resources.AccountsContextMenu_EditAccount}"
                   Command="{Binding EditAccountCommand}"
-                  CommandParameter="{Binding AccountList/}" />
+                  CommandParameter="{Binding Accounts.AccountList/}" />
                 <Separator />
                 <MenuItem
                   Header="{x:Static properties:Resources.AccountsContextMenu_NewAccount}"
@@ -264,7 +264,7 @@
                 <MenuItem
                   Header="{x:Static properties:Resources.AccountsContextMenu_ShowInactiveAccounts}"
                   IsCheckable="True"
-                  IsChecked="{Binding ShowInactiveAccounts}" />
+                  IsChecked="{Binding Accounts.ShowInactiveAccounts}" />
               </ContextMenu>
             </DataGrid.ContextMenu>
           </DataGrid>

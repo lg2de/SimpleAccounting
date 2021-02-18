@@ -39,8 +39,6 @@ namespace lg2de.SimpleAccounting.Presentation
         private Task autoSaveTask = Task.CompletedTask;
         private CancellationTokenSource? cancellationTokenSource;
         private bool isBusy;
-        private AccountViewModel? selectedAccount;
-        private bool showInactiveAccounts;
 
         public ShellViewModel(
             IWindowManager windowManager,
@@ -65,20 +63,28 @@ namespace lg2de.SimpleAccounting.Presentation
             this.ProjectData = new ProjectData(this.windowManager, this.messageBox);
             this.FullJournal = new FullJournalViewModel(this.ProjectData);
             this.AccountJournal = new AccountJournalViewModel(this.ProjectData);
+            this.Accounts = new AccountsViewModel(this.windowManager, this.ProjectData);
 
             this.ProjectData.JournalChanged += (sender, args) =>
             {
                 this.FullJournal.Rebuild();
                 this.FullJournal.Select(args.ChangedBookingId);
 
-                if (this.SelectedAccount == null
-                    || !args.AffectedAccounts.Contains(this.SelectedAccount.Identifier))
+                if (this.Accounts.SelectedAccount == null
+                    || !args.AffectedAccounts.Contains(this.Accounts.SelectedAccount.Identifier))
                 {
                     return;
                 }
 
-                this.AccountJournal.Rebuild(this.SelectedAccount.Identifier);
+                this.AccountJournal.Rebuild(this.Accounts.SelectedAccount.Identifier);
                 this.AccountJournal.Select(args.ChangedBookingId);
+            };
+            this.Accounts.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(this.Accounts.SelectedAccount))
+                {
+                    this.AccountJournal.Rebuild(this.Accounts.SelectedAccount?.Identifier ?? 0);
+                }
             };
         }
 
@@ -88,39 +94,11 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<MenuViewModel> BookingYears { get; }
             = new ObservableCollection<MenuViewModel>();
 
-        // move to ProjectData
-        public List<AccountViewModel> AllAccounts { get; } = new List<AccountViewModel>();
-
-        // TODO introduce AccountsViewModel
-        public ObservableCollection<AccountViewModel> AccountList { get; }
-            = new ObservableCollection<AccountViewModel>();
-
         public FullJournalViewModel FullJournal { get; }
 
         public AccountJournalViewModel AccountJournal { get; }
-
-        // TODO move to AccountsViewModel
-        public AccountViewModel? SelectedAccount
-        {
-            get => this.selectedAccount;
-            set
-            {
-                this.selectedAccount = value;
-                this.NotifyOfPropertyChange();
-                this.RefreshAccountJournal();
-            }
-        }
-
-        // TODO move to AccountsViewModel
-        public bool ShowInactiveAccounts
-        {
-            get => this.showInactiveAccounts;
-            set
-            {
-                this.showInactiveAccounts = value;
-                this.RefreshAccountList();
-            }
-        }
+        
+        public AccountsViewModel Accounts { get; }
 
         public ICommand NewProjectCommand => new RelayCommand(
             _ =>
@@ -159,7 +137,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
         public ICommand AddBookingsCommand => new RelayCommand(
-            _ => this.ProjectData.ShowAddBookingDialog(this.ShowInactiveAccounts),
+            _ => this.ProjectData.ShowAddBookingDialog(this.Accounts.ShowInactiveAccounts),
             _ => !this.ProjectData.CurrentYear.Closed);
 
         public ICommand EditBookingCommand => new RelayCommand(
@@ -194,19 +172,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this, this.OnCheckForUpdateAsync);
 
-        public ICommand AccountSelectionCommand => new RelayCommand(
-            o =>
-            {
-                if (o is AccountViewModel account)
-                {
-                    this.SelectedAccount = account;
-                }
-            });
+        public ICommand NewAccountCommand => new RelayCommand(_ => this.Accounts.ShowNewAccountDialog());
 
-        // TODO move to AccountsViewModel
-        public ICommand NewAccountCommand => new RelayCommand(_ => this.OnNewAccount());
-
-        public ICommand EditAccountCommand => new RelayCommand(this.OnEditAccount);
+        public ICommand EditAccountCommand => new RelayCommand(this.Accounts.OnEditAccount);
 
         internal Settings Settings { get; set; } = Settings.Default;
 
@@ -369,25 +337,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.ProjectData.Storage = newData;
             this.UpdateBookingYears();
 
-            this.AllAccounts.Clear();
-            foreach (var accountGroup in this.ProjectData.Storage.Accounts)
-            {
-                foreach (var account in accountGroup.Account)
-                {
-                    var accountModel = new AccountViewModel
-                    {
-                        Identifier = account.ID,
-                        Name = account.Name,
-                        Group = accountGroup,
-                        Groups = this.ProjectData.Storage.Accounts!,
-                        Type = account.Type,
-                        IsActivated = account.Active
-                    };
-                    this.AllAccounts.Add(accountModel);
-                }
-            }
-
-            this.RefreshAccountList();
+            this.Accounts.LoadAccounts(this.ProjectData.Storage.Accounts);
 
             // select last booking year after loading
             this.BookingYears.LastOrDefault()?.Command.Execute(null);
@@ -542,103 +492,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void UpdateDisplayName()
         {
-            this.DisplayName = string.IsNullOrEmpty(this.ProjectData.FileName) || this.ProjectData.CurrentYear == null
+            this.DisplayName = string.IsNullOrEmpty(this.ProjectData.FileName)
                 ? $"SimpleAccounting {this.version}"
                 : $"SimpleAccounting {this.version} - {this.ProjectData.FileName} - {this.ProjectData.CurrentYear.Year}";
-        }
-
-        // TODO move to ProjectData or AccountsViewModel
-        private void OnNewAccount()
-        {
-            var accountVm = new AccountViewModel
-            {
-                DisplayName = Resources.Header_CreateAccount,
-                Group = this.ProjectData.Storage.Accounts.First(),
-                Groups = this.ProjectData.Storage.Accounts,
-                IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
-            };
-            var result = this.windowManager.ShowDialog(accountVm);
-            if (result != true)
-            {
-                return;
-            }
-
-            // update database
-            var newAccount = new AccountDefinition
-            {
-                ID = accountVm.Identifier,
-                Name = accountVm.Name,
-                Type = accountVm.Type,
-                Active = accountVm.IsActivated
-            };
-            accountVm.Group.Account.Add(newAccount);
-            accountVm.Group.Account = accountVm.Group.Account.OrderBy(x => x.ID).ToList();
-
-            // update view
-            this.AllAccounts.Add(accountVm);
-            this.RefreshAccountList();
-
-            this.ProjectData.IsModified = true;
-        }
-
-        // TODO move to ProjectData or AccountsViewModel
-        private void OnEditAccount(object commandParameter)
-        {
-            if (!(commandParameter is AccountViewModel account))
-            {
-                return;
-            }
-
-            var vm = account.Clone();
-            vm.DisplayName = Resources.Header_EditAccount;
-            var invalidIds = this.AllAccounts.Select(x => x.Identifier).Where(x => x != account.Identifier)
-                .ToList();
-            vm.IsValidIdentifierFunc = id => !invalidIds.Contains(id);
-            var result = this.windowManager.ShowDialog(vm);
-            if (result != true)
-            {
-                return;
-            }
-
-            // update database
-            var accountData = this.ProjectData.Storage.AllAccounts.Single(x => x.ID == account.Identifier);
-            accountData.Name = vm.Name;
-            accountData.Type = vm.Type;
-            accountData.Active = vm.IsActivated;
-            if (account.Identifier != vm.Identifier)
-            {
-                accountData.ID = vm.Identifier;
-                account.Group!.Account = account.Group.Account.OrderBy(x => x.ID).ToList();
-
-                this.ProjectData.Storage.Journal.ForEach(
-                    j => j.Booking?.ForEach(
-                        b =>
-                        {
-                            b.Credit.ForEach(c => UpdateAccount(c, account.Identifier, vm.Identifier));
-                            b.Debit.ForEach(d => UpdateAccount(d, account.Identifier, vm.Identifier));
-                        }));
-            }
-
-            // update view
-            account.Name = vm.Name;
-            account.Group = vm.Group;
-            account.Type = vm.Type;
-            account.Identifier = vm.Identifier;
-            account.IsActivated = vm.IsActivated;
-            this.RefreshAccountList();
-            account.Refresh();
-            this.FullJournal.Rebuild();
-            this.RefreshAccountJournal();
-
-            this.ProjectData.IsModified = true;
-
-            static void UpdateAccount(BookingValue entry, ulong oldIdentifier, ulong newIdentifier)
-            {
-                if (entry.Account == oldIdentifier)
-                {
-                    entry.Account = newIdentifier;
-                }
-            }
         }
 
         private void OnEditBooking(object commandParameter)
@@ -648,7 +504,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            this.ProjectData.ShowEditBookingDialog(journalViewModel.Identifier, this.ShowInactiveAccounts);
+            this.ProjectData.ShowEditBookingDialog(journalViewModel.Identifier, this.Accounts.ShowInactiveAccounts);
         }
 
         private void CloseYear()
@@ -677,25 +533,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.ProjectData.CurrentYear = this.ProjectData.Storage.Journal.Single(y => y.Year == newYearName);
             this.UpdateDisplayName();
             this.FullJournal.Rebuild();
-            var firstBooking = this.ProjectData.CurrentYear.Booking?.FirstOrDefault();
-            if (!this.AccountList.Any())
-            {
-                this.AccountJournal.Items.Clear();
-                return;
-            }
-
-            if (firstBooking != null)
-            {
-                var firstAccount = firstBooking
-                    .Credit.Select(x => x.Account)
-                    .Concat(firstBooking.Debit.Select(x => x.Account))
-                    .Min();
-                this.SelectedAccount = this.AccountList.Single(x => x.Identifier == firstAccount);
-            }
-            else
-            {
-                this.SelectedAccount = this.AccountList.First();
-            }
+            this.Accounts.SelectFirstAccount();
         }
 
         private void UpdateBookingYears()
@@ -708,30 +546,6 @@ namespace lg2de.SimpleAccounting.Presentation
                     new AsyncCommand(this, () => this.SelectBookingYear(year.Year)));
                 this.BookingYears.Add(menu);
             }
-        }
-
-        private void RefreshAccountList()
-        {
-            IEnumerable<AccountViewModel> accounts = this.AllAccounts;
-            if (!this.ShowInactiveAccounts)
-            {
-                accounts = accounts.Where(x => x.IsActivated);
-            }
-
-            var sorted = accounts.OrderBy(x => x.Identifier).ToList();
-
-            this.AccountList.Clear();
-            sorted.ForEach(this.AccountList.Add);
-        }
-
-        private void RefreshAccountJournal()
-        {
-            if (this.SelectedAccount == null)
-            {
-                return;
-            }
-
-            this.AccountJournal.Rebuild(this.SelectedAccount.Identifier);
         }
 
         private void OnTotalJournalReport()
