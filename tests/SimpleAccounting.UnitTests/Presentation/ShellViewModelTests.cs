@@ -144,8 +144,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
             var sut =
-                new ShellViewModel(windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
                 {
                     Settings = new Settings
                     {
@@ -423,8 +424,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
             var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi);
+                projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi);
             sut.ProjectData.Load(Samples.SampleProject);
             sut.ProjectData.IsModified = true;
 
@@ -586,8 +588,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut =
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
             {
                 Settings = new Settings { SecuredDrives = new StringCollection { "K:\\" } }
             };
@@ -816,8 +819,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut =
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
             {
                 Settings = new Settings()
             };
@@ -832,8 +836,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut =
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
             {
                 Settings = new Settings()
             };
@@ -848,8 +853,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut =
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
             {
                 Settings = new Settings()
             };
@@ -864,8 +870,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut =
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
             {
                 Settings = new Settings()
             };
@@ -880,8 +887,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut =
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
             {
                 Settings = new Settings()
             };
@@ -896,8 +904,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut =
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
             {
                 Settings = new Settings()
             };
@@ -912,8 +921,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut =
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
             {
                 Settings = new Settings()
             };
@@ -928,8 +938,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             messageBox = Substitute.For<IMessageBox>();
             fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi)
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut =
+                new ShellViewModel(projectData, windowManager, reportFactory, applicationUpdate, messageBox, processApi)
             {
                 Settings = new Settings()
             };

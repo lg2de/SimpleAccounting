@@ -29,7 +29,6 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class ShellViewModel : Conductor<IScreen>, IBusy, IDisposable
     {
         private readonly IApplicationUpdate applicationUpdate;
-        private readonly IFileSystem fileSystem;
         private readonly IMessageBox messageBox;
         private readonly IProcess processApi;
         private readonly IReportFactory reportFactory;
@@ -40,25 +39,24 @@ namespace lg2de.SimpleAccounting.Presentation
         private bool isBusy;
 
         public ShellViewModel(
+            IProjectData projectData,
             IWindowManager windowManager,
             IReportFactory reportFactory,
             IApplicationUpdate applicationUpdate,
             IMessageBox messageBox,
-            IFileSystem fileSystem,
             IProcess processApi)
         {
+            this.ProjectData = projectData;
             this.reportFactory = reportFactory;
             this.applicationUpdate = applicationUpdate;
             this.messageBox = messageBox;
-            this.fileSystem = fileSystem;
             this.processApi = processApi;
 
             this.version = this.GetType().Assembly
                                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                            ?? "UNKNOWN";
 
-            // TODO make ProjectData injectable
-            this.ProjectData = new ProjectData(windowManager, this.messageBox, this.fileSystem, this.processApi);
+            // TODO make injectable
             this.FullJournal = new FullJournalViewModel(this.ProjectData);
             this.AccountJournal = new AccountJournalViewModel(this.ProjectData);
             this.Accounts = new AccountsViewModel(windowManager, this.ProjectData);
@@ -184,7 +182,7 @@ namespace lg2de.SimpleAccounting.Presentation
         // TODO make injectable
         internal Settings Settings { get; set; } = Settings.Default;
 
-        internal ProjectData ProjectData { get; }
+        internal IProjectData ProjectData { get; }
 
         internal Task LoadingTask { get; private set; } = Task.CompletedTask;
 
@@ -222,11 +220,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            if (this.fileSystem.FileExists(this.ProjectData.AutoSaveFileName))
-            {
-                // remove auto backup
-                this.fileSystem.FileDelete(this.ProjectData.AutoSaveFileName);
-            }
+            this.ProjectData.RemoveAutoSaveFile();
 
             base.CanClose(callback);
         }

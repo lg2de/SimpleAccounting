@@ -16,13 +16,13 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class AccountsViewModel : Screen
     {
         private readonly IList<AccountViewModel> allAccounts = new List<AccountViewModel>();
-        private readonly ProjectData projectData;
+        private readonly IProjectData projectData;
         private readonly IWindowManager windowManager;
 
         private AccountViewModel? selectedAccount;
         private bool showInactiveAccounts;
 
-        public AccountsViewModel(IWindowManager windowManager, ProjectData projectData)
+        public AccountsViewModel(IWindowManager windowManager, IProjectData projectData)
         {
             this.windowManager = windowManager;
             this.projectData = projectData;

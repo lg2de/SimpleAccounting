@@ -33,7 +33,7 @@ namespace lg2de.SimpleAccounting.Reports
         private long overallTotalDebit;
 
         public TotalsAndBalancesReport(
-            ProjectData projectData,
+            IProjectData projectData,
             IEnumerable<AccountingDataAccountGroup> accountGroups)
             : base(ResourceName, projectData)
         {

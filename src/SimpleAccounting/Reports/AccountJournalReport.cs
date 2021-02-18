@@ -22,7 +22,7 @@ namespace lg2de.SimpleAccounting.Reports
         private double debitTotal;
         private bool firstAccount;
 
-        public AccountJournalReport(ProjectData projectData)
+        public AccountJournalReport(IProjectData projectData)
             : base(ResourceName, projectData)
         {
             this.accounts = projectData.Storage.AllAccounts.OrderBy(a => a.ID);

@@ -16,7 +16,7 @@ namespace lg2de.SimpleAccounting.Reports
         protected const int TitleSize = 10;
         private readonly AccountingDataSetup setup;
 
-        protected ReportBase(string resourceName, ProjectData projectData)
+        protected ReportBase(string resourceName, IProjectData projectData)
         {
             this.setup = projectData.Storage.Setup;
             this.YearData = projectData.CurrentYear;

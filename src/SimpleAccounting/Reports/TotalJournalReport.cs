@@ -14,7 +14,7 @@ namespace lg2de.SimpleAccounting.Reports
     {
         public const string ResourceName = "TotalJournal.xml";
 
-        public TotalJournalReport(ProjectData projectData)
+        public TotalJournalReport(IProjectData projectData)
             : base(ResourceName, projectData)
         {
         }

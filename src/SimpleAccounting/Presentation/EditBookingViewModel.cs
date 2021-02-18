@@ -17,13 +17,13 @@ namespace lg2de.SimpleAccounting.Presentation
 
     internal class EditBookingViewModel : Screen
     {
-        private readonly ProjectData projectData;
+        private readonly IProjectData projectData;
 
         private ulong creditAccount;
         private ulong debitAccount;
         private BookingTemplate? selectedTemplate;
 
-        public EditBookingViewModel(ProjectData projectData, DateTime date, bool editMode = false)
+        public EditBookingViewModel(IProjectData projectData, DateTime date, bool editMode = false)
         {
             this.projectData = projectData;
             this.Date = date;

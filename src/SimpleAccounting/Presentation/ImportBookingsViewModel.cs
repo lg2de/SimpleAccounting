@@ -28,7 +28,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ImportBookingsViewModel(
             IMessageBox messageBox,
-            ProjectData projectData)
+            IProjectData projectData)
         {
             this.messageBox = messageBox;
             this.ProjectData = projectData;
@@ -154,7 +154,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.ProcessData(),
             _ => this.LoadedData.Any(x => x.RemoteAccount != null));
 
-        protected ProjectData ProjectData { get; }
+        protected IProjectData ProjectData { get; }
 
         private ulong FirstBookingNumber { get; }
 

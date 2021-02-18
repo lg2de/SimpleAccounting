@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    using System;
     using System.Collections.ObjectModel;
     using System.Linq;
     using Caliburn.Micro;
@@ -13,10 +12,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
     internal class FullJournalViewModel : Screen
     {
-        private readonly ProjectData projectData;
+        private readonly IProjectData projectData;
         private FullJournalItemViewModel? selectedItem;
 
-        public FullJournalViewModel(ProjectData projectData)
+        public FullJournalViewModel(IProjectData projectData)
         {
             this.projectData = projectData;
         }

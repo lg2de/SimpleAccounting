@@ -13,10 +13,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
     internal class AccountJournalViewModel : Screen
     {
-        private readonly ProjectData projectData;
+        private readonly IProjectData projectData;
         private AccountJournalItemViewModel? selectedItem;
 
-        public AccountJournalViewModel(ProjectData projectData)
+        public AccountJournalViewModel(IProjectData projectData)
         {
             this.projectData = projectData;
         }

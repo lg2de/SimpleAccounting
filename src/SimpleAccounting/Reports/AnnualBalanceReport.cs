@@ -21,7 +21,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         private readonly List<AccountDefinition> allAccounts;
 
-        public AnnualBalanceReport(ProjectData projectData)
+        public AnnualBalanceReport(IProjectData projectData)
             : base(ResourceName, projectData)
         {
             this.allAccounts = projectData.Storage.AllAccounts.ToList();

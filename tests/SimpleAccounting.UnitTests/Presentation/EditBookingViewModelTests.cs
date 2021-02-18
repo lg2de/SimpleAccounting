@@ -11,10 +11,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using FluentAssertions;
     using FluentAssertions.Execution;
     using lg2de.SimpleAccounting.Abstractions;
-    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
-    using lg2de.SimpleAccounting.Reports;
     using NSubstitute;
     using Xunit;
 
@@ -66,15 +64,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AddCommand_FirstBooking_BookingNumberIncremented()
         {
             var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var messageBox = Substitute.For<IMessageBox>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var parent = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi);
-            parent.ProjectData.Load(Samples.SampleProject);
-            var sut = new EditBookingViewModel(parent.ProjectData, YearBegin);
+            var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin);
 
             var oldNumber = sut.BookingIdentifier;
             sut.CreditAccount = 100;

@@ -146,14 +146,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ProcessData_SampleData_DataConvertedIntoJournal()
         {
-            var parent = new ShellViewModel(null!, null!, null!, null!, null!, null!);
-            var project = Samples.SampleProject;
-            parent.ProjectData.Load(project);
-            var accounts = project.AllAccounts.ToList();
+            var projectData = Samples.SampleProjectData;
+            var parent = new ShellViewModel(projectData, null!, null!, null!, null!, null!);
+            var accounts = projectData.Storage.AllAccounts.ToList();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
             var sut = new ImportBookingsViewModel(
                 null!,
-                parent.ProjectData) { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
+                projectData) { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
             var remoteAccount = accounts.Single(x => x.ID == 600);
             int year = DateTime.Today.Year;
             sut.StartDate = new DateTime(year, 1, 2);

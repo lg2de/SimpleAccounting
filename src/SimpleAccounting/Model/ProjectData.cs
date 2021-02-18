@@ -24,7 +24,7 @@ namespace lg2de.SimpleAccounting.Model
     ///     It contains the persistent data according to <see cref="AccountingData" />
     ///     as well as the current state of the project.
     /// </remarks>
-    internal class ProjectData
+    internal class ProjectData : IProjectData
     {
         private readonly IWindowManager windowManager;
         private readonly IMessageBox messageBox;
@@ -60,11 +60,11 @@ namespace lg2de.SimpleAccounting.Model
 
         public bool IsModified { get; set; } // TODO setter should be internal
 
-        internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
-        
-        internal string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
-        
-        internal ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
+        public TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
+
+        public string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
+
+        public ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
 
         public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
 
@@ -177,6 +177,14 @@ namespace lg2de.SimpleAccounting.Model
             catch (OperationCanceledException)
             {
                 // expected behavior
+            }
+        }
+
+        public void RemoveAutoSaveFile()
+        {
+            if (this.fileSystem.FileExists(this.AutoSaveFileName))
+            {
+                this.fileSystem.FileDelete(this.AutoSaveFileName);
             }
         }
 
