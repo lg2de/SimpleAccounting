@@ -22,7 +22,6 @@ namespace lg2de.SimpleAccounting.Presentation
     {
         private readonly List<AccountDefinition> accounts;
         private readonly IMessageBox messageBox;
-        private readonly ProjectData projectData;
         private bool isBusy;
         private ulong selectedAccountNumber;
         private DateTime startDate;
@@ -32,12 +31,12 @@ namespace lg2de.SimpleAccounting.Presentation
             ProjectData projectData)
         {
             this.messageBox = messageBox;
-            this.projectData = projectData;
+            this.ProjectData = projectData;
             this.accounts = projectData.Storage.AllAccounts.ToList();
             this.FirstBookingNumber = projectData.MaxBookIdent + 1;
 
-            this.RangeMin = this.projectData.CurrentYear.DateStart.ToDateTime();
-            this.RangeMax = this.projectData.CurrentYear.DateEnd.ToDateTime();
+            this.RangeMin = this.ProjectData.CurrentYear.DateStart.ToDateTime();
+            this.RangeMax = this.ProjectData.CurrentYear.DateEnd.ToDateTime();
             this.StartDate = this.RangeMin;
 
             // ReSharper disable once VirtualMemberCallInConstructor
@@ -56,8 +55,6 @@ namespace lg2de.SimpleAccounting.Presentation
         public DateTime RangeMin { get; }
 
         public DateTime RangeMax { get; }
-
-        private ulong FirstBookingNumber { get; }
 
         public ulong SelectedAccountNumber
         {
@@ -157,6 +154,10 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.ProcessData(),
             _ => this.LoadedData.Any(x => x.RemoteAccount != null));
 
+        protected ProjectData ProjectData { get; }
+
+        private ulong FirstBookingNumber { get; }
+
         protected void UpdateIdentifierInLoadedData()
         {
             var bookingNumber = this.FirstBookingNumber;
@@ -170,7 +171,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.ExistingData.Clear();
             this.ExistingData.AddRange(
-                this.projectData.CurrentYear.Booking
+                this.ProjectData.CurrentYear.Booking
                     .Where(
                         x => x.Credit.Any(c => c.Account == this.selectedAccountNumber)
                              || x.Debit.Any(d => d.Account == this.selectedAccountNumber))
@@ -313,7 +314,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 newBooking.Credit = new List<BookingValue> { creditValue };
                 newBooking.Debit = new List<BookingValue> { debitValue };
-                this.projectData.AddBooking(newBooking);
+                this.ProjectData.AddBooking(newBooking);
             }
 
             this.TryClose();

@@ -17,7 +17,7 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class EditBookingDesignViewModel : EditBookingViewModel
     {
         public EditBookingDesignViewModel()
-            : base(new ProjectData(null!, null!), DateTime.Now, editMode: false)
+            : base(new ProjectData(null!, null!, null!, null!), DateTime.Now, editMode: false)
         {
             this.BookingIdentifier = 42;
             this.BookingText = "shoes";

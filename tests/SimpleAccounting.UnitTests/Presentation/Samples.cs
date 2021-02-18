@@ -12,9 +12,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using lg2de.SimpleAccounting.Model;
     using NSubstitute;
 
-    internal class Samples
+    internal static class Samples
     {
-        public static uint BaseDate = (uint)DateTime.Now.Year * 10000;
+        public static readonly uint BaseDate = (uint)DateTime.Now.Year * 10000;
 
         public static AccountingData SampleProject
         {
@@ -129,7 +129,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             {
                 var windowManager = Substitute.For<IWindowManager>();
                 var messageBox = Substitute.For<IMessageBox>();
-                return new ProjectData(windowManager, messageBox) { Storage = SampleProject };
+                var fileSystem = Substitute.For<IFileSystem>();
+                var processApi = Substitute.For<IProcess>();
+                var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+                projectData.Load(SampleProject);
+                return projectData;
             }
         }
 

@@ -6,10 +6,15 @@ namespace lg2de.SimpleAccounting.Model
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Forms;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Presentation;
+    using lg2de.SimpleAccounting.Properties;
 
     /// <summary>
     ///     Implements the storage for all data of the current project.
@@ -20,14 +25,18 @@ namespace lg2de.SimpleAccounting.Model
     /// </remarks>
     internal class ProjectData
     {
-        private readonly IMessageBox messageBox;
         private readonly IWindowManager windowManager;
+        private readonly IMessageBox messageBox;
+        private readonly IFileSystem fileSystem;
+        private readonly IProcess processApi;
         private AccountingData storage;
 
-        public ProjectData(IWindowManager windowManager, IMessageBox messageBox)
+        public ProjectData(IWindowManager windowManager, IMessageBox messageBox, IFileSystem fileSystem, IProcess processApi)
         {
             this.windowManager = windowManager;
             this.messageBox = messageBox;
+            this.fileSystem = fileSystem;
+            this.processApi = processApi;
 
             this.storage = new AccountingData();
             this.CurrentYear = this.storage.Journal.SafeGetLatest();
@@ -38,10 +47,11 @@ namespace lg2de.SimpleAccounting.Model
         public AccountingData Storage
         {
             get => this.storage;
-            set
+            private set
             {
                 this.storage = value;
                 this.CurrentYear = this.Storage.Journal.SafeGetLatest();
+                Execute.OnUIThread(() => this.DataLoaded(this, EventArgs.Empty));
             }
         }
 
@@ -49,10 +59,103 @@ namespace lg2de.SimpleAccounting.Model
 
         public bool IsModified { get; set; }
 
+        internal string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
+        
         internal ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
 
         public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
 
+        public event EventHandler DataLoaded = (_, __) => { };
+
+        public void Load(AccountingData accountingData)
+        {
+            this.Storage = accountingData;
+        }
+        
+        internal async Task<OperationResult> LoadFromFileAsync(string projectFileName, Settings settings)
+        {
+            if (!this.CheckSaveProject())
+            {
+                return OperationResult.Aborted;
+            }
+
+            this.IsModified = false;
+
+            var loader = new ProjectFileLoader(this.messageBox, this.fileSystem, this.processApi, settings);
+            var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName));
+            if (loadResult != OperationResult.Completed)
+            {
+                return loadResult;
+            }
+
+            this.FileName = projectFileName;
+            this.Storage = loader.ProjectData;
+            this.IsModified = loader.Migrated;
+
+            return OperationResult.Completed;
+        }
+        
+        
+        internal bool CheckSaveProject()
+        {
+            if (!this.IsModified)
+            {
+                // no need to save the project
+                return true;
+            }
+
+            var result = this.messageBox.Show(
+                Resources.Question_SaveBeforeProceed,
+                Resources.Header_Shutdown,
+                MessageBoxButton.YesNoCancel);
+            if (result == MessageBoxResult.Cancel)
+            {
+                return false;
+            }
+
+            if (result == MessageBoxResult.Yes)
+            {
+                this.SaveProject();
+                return true;
+            }
+
+            // TODO Not saving but continue cannot work correctly this way!?
+            return result == MessageBoxResult.No;
+        }
+        
+        internal void SaveProject()
+        {
+            if (this.FileName == "<new>")
+            {
+                using var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = Resources.FileFilter_MainProject, RestoreDirectory = true
+                };
+
+                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                this.FileName = saveFileDialog.FileName;
+            }
+
+            DateTime fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
+            string backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
+            if (this.fileSystem.FileExists(this.FileName))
+            {
+                this.fileSystem.FileMove(this.FileName, backupFileName);
+            }
+
+            this.fileSystem.WriteAllTextIntoFile(this.FileName, this.Storage.Serialize());
+            this.IsModified = false;
+
+            if (this.fileSystem.FileExists(this.AutoSaveFileName))
+            {
+                this.fileSystem.FileDelete(this.AutoSaveFileName);
+            }
+        }
+        
         public void AddBooking(AccountingDataJournalBooking booking)
         {
             this.CurrentYear.Booking.Add(booking);
@@ -82,8 +185,7 @@ namespace lg2de.SimpleAccounting.Model
 
         public void ShowEditBookingDialog(ulong bookingId, bool showInactiveAccounts)
         {
-            var journalIndex =
-                this.CurrentYear.Booking.FindIndex(x => { return x.ID == bookingId; });
+            var journalIndex = this.CurrentYear.Booking.FindIndex(x => x.ID == bookingId);
             if (journalIndex < 0)
             {
                 // summary item selected => ignore

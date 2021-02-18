@@ -26,6 +26,11 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.windowManager = windowManager;
             this.projectData = projectData;
+
+            this.projectData.DataLoaded += (_, __) =>
+            {
+                this.LoadAccounts(this.projectData.Storage.Accounts);
+            };
         }
 
         public IEnumerable<AccountViewModel> AllAccounts => this.allAccounts;

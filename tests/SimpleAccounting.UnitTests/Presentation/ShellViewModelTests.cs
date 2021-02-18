@@ -50,7 +50,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             ((IActivate)sut).Activate();
             sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
-            sut.LoadProjectData(new AccountingData());
+            sut.ProjectData.Load(new AccountingData());
             sut.ProjectData.IsModified = true;
             await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
 
@@ -184,7 +184,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut();
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            sut.LoadProjectData(project);
+            sut.ProjectData.Load(project);
 
             ((IActivate)sut).Activate();
 
@@ -302,7 +302,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AddBooking_FirstBooking_JournalsUpdated()
         {
             var sut = CreateSut();
-            sut.LoadProjectData(Samples.SampleProject);
+            sut.ProjectData.Load(Samples.SampleProject);
             var booking = new AccountingDataJournalBooking
             {
                 Date = Samples.BaseDate + 401,
@@ -348,7 +348,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AddBooking_BookingWithoutCurrentAccount_AccountJournalUnchanged()
         {
             var sut = CreateSut();
-            sut.LoadProjectData(Samples.SampleProject);
+            sut.ProjectData.Load(Samples.SampleProject);
             var booking = new AccountingDataJournalBooking
             {
                 Date = Samples.BaseDate + 401,
@@ -377,9 +377,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
-            sut.LoadProjectData(Samples.SampleProject);
+            sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.CheckSaveProject().Should().BeTrue();
+            sut.ProjectData.CheckSaveProject().Should().BeTrue();
 
             messageBox.Received(1).Show(
                 Arg.Any<string>(), Arg.Any<string>(),
@@ -398,9 +398,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
-            sut.LoadProjectData(Samples.SampleProject);
+            sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.CheckSaveProject().Should().BeTrue();
+            sut.ProjectData.CheckSaveProject().Should().BeTrue();
 
             messageBox.Received(1).Show(
                 Arg.Any<string>(), Arg.Any<string>(),
@@ -425,10 +425,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Returns(MessageBoxResult.Cancel);
             var sut = new ShellViewModel(
                 windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi);
-            sut.LoadProjectData(Samples.SampleProject);
+            sut.ProjectData.Load(Samples.SampleProject);
             sut.ProjectData.IsModified = true;
 
-            sut.CheckSaveProject().Should().BeFalse();
+            sut.ProjectData.CheckSaveProject().Should().BeFalse();
 
             messageBox.Received(1).Show(
                 Arg.Any<string>(), Arg.Any<string>(),
@@ -442,7 +442,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IMessageBox messageBox);
 
-            sut.CheckSaveProject().Should().BeTrue();
+            sut.ProjectData.CheckSaveProject().Should().BeTrue();
 
             messageBox.DidNotReceive().Show(
                 Arg.Any<string>(), Arg.Any<string>(),
@@ -487,7 +487,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -512,7 +512,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.FileExists("the.fileName~").Returns(true);
 
-            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -537,7 +537,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.FileExists("the.fileName~").Returns(true);
 
-            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -564,7 +564,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     return new[] { (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2) };
                 });
 
-            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("K:\\the.fileName")).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("K:\\the.fileName", sut.Settings)).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -614,7 +614,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             processApi.When(x => x.BringProcessToFront(Arg.Any<Process>())).Do(info => securedFileAvailable = true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("K:\\the.fileName")).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("K:\\the.fileName", sut.Settings)).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -641,7 +641,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -660,7 +660,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 
-            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -681,7 +681,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
             fileSystem.FileExists("new.fileName").Returns(true);
 
-            (await sut.Awaiting(x => x.LoadProjectFromFileAsync("the.fileName")).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Aborted);
 
@@ -698,10 +698,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
             var fileName = "project.name";
             fileSystem.FileExists(fileName + "~").Returns(true);
-            sut.LoadProjectData(Samples.SampleProject);
+            sut.ProjectData.Load(Samples.SampleProject);
             sut.ProjectData.FileName = fileName;
 
-            sut.SaveProject();
+            sut.ProjectData.SaveProject();
 
             fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
             fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());
@@ -713,9 +713,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IFileSystem fileSystem);
             fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
-            sut.LoadProjectData(Samples.SampleProject);
+            sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.SaveProject();
+            sut.ProjectData.SaveProject();
 
             fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
             fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
@@ -729,10 +729,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
             var fileName = "project.name";
             fileSystem.FileExists(fileName).Returns(true);
-            sut.LoadProjectData(Samples.SampleProject);
+            sut.ProjectData.Load(Samples.SampleProject);
             sut.ProjectData.FileName = fileName;
 
-            sut.SaveProject();
+            sut.ProjectData.SaveProject();
 
             fileSystem.Received(1).FileMove(fileName, fileName + ".20200229184556");
             fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());
@@ -745,7 +745,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut();
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            sut.LoadProjectData(project);
+            sut.ProjectData.Load(project);
 
             sut.Accounts.ShowInactiveAccounts = true;
 
@@ -790,14 +790,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void CanClose_AutoSaveFileExists_FileRemoved()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            fileSystem.FileExists(sut.AutoSaveFileName).Returns(true);
+            fileSystem.FileExists(sut.ProjectData.AutoSaveFileName).Returns(true);
             bool? invokedWith = null;
             void Callback(bool value) => invokedWith = value;
 
             sut.CanClose(Callback);
 
             invokedWith.Should().BeTrue();
-            fileSystem.Received(1).FileDelete(sut.AutoSaveFileName);
+            fileSystem.Received(1).FileDelete(sut.ProjectData.AutoSaveFileName);
         }
 
         [Fact]

@@ -60,12 +60,19 @@ namespace lg2de.SimpleAccounting.Presentation
                            ?? "UNKNOWN";
 
             // TODO make ProjectData injectable
-            this.ProjectData = new ProjectData(this.windowManager, this.messageBox);
+            this.ProjectData = new ProjectData(this.windowManager, this.messageBox, this.fileSystem, this.processApi);
             this.FullJournal = new FullJournalViewModel(this.ProjectData);
             this.AccountJournal = new AccountJournalViewModel(this.ProjectData);
             this.Accounts = new AccountsViewModel(this.windowManager, this.ProjectData);
 
-            this.ProjectData.JournalChanged += (sender, args) =>
+            this.ProjectData.DataLoaded += (_, __) =>
+            {
+                this.UpdateBookingYears();
+
+                // select last booking year after loading
+                this.BookingYears.LastOrDefault()?.Command.Execute(null);
+            };
+            this.ProjectData.JournalChanged += (_, args) =>
             {
                 this.FullJournal.Rebuild();
                 this.FullJournal.Select(args.ChangedBookingId);
@@ -103,19 +110,19 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand NewProjectCommand => new RelayCommand(
             _ =>
             {
-                if (!this.CheckSaveProject())
+                if (!this.ProjectData.CheckSaveProject())
                 {
                     return;
                 }
 
                 this.ProjectData.FileName = "<new>";
-                this.LoadProjectData(AccountingData.GetTemplateProject());
+                this.ProjectData.Load(AccountingData.GetTemplateProject());
             });
 
         public ICommand OpenProjectCommand => new RelayCommand(_ => this.OnOpenProject());
 
         public ICommand SaveProjectCommand => new RelayCommand(
-            _ => this.SaveProject(), _ => this.ProjectData.IsModified);
+            _ => this.ProjectData.SaveProject(), _ => this.ProjectData.IsModified);
 
         public ICommand SwitchCultureCommand => new RelayCommand(
             cultureName =>
@@ -176,6 +183,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand EditAccountCommand => new RelayCommand(this.Accounts.OnEditAccount);
 
+        // TODO make injectable
         internal Settings Settings { get; set; } = Settings.Default;
 
         internal ProjectData ProjectData { get; }
@@ -183,8 +191,6 @@ namespace lg2de.SimpleAccounting.Presentation
         internal Task LoadingTask { get; private set; } = Task.CompletedTask;
 
         internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
-
-        internal string AutoSaveFileName => Defines.GetAutoSaveFileName(this.ProjectData.FileName);
 
         public bool IsBusy
         {
@@ -214,16 +220,16 @@ namespace lg2de.SimpleAccounting.Presentation
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            if (!this.CheckSaveProject())
+            if (!this.ProjectData.CheckSaveProject())
             {
                 callback(false);
                 return;
             }
 
-            if (this.fileSystem.FileExists(this.AutoSaveFileName))
+            if (this.fileSystem.FileExists(this.ProjectData.AutoSaveFileName))
             {
                 // remove auto backup
-                this.fileSystem.FileDelete(this.AutoSaveFileName);
+                this.fileSystem.FileDelete(this.ProjectData.AutoSaveFileName);
             }
 
             base.CanClose(callback);
@@ -255,7 +261,7 @@ namespace lg2de.SimpleAccounting.Presentation
                             async () =>
                             {
                                 this.IsBusy = true;
-                                await this.LoadProjectFromFileAsync(this.Settings.RecentProject);
+                                await this.ProjectData.LoadFromFileAsync(this.Settings.RecentProject, this.Settings);
                                 this.BuildRecentProjectsMenu();
                                 this.IsBusy = false;
                             });
@@ -302,107 +308,9 @@ namespace lg2de.SimpleAccounting.Presentation
             Task.Run(
                 async () =>
                 {
-                    await this.LoadProjectFromFileAsync(fileName);
+                    await this.ProjectData.LoadFromFileAsync(fileName, this.Settings);
                     await Execute.OnUIThreadAsync(() => this.IsBusy = false);
                 });
-        }
-
-        // TODO move to ProjectData
-        internal async Task<OperationResult> LoadProjectFromFileAsync(string projectFileName)
-        {
-            if (!this.CheckSaveProject())
-            {
-                return OperationResult.Aborted;
-            }
-
-            this.ProjectData.IsModified = false;
-
-            var loader = new ProjectFileLoader(this.messageBox, this.fileSystem, this.processApi, this.Settings);
-            var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName));
-            if (loadResult != OperationResult.Completed)
-            {
-                return loadResult;
-            }
-
-            this.ProjectData.FileName = projectFileName;
-            this.LoadProjectData(loader.ProjectData);
-            this.ProjectData.IsModified = loader.Migrated;
-
-            return OperationResult.Completed;
-        }
-
-        // TODO move to ProjectData
-        internal void LoadProjectData(AccountingData newData)
-        {
-            this.ProjectData.Storage = newData;
-            this.UpdateBookingYears();
-
-            this.Accounts.LoadAccounts(this.ProjectData.Storage.Accounts);
-
-            // select last booking year after loading
-            this.BookingYears.LastOrDefault()?.Command.Execute(null);
-        }
-
-        // TODO move to ProjectData
-        internal bool CheckSaveProject()
-        {
-            if (!this.ProjectData.IsModified)
-            {
-                // no need to save the project
-                return true;
-            }
-
-            var result = this.messageBox.Show(
-                Resources.Question_SaveBeforeProceed,
-                Resources.Header_Shutdown,
-                MessageBoxButton.YesNoCancel);
-            if (result == MessageBoxResult.Cancel)
-            {
-                return false;
-            }
-
-            if (result == MessageBoxResult.Yes)
-            {
-                this.SaveProject();
-                return true;
-            }
-
-            // TODO Not saving but continue cannot work correctly this way!?
-            return result == MessageBoxResult.No;
-        }
-
-        // TODO move to ProjectData
-        internal void SaveProject()
-        {
-            if (this.ProjectData.FileName == "<new>")
-            {
-                using var saveFileDialog = new SaveFileDialog
-                {
-                    Filter = Resources.FileFilter_MainProject, RestoreDirectory = true
-                };
-
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-
-                this.ProjectData.FileName = saveFileDialog.FileName;
-            }
-
-            DateTime fileDate = this.fileSystem.GetLastWriteTime(this.ProjectData.FileName);
-            string backupFileName = $"{this.ProjectData.FileName}.{fileDate:yyyyMMddHHmmss}";
-            if (this.fileSystem.FileExists(this.ProjectData.FileName))
-            {
-                this.fileSystem.FileMove(this.ProjectData.FileName, backupFileName);
-            }
-
-            this.fileSystem.WriteAllTextIntoFile(this.ProjectData.FileName, this.ProjectData.Storage.Serialize());
-            this.ProjectData.IsModified = false;
-
-            if (this.fileSystem.FileExists(this.AutoSaveFileName))
-            {
-                this.fileSystem.FileDelete(this.AutoSaveFileName);
-            }
         }
 
         private async Task OnCheckForUpdateAsync()
@@ -412,7 +320,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            if (!this.CheckSaveProject())
+            if (!this.ProjectData.CheckSaveProject())
             {
                 return;
             }
@@ -456,7 +364,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private async Task OnLoadRecentProjectAsync(string project)
         {
-            var loadResult = await this.LoadProjectFromFileAsync(project);
+            var loadResult = await this.ProjectData.LoadFromFileAsync(project, this.Settings);
             if (loadResult != OperationResult.Failed)
             {
                 return;
@@ -469,6 +377,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.Settings.RecentProjects.Remove(project);
         }
 
+        // TODO move to ProjectData
         private async Task AutoSaveAsync()
         {
             try
@@ -481,7 +390,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         continue;
                     }
 
-                    this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.ProjectData.Storage.Serialize());
+                    this.fileSystem.WriteAllTextIntoFile(this.ProjectData.AutoSaveFileName, this.ProjectData.Storage.Serialize());
                 }
             }
             catch (OperationCanceledException)
@@ -507,6 +416,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.ProjectData.ShowEditBookingDialog(journalViewModel.Identifier, this.Accounts.ShowInactiveAccounts);
         }
 
+        // TODO move to ProjectData
         private void CloseYear()
         {
             var viewModel = new CloseYearViewModel(this.ProjectData.CurrentYear);
