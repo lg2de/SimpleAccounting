@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Model
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
@@ -57,8 +58,10 @@ namespace lg2de.SimpleAccounting.Model
 
         public AccountingDataJournal CurrentYear { get; set; }
 
-        public bool IsModified { get; set; }
+        public bool IsModified { get; set; } // TODO setter should be internal
 
+        internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
+        
         internal string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
         
         internal ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
@@ -72,7 +75,7 @@ namespace lg2de.SimpleAccounting.Model
             this.Storage = accountingData;
         }
         
-        internal async Task<OperationResult> LoadFromFileAsync(string projectFileName, Settings settings)
+        public async Task<OperationResult> LoadFromFileAsync(string projectFileName, Settings settings)
         {
             if (!this.CheckSaveProject())
             {
@@ -96,7 +99,7 @@ namespace lg2de.SimpleAccounting.Model
         }
         
         
-        internal bool CheckSaveProject()
+        public bool CheckSaveProject()
         {
             if (!this.IsModified)
             {
@@ -123,7 +126,7 @@ namespace lg2de.SimpleAccounting.Model
             return result == MessageBoxResult.No;
         }
         
-        internal void SaveProject()
+        public void SaveProject()
         {
             if (this.FileName == "<new>")
             {
@@ -156,6 +159,27 @@ namespace lg2de.SimpleAccounting.Model
             }
         }
         
+        public async Task AutoSaveAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                while (true)
+                {
+                    await Task.Delay(this.AutoSaveInterval, cancellationToken);
+                    if (!this.IsModified)
+                    {
+                        continue;
+                    }
+
+                    this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.Storage.Serialize());
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // expected behavior
+            }
+        }
+
         public void AddBooking(AccountingDataJournalBooking booking)
         {
             this.CurrentYear.Booking.Add(booking);
@@ -251,6 +275,24 @@ namespace lg2de.SimpleAccounting.Model
         {
             var importModel = new ImportBookingsViewModel(this.messageBox, this);
             this.windowManager.ShowDialog(importModel);
+        }
+        
+        public bool CloseYear()
+        {
+            var viewModel = new CloseYearViewModel(this.CurrentYear);
+            this.Storage.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward)
+                .ToList().ForEach(viewModel.Accounts.Add);
+
+            var result = this.windowManager.ShowDialog(viewModel);
+            if (result != true || viewModel.RemoteAccount == null)
+            {
+                return false;
+            }
+
+            this.Storage.CloseYear(this.CurrentYear, viewModel.RemoteAccount);
+
+            this.IsModified = true;
+            return true;
         }
 
         public void TriggerJournalChanged()

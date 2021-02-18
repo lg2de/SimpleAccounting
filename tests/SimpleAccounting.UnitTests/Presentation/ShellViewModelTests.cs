@@ -41,7 +41,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task OnActivate_NewProject_ProjectLoadedAndAutoSaveActive()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            sut.AutoSaveInterval = 100.Milliseconds();
+            sut.ProjectData.AutoSaveInterval = 100.Milliseconds();
             sut.ProjectData.FileName = "new.project";
             var fileSaved = new TaskCompletionSource<bool>();
             fileSystem
@@ -63,7 +63,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task OnActivate_RecentProject_ProjectLoadedAndModifiedProjectAutoSaved()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            sut.AutoSaveInterval = 100.Milliseconds();
+            sut.ProjectData.AutoSaveInterval = 100.Milliseconds();
             sut.Settings.RecentProject = "recent.project";
             var sample = new AccountingData
             {
@@ -103,7 +103,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task OnActivate_RecentProject_ProjectLoadedAndUnmodifiedProjectNotAutoSaved()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            sut.AutoSaveInterval = 10.Milliseconds();
+            sut.ProjectData.AutoSaveInterval = 10.Milliseconds();
             sut.Settings.RecentProject = "recent.project";
             var sample = new AccountingData
             {

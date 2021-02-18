@@ -34,7 +34,6 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly IProcess processApi;
         private readonly IReportFactory reportFactory;
         private readonly string version;
-        private readonly IWindowManager windowManager;
 
         private Task autoSaveTask = Task.CompletedTask;
         private CancellationTokenSource? cancellationTokenSource;
@@ -48,7 +47,6 @@ namespace lg2de.SimpleAccounting.Presentation
             IFileSystem fileSystem,
             IProcess processApi)
         {
-            this.windowManager = windowManager;
             this.reportFactory = reportFactory;
             this.applicationUpdate = applicationUpdate;
             this.messageBox = messageBox;
@@ -60,10 +58,10 @@ namespace lg2de.SimpleAccounting.Presentation
                            ?? "UNKNOWN";
 
             // TODO make ProjectData injectable
-            this.ProjectData = new ProjectData(this.windowManager, this.messageBox, this.fileSystem, this.processApi);
+            this.ProjectData = new ProjectData(windowManager, this.messageBox, this.fileSystem, this.processApi);
             this.FullJournal = new FullJournalViewModel(this.ProjectData);
             this.AccountJournal = new AccountJournalViewModel(this.ProjectData);
-            this.Accounts = new AccountsViewModel(this.windowManager, this.ProjectData);
+            this.Accounts = new AccountsViewModel(windowManager, this.ProjectData);
 
             this.ProjectData.DataLoaded += (_, __) =>
             {
@@ -154,7 +152,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.ProjectData.ShowImportDialog(), _ => !this.ProjectData.CurrentYear.Closed);
 
         public ICommand CloseYearCommand => new RelayCommand(
-            _ => this.CloseYear(), _ => !this.ProjectData.CurrentYear.Closed);
+            this.OnCloseYear, _ => !this.ProjectData.CurrentYear.Closed);
 
         public ICommand TotalJournalReportCommand => new RelayCommand(
             _ => this.OnTotalJournalReport(), _ => this.FullJournal.Items.Any());
@@ -189,8 +187,6 @@ namespace lg2de.SimpleAccounting.Presentation
         internal ProjectData ProjectData { get; }
 
         internal Task LoadingTask { get; private set; } = Task.CompletedTask;
-
-        internal TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
 
         public bool IsBusy
         {
@@ -265,13 +261,13 @@ namespace lg2de.SimpleAccounting.Presentation
                                 this.BuildRecentProjectsMenu();
                                 this.IsBusy = false;
                             });
-                        this.autoSaveTask = this.AutoSaveAsync();
+                        this.autoSaveTask = this.ProjectData.AutoSaveAsync(this.cancellationTokenSource.Token);
                     });
             }
             else
             {
                 this.BuildRecentProjectsMenu();
-                this.autoSaveTask = Task.Run(this.AutoSaveAsync);
+                this.autoSaveTask = Task.Run(() => this.ProjectData.AutoSaveAsync(this.cancellationTokenSource.Token));
             }
         }
 
@@ -377,28 +373,6 @@ namespace lg2de.SimpleAccounting.Presentation
             this.Settings.RecentProjects.Remove(project);
         }
 
-        // TODO move to ProjectData
-        private async Task AutoSaveAsync()
-        {
-            try
-            {
-                while (true)
-                {
-                    await Task.Delay(this.AutoSaveInterval, this.cancellationTokenSource!.Token);
-                    if (!this.ProjectData.IsModified)
-                    {
-                        continue;
-                    }
-
-                    this.fileSystem.WriteAllTextIntoFile(this.ProjectData.AutoSaveFileName, this.ProjectData.Storage.Serialize());
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // expected behavior
-            }
-        }
-
         private void UpdateDisplayName()
         {
             this.DisplayName = string.IsNullOrEmpty(this.ProjectData.FileName)
@@ -416,26 +390,15 @@ namespace lg2de.SimpleAccounting.Presentation
             this.ProjectData.ShowEditBookingDialog(journalViewModel.Identifier, this.Accounts.ShowInactiveAccounts);
         }
 
-        // TODO move to ProjectData
-        private void CloseYear()
+        private void OnCloseYear(object _)
         {
-            var viewModel = new CloseYearViewModel(this.ProjectData.CurrentYear);
-            this.ProjectData.Storage.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward)
-                .ToList().ForEach(viewModel.Accounts.Add);
-
-            var result = this.windowManager.ShowDialog(viewModel);
-            if (result != true || viewModel.RemoteAccount == null)
+            if (!this.ProjectData.CloseYear())
             {
                 return;
             }
 
-            var newYearJournal = this.ProjectData.Storage.CloseYear(
-                this.ProjectData.CurrentYear, viewModel.RemoteAccount);
-
-            this.ProjectData.IsModified = true;
-            this.SelectBookingYear(newYearJournal.Year);
-
             this.UpdateBookingYears();
+            this.BookingYears.Last().Command.Execute(null);
         }
 
         private void SelectBookingYear(string newYearName)
