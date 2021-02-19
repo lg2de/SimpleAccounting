@@ -19,8 +19,11 @@ namespace lg2de.SimpleAccounting.Model
         AccountingDataJournal CurrentYear { get; set; }
         
         bool IsModified { get; set; } // TODO setter should be internal
+        
         ulong MaxBookIdent { get; }
+        
         TimeSpan AutoSaveInterval { get; set; }
+        
         string AutoSaveFileName { get; }
 
         event EventHandler<JournalChangedEventArgs> JournalChanged;
@@ -44,8 +47,11 @@ namespace lg2de.SimpleAccounting.Model
         void ShowImportDialog();
         
         bool CloseYear();
+        
         bool CheckSaveProject();
+        
         void TriggerJournalChanged();
+        
         void AddBooking(AccountingDataJournalBooking booking);
     }
 }

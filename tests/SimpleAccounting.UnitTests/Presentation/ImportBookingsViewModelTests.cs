@@ -147,7 +147,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void ProcessData_SampleData_DataConvertedIntoJournal()
         {
             var projectData = Samples.SampleProjectData;
-            var parent = new ShellViewModel(projectData, null!, null!, null!, null!, null!);
+            var parent = new ShellViewModel(
+                projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                new AccountsViewModel(null!, projectData), null!, null!, null!, null!);
             var accounts = projectData.Storage.AllAccounts.ToList();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
             var sut = new ImportBookingsViewModel(

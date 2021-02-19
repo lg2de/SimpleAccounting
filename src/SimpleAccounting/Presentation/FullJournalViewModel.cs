@@ -10,7 +10,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
-    internal class FullJournalViewModel : Screen
+    internal class FullJournalViewModel : Screen, IFullJournalViewModel
     {
         private readonly IProjectData projectData;
         private FullJournalItemViewModel? selectedItem;

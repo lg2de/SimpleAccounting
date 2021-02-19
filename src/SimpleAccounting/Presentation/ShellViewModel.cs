@@ -25,8 +25,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
+    using Screen = Caliburn.Micro.Screen;
 
-    internal class ShellViewModel : Conductor<IScreen>, IBusy, IDisposable
+    internal class ShellViewModel : Screen, IBusy, IDisposable
     {
         private readonly IApplicationUpdate applicationUpdate;
         private readonly IMessageBox messageBox;
@@ -40,13 +41,18 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ShellViewModel(
             IProjectData projectData,
-            IWindowManager windowManager,
+            IFullJournalViewModel fullJournal,
+            IAccountJournalViewModel accountJournal,
+            IAccountsViewModel accounts,
             IReportFactory reportFactory,
             IApplicationUpdate applicationUpdate,
             IMessageBox messageBox,
             IProcess processApi)
         {
             this.ProjectData = projectData;
+            this.FullJournal = fullJournal;
+            this.AccountJournal = accountJournal;
+            this.Accounts = accounts;
             this.reportFactory = reportFactory;
             this.applicationUpdate = applicationUpdate;
             this.messageBox = messageBox;
@@ -55,11 +61,6 @@ namespace lg2de.SimpleAccounting.Presentation
             this.version = this.GetType().Assembly
                                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                            ?? "UNKNOWN";
-
-            // TODO make injectable
-            this.FullJournal = new FullJournalViewModel(this.ProjectData);
-            this.AccountJournal = new AccountJournalViewModel(this.ProjectData);
-            this.Accounts = new AccountsViewModel(windowManager, this.ProjectData);
 
             this.ProjectData.DataLoaded += (_, __) =>
             {
@@ -97,11 +98,11 @@ namespace lg2de.SimpleAccounting.Presentation
         public ObservableCollection<MenuViewModel> BookingYears { get; }
             = new ObservableCollection<MenuViewModel>();
 
-        public FullJournalViewModel FullJournal { get; }
+        public IFullJournalViewModel FullJournal { get; }
 
-        public AccountJournalViewModel AccountJournal { get; }
+        public IAccountJournalViewModel AccountJournal { get; }
         
-        public AccountsViewModel Accounts { get; }
+        public IAccountsViewModel Accounts { get; }
 
         public ICommand NewProjectCommand => new RelayCommand(
             _ =>

@@ -13,7 +13,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
-    internal class AccountsViewModel : Screen
+    internal class AccountsViewModel : Screen, IAccountsViewModel
     {
         private readonly IList<AccountViewModel> allAccounts = new List<AccountViewModel>();
         private readonly IProjectData projectData;

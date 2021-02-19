@@ -19,8 +19,15 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellDesignViewModel : ShellViewModel
     {
+        private static readonly ProjectData DesignProject = new ProjectData(null!, null!, null!, null!);
+
         public ShellDesignViewModel()
-            : base(new ProjectData(null!, null!, null!, null!), null!, null!, null!, null!, null!)
+            : base(
+                DesignProject,
+                new FullJournalViewModel(DesignProject),
+                new AccountJournalViewModel(DesignProject),
+                new AccountsViewModel(null!, DesignProject),
+                null!, null!, null!, null!)
         {
             var menuItem = new MenuViewModel("c:\\Test.acml", null!);
             this.RecentProjects.Add(menuItem);
