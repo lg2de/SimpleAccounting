@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using FluentAssertions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
+    using lg2de.SimpleAccounting.Properties;
     using Xunit;
 
     public class ImportBookingsViewModelTests
@@ -16,7 +17,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [CulturedFact("en")]
         public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
         {
-            var projectData = new ProjectData(null!, null!, null!, null!);
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
             projectData.Load(Samples.SampleProject);
             var sut = new ImportBookingsViewModel(null!, projectData);
             projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
@@ -76,7 +77,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void ImportBookings_SampleData_AccountsFiltered()
         {
-            var projectData = new ProjectData(null!, null!, null!, null!);
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
             projectData.Load(Samples.SampleProject);
             projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var sut = new ImportBookingsViewModel(null!, projectData);
@@ -87,7 +88,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookAllCommand_EntryNotMapped_CannotExecute()
         {
-            var projectData = new ProjectData(null!, null!, null!, null!);
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
             projectData.Load(Samples.SampleProject);
             projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var accounts = projectData.Storage.AllAccounts.ToList();
@@ -101,7 +102,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookAllCommand_EntryMapped_CanExecute()
         {
-            var projectData = new ProjectData(null!, null!, null!, null!);
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
             projectData.Load(Samples.SampleProject);
             projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var accounts = projectData.Storage.AllAccounts.ToList();
@@ -118,7 +119,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookAllCommand_EntrySkipped_CanExecute()
         {
-            var projectData = new ProjectData(null!, null!, null!, null!);
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
             projectData.Load(Samples.SampleProject);
             projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var accounts = projectData.Storage.AllAccounts.ToList();
@@ -132,7 +133,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void BookAllCommand_EntryExisting_CannotExecute()
         {
-            var projectData = new ProjectData(null!, null!, null!, null!);
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
             projectData.Load(Samples.SampleProject);
             projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var accounts = projectData.Storage.AllAccounts.ToList();
@@ -147,9 +148,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void ProcessData_SampleData_DataConvertedIntoJournal()
         {
             var projectData = Samples.SampleProjectData;
+            var accountsViewModel = new AccountsViewModel(null!, projectData);
+            var settings = new Settings();
             var parent = new ShellViewModel(
-                projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                new AccountsViewModel(null!, projectData), null!, null!, null!, null!);
+                settings, projectData, new MenuViewModel(settings, projectData, accountsViewModel, null!, null!, null!),
+                new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                accountsViewModel, null!);
             var accounts = projectData.Storage.AllAccounts.ToList();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
             var sut = new ImportBookingsViewModel(

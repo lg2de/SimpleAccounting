@@ -10,6 +10,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
     [SuppressMessage(
         "Major Code Smell", "S109:Magic numbers should not be used",
@@ -83,7 +84,7 @@ namespace lg2de.SimpleAccounting.Presentation
         };
 
         public ImportBookingsDesignViewModel()
-            : base(null!, new ProjectData(null!, null!, null!, null!))
+            : base(null!, new ProjectData(new Settings(), null!, null!, null!, null!))
         {
             this.ProjectData.Load(SampleData);
             this.SelectedAccountNumber = 100;

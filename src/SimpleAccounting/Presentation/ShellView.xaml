@@ -18,10 +18,10 @@
     </Style>
   </Window.Resources>
   <Window.InputBindings>
-    <KeyBinding Key="B" Modifiers="Control" Command="{Binding AddBookingsCommand}" />
-    <KeyBinding Key="I" Modifiers="Control" Command="{Binding ImportBookingsCommand}" />
-    <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenProjectCommand}" />
-    <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveProjectCommand}" />
+    <KeyBinding Key="B" Modifiers="Control" Command="{Binding Menu.AddBookingsCommand}" />
+    <KeyBinding Key="I" Modifiers="Control" Command="{Binding Menu.ImportBookingsCommand}" />
+    <KeyBinding Key="O" Modifiers="Control" Command="{Binding Menu.OpenProjectCommand}" />
+    <KeyBinding Key="S" Modifiers="Control" Command="{Binding Menu.SaveProjectCommand}" />
   </Window.InputBindings>
   <Grid>
     <DockPanel>
@@ -33,39 +33,39 @@
           </Style>
         </Menu.Resources>
         <MenuItem Header="{x:Static properties:Resources.Menu_Project}">
-          <MenuItem Header="{x:Static properties:Resources.Menu_Project_New}" Command="{Binding NewProjectCommand}" />
-          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Open}" Command="{Binding OpenProjectCommand}"
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_New}" Command="{Binding Menu.NewProjectCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Open}" Command="{Binding Menu.OpenProjectCommand}"
                     InputGestureText="STRG-O" />
-          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Save}" Command="{Binding SaveProjectCommand}"
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Save}" Command="{Binding Menu.SaveProjectCommand}"
                     InputGestureText="STRG-S" />
           <Separator />
           <MenuItem
             Header="{x:Static properties:Resources.Menu_Project_RecentProjects}"
-            ItemsSource="{Binding RecentProjects}"
+            ItemsSource="{Binding Menu.RecentProjects}"
             ItemContainerStyle="{StaticResource CommandMenuStyle}" />
           <Separator />
           <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings}">
-            <MenuItem Header="Deutsch" Command="{Binding SwitchCultureCommand}" CommandParameter="de"
-                      IsCheckable="True" IsChecked="{Binding IsGermanCulture, Mode=OneWay}" />
-            <MenuItem Header="English" Command="{Binding SwitchCultureCommand}" CommandParameter="en"
-                      IsCheckable="True" IsChecked="{Binding IsEnglishCulture, Mode=OneWay}" />
-            <MenuItem Header="&lt;System&gt;" Command="{Binding SwitchCultureCommand}" CommandParameter=""
-                      IsCheckable="True" IsChecked="{Binding IsSystemCulture, Mode=OneWay}" />
+            <MenuItem Header="Deutsch" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="de"
+                      IsCheckable="True" IsChecked="{Binding Menu.IsGermanCulture, Mode=OneWay}" />
+            <MenuItem Header="English" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="en"
+                      IsCheckable="True" IsChecked="{Binding Menu.IsEnglishCulture, Mode=OneWay}" />
+            <MenuItem Header="&lt;System&gt;" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter=""
+                      IsCheckable="True" IsChecked="{Binding Menu.IsSystemCulture, Mode=OneWay}" />
           </MenuItem>
           <MenuItem Header="{x:Static properties:Resources.Menu_Project_Exit}"
                     Command="{Binding CloseApplicationCommand}" />
         </MenuItem>
         <MenuItem Header="{x:Static properties:Resources.Menu_Actions}">
           <MenuItem Header="{x:Static properties:Resources.Menu_Actions_AddBooking}"
-                    Command="{Binding AddBookingsCommand}" InputGestureText="STRG+B" />
+                    Command="{Binding Menu.AddBookingsCommand}" InputGestureText="STRG+B" />
           <MenuItem Header="{x:Static properties:Resources.Menu_Actions_ImportBookings}"
-                    Command="{Binding ImportBookingsCommand}"
+                    Command="{Binding Menu.ImportBookingsCommand}"
                     InputGestureText="STRG-I" />
           <MenuItem Header="{x:Static properties:Resources.Menu_Actions_CloseYear}"
-                    Command="{Binding CloseYearCommand}" />
+                    Command="{Binding Menu.CloseYearCommand}" />
           <MenuItem
             Header="{x:Static properties:Resources.Menu_Actions_SelectYear}"
-            ItemsSource="{Binding BookingYears}"
+            ItemsSource="{Binding Menu.BookingYears}"
             ItemContainerStyle="{StaticResource CommandMenuStyle}" />
           <Separator />
           <MenuItem Header="{x:Static properties:Resources.Menu_Actions_NewAccount}"
@@ -73,19 +73,19 @@
         </MenuItem>
         <MenuItem Header="{x:Static properties:Resources.Menu_Reports}">
           <MenuItem Header="{x:Static properties:Resources.Menu_Reports_Journal}"
-                    Command="{Binding TotalJournalReportCommand}" />
+                    Command="{Binding Menu.TotalJournalReportCommand}" />
           <MenuItem Header="{x:Static properties:Resources.Menu_Reports_AccountJournal}"
-                    Command="{Binding AccountJournalReportCommand}" />
+                    Command="{Binding Menu.AccountJournalReportCommand}" />
           <MenuItem Header="{x:Static properties:Resources.Menu_Reports_TotalsAndBalances}"
-                    Command="{Binding TotalsAndBalancesReportCommand}" />
+                    Command="{Binding Menu.TotalsAndBalancesReportCommand}" />
           <MenuItem Header="{x:Static properties:Resources.Menu_Reports_AssetBalance}"
-                    Command="{Binding AssetBalancesReportCommand}" />
+                    Command="{Binding Menu.AssetBalancesReportCommand}" />
           <MenuItem Header="{x:Static properties:Resources.Menu_Reports_AnnualBalance}"
-                    Command="{Binding AnnualBalanceReportCommand}" />
+                    Command="{Binding Menu.AnnualBalanceReportCommand}" />
         </MenuItem>
         <MenuItem Header="{x:Static properties:Resources.Menu_Help}">
-          <MenuItem Header="{x:Static properties:Resources.Menu_Help_About}" Command="{Binding HelpAboutCommand}" />
-          <MenuItem Header="{x:Static properties:Resources.Menu_Help_Feedback}" Command="{Binding HelpFeedbackCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Help_About}" Command="{Binding Menu.HelpAboutCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Help_Feedback}" Command="{Binding Menu.HelpFeedbackCommand}" />
           <MenuItem Header="{x:Static properties:Resources.Menu_Help_CheckUpdate}"
                     Command="{Binding HelpCheckForUpdateCommand}" />
         </MenuItem>
@@ -161,7 +161,7 @@
             <DataGrid.InputBindings>
               <MouseBinding
                 MouseAction="LeftDoubleClick"
-                Command="{Binding EditBookingCommand}"
+                Command="{Binding Menu.EditBookingCommand}"
                 CommandParameter="{Binding FullJournal.Items/}" />
             </DataGrid.InputBindings>
           </DataGrid>
@@ -209,7 +209,7 @@
             <DataGrid.InputBindings>
               <MouseBinding
                 MouseAction="LeftDoubleClick"
-                Command="{Binding EditBookingCommand}"
+                Command="{Binding Menu.EditBookingCommand}"
                 CommandParameter="{Binding AccountJournal.Items/}" />
             </DataGrid.InputBindings>
           </DataGrid>
@@ -272,7 +272,7 @@
       </Grid>
     </DockPanel>
     <Grid Background="Gray" Opacity="0.5"
-          Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+          Visibility="{Binding Menu.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
       <Rectangle Width="150" Height="50" Fill="White" />
       <ProgressBar
         Width="100" Height="20"

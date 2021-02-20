@@ -25,7 +25,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
             var settings = new Settings();
-            var sut = new ProjectFileLoader(dialogs, fileSystem, processApi, settings);
+            var sut = new ProjectFileLoader(settings, dialogs, fileSystem, processApi);
 
             var result = await sut.Awaiting(x => x.LoadAsync("the.fileName")).Should().CompleteWithinAsync(1.Seconds());
 
@@ -39,7 +39,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
             var settings = new Settings { SecuredDrives = new StringCollection { "K:\\" } };
-            var sut = new ProjectFileLoader(dialogs, fileSystem, processApi, settings);
+            var sut = new ProjectFileLoader(settings, dialogs, fileSystem, processApi);
             dialogs.ShowMessageBox(
                     Arg.Is<string>(s => s.Contains("Cryptomator")),
                     Arg.Any<string>(),

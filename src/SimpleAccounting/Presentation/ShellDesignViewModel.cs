@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Diagnostics.CodeAnalysis;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
     [SuppressMessage(
         "Major Code Smell", "S109:Magic numbers should not be used",
@@ -19,18 +20,20 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellDesignViewModel : ShellViewModel
     {
-        private static readonly ProjectData DesignProject = new ProjectData(null!, null!, null!, null!);
+        private static readonly Settings DesignSettings = new Settings();
+        private static readonly ProjectData DesignProject = new ProjectData(DesignSettings, null!, null!, null!, null!);
 
         public ShellDesignViewModel()
             : base(
+                DesignSettings,
                 DesignProject,
+                new MenuViewModel(DesignSettings, DesignProject, null!, null!, null!, null!),
                 new FullJournalViewModel(DesignProject),
                 new AccountJournalViewModel(DesignProject),
-                new AccountsViewModel(null!, DesignProject),
-                null!, null!, null!, null!)
+                new AccountsViewModel(null!, DesignProject), null!)
         {
-            var menuItem = new MenuViewModel("c:\\Test.acml", null!);
-            this.RecentProjects.Add(menuItem);
+            var menuItem = new MenuItemViewModel("c:\\Test.acml", null!);
+            this.Menu.RecentProjects.Add(menuItem);
 
             this.LoadAccounts();
             this.LoadJournal();

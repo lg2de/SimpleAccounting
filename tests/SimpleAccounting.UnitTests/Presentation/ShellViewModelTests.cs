@@ -9,7 +9,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Collections.Specialized;
     using System.Diagnostics;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using Caliburn.Micro;
@@ -139,25 +138,23 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task OnActivate_TwoRecentProjectsOneOnSecuredDrive_AllProjectListed()
         {
             var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
             var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+            var settings = new Settings
+            {
+                RecentProject = "k:\\file2",
+                RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
+                SecuredDrives = new StringCollection { "K:\\" }
+            };
+            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs,
-                    processApi)
-                {
-                    Settings = new Settings
-                    {
-                        RecentProject = "k:\\file2",
-                        RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
-                        SecuredDrives = new StringCollection { "K:\\" }
-                    }
-                };
+                    settings, projectData, new MenuViewModel(settings, projectData, accountsViewModel, null!, null!, null!),
+                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                    accountsViewModel, applicationUpdate);
             dialogs.ShowMessageBox(
                     Arg.Is<string>(s => s.Contains("Cryptomator")),
                     Arg.Any<string>(),
@@ -174,7 +171,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
             await sut.LoadingTask;
 
-            sut.RecentProjects.Select(x => x.Header).Should().Equal("c:\\file1", "k:\\file2");
+            sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("c:\\file1", "k:\\file2");
             dialogs.Received(1).ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator")),
                 Arg.Any<string>(),
@@ -231,33 +228,33 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void OnActivate_TwoRecentProjectsOneExisting_AllProjectListed()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            sut.Settings = new Settings { RecentProjects = new StringCollection { "file1", "file2" } };
+            sut.Settings.RecentProjects = new StringCollection { "file1", "file2" };
             fileSystem.FileExists(Arg.Is("file1")).Returns(true);
             fileSystem.FileExists(Arg.Is("file2")).Returns(false);
 
             ((IActivate)sut).Activate();
 
             // even the file is not available currently it should not be removed immediately from menu
-            sut.RecentProjects.Select(x => x.Header).Should().Equal("file1", "file2");
+            sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("file1", "file2");
         }
 
         [Fact]
         public async Task RecentFileCommand_NonExisting_ProjectRemovedFromList()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            sut.Settings = new Settings { RecentProjects = new StringCollection { "file1", "file2" } };
+            sut.Settings.RecentProjects = new StringCollection { "file1", "file2" };
             fileSystem.FileExists(Arg.Is("file1")).Returns(true);
             fileSystem.FileExists(Arg.Is("file2")).Returns(false);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
             ((IActivate)sut).Activate();
-            sut.RecentProjects.Select(x => x.Header).Should().Equal("file1", "file2");
+            sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("file1", "file2");
 
-            foreach (var viewModel in sut.RecentProjects.ToList())
+            foreach (var viewModel in sut.Menu.RecentProjects.ToList())
             {
                 await viewModel.Command.ExecuteAsync(null);
             }
 
-            sut.RecentProjects.Select(x => x.Header).Should().BeEquivalentTo("file1");
+            sut.Menu.RecentProjects.Select(x => x.Header).Should().BeEquivalentTo("file1");
             sut.Settings.RecentProjects.OfType<string>().Should().BeEquivalentTo("file1");
         }
 
@@ -265,11 +262,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task RecentFileCommand_FileOnSecureDriveNotStarted_ProjectKept()
         {
             var sut = CreateSut(out IDialogs dialogs, out IFileSystem fileSystem);
-            sut.Settings = new Settings
-            {
-                RecentProjects = new StringCollection { "K:\\file1", "file2" },
-                SecuredDrives = new StringCollection { "K:\\" }
-            };
+            sut.Settings.RecentProjects = new StringCollection { "K:\\file1", "file2" };
+            sut.Settings.SecuredDrives = new StringCollection { "K:\\" };
             fileSystem.FileExists(Arg.Is("K:\\file1")).Returns(false);
             fileSystem.FileExists(Arg.Is("file2")).Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
@@ -280,14 +274,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
             ((IActivate)sut).Activate();
-            sut.RecentProjects.Select(x => x.Header).Should().Equal("K:\\file1", "file2");
+            sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("K:\\file1", "file2");
 
-            foreach (var viewModel in sut.RecentProjects)
+            foreach (var viewModel in sut.Menu.RecentProjects)
             {
                 await viewModel.Command.ExecuteAsync(null);
             }
 
-            sut.RecentProjects.Select(x => x.Header).Should().BeEquivalentTo("K:\\file1", "file2");
+            sut.Menu.RecentProjects.Select(x => x.Header).Should().BeEquivalentTo("K:\\file1", "file2");
             sut.Settings.RecentProjects.OfType<string>().Should().BeEquivalentTo("K:\\file1", "file2");
         }
 
@@ -414,36 +408,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void CheckSaveProject_Cancel_NotSavedAndReturnsFalse()
-        {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var applicationUpdate = Substitute.For<IApplicationUpdate>();
-            var dialogs = Substitute.For<IDialogs>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var processApi = Substitute.For<IProcess>();
-            dialogs.ShowMessageBox(
-                    Arg.Any<string>(), Arg.Any<string>(),
-                    Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-                .Returns(MessageBoxResult.Cancel);
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
-            var sut = new ShellViewModel(
-                projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi);
-            sut.ProjectData.Load(Samples.SampleProject);
-            sut.ProjectData.IsModified = true;
-
-            sut.ProjectData.CheckSaveProject().Should().BeFalse();
-
-            dialogs.Received(1).ShowMessageBox(
-                Arg.Any<string>(), Arg.Any<string>(),
-                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-            fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
-        }
-
-        [Fact]
         public void CheckSaveProject_NotModified_ReturnsTrue()
         {
             var sut = CreateSut(out IDialogs dialogs);
@@ -456,36 +420,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
         }
 
-        [UIFact]
-        public async Task InvokeLoadProjectFile_HappyPath_BusyIndicatorChanged()
-        {
-            var sut = CreateSut();
-            long counter = 0;
-            var tcs = new TaskCompletionSource<bool>();
-
-            // Because awaiting "ExecuteUIThread" does not really await the action
-            // we need to wait for two property changed events.
-            var values = new List<bool>();
-            sut.PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName != "IsBusy")
-                {
-                    return;
-                }
-
-                values.Add(sut.IsBusy);
-                if (Interlocked.Increment(ref counter) == 2)
-                {
-                    tcs.SetResult(true);
-                }
-            };
-
-            sut.InvokeLoadProjectFile("dummy");
-
-            await tcs.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds(), "IsBusy should change twice");
-            values.Should().Equal(true, false);
-        }
-
         [Fact]
         public async Task LoadProjectFromFileAsync_HappyPath_FileLoaded()
         {
@@ -493,7 +427,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -518,7 +452,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.FileExists("the.fileName~").Returns(true);
 
-            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -543,7 +477,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.FileExists("the.fileName~").Returns(true);
 
-            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -570,7 +504,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     return new[] { (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2) };
                 });
 
-            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("K:\\the.fileName", sut.Settings)).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("K:\\the.fileName")).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -580,53 +514,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-            fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
-        }
-
-        [Fact]
-        public async Task LoadProjectFromFileAsync_KnownFileOnSecureDrive_StoreOpenedAndFileLoaded()
-        {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var applicationUpdate = Substitute.For<IApplicationUpdate>();
-            var dialogs = Substitute.For<IDialogs>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
-            var sut =
-                new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi)
-                {
-                    Settings = new Settings { SecuredDrives = new StringCollection { "K:\\" } }
-                };
-            dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("Cryptomator")),
-                    Arg.Any<string>(),
-                    Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-                .Returns(MessageBoxResult.Yes);
-            bool securedFileAvailable = false;
-            fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(info => securedFileAvailable);
-            fileSystem.FileExists(
-                    Arg.Is<string>(s => s.Contains("cryptomator.exe", StringComparison.InvariantCultureIgnoreCase)))
-                .Returns(true);
-            Process cryptomator = null;
-            processApi.Start(Arg.Any<ProcessStartInfo>()).Returns(
-                info =>
-                {
-                    cryptomator = new Process();
-                    return cryptomator;
-                });
-            processApi.IsProcessWindowVisible(Arg.Any<Process>()).Returns(true);
-            processApi.GetProcessByName(Arg.Any<string>()).Returns(cryptomator);
-            processApi.When(x => x.BringProcessToFront(Arg.Any<Process>())).Do(info => securedFileAvailable = true);
-            fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-
-            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("K:\\the.fileName", sut.Settings)).Should()
-                    .CompleteWithinAsync(1.Seconds()))
-                .Which.Should().Be(OperationResult.Completed);
-
             fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
         }
 
@@ -650,7 +537,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
-            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -669,7 +556,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName").Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 
-            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
@@ -690,7 +577,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
             fileSystem.FileExists("new.fileName").Returns(true);
 
-            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName", sut.Settings)).Should()
+            (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Aborted);
 
@@ -825,14 +712,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+            var settings = new Settings();
+            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi)
-                {
-                    Settings = new Settings()
-                };
+                    settings, projectData,
+                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                    accountsViewModel, applicationUpdate);
             return sut;
         }
 
@@ -844,14 +732,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+            var settings = new Settings();
+            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi)
-                {
-                    Settings = new Settings()
-                };
+                    settings, projectData,
+                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                    accountsViewModel, applicationUpdate);
             return sut;
         }
 
@@ -863,14 +752,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+            var settings = new Settings();
+            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi)
-                {
-                    Settings = new Settings()
-                };
+                    settings, projectData,
+                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                    accountsViewModel, applicationUpdate);
             return sut;
         }
 
@@ -882,14 +772,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+            var settings = new Settings();
+            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi)
-                {
-                    Settings = new Settings()
-                };
+                    settings, projectData,
+                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                    accountsViewModel, applicationUpdate);
             return sut;
         }
 
@@ -901,14 +792,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+            var settings = new Settings();
+            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi)
-                {
-                    Settings = new Settings()
-                };
+                    settings, projectData,
+                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                    accountsViewModel, applicationUpdate);
             return sut;
         }
 
@@ -920,14 +812,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var dialogs = Substitute.For<IDialogs>();
             fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+            var settings = new Settings();
+            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi)
-                {
-                    Settings = new Settings()
-                };
+                    settings, projectData,
+                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                    accountsViewModel, applicationUpdate);
             return sut;
         }
 
@@ -939,14 +832,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+            var settings = new Settings();
+            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi)
-                {
-                    Settings = new Settings()
-                };
+                    settings, projectData,
+                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                    accountsViewModel, applicationUpdate);
             return sut;
         }
 
@@ -958,14 +852,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             dialogs = Substitute.For<IDialogs>();
             fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+            var settings = new Settings();
+            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    projectData, new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    new AccountsViewModel(windowManager, projectData), reportFactory, applicationUpdate, dialogs, processApi)
-                {
-                    Settings = new Settings()
-                };
+                    settings, projectData,
+                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                    accountsViewModel, applicationUpdate);
             return sut;
         }
     }

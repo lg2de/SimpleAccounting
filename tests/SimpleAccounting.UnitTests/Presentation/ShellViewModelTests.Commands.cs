@@ -91,7 +91,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
 
-            sut.NewProjectCommand.Execute(null);
+            sut.Menu.NewProjectCommand.Execute(null);
 
             sut.Accounts.AccountList.Should().NotBeEmpty();
             sut.FullJournal.Items.Should().BeEmpty();
@@ -105,7 +105,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.ProjectData.Load(Samples.SampleProject);
             sut.ProjectData.IsModified = true;
 
-            sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
+            sut.Menu.SaveProjectCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
 
-            sut.SaveProjectCommand.CanExecute(null).Should()
+            sut.Menu.SaveProjectCommand.CanExecute(null).Should()
                 .BeFalse("default instance does not contain modified document");
         }
 
@@ -122,16 +122,16 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IDialogs dialogs);
 
-            sut.SwitchCultureCommand.Execute("dummy");
+            sut.Menu.SwitchCultureCommand.Execute("dummy");
 
             dialogs.Received(1).ShowMessageBox(
                 Arg.Is<string>(x => x.Contains("must restart the application")),
                 Arg.Any<string>(),
                 icon: MessageBoxImage.Information);
             sut.Settings.Culture.Should().Be("dummy");
-            sut.IsGermanCulture.Should().BeFalse();
-            sut.IsEnglishCulture.Should().BeFalse();
-            sut.IsSystemCulture.Should().BeFalse();
+            sut.Menu.IsGermanCulture.Should().BeFalse();
+            sut.Menu.IsEnglishCulture.Should().BeFalse();
+            sut.Menu.IsSystemCulture.Should().BeFalse();
         }
 
         [Fact]
@@ -231,9 +231,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
             sut.ProjectData.Load(Samples.SampleProject);
-            sut.BookingYears.First().Command.Execute(null);
+            sut.Menu.BookingYears.First().Command.Execute(null);
 
-            sut.AddBookingsCommand.CanExecute(null).Should().BeFalse();
+            sut.Menu.AddBookingsCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -241,9 +241,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
             sut.ProjectData.Load(Samples.SampleProject);
-            sut.BookingYears.Last().Command.Execute(null);
+            sut.Menu.BookingYears.Last().Command.Execute(null);
 
-            sut.AddBookingsCommand.CanExecute(null).Should().BeTrue();
+            sut.Menu.AddBookingsCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -255,7 +255,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.ProjectData.Load(Samples.SampleProject);
             sut.Accounts.ShowInactiveAccounts = true;
 
-            sut.AddBookingsCommand.Execute(null);
+            sut.Menu.AddBookingsCommand.Execute(null);
 
             using var _ = new AssertionScope();
             vm.BookingIdentifier.Should().Be(1);
@@ -271,7 +271,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.ProjectData.Load(Samples.SampleProject);
             sut.Accounts.ShowInactiveAccounts = false;
 
-            sut.AddBookingsCommand.Execute(null);
+            sut.Menu.AddBookingsCommand.Execute(null);
 
             using var _ = new AssertionScope();
             vm.BookingIdentifier.Should().Be(1);
@@ -288,7 +288,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
 
-            sut.EditBookingCommand.Execute(sut.FullJournal.Items.Last());
+            sut.Menu.EditBookingCommand.Execute(sut.FullJournal.Items.Last());
 
             using var _ = new AssertionScope();
             sut.ProjectData.IsModified.Should().BeFalse("the project remains unchanged");
@@ -307,7 +307,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
 
-            sut.EditBookingCommand.Execute(sut.FullJournal.Items.First(x => x.Identifier == 3));
+            sut.Menu.EditBookingCommand.Execute(sut.FullJournal.Items.First(x => x.Identifier == 3));
 
             using var _ = new AssertionScope();
             vm.CreditSplitEntries.Should().BeEquivalentTo(
@@ -325,7 +325,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
 
-            sut.EditBookingCommand.Execute(sut.FullJournal.Items.First(x => x.Identifier == 5));
+            sut.Menu.EditBookingCommand.Execute(sut.FullJournal.Items.First(x => x.Identifier == 5));
 
             using var _ = new AssertionScope();
             vm.DebitSplitEntries.Should().BeEquivalentTo(
@@ -350,7 +350,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
 
-            sut.EditBookingCommand.Execute(sut.FullJournal.Items.Last());
+            sut.Menu.EditBookingCommand.Execute(sut.FullJournal.Items.Last());
 
             using var _ = new AssertionScope();
             sut.ProjectData.IsModified.Should().BeTrue("the project changed");
@@ -366,7 +366,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
 
-            sut.EditBookingCommand.Execute(null);
+            sut.Menu.EditBookingCommand.Execute(null);
 
             using var _ = new AssertionScope();
             sut.ProjectData.IsModified.Should().BeFalse("the project remains unchanged");
@@ -381,7 +381,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             windowManager.ShowDialog(Arg.Do<object>(model => vm = model as ImportBookingsViewModel));
             sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.ImportBookingsCommand.Execute(null);
+            sut.Menu.ImportBookingsCommand.Execute(null);
 
             using (new AssertionScope())
             {
@@ -401,9 +401,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
             sut.ProjectData.Load(Samples.SampleProject);
-            sut.BookingYears.First().Command.Execute(null);
+            sut.Menu.BookingYears.First().Command.Execute(null);
 
-            sut.ImportBookingsCommand.CanExecute(null).Should().BeFalse();
+            sut.Menu.ImportBookingsCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -411,9 +411,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
             sut.ProjectData.Load(Samples.SampleProject);
-            sut.BookingYears.Last().Command.Execute(null);
+            sut.Menu.BookingYears.Last().Command.Execute(null);
 
-            sut.ImportBookingsCommand.CanExecute(null).Should().BeTrue();
+            sut.Menu.ImportBookingsCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -428,10 +428,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 MessageBoxResult.No).Returns(MessageBoxResult.No);
             sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.CloseYearCommand.Execute(null);
+            sut.Menu.CloseYearCommand.Execute(null);
 
             var thisYear = DateTime.Now.Year;
-            sut.BookingYears.Select(x => x.Header).Should().Equal("2000", thisYear.ToString());
+            sut.Menu.BookingYears.Select(x => x.Header).Should().Equal("2000", thisYear.ToString());
         }
 
         [Fact]
@@ -442,9 +442,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
             sut.ProjectData.Load(Samples.SampleProject);
-            sut.BookingYears.First().Command.Execute(null);
+            sut.Menu.BookingYears.First().Command.Execute(null);
 
-            sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
+            sut.Menu.CloseYearCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -453,7 +453,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut();
             sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.CloseYearCommand.CanExecute(null).Should().BeTrue();
+            sut.Menu.CloseYearCommand.CanExecute(null).Should().BeTrue();
         }
 
         [CulturedFact("en")]
@@ -474,7 +474,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
 
-            sut.CloseYearCommand.Execute(null);
+            sut.Menu.CloseYearCommand.Execute(null);
 
             windowManager.Received(1).ShowDialog(
                 Arg.Any<CloseYearViewModel>(),
@@ -482,7 +482,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<IDictionary<string, object>>());
             var thisYear = DateTime.Now.Year;
             using var _ = new AssertionScope();
-            sut.BookingYears.Select(x => x.Header).Should()
+            sut.Menu.BookingYears.Select(x => x.Header).Should()
                 .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
             sut.FullJournal.Items.Should().BeEquivalentTo(
                 new
@@ -546,7 +546,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new AccountDefinition { ID = 999, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward });
             sut.ProjectData.Load(project);
 
-            sut.CloseYearCommand.Execute(null);
+            sut.Menu.CloseYearCommand.Execute(null);
 
             windowManager.Received(1).ShowDialog(
                 Arg.Any<CloseYearViewModel>(),
@@ -554,7 +554,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<IDictionary<string, object>>());
             var thisYear = DateTime.Now.Year;
             using var _ = new AssertionScope();
-            sut.BookingYears.Select(x => x.Header).Should()
+            sut.Menu.BookingYears.Select(x => x.Header).Should()
                 .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
             sut.FullJournal.Items.Should().BeEquivalentTo(
                 new
@@ -606,7 +606,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory.CreateAccountJournal(sut.ProjectData).Returns(accountJournalReport);
             sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.AccountJournalReportCommand.Execute(null);
+            sut.Menu.AccountJournalReportCommand.Execute(null);
 
             accountJournalReport.Received(1)
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
@@ -616,9 +616,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AccountJournalReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
+            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
 
-            sut.AccountJournalReportCommand.CanExecute(null).Should().BeTrue();
+            sut.Menu.AccountJournalReportCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -626,7 +626,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
 
-            sut.AccountJournalReportCommand.CanExecute(null).Should().BeFalse();
+            sut.Menu.AccountJournalReportCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -637,7 +637,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory.CreateAnnualBalance(sut.ProjectData).Returns(annualBalanceReport);
             sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.AnnualBalanceReportCommand.Execute(null);
+            sut.Menu.AnnualBalanceReportCommand.Execute(null);
 
             annualBalanceReport.Received(1)
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
@@ -647,9 +647,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AnnualBalanceReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
+            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
 
-            sut.AnnualBalanceReportCommand.CanExecute(null).Should().BeTrue();
+            sut.Menu.AnnualBalanceReportCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -657,7 +657,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
 
-            sut.AnnualBalanceReportCommand.CanExecute(null).Should().BeFalse();
+            sut.Menu.AnnualBalanceReportCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -674,7 +674,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new AccountingDataAccountGroup { Name = "EMPTY", Account = new List<AccountDefinition>() });
             sut.ProjectData.Load(project);
 
-            sut.AssetBalancesReportCommand.Execute(null);
+            sut.Menu.AssetBalancesReportCommand.Execute(null);
 
             assetBalancesReport.Received(1)
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
@@ -687,9 +687,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AssetBalancesReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
+            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
 
-            sut.AssetBalancesReportCommand.CanExecute(null).Should().BeTrue();
+            sut.Menu.AssetBalancesReportCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -697,7 +697,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
 
-            sut.AssetBalancesReportCommand.CanExecute(null).Should().BeFalse();
+            sut.Menu.AssetBalancesReportCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -708,7 +708,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory.CreateTotalJournal(sut.ProjectData).Returns(totalJournalReport);
             sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.TotalJournalReportCommand.Execute(null);
+            sut.Menu.TotalJournalReportCommand.Execute(null);
 
             totalJournalReport.Received(1)
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
@@ -718,9 +718,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void TotalJournalReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
+            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
 
-            sut.TotalJournalReportCommand.CanExecute(null).Should().BeTrue();
+            sut.Menu.TotalJournalReportCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -728,7 +728,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
 
-            sut.TotalJournalReportCommand.CanExecute(null).Should().BeFalse();
+            sut.Menu.TotalJournalReportCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -742,7 +742,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Returns(totalsAndBalancesReport);
             sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.TotalsAndBalancesReportCommand.Execute(null);
+            sut.Menu.TotalsAndBalancesReportCommand.Execute(null);
 
             totalsAndBalancesReport.Received(1)
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
@@ -752,9 +752,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void TotalsAndBalancesReportCommand_JournalWithEntries_CanExecute()
         {
             var sut = CreateSut();
-            sut.FullJournal.Items.Add(new FullJournalItemViewModel());
+            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
 
-            sut.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeTrue();
+            sut.Menu.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeTrue();
         }
 
         [Fact]
@@ -762,7 +762,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut();
 
-            sut.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeFalse();
+            sut.Menu.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeFalse();
         }
 
         [Fact]
@@ -770,7 +770,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IProcess processApi);
 
-            sut.HelpAboutCommand.Execute(null);
+            sut.Menu.HelpAboutCommand.Execute(null);
 
             processApi.Received(1).ShellExecute(Arg.Any<string>());
         }
@@ -780,7 +780,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IProcess processApi);
 
-            sut.HelpFeedbackCommand.Execute(null);
+            sut.Menu.HelpFeedbackCommand.Execute(null);
 
             processApi.Received(1).ShellExecute(Arg.Any<string>());
         }

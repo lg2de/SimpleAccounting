@@ -26,14 +26,16 @@ namespace lg2de.SimpleAccounting.Model
     /// </remarks>
     internal class ProjectData : IProjectData
     {
+        private readonly Settings settings;
         private readonly IWindowManager windowManager;
         private readonly IDialogs dialogs;
         private readonly IFileSystem fileSystem;
         private readonly IProcess processApi;
         private AccountingData storage;
 
-        public ProjectData(IWindowManager windowManager, IDialogs dialogs, IFileSystem fileSystem, IProcess processApi)
+        public ProjectData(Settings settings, IWindowManager windowManager, IDialogs dialogs, IFileSystem fileSystem, IProcess processApi)
         {
+            this.settings = settings;
             this.windowManager = windowManager;
             this.dialogs = dialogs;
             this.fileSystem = fileSystem;
@@ -56,7 +58,7 @@ namespace lg2de.SimpleAccounting.Model
             }
         }
 
-        public AccountingDataJournal CurrentYear { get; set; }
+        public AccountingDataJournal CurrentYear { get; private set; }
 
         public bool IsModified { get; set; } // TODO setter should be internal
 
@@ -66,9 +68,11 @@ namespace lg2de.SimpleAccounting.Model
 
         public ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
 
-        public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
-
         public event EventHandler DataLoaded = (_, __) => { };
+
+        public event EventHandler YearChanged = (_, __) => { };
+        
+        public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
 
         public void NewProject()
         {
@@ -81,7 +85,7 @@ namespace lg2de.SimpleAccounting.Model
             this.Storage = accountingData;
         }
         
-        public async Task<OperationResult> LoadFromFileAsync(string projectFileName, Settings settings)
+        public async Task<OperationResult> LoadFromFileAsync(string projectFileName)
         {
             if (!this.CheckSaveProject())
             {
@@ -90,7 +94,7 @@ namespace lg2de.SimpleAccounting.Model
 
             this.IsModified = false;
 
-            var loader = new ProjectFileLoader(this.dialogs, this.fileSystem, this.processApi, settings);
+            var loader = new ProjectFileLoader(this.settings, this.dialogs, this.fileSystem, this.processApi);
             var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName));
             if (loadResult != OperationResult.Completed)
             {
@@ -201,6 +205,12 @@ namespace lg2de.SimpleAccounting.Model
             this.IsModified = true;
 
             this.JournalChanged(this, new JournalChangedEventArgs(booking.ID, booking.GetAccounts()));
+        }
+
+        public void SelectYear(string yearName)
+        {
+            this.CurrentYear = this.Storage.Journal.Single(y => y.Year == yearName);
+            this.YearChanged(this, EventArgs.Empty);
         }
 
         public void ShowAddBookingDialog(bool showInactiveAccounts)

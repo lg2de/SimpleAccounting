@@ -8,7 +8,6 @@ namespace lg2de.SimpleAccounting.Model
     using System.Threading;
     using System.Threading.Tasks;
     using lg2de.SimpleAccounting.Infrastructure;
-    using lg2de.SimpleAccounting.Properties;
 
     internal interface IProjectData
     {
@@ -16,7 +15,7 @@ namespace lg2de.SimpleAccounting.Model
 
         AccountingData Storage { get; }
         
-        AccountingDataJournal CurrentYear { get; set; }
+        AccountingDataJournal CurrentYear { get; }
         
         bool IsModified { get; set; } // TODO setter should be internal
         
@@ -26,15 +25,17 @@ namespace lg2de.SimpleAccounting.Model
         
         string AutoSaveFileName { get; }
 
-        event EventHandler<JournalChangedEventArgs> JournalChanged;
-
         event EventHandler DataLoaded;
+
+        event EventHandler YearChanged; 
+
+        event EventHandler<JournalChangedEventArgs> JournalChanged;
 
         void NewProject();
         
         void Load(AccountingData accountingData);
         
-        Task<OperationResult> LoadFromFileAsync(string projectFileName, Settings settings);
+        Task<OperationResult> LoadFromFileAsync(string projectFileName);
         
         void SaveProject();
         
@@ -55,5 +56,7 @@ namespace lg2de.SimpleAccounting.Model
         void TriggerJournalChanged();
         
         void AddBooking(AccountingDataJournalBooking booking);
+        
+        void SelectYear(string yearName);
     }
 }

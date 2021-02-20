@@ -23,12 +23,12 @@ namespace lg2de.SimpleAccounting.Infrastructure
         private readonly IProcess processApi;
         private readonly Settings settings;
 
-        public ProjectFileLoader(IDialogs dialogs, IFileSystem fileSystem, IProcess processApi, Settings settings)
+        public ProjectFileLoader(Settings settings, IDialogs dialogs, IFileSystem fileSystem, IProcess processApi)
         {
+            this.settings = settings;
             this.dialogs = dialogs;
             this.fileSystem = fileSystem;
             this.processApi = processApi;
-            this.settings = settings;
 
             this.settings.RecentProjects ??= new StringCollection();
             this.settings.SecuredDrives ??= new StringCollection();

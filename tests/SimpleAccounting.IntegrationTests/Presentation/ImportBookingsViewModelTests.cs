@@ -13,6 +13,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
+    using lg2de.SimpleAccounting.Properties;
     using NSubstitute;
     using Xunit;
 
@@ -107,7 +108,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
             var dialogs = Substitute.For<IDialogs>();
             var accounts = project.AllAccounts.ToList();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
-            var projectData = new ProjectData(null!, null!, null!, null!);
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
             projectData.Load(project);
             var sut = new ImportBookingsViewModel(dialogs, projectData)
             {

@@ -10,6 +10,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
     using NSubstitute;
 
     internal static class Samples
@@ -131,7 +132,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 var dialogs = Substitute.For<IDialogs>();
                 var fileSystem = Substitute.For<IFileSystem>();
                 var processApi = Substitute.For<IProcess>();
-                var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
+                var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
                 projectData.Load(SampleProject);
                 return projectData;
             }

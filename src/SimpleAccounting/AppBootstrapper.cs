@@ -13,6 +13,7 @@ namespace lg2de.SimpleAccounting
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
+    using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.Reports;
 
     [ExcludeFromCodeCoverage]
@@ -25,7 +26,9 @@ namespace lg2de.SimpleAccounting
             this.Initialize();
 
             // register default implementations for our interfaces
+            this.container.RegisterInstance(typeof(Settings), null, Settings.Default);
             this.container.Singleton<IProjectData, ProjectData>()
+                .Singleton<IMenuViewModel, MenuViewModel>()
                 .Singleton<IFullJournalViewModel, FullJournalViewModel>()
                 .Singleton<IAccountJournalViewModel, AccountJournalViewModel>()
                 .Singleton<IAccountsViewModel, AccountsViewModel>();
