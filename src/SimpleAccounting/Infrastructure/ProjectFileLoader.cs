@@ -19,13 +19,13 @@ namespace lg2de.SimpleAccounting.Infrastructure
         private const int MaxRecentProjects = 10;
         private readonly IFileSystem fileSystem;
 
-        private readonly IMessageBox messageBox;
+        private readonly IDialogs dialogs;
         private readonly IProcess processApi;
         private readonly Settings settings;
 
-        public ProjectFileLoader(IMessageBox messageBox, IFileSystem fileSystem, IProcess processApi, Settings settings)
+        public ProjectFileLoader(IDialogs dialogs, IFileSystem fileSystem, IProcess processApi, Settings settings)
         {
-            this.messageBox = messageBox;
+            this.dialogs = dialogs;
             this.fileSystem = fileSystem;
             this.processApi = processApi;
             this.settings = settings;
@@ -72,7 +72,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 string message =
                     string.Format(CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, projectFileName)
                     + $"\n{e.Message}";
-                this.messageBox.Show(message, Resources.Header_LoadProject);
+                this.dialogs.ShowMessageBox(message, Resources.Header_LoadProject);
                 return OperationResult.Failed;
             }
         }
@@ -94,7 +94,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 return true;
             }
 
-            MessageBoxResult result = this.messageBox.Show(
+            MessageBoxResult result = this.dialogs.ShowMessageBox(
                 string.Format(
                     CultureInfo.CurrentUICulture,
                     Resources.Question_StartSecureDriverX,
@@ -129,7 +129,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
             var autoSaveFileName = Defines.GetAutoSaveFileName(projectFileName);
             if (this.fileSystem.FileExists(autoSaveFileName))
             {
-                result = this.messageBox.Show(
+                result = this.dialogs.ShowMessageBox(
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         Resources.Question_LoadAutoSaveProjectFileX,

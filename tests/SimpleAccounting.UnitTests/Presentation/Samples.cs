@@ -128,10 +128,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             get
             {
                 var windowManager = Substitute.For<IWindowManager>();
-                var messageBox = Substitute.For<IMessageBox>();
+                var dialogs = Substitute.For<IDialogs>();
                 var fileSystem = Substitute.For<IFileSystem>();
                 var processApi = Substitute.For<IProcess>();
-                var projectData = new ProjectData(windowManager, messageBox, fileSystem, processApi);
+                var projectData = new ProjectData(windowManager, dialogs, fileSystem, processApi);
                 projectData.Load(SampleProject);
                 return projectData;
             }

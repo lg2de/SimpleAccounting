@@ -28,7 +28,7 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class ShellViewModel : Screen, IBusy, IDisposable
     {
         private readonly IApplicationUpdate applicationUpdate;
-        private readonly IMessageBox messageBox;
+        private readonly IDialogs dialogs;
         private readonly IProcess processApi;
         private readonly IReportFactory reportFactory;
         private readonly string version;
@@ -44,7 +44,7 @@ namespace lg2de.SimpleAccounting.Presentation
             IAccountsViewModel accounts,
             IReportFactory reportFactory,
             IApplicationUpdate applicationUpdate,
-            IMessageBox messageBox,
+            IDialogs dialogs,
             IProcess processApi)
         {
             this.ProjectData = projectData;
@@ -53,7 +53,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.Accounts = accounts;
             this.reportFactory = reportFactory;
             this.applicationUpdate = applicationUpdate;
-            this.messageBox = messageBox;
+            this.dialogs = dialogs;
             this.processApi = processApi;
 
             this.version = this.GetType().GetInformationalVersion();
@@ -97,7 +97,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public IFullJournalViewModel FullJournal { get; }
 
         public IAccountJournalViewModel AccountJournal { get; }
-        
+
         public IAccountsViewModel Accounts { get; }
 
         public ICommand NewProjectCommand => new RelayCommand(
@@ -123,7 +123,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.NotifyOfPropertyChange(nameof(this.IsGermanCulture));
                 this.NotifyOfPropertyChange(nameof(this.IsEnglishCulture));
                 this.NotifyOfPropertyChange(nameof(this.IsSystemCulture));
-                this.messageBox.Show(
+                this.dialogs.ShowMessageBox(
                     Resources.Information_CultureChangeRestartRequired,
                     Resources.Header_SettingsChanged,
                     icon: MessageBoxImage.Information);
@@ -325,18 +325,14 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void OnOpenProject()
         {
-            // TODO abstract the dialogs
-            using var openFileDialog = new OpenFileDialog
-            {
-                Filter = Resources.FileFilter_MainProject, RestoreDirectory = true
-            };
-
-            if (openFileDialog.ShowDialog() != DialogResult.OK)
+            (DialogResult result, var fileName) =
+                this.dialogs.ShowOpenFileDialog(filter: Resources.FileFilter_MainProject);
+            if (result != DialogResult.OK)
             {
                 return;
             }
 
-            this.InvokeLoadProjectFile(openFileDialog.FileName);
+            this.InvokeLoadProjectFile(fileName);
         }
 
         private void BuildRecentProjectsMenu()
@@ -345,7 +341,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 return;
             }
-            
+
             foreach (var project in this.Settings.RecentProjects)
             {
                 var command = new AsyncCommand(this, () => this.OnLoadRecentProjectAsync(project));

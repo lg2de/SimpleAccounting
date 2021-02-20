@@ -27,15 +27,15 @@ namespace lg2de.SimpleAccounting.Model
     internal class ProjectData : IProjectData
     {
         private readonly IWindowManager windowManager;
-        private readonly IMessageBox messageBox;
+        private readonly IDialogs dialogs;
         private readonly IFileSystem fileSystem;
         private readonly IProcess processApi;
         private AccountingData storage;
 
-        public ProjectData(IWindowManager windowManager, IMessageBox messageBox, IFileSystem fileSystem, IProcess processApi)
+        public ProjectData(IWindowManager windowManager, IDialogs dialogs, IFileSystem fileSystem, IProcess processApi)
         {
             this.windowManager = windowManager;
-            this.messageBox = messageBox;
+            this.dialogs = dialogs;
             this.fileSystem = fileSystem;
             this.processApi = processApi;
 
@@ -90,7 +90,7 @@ namespace lg2de.SimpleAccounting.Model
 
             this.IsModified = false;
 
-            var loader = new ProjectFileLoader(this.messageBox, this.fileSystem, this.processApi, settings);
+            var loader = new ProjectFileLoader(this.dialogs, this.fileSystem, this.processApi, settings);
             var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName));
             if (loadResult != OperationResult.Completed)
             {
@@ -113,7 +113,7 @@ namespace lg2de.SimpleAccounting.Model
                 return true;
             }
 
-            var result = this.messageBox.Show(
+            var result = this.dialogs.ShowMessageBox(
                 Resources.Question_SaveBeforeProceed,
                 Resources.Header_Shutdown,
                 MessageBoxButton.YesNoCancel);
@@ -287,7 +287,7 @@ namespace lg2de.SimpleAccounting.Model
 
         public void ShowImportDialog()
         {
-            var importModel = new ImportBookingsViewModel(this.messageBox, this);
+            var importModel = new ImportBookingsViewModel(this.dialogs, this);
             this.windowManager.ShowDialog(importModel);
         }
         

@@ -6,15 +6,19 @@ namespace lg2de.SimpleAccounting.Abstractions
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
+    using System.Windows.Forms;
     using Caliburn.Micro;
+    using Application = System.Windows.Application;
+    using MessageBox = System.Windows.MessageBox;
+    using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
     /// <summary>
-    ///     Default implementation of <see cref="IMessageBox"/> using <see cref="MessageBox"/>.
+    ///     Default implementation of <see cref="IDialogs"/> using <see cref="System.Windows.MessageBox"/>.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    internal class WindowsMessageBox : IMessageBox
+    internal class WindowsDialogs : IDialogs
     {
-        public MessageBoxResult Show(
+        public MessageBoxResult ShowMessageBox(
             string messageBoxText,
             string caption,
             MessageBoxButton button = MessageBoxButton.OK,
@@ -37,6 +41,17 @@ namespace lg2de.SimpleAccounting.Abstractions
                         options);
                 });
             return result;
+        }
+
+        public (DialogResult Result, string FileName) ShowOpenFileDialog(string filter)
+        {
+            using var dialog = new OpenFileDialog
+            {
+                Filter = filter, RestoreDirectory = true
+            };
+
+            var result = dialog.ShowDialog();
+            return (result, dialog.FileName);
         }
     }
 }

@@ -104,12 +104,12 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
 
             #endregion
 
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var accounts = project.AllAccounts.ToList();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
             var projectData = new ProjectData(null!, null!, null!, null!);
             projectData.Load(project);
-            var sut = new ImportBookingsViewModel(messageBox, projectData)
+            var sut = new ImportBookingsViewModel(dialogs, projectData)
             {
                 SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID, IsForceEnglish = true
             };
@@ -125,7 +125,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
 
             File.Delete(fileName);
 
-            messageBox.DidNotReceive().Show(
+            dialogs.DidNotReceive().ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(),

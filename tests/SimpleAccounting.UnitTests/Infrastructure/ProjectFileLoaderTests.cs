@@ -21,11 +21,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
         [Fact]
         public async Task LoadAsync_FileNotExists_ReturnsFailed()
         {
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
             var settings = new Settings();
-            var sut = new ProjectFileLoader(messageBox, fileSystem, processApi, settings);
+            var sut = new ProjectFileLoader(dialogs, fileSystem, processApi, settings);
 
             var result = await sut.Awaiting(x => x.LoadAsync("the.fileName")).Should().CompleteWithinAsync(1.Seconds());
 
@@ -35,12 +35,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
         [Fact]
         public async Task LoadAsync_UserDoesNotWantToStartSecureDriveApp_ReturnsAborted()
         {
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
             var settings = new Settings { SecuredDrives = new StringCollection { "K:\\" } };
-            var sut = new ProjectFileLoader(messageBox, fileSystem, processApi, settings);
-            messageBox.Show(
+            var sut = new ProjectFileLoader(dialogs, fileSystem, processApi, settings);
+            dialogs.ShowMessageBox(
                     Arg.Is<string>(s => s.Contains("Cryptomator")),
                     Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
@@ -51,7 +51,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
 
             result.Subject.Should().Be(OperationResult.Aborted);
             processApi.DidNotReceive().Start(Arg.Any<ProcessStartInfo>());
-            messageBox.Received(1).Show(
+            dialogs.Received(1).ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator")),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),

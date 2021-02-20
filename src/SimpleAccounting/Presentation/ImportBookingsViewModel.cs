@@ -21,16 +21,16 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class ImportBookingsViewModel : Screen
     {
         private readonly List<AccountDefinition> accounts;
-        private readonly IMessageBox messageBox;
+        private readonly IDialogs dialogs;
         private bool isBusy;
         private ulong selectedAccountNumber;
         private DateTime startDate;
 
         public ImportBookingsViewModel(
-            IMessageBox messageBox,
+            IDialogs dialogs,
             IProjectData projectData)
         {
-            this.messageBox = messageBox;
+            this.dialogs = dialogs;
             this.ProjectData = projectData;
             this.accounts = projectData.Storage.AllAccounts.ToList();
             this.FirstBookingNumber = projectData.MaxBookIdent + 1;
@@ -253,7 +253,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 if (!this.LoadedData.Any())
                 {
-                    this.messageBox.Show(
+                    this.dialogs.ShowMessageBox(
                         string.Format(
                             CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFoundInX, fileName),
                         Resources.ImportData_MessageTitle);
@@ -266,7 +266,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 string message = string.Format(
                     CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, fileName) + "\n" + e.Message;
-                this.messageBox.Show(message, Resources.ImportData_MessageTitle);
+                this.dialogs.ShowMessageBox(message, Resources.ImportData_MessageTitle);
             }
         }
 

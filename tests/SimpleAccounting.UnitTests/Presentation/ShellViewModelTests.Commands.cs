@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
@@ -121,11 +120,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [CulturedFact("en")]
         public void SwitchCultureCommand_DummyLanguage_MessageBoxShownAndConfigurationUpdated()
         {
-            var sut = CreateSut(out IMessageBox messageBox);
+            var sut = CreateSut(out IDialogs dialogs);
 
             sut.SwitchCultureCommand.Execute("dummy");
 
-            messageBox.Received(1).Show(
+            dialogs.Received(1).ShowMessageBox(
                 Arg.Is<string>(x => x.Contains("must restart the application")),
                 Arg.Any<string>(),
                 icon: MessageBoxImage.Information);
@@ -420,8 +419,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CloseYearCommand_ActionAborted_YearsUnchanged()
         {
-            var sut = CreateSut(out IMessageBox messageBox);
-            messageBox.Show(
+            var sut = CreateSut(out IDialogs dialogs);
+            dialogs.ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo,
@@ -438,8 +437,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CloseYearCommand_CurrentYearClosed_CannotExecute()
         {
-            var sut = CreateSut(out IMessageBox messageBox);
-            messageBox.Show(
+            var sut = CreateSut(out IDialogs dialogs);
+            dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
             sut.ProjectData.Load(Samples.SampleProject);
@@ -773,7 +772,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.HelpAboutCommand.Execute(null);
 
-            processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(x => x.UseShellExecute));
+            processApi.Received(1).ShellExecute(Arg.Any<string>());
         }
 
         [Fact]
@@ -783,7 +782,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.HelpFeedbackCommand.Execute(null);
 
-            processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(x => x.UseShellExecute));
+            processApi.Received(1).ShellExecute(Arg.Any<string>());
         }
 
         [Fact]
