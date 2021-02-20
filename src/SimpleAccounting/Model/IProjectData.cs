@@ -30,6 +30,8 @@ namespace lg2de.SimpleAccounting.Model
 
         event EventHandler DataLoaded;
 
+        void NewProject();
+        
         void Load(AccountingData accountingData);
         
         Task<OperationResult> LoadFromFileAsync(string projectFileName, Settings settings);

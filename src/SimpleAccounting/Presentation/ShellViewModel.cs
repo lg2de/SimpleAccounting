@@ -7,12 +7,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
-    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -21,6 +18,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Windows.Threading;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
+    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
@@ -58,9 +56,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.messageBox = messageBox;
             this.processApi = processApi;
 
-            this.version = this.GetType().Assembly
-                               .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-                           ?? "UNKNOWN";
+            this.version = this.GetType().GetInformationalVersion();
 
             this.ProjectData.DataLoaded += (_, __) =>
             {
@@ -112,8 +108,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return;
                 }
 
-                this.ProjectData.FileName = "<new>";
-                this.ProjectData.Load(AccountingData.GetTemplateProject());
+                this.ProjectData.NewProject();
             });
 
         public ICommand OpenProjectCommand => new RelayCommand(_ => this.OnOpenProject());
@@ -169,10 +164,10 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.OnAnnualBalanceReport(), _ => this.FullJournal.Items.Any());
 
         public ICommand HelpAboutCommand => new RelayCommand(
-            _ => this.processApi.Start(new ProcessStartInfo(Defines.ProjectUrl) { UseShellExecute = true }));
+            _ => this.processApi.ShellExecute(Defines.ProjectUrl));
 
         public ICommand HelpFeedbackCommand => new RelayCommand(
-            _ => this.processApi.Start(new ProcessStartInfo(Defines.NewIssueUrl) { UseShellExecute = true }));
+            _ => this.processApi.ShellExecute(Defines.NewIssueUrl));
 
         public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this, this.OnCheckForUpdateAsync);
 
@@ -330,6 +325,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void OnOpenProject()
         {
+            // TODO abstract the dialogs
             using var openFileDialog = new OpenFileDialog
             {
                 Filter = Resources.FileFilter_MainProject, RestoreDirectory = true
@@ -345,8 +341,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void BuildRecentProjectsMenu()
         {
-            // ReSharper disable once ConstantNullCoalescingCondition - FP
-            foreach (var project in this.Settings.RecentProjects ?? new StringCollection())
+            if (this.Settings.RecentProjects == null)
+            {
+                return;
+            }
+            
+            foreach (var project in this.Settings.RecentProjects)
             {
                 var command = new AsyncCommand(this, () => this.OnLoadRecentProjectAsync(project));
                 this.RecentProjects.Add(new MenuViewModel(project, command));
@@ -377,12 +377,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void OnEditBooking(object commandParameter)
         {
-            if (!(commandParameter is JournalItemBaseViewModel journalViewModel))
+            if (!(commandParameter is IJournalItem journalItem))
             {
                 return;
             }
 
-            this.ProjectData.ShowEditBookingDialog(journalViewModel.Identifier, this.Accounts.ShowInactiveAccounts);
+            this.ProjectData.ShowEditBookingDialog(journalItem.Identifier, this.Accounts.ShowInactiveAccounts);
         }
 
         private void OnCloseYear(object _)
@@ -416,6 +416,7 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        // TODO move complete report handling to ReportFactory
         private void OnTotalJournalReport()
         {
             var report = this.reportFactory.CreateTotalJournal(this.ProjectData);

@@ -70,6 +70,12 @@ namespace lg2de.SimpleAccounting.Model
 
         public event EventHandler DataLoaded = (_, __) => { };
 
+        public void NewProject()
+        {
+            this.FileName = "<new>";
+            this.Load(AccountingData.GetTemplateProject());
+        }
+
         public void Load(AccountingData accountingData)
         {
             this.Storage = accountingData;
