@@ -791,10 +791,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IApplicationUpdate applicationUpdate);
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
 
-            sut.HelpCheckForUpdateCommand.Execute(null);
-
-            // TODO remove with AsyncCommand
-            await Task.Delay(1.Seconds());
+            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
 
             applicationUpdate.Received(1).StartUpdateProcess();
         }
@@ -805,10 +802,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IApplicationUpdate applicationUpdate);
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(false);
 
-            sut.HelpCheckForUpdateCommand.Execute(null);
-
-            // TODO remove with AsyncCommand
-            await Task.Delay(1.Seconds());
+            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
 
             applicationUpdate.DidNotReceive().StartUpdateProcess();
         }
@@ -820,10 +814,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
             sut.ProjectData.IsModified = true;
 
-            sut.HelpCheckForUpdateCommand.Execute(null);
-
-            // TODO remove with AsyncCommand
-            await Task.Delay(1.Seconds());
+            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
 
             applicationUpdate.DidNotReceive().StartUpdateProcess();
         }

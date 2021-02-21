@@ -366,7 +366,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void CheckSaveProject_AnswerNo_NotSavedAndReturnsTrue()
+        public void CanDiscardModifiedProject_AnswerNo_NotSavedAndReturnsTrue()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             sut.ProjectData.IsModified = true;
@@ -377,7 +377,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Returns(MessageBoxResult.No);
             sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.ProjectData.CheckSaveProject().Should().BeTrue();
+            sut.ProjectData.CanDiscardModifiedProject().Should().BeTrue();
 
             messageBox.Received(1).ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
@@ -387,7 +387,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void CheckSaveProject_AnswerYes_SavedAndReturnsTrue()
+        public void CanDiscardModifiedProject_AnswerYes_SavedAndReturnsTrue()
         {
             var sut = CreateSut(out var messageBox, out var fileSystem);
             sut.ProjectData.IsModified = true;
@@ -398,7 +398,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Returns(MessageBoxResult.Yes);
             sut.ProjectData.Load(Samples.SampleProject);
 
-            sut.ProjectData.CheckSaveProject().Should().BeTrue();
+            sut.ProjectData.CanDiscardModifiedProject().Should().BeTrue();
 
             messageBox.Received(1).ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
@@ -408,11 +408,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void CheckSaveProject_NotModified_ReturnsTrue()
+        public void CanDiscardModifiedProject_NotModified_ReturnsTrue()
         {
             var sut = CreateSut(out IDialogs dialogs);
 
-            sut.ProjectData.CheckSaveProject().Should().BeTrue();
+            sut.ProjectData.CanDiscardModifiedProject().Should().BeTrue();
 
             dialogs.DidNotReceive().ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),

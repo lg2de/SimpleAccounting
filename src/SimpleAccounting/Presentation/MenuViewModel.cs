@@ -20,6 +20,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Reports;
     using Screen = Caliburn.Micro.Screen;
 
+    /// <summary>
+    ///     Implements the view model for the complete menu including all application commands.
+    /// </summary>
     internal class MenuViewModel : Screen, IMenuViewModel
     {
         private readonly IAccountsViewModel accounts;
@@ -45,6 +48,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.projectData.DataLoaded += (_, __) =>
             {
+                // build the list of booking years from loaded data
                 this.UpdateBookingYears();
 
                 // select last booking year after loading
@@ -55,7 +59,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand NewProjectCommand => new RelayCommand(
             _ =>
             {
-                if (!this.projectData.CheckSaveProject())
+                if (!this.projectData.CanDiscardModifiedProject())
                 {
                     return;
                 }
@@ -226,6 +230,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
+            // refresh menu and select the new year
             this.UpdateBookingYears();
             this.BookingYears.Last().Command.Execute(null);
         }

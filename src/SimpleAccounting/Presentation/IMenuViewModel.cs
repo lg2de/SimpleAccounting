@@ -9,9 +9,21 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Windows.Input;
     using lg2de.SimpleAccounting.Infrastructure;
 
-    internal interface IMenuViewModel : IBusy, INotifyPropertyChanged
+    /// <summary>
+    ///     Defines abstraction for <see cref="MenuViewModel"/>.
+    /// </summary>
+    internal interface IMenuViewModel : IBusy, INotifyPropertyChanged // TODO inject IsBusy
     {
+        ICommand NewProjectCommand { get; }
+        ICommand OpenProjectCommand { get; }
+        ICommand SaveProjectCommand { get; }
+        
         ObservableCollection<MenuItemViewModel> RecentProjects { get; }
+
+        ICommand SwitchCultureCommand { get; }
+        bool IsGermanCulture { get; }
+        bool IsEnglishCulture { get; }
+        bool IsSystemCulture { get; }
 
         ICommand AddBookingsCommand { get; }
         ICommand EditBookingCommand { get; }
@@ -27,13 +39,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
         ICommand HelpAboutCommand { get; }
         ICommand HelpFeedbackCommand { get; }
-        ICommand NewProjectCommand { get; }
-        ICommand OpenProjectCommand { get; }
-        ICommand SaveProjectCommand { get; }
-        ICommand SwitchCultureCommand { get; }
-        bool IsGermanCulture { get; }
-        bool IsEnglishCulture { get; }
-        bool IsSystemCulture { get; }
 
         void BuildRecentProjectsMenu();
     }

@@ -1,5 +1,5 @@
 // <copyright>
-//     Copyright (c) Lukas Grützmacher. All rights reserved.
+//     Copyright (c) Lukas GrÃ¼tzmacher. All rights reserved.
 // </copyright>
 
 namespace lg2de.SimpleAccounting.Reports
@@ -16,14 +16,15 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
 
-    [SuppressMessage("Minor Code Smell", "S1192:String literals should not be duplicated")] // TODO fix S1192
     internal class XmlPrinter : IXmlPrinter
     {
         private const int A4Width = 210;
         private const int A4Height = 297;
         private const double DefaultPrintFactor = 100 / 25.4; // mm > inch
-        public const int DefaultLineHeight = 4;
+        private const int DefaultLineHeight = 4;
         private const int Two = 2;
+        
+        private const string NewPageNode = "newPage";
 
         private readonly Stack<Font> fontStack;
         private readonly Stack<Pen> penStack;
@@ -60,16 +61,15 @@ namespace lg2de.SimpleAccounting.Reports
         public void LoadDocument(string resourceName)
         {
             var assembly = this.GetType().Assembly;
-            string fullResourceName = assembly.GetManifestResourceNames()
+            var fullResourceName = assembly.GetManifestResourceNames()
                 .SingleOrDefault(str => str.EndsWith(resourceName, StringComparison.InvariantCultureIgnoreCase));
-
             if (fullResourceName == null)
             {
                 throw new ArgumentException($"The report {resourceName} is invalid.");
             }
 
             using var stream = assembly.GetManifestResourceStream(fullResourceName);
-            this.Document.Load(stream);
+            this.Document.Load(stream!);
         }
 
         public void PrintDocument(string documentName)
@@ -202,9 +202,13 @@ namespace lg2de.SimpleAccounting.Reports
                     transformingNode.ParentNode.RemoveChild(transformingNode);
                     continue;
                 }
-                else if (transformingNode.Name == "newPage")
+                else if (transformingNode.Name == NewPageNode)
                 {
                     this.ProcessNewPage();
+                }
+                else
+                {
+                    // nothing to do
                 }
 
                 this.TransformNodes(transformingNode.FirstChild);
@@ -212,7 +216,7 @@ namespace lg2de.SimpleAccounting.Reports
                 if (nextNode != null
                     && this.CursorY >= this.DocumentHeight - this.DocumentBottomMargin)
                 {
-                    XmlNode newPage = this.Document.CreateElement("newPage");
+                    XmlNode newPage = this.Document.CreateElement(NewPageNode);
                     nextNode.ParentNode.InsertBefore(newPage, nextNode);
 
                     this.ProcessNewPage();
@@ -245,11 +249,15 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     this.PrintFontNode(graphics);
                 }
-                else if (this.currentNode.Name == "newPage")
+                else if (this.currentNode.Name == NewPageNode)
                 {
                     graphics.HasMorePages = true;
                     this.currentNode = this.currentNode.NextSibling;
                     return;
+                }
+                else
+                {
+                    // nothing to do
                 }
 
                 if (this.currentNode.NextSibling != null)
@@ -317,7 +325,7 @@ namespace lg2de.SimpleAccounting.Reports
             // if table can not be started on page - create new one
             if (this.CursorY + tableLineHeight * Two > this.DocumentHeight - this.DocumentBottomMargin)
             {
-                XmlNode newPage = this.Document.CreateElement("newPage");
+                XmlNode newPage = this.Document.CreateElement(NewPageNode);
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
                 this.CursorY = this.DocumentTopMargin;
             }
@@ -358,14 +366,12 @@ namespace lg2de.SimpleAccounting.Reports
                 if (!string.IsNullOrEmpty(align))
                 {
                     textNode.SetAttribute("align", align);
-                    if (align == "right")
+                    xAdoption = align switch
                     {
-                        xAdoption = columnWidth;
-                    }
-                    else if (align == "center")
-                    {
-                        xAdoption = columnWidth / Two;
-                    }
+                        "right" => columnWidth,
+                        "center" => columnWidth / Two,
+                        _ => 0
+                    };
                 }
 
                 textNode.SetAttribute("relX", xPosition + xAdoption);
@@ -431,14 +437,12 @@ namespace lg2de.SimpleAccounting.Reports
                 if (align != null)
                 {
                     textNode.SetAttribute("align", align.Value);
-                    if (align.Value == "right")
+                    xAdoption = align.Value switch
                     {
-                        xAdoption = columnWidth;
-                    }
-                    else if (align.Value == "center")
-                    {
-                        xAdoption = columnWidth / Two;
-                    }
+                        "right" => columnWidth,
+                        "center" => columnWidth / Two,
+                        _ => 0
+                    };
                 }
 
                 textNode.SetAttribute("relX", (xPosition + xAdoption));
@@ -467,7 +471,7 @@ namespace lg2de.SimpleAccounting.Reports
             void StartNewPage()
             {
                 // start new page with table header
-                XmlNode newPage = this.Document.CreateElement("newPage");
+                XmlNode newPage = this.Document.CreateElement(NewPageNode);
                 tableNode.ParentNode.InsertBefore(newPage, tableNode);
                 this.CursorY = this.DocumentTopMargin;
                 this.TransformTableHeader(tableNode);
@@ -730,7 +734,7 @@ namespace lg2de.SimpleAccounting.Reports
             Font drawFont = this.fontStack.Peek();
 
             XmlNode nodeBold = this.currentNode.Attributes.GetNamedItem("bold");
-            string fontName = this.currentNode.GetAttribute<string>("name") ?? drawFont.Name;
+            string fontName = this.currentNode.GetAttribute<string?>("name") ?? drawFont.Name;
             float fontSize = this.currentNode.GetAttribute<float?>("size") ?? drawFont.SizeInPoints;
             FontStyle fontStyle = drawFont.Style;
 

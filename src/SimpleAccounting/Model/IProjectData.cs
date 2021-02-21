@@ -9,22 +9,25 @@ namespace lg2de.SimpleAccounting.Model
     using System.Threading.Tasks;
     using lg2de.SimpleAccounting.Infrastructure;
 
+    /// <summary>
+    ///     Defines the interface for the runtime information of a single project loaded.
+    /// </summary>
     internal interface IProjectData
     {
         string FileName { get; set; }
+
+        string AutoSaveFileName { get; }
 
         AccountingData Storage { get; }
         
         AccountingDataJournal CurrentYear { get; }
         
-        bool IsModified { get; set; } // TODO setter should be internal
+        bool IsModified { get; set; }
         
         ulong MaxBookIdent { get; }
         
         TimeSpan AutoSaveInterval { get; set; }
         
-        string AutoSaveFileName { get; }
-
         event EventHandler DataLoaded;
 
         event EventHandler YearChanged; 
@@ -51,7 +54,7 @@ namespace lg2de.SimpleAccounting.Model
         
         bool CloseYear();
         
-        bool CheckSaveProject();
+        bool CanDiscardModifiedProject();
         
         void TriggerJournalChanged();
         

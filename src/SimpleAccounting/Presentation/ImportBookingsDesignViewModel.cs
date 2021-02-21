@@ -2,7 +2,7 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-#pragma warning disable CA1303 // Do not pass literals as localized parameters
+#pragma warning disable CA1303 // Do not pass literals as localized parameters because design view model defines useful values
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
@@ -12,6 +12,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
+    /// <summary>
+    ///     Implements the view model for the booking importer in the designer.
+    /// </summary>
     [SuppressMessage(
         "Major Code Smell", "S109:Magic numbers should not be used",
         Justification = "Design view model defines useful values")]
@@ -20,6 +23,7 @@ namespace lg2de.SimpleAccounting.Presentation
         Justification = "Design view model defines useful values")]
     internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     {
+        // define some accounts
         private static readonly List<AccountDefinition> SampleAccounts = new List<AccountDefinition>
         {
             new AccountDefinition
@@ -45,6 +49,7 @@ namespace lg2de.SimpleAccounting.Presentation
             new AccountDefinition { ID = 990, Name = "Carryforward" }
         };
 
+        // build sample project with journal entries
         private static readonly AccountingData SampleData = new AccountingData
         {
             Journal = new List<AccountingDataJournal>

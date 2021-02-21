@@ -9,6 +9,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
+    /// <summary>
+    ///     Implements the view model for booking editor to be used in the designer.
+    /// </summary>
     [SuppressMessage(
         "Major Code Smell", "S109:Magic numbers should not be used",
         Justification = "Design view model defines useful values")]

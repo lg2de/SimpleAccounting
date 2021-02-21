@@ -4,6 +4,9 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
+    /// <summary>
+    ///     Implements the view model for a single entry in the full journal.
+    /// </summary>
     public class FullJournalItemViewModel : JournalItemBaseViewModel
     {
         public double Value { get; set; }

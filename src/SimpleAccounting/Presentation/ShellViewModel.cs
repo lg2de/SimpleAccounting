@@ -108,7 +108,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            if (!this.ProjectData.CheckSaveProject())
+            if (!this.ProjectData.CanDiscardModifiedProject())
             {
                 callback(false);
                 return;
@@ -193,7 +193,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            if (!this.ProjectData.CheckSaveProject())
+            if (!this.ProjectData.CanDiscardModifiedProject())
             {
                 return;
             }
@@ -202,7 +202,7 @@ namespace lg2de.SimpleAccounting.Presentation
             // Now we need to close this application.
             this.applicationUpdate.StartUpdateProcess();
 
-            // The user was asked whether saving the project (CheckSaveProject).
+            // The user was asked whether saving the project (CanDiscardModifiedProject).
             // It may have answered "No". So, the project may still be modified.
             // We do not want to ask again, and he doesn't want to save.
             this.ProjectData.IsModified = false;

@@ -7,6 +7,9 @@ namespace lg2de.SimpleAccounting.Model
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    ///     Implements the information relevant for the notification of change in the journal.
+    /// </summary>
     public class JournalChangedEventArgs : EventArgs
     {
         public JournalChangedEventArgs(ulong changedBookingId, IReadOnlyCollection<ulong> affectedAccounts)

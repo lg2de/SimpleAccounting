@@ -60,7 +60,7 @@ namespace lg2de.SimpleAccounting.Model
 
         public AccountingDataJournal CurrentYear { get; private set; }
 
-        public bool IsModified { get; set; } // TODO setter should be internal
+        public bool IsModified { get; set; }
 
         public TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
 
@@ -87,7 +87,7 @@ namespace lg2de.SimpleAccounting.Model
         
         public async Task<OperationResult> LoadFromFileAsync(string projectFileName)
         {
-            if (!this.CheckSaveProject())
+            if (!this.CanDiscardModifiedProject())
             {
                 return OperationResult.Aborted;
             }
@@ -109,7 +109,7 @@ namespace lg2de.SimpleAccounting.Model
         }
         
         
-        public bool CheckSaveProject()
+        public bool CanDiscardModifiedProject()
         {
             if (!this.IsModified)
             {
@@ -121,19 +121,18 @@ namespace lg2de.SimpleAccounting.Model
                 Resources.Question_SaveBeforeProceed,
                 Resources.Header_Shutdown,
                 MessageBoxButton.YesNoCancel);
-            if (result == MessageBoxResult.Cancel)
+            switch (result)
             {
-                return false;
-            }
-
-            if (result == MessageBoxResult.Yes)
-            {
+            case MessageBoxResult.Yes:
                 this.SaveProject();
                 return true;
+            case MessageBoxResult.No:
+                // User wants to discard changes.
+                return true;
+            default:
+                // abort
+                return false;
             }
-
-            // TODO Not saving but continue cannot work correctly this way!?
-            return result == MessageBoxResult.No;
         }
         
         public void SaveProject()

@@ -62,7 +62,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
         }
         
         [Fact]
-        public void CheckSaveProject_Cancel_NotSavedAndReturnsFalse()
+        public void CanDiscardModifiedProject_Cancel_NotSavedAndReturnsFalse()
         {
             var windowManager = Substitute.For<IWindowManager>();
             var dialogs = Substitute.For<IDialogs>();
@@ -77,7 +77,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
             sut.Load(Samples.SampleProject);
             sut.IsModified = true;
 
-            sut.CheckSaveProject().Should().BeFalse();
+            sut.CanDiscardModifiedProject().Should().BeFalse();
 
             dialogs.Received(1).ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),

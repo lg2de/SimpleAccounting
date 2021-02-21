@@ -7,6 +7,9 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Collections.Generic;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Defines abstraction for <see cref="ReportFactory"/>.
+    /// </summary>
     internal interface IReportFactory
     {
         IAccountJournalReport CreateAccountJournal(IProjectData projectData);

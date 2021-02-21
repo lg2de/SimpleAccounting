@@ -12,6 +12,9 @@ namespace lg2de.SimpleAccounting.Model
     using System.Xml.Serialization;
     using lg2de.SimpleAccounting.Extensions;
 
+    /// <summary>
+    ///     Implements the root storage class. 
+    /// </summary>
     public partial class AccountingData
     {
         internal const string DefaultXsiSchemaLocation = DefaultSchemaNamespace + " " + DefaultSchemaLocation;
@@ -48,6 +51,9 @@ namespace lg2de.SimpleAccounting.Model
         internal IEnumerable<AccountDefinition> AllAccounts =>
             this.Accounts?.SelectMany(g => g.Account) ?? Enumerable.Empty<AccountDefinition>();
 
+        /// <summary>
+        ///     Creates new project with some template data.
+        /// </summary>
         internal static AccountingData GetTemplateProject()
         {
             var year = (ushort)DateTime.Now.Year;
@@ -81,6 +87,10 @@ namespace lg2de.SimpleAccounting.Model
             return Deserialize(xml);
         }
 
+        /// <summary>
+        ///     Migrates the project from earlier versions.
+        /// </summary>
+        /// <returns><c>true</c> if the project has been modified while migration, otherwise <c>false</c>.</returns>
         internal bool Migrate()
         {
             var result = false;
@@ -230,6 +240,9 @@ namespace lg2de.SimpleAccounting.Model
         }
     }
 
+    /// <summary>
+    ///     Implements extension on <see cref="AccountingDataJournal"/>.
+    /// </summary>
     internal static class AccountDataJournalExtensions
     {
         public static AccountingDataJournal SafeGetLatest(this IList<AccountingDataJournal> journals)

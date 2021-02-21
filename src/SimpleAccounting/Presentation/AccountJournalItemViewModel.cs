@@ -4,8 +4,9 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    using System.Windows;
-
+    /// <summary>
+    ///     Implements the view model for a single entry in the account journal.
+    /// </summary>
     public class AccountJournalItemViewModel : JournalItemBaseViewModel
     {
         public double CreditValue { get; set; }
@@ -15,7 +16,5 @@ namespace lg2de.SimpleAccounting.Presentation
         public string RemoteAccount { get; set; } = string.Empty;
 
         public bool IsSummary { get; set; }
-
-        public Visibility SummaryVisibility => this.IsSummary ? Visibility.Hidden : Visibility.Visible;
     }
 }

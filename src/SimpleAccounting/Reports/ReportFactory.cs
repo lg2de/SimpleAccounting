@@ -8,6 +8,9 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Diagnostics.CodeAnalysis;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Implements <see cref="IReportFactory"/> using real report implementations.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     internal class ReportFactory : IReportFactory
     {

@@ -10,6 +10,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Implements the view model for the full journal.
+    /// </summary>
     internal class FullJournalViewModel : Screen, IFullJournalViewModel
     {
         private readonly IProjectData projectData;

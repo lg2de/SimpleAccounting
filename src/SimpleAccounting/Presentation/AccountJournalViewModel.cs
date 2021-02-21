@@ -11,6 +11,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
+    /// <summary>
+    ///     Implements the view model for the account journal.
+    /// </summary>
     internal class AccountJournalViewModel : Screen, IAccountJournalViewModel
     {
         private readonly IProjectData projectData;
@@ -100,17 +103,17 @@ namespace lg2de.SimpleAccounting.Presentation
             sumItem.DebitValue = debitSum;
             sumItem.CreditValue = creditSum;
 
-            var saldoItem = new AccountJournalItemViewModel();
-            this.Items.Add(saldoItem);
-            saldoItem.IsSummary = true;
-            saldoItem.Text = Resources.Word_Balance;
+            var balanceItem = new AccountJournalItemViewModel();
+            this.Items.Add(balanceItem);
+            balanceItem.IsSummary = true;
+            balanceItem.Text = Resources.Word_Balance;
             if (debitSum > creditSum)
             {
-                saldoItem.DebitValue = debitSum - creditSum;
+                balanceItem.DebitValue = debitSum - creditSum;
             }
             else
             {
-                saldoItem.CreditValue = creditSum - debitSum;
+                balanceItem.CreditValue = creditSum - debitSum;
             }
         }
 
