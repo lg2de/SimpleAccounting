@@ -268,31 +268,26 @@ namespace lg2de.SimpleAccounting.Reports
                     return;
                 }
 
-                if (this.currentNode.Name == MoveNode)
+                switch (this.currentNode.Name)
                 {
+                case MoveNode:
                     this.ProcessMoveNode(this.currentNode);
-                }
-                else if (this.currentNode.Name == TextNode)
-                {
+                    break;
+                case TextNode:
                     this.PrintTextNode(graphics);
-                }
-                else if (this.currentNode.Name == LineNode)
-                {
+                    break;
+                case LineNode:
                     this.PrintLineNode(graphics);
-                }
-                else if (this.currentNode.Name == FontNode)
-                {
+                    break;
+                case FontNode:
                     this.PrintFontNode(graphics);
-                }
-                else if (this.currentNode.Name == NewPageNode)
-                {
+                    break;
+                case NewPageNode:
                     graphics.HasMorePages = true;
                     this.currentNode = this.currentNode.NextSibling;
                     return;
-                }
-                else
-                {
-                    // nothing to do
+                default:
+                    throw new NotSupportedException($"Missing handler for {this.currentNode.Name}");
                 }
 
                 if (this.currentNode.NextSibling != null)

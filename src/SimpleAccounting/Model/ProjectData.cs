@@ -139,17 +139,14 @@ namespace lg2de.SimpleAccounting.Model
         {
             if (this.FileName == "<new>")
             {
-                using var saveFileDialog = new SaveFileDialog
-                {
-                    Filter = Resources.FileFilter_MainProject, RestoreDirectory = true
-                };
-
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                (DialogResult result, var fileName) =
+                    this.dialogs.ShowSaveFileDialog(filter: Resources.FileFilter_MainProject);
+                if (result != DialogResult.OK)
                 {
                     return;
                 }
 
-                this.FileName = saveFileDialog.FileName;
+                this.FileName = fileName;
             }
 
             DateTime fileDate = this.fileSystem.GetLastWriteTime(this.FileName);

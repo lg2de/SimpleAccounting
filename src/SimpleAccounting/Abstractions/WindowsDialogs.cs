@@ -8,6 +8,7 @@ namespace lg2de.SimpleAccounting.Abstractions
     using System.Windows;
     using System.Windows.Forms;
     using Caliburn.Micro;
+    using JetBrains.Annotations;
     using Application = System.Windows.Application;
     using MessageBox = System.Windows.MessageBox;
     using MessageBoxOptions = System.Windows.MessageBoxOptions;
@@ -16,6 +17,7 @@ namespace lg2de.SimpleAccounting.Abstractions
     ///     Default implementation of <see cref="IDialogs"/> using <see cref="System.Windows.MessageBox"/>.
     /// </summary>
     [ExcludeFromCodeCoverage]
+    [UsedImplicitly]
     internal class WindowsDialogs : IDialogs
     {
         public MessageBoxResult ShowMessageBox(
@@ -30,7 +32,7 @@ namespace lg2de.SimpleAccounting.Abstractions
             Execute.OnUIThread(
                 () =>
                 {
-                    Application.Current.MainWindow.Activate();
+                    Application.Current.MainWindow!.Activate();
                     result = MessageBox.Show(
                         Application.Current.MainWindow,
                         messageBoxText,
@@ -45,10 +47,15 @@ namespace lg2de.SimpleAccounting.Abstractions
 
         public (DialogResult Result, string FileName) ShowOpenFileDialog(string filter)
         {
-            using var dialog = new OpenFileDialog
-            {
-                Filter = filter, RestoreDirectory = true
-            };
+            using var dialog = new OpenFileDialog { Filter = filter, RestoreDirectory = true };
+
+            var result = dialog.ShowDialog();
+            return (result, dialog.FileName);
+        }
+
+        public (DialogResult Result, string FileName) ShowSaveFileDialog(string filter)
+        {
+            using var dialog = new SaveFileDialog { Filter = filter, RestoreDirectory = true };
 
             var result = dialog.ShowDialog();
             return (result, dialog.FileName);

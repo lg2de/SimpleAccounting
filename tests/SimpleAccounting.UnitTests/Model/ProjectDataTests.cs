@@ -60,7 +60,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
 
             fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
         }
-        
+
         [Fact]
         public void CanDiscardModifiedProject_Cancel_NotSavedAndReturnsFalse()
         {
@@ -83,6 +83,42 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+        }
+
+        [Fact]
+        public void SaveProject_NotExisting_JustSaved()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var settings = new Settings();
+            var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
+            sut.Load(Samples.SampleProject);
+
+            sut.SaveProject();
+
+            fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
+            fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+            fileSystem.DidNotReceive().FileDelete(Arg.Any<string>());
+        }
+
+        [Fact]
+        public void SaveProject_NewProject_SaveAsDialog()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var settings = new Settings();
+            var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            sut.NewProject();
+
+            sut.SaveProject();
+
+            dialogs.Received(1).ShowSaveFileDialog(Arg.Any<string>());
             fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
         }
     }

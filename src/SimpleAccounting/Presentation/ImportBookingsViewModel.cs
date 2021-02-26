@@ -10,13 +10,14 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+    using System.Windows.Forms;
     using System.Windows.Input;
-    using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
+    using Screen = Caliburn.Micro.Screen;
 
     internal class ImportBookingsViewModel : Screen
     {
@@ -131,17 +132,14 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.IsBusy = true;
 
-                using var openFileDialog = new System.Windows.Forms.OpenFileDialog
-                {
-                    Filter = Resources.FileFilter_ImportData, RestoreDirectory = true
-                };
+                (DialogResult result, var fileName) = this.dialogs.ShowOpenFileDialog(Resources.FileFilter_ImportData);
 
-                if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                if (result != DialogResult.OK)
                 {
                     return;
                 }
 
-                this.OnLoadData(openFileDialog.FileName);
+                this.OnLoadData(fileName);
 
                 this.IsBusy = false;
             }, _ => this.SelectedAccount != null);

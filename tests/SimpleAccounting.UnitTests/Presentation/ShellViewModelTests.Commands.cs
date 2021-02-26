@@ -9,17 +9,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
-    using System.Windows;
     using Caliburn.Micro;
     using FluentAssertions;
     using FluentAssertions.Execution;
     using FluentAssertions.Extensions;
-    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
-    using lg2de.SimpleAccounting.Reports;
     using NSubstitute;
     using Xunit;
 
@@ -97,43 +94,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.FullJournal.Items.Should().BeEmpty();
             sut.AccountJournal.Items.Should().BeEmpty();
         }
-
-        [Fact]
-        public void SaveProjectCommand_DocumentModified_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.ProjectData.Load(Samples.SampleProject);
-            sut.ProjectData.IsModified = true;
-
-            sut.Menu.SaveProjectCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void SaveProjectCommand_Initialized_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.Menu.SaveProjectCommand.CanExecute(null).Should()
-                .BeFalse("default instance does not contain modified document");
-        }
-
-        [CulturedFact("en")]
-        public void SwitchCultureCommand_DummyLanguage_MessageBoxShownAndConfigurationUpdated()
-        {
-            var sut = CreateSut(out IDialogs dialogs);
-
-            sut.Menu.SwitchCultureCommand.Execute("dummy");
-
-            dialogs.Received(1).ShowMessageBox(
-                Arg.Is<string>(x => x.Contains("must restart the application")),
-                Arg.Any<string>(),
-                icon: MessageBoxImage.Information);
-            sut.Settings.Culture.Should().Be("dummy");
-            sut.Menu.IsGermanCulture.Should().BeFalse();
-            sut.Menu.IsEnglishCulture.Should().BeFalse();
-            sut.Menu.IsSystemCulture.Should().BeFalse();
-        }
-
+        
         [Fact]
         public void NewAccountCommand_AccountCreatedAndSorted()
         {
@@ -416,46 +377,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.Menu.ImportBookingsCommand.CanExecute(null).Should().BeTrue();
         }
 
-        [Fact]
-        public void CloseYearCommand_ActionAborted_YearsUnchanged()
-        {
-            var sut = CreateSut(out IDialogs dialogs);
-            dialogs.ShowMessageBox(
-                Arg.Any<string>(),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No).Returns(MessageBoxResult.No);
-            sut.ProjectData.Load(Samples.SampleProject);
-
-            sut.Menu.CloseYearCommand.Execute(null);
-
-            var thisYear = DateTime.Now.Year;
-            sut.Menu.BookingYears.Select(x => x.Header).Should().Equal("2000", thisYear.ToString());
-        }
-
-        [Fact]
-        public void CloseYearCommand_CurrentYearClosed_CannotExecute()
-        {
-            var sut = CreateSut(out IDialogs dialogs);
-            dialogs.ShowMessageBox(
-                Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
-            sut.ProjectData.Load(Samples.SampleProject);
-            sut.Menu.BookingYears.First().Command.Execute(null);
-
-            sut.Menu.CloseYearCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void CloseYearCommand_DefaultProject_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.ProjectData.Load(Samples.SampleProject);
-
-            sut.Menu.CloseYearCommand.CanExecute(null).Should().BeTrue();
-        }
-
         [CulturedFact("en")]
         public void CloseYearCommand_HappyPath_YearClosedAndNewAdded()
         {
@@ -596,193 +517,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 },
                 new { Text = "Total", IsSummary = true, DebitValue = 651, CreditValue = 0 },
                 new { Text = "Balance", IsSummary = true, DebitValue = 651, CreditValue = 0 });
-        }
-
-        [Fact]
-        public void AccountJournalReportCommand_HappyPath_Completed()
-        {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var accountJournalReport = Substitute.For<IAccountJournalReport>();
-            reportFactory.CreateAccountJournal(sut.ProjectData).Returns(accountJournalReport);
-            sut.ProjectData.Load(Samples.SampleProject);
-
-            sut.Menu.AccountJournalReportCommand.Execute(null);
-
-            accountJournalReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
-        }
-
-        [Fact]
-        public void AccountJournalReportCommand_JournalWithEntries_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
-
-            sut.Menu.AccountJournalReportCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void AccountJournalReportCommand_NoJournal_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.Menu.AccountJournalReportCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void AnnualBalanceReportCommand_HappyPath_Completed()
-        {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var annualBalanceReport = Substitute.For<IAnnualBalanceReport>();
-            reportFactory.CreateAnnualBalance(sut.ProjectData).Returns(annualBalanceReport);
-            sut.ProjectData.Load(Samples.SampleProject);
-
-            sut.Menu.AnnualBalanceReportCommand.Execute(null);
-
-            annualBalanceReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
-        }
-
-        [Fact]
-        public void AnnualBalanceReportCommand_JournalWithEntries_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
-
-            sut.Menu.AnnualBalanceReportCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void AnnualBalanceReportCommand_NoJournal_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.Menu.AnnualBalanceReportCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void AssetBalancesReportCommand_HappyPath_Completed()
-        {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var assetBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
-            reportFactory.CreateTotalsAndBalances(
-                    sut.ProjectData,
-                    Arg.Any<IEnumerable<AccountingDataAccountGroup>>())
-                .Returns(assetBalancesReport);
-            var project = Samples.SampleProject;
-            project.Accounts.Add(
-                new AccountingDataAccountGroup { Name = "EMPTY", Account = new List<AccountDefinition>() });
-            sut.ProjectData.Load(project);
-
-            sut.Menu.AssetBalancesReportCommand.Execute(null);
-
-            assetBalancesReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
-            reportFactory.Received(1).CreateTotalsAndBalances(
-                sut.ProjectData,
-                Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.ToList().All(y => y.Name != "EMPTY")));
-        }
-
-        [Fact]
-        public void AssetBalancesReportCommand_JournalWithEntries_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
-
-            sut.Menu.AssetBalancesReportCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void AssetBalancesReportCommand_NoJournal_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.Menu.AssetBalancesReportCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void TotalJournalReportCommand_HappyPath_Completed()
-        {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var totalJournalReport = Substitute.For<ITotalJournalReport>();
-            reportFactory.CreateTotalJournal(sut.ProjectData).Returns(totalJournalReport);
-            sut.ProjectData.Load(Samples.SampleProject);
-
-            sut.Menu.TotalJournalReportCommand.Execute(null);
-
-            totalJournalReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
-        }
-
-        [Fact]
-        public void TotalJournalReportCommand_JournalWithEntries_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
-
-            sut.Menu.TotalJournalReportCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void TotalJournalReportCommand_NoJournal_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.Menu.TotalJournalReportCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void TotalsAndBalancesReportCommand_HappyPath_Completed()
-        {
-            var sut = CreateSut(out IReportFactory reportFactory);
-            var totalsAndBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
-            reportFactory.CreateTotalsAndBalances(
-                    sut.ProjectData,
-                    Arg.Any<IEnumerable<AccountingDataAccountGroup>>())
-                .Returns(totalsAndBalancesReport);
-            sut.ProjectData.Load(Samples.SampleProject);
-
-            sut.Menu.TotalsAndBalancesReportCommand.Execute(null);
-
-            totalsAndBalancesReport.Received(1)
-                .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
-        }
-
-        [Fact]
-        public void TotalsAndBalancesReportCommand_JournalWithEntries_CanExecute()
-        {
-            var sut = CreateSut();
-            sut.ProjectData.CurrentYear.Booking.Add(new AccountingDataJournalBooking());
-
-            sut.Menu.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void TotalsAndBalancesReportCommand_NoJournal_CannotExecute()
-        {
-            var sut = CreateSut();
-
-            sut.Menu.TotalsAndBalancesReportCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void HelpAboutCommand_Execute_ShellProcessInvoked()
-        {
-            var sut = CreateSut(out IProcess processApi);
-
-            sut.Menu.HelpAboutCommand.Execute(null);
-
-            processApi.Received(1).ShellExecute(Arg.Any<string>());
-        }
-
-        [Fact]
-        public void HelpFeedbackCommand_Execute_ShellProcessInvoked()
-        {
-            var sut = CreateSut(out IProcess processApi);
-
-            sut.Menu.HelpFeedbackCommand.Execute(null);
-
-            processApi.Received(1).ShellExecute(Arg.Any<string>());
         }
 
         [Fact]

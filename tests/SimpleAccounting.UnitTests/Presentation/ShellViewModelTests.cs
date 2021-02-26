@@ -605,20 +605,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void SaveProject_NotExisting_JustSaved()
-        {
-            var sut = CreateSut(out IFileSystem fileSystem);
-            fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
-            sut.ProjectData.Load(Samples.SampleProject);
-
-            sut.ProjectData.SaveProject();
-
-            fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
-            fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
-            fileSystem.DidNotReceive().FileDelete(Arg.Any<string>());
-        }
-
-        [Fact]
         public void SaveProject_ProjectExisting_SavedAfterBackup()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
