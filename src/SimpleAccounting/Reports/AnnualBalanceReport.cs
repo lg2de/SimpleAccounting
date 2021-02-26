@@ -13,7 +13,7 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
-    [SuppressMessage("ReSharper", "CommentTypo")]
+    [SuppressMessage("ReSharper", "CommentTypo", Justification = "additional german comments")]
     internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
     {
         public const string ResourceName = "AnnualBalance.xml";
@@ -113,6 +113,10 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     totalLiability += balance;
                     liabilityNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
+                }
+                else
+                {
+                    // cells remains empty
                 }
             }
 
