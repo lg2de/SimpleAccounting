@@ -144,7 +144,7 @@ namespace lg2de.SimpleAccounting.Reports
             };
 
             this.printFactor = DefaultPrintFactor;
-            string documentPaperSize = this.Document.DocumentElement.GetAttribute<string>(PaperSizeNode, "A4");
+            var documentPaperSize = this.Document.DocumentElement.GetAttribute<string>(PaperSizeNode, "A4");
             var paperSize = paperSizes.FirstOrDefault(
                 s => s.PaperName.StartsWith(documentPaperSize, StringComparison.CurrentCultureIgnoreCase));
             if (paperSize != null)
@@ -769,8 +769,8 @@ namespace lg2de.SimpleAccounting.Reports
             Font drawFont = this.fontStack.Peek();
 
             XmlNode nodeBold = this.currentNode.Attributes.GetNamedItem("bold");
-            string fontName = this.currentNode.GetAttribute<string?>("name") ?? drawFont.Name;
-            float fontSize = this.currentNode.GetAttribute<float?>("size") ?? drawFont.SizeInPoints;
+            var fontName = this.currentNode.GetAttribute("name", drawFont.Name);
+            var fontSize = this.currentNode.GetAttribute("size", drawFont.SizeInPoints);
             FontStyle fontStyle = drawFont.Style;
 
             if (nodeBold != null)

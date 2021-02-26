@@ -35,6 +35,7 @@ namespace lg2de.SimpleAccounting.Extensions
             node.Attributes.SetNamedItem(attr);
         }
 
+#nullable disable
         public static T GetAttribute<T>(this XmlNode node, string name, T defaultValue = default)
         {
             if (node == null)
