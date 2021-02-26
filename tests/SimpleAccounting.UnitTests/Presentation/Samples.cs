@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
@@ -13,6 +14,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using lg2de.SimpleAccounting.Properties;
     using NSubstitute;
 
+    [ExcludeFromCodeCoverage]
     internal static class Samples
     {
         public static readonly uint BaseDate = (uint)DateTime.Now.Year * 10000;
