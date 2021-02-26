@@ -264,13 +264,14 @@ namespace lg2de.SimpleAccounting.Presentation
             }
             catch (Exception e)
             {
-                string message = string.Format(
-                    CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, fileName) + "\n" + e.Message;
+                string message =
+                    string.Format(CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, fileName)
+                    + Environment.NewLine + e.Message;
                 this.dialogs.ShowMessageBox(message, Resources.ImportData_MessageTitle);
             }
         }
 
-        internal void ProcessData()
+        private void ProcessData()
         {
             foreach (var importing in this.ImportDataFiltered)
             {
@@ -283,7 +284,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (importing.RemoteAccount == null)
                 {
                     // mapping missing - abort
-                    break;
+                    this.TryClose();
+                    return;
                 }
 
                 var newBooking = new AccountingDataJournalBooking

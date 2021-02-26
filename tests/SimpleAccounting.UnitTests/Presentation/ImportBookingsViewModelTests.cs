@@ -145,7 +145,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void ProcessData_SampleData_DataConvertedIntoJournal()
+        public void BookAllCommand_SampleData_DataConvertedIntoJournal()
         {
             var projectData = Samples.SampleProjectData;
             var accountsViewModel = new AccountsViewModel(null!, projectData);
@@ -217,7 +217,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     }
                 });
 
-            sut.ProcessData();
+            sut.BookAllCommand.Execute(null);
 
             // 101 should be skipped because of selected start date
             // 103 should be skipped because it is configured to be skipped
