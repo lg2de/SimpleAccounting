@@ -23,17 +23,11 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly IWindowManager windowManager;
 
         private AccountViewModel? selectedAccount;
-        private bool showInactiveAccounts;
 
         public AccountsViewModel(IWindowManager windowManager, IProjectData projectData)
         {
             this.windowManager = windowManager;
             this.projectData = projectData;
-
-            this.projectData.DataLoaded += (_, __) =>
-            {
-                this.LoadAccounts(this.projectData.Storage.Accounts);
-            };
         }
 
         public IEnumerable<AccountViewModel> AllAccounts => this.allAccounts;
@@ -62,12 +56,17 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool ShowInactiveAccounts
         {
-            get => this.showInactiveAccounts;
+            get => this.projectData.ShowInactiveAccounts;
             set
             {
-                this.showInactiveAccounts = value;
+                this.projectData.ShowInactiveAccounts = value;
                 this.RefreshAccountList();
             }
+        }
+
+        public void OnDataLoaded()
+        {
+            this.LoadAccounts(this.projectData.Storage.Accounts);
         }
 
         public void LoadAccounts(IReadOnlyCollection<AccountingDataAccountGroup> accounts)

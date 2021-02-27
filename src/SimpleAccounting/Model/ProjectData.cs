@@ -60,6 +60,8 @@ namespace lg2de.SimpleAccounting.Model
 
         public AccountingDataJournal CurrentYear { get; private set; }
 
+        public bool ShowInactiveAccounts { get; set; }
+
         public bool IsModified { get; set; }
 
         public TimeSpan AutoSaveInterval { get; set; } = TimeSpan.FromMinutes(1);
@@ -71,7 +73,7 @@ namespace lg2de.SimpleAccounting.Model
         public event EventHandler DataLoaded = (_, __) => { };
 
         public event EventHandler YearChanged = (_, __) => { };
-        
+
         public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
 
         public void NewProject()
@@ -84,7 +86,7 @@ namespace lg2de.SimpleAccounting.Model
         {
             this.Storage = accountingData;
         }
-        
+
         public async Task<OperationResult> LoadFromFileAsync(string projectFileName)
         {
             if (!this.CanDiscardModifiedProject())
@@ -107,8 +109,7 @@ namespace lg2de.SimpleAccounting.Model
 
             return OperationResult.Completed;
         }
-        
-        
+
         public bool CanDiscardModifiedProject()
         {
             if (!this.IsModified)
@@ -134,7 +135,7 @@ namespace lg2de.SimpleAccounting.Model
                 return false;
             }
         }
-        
+
         public void SaveProject()
         {
             if (this.FileName == "<new>")
@@ -164,7 +165,7 @@ namespace lg2de.SimpleAccounting.Model
                 this.fileSystem.FileDelete(this.AutoSaveFileName);
             }
         }
-        
+
         public async Task AutoSaveAsync(CancellationToken cancellationToken)
         {
             try
@@ -296,7 +297,7 @@ namespace lg2de.SimpleAccounting.Model
             var importModel = new ImportBookingsViewModel(this.dialogs, this);
             this.windowManager.ShowDialog(importModel);
         }
-        
+
         public bool CloseYear()
         {
             var viewModel = new CloseYearViewModel(this.CurrentYear);

@@ -44,6 +44,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.version = this.GetType().GetInformationalVersion();
 
+            // TODO SVM is too much responsible
+            this.ProjectData.DataLoaded += (sender, args) =>
+            {
+                this.Accounts.OnDataLoaded();
+                this.Menu.OnDataLoaded();
+            };
             this.ProjectData.YearChanged += (_, __) =>
             {
                 this.UpdateDisplayName();
@@ -74,7 +80,7 @@ namespace lg2de.SimpleAccounting.Presentation
         }
 
         public IMenuViewModel Menu { get; }
-        
+
         public IFullJournalViewModel FullJournal { get; }
 
         public IAccountJournalViewModel AccountJournal { get; }
@@ -90,7 +96,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand EditAccountCommand => new RelayCommand(this.Accounts.OnEditAccount);
 
         internal Settings Settings { get; }
-        
+
         internal IProjectData ProjectData { get; }
 
         internal Task LoadingTask { get; private set; } = Task.CompletedTask;

@@ -32,9 +32,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var settings = new Settings();
             var fileSystem = Substitute.For<IFileSystem>();
             var projectData = new ProjectData(settings, null!, null!, fileSystem, null!);
-            var accounts = new AccountsViewModel(null!, projectData);
             var dialogs = Substitute.For<IDialogs>();
-            var sut = new MenuViewModel(settings, projectData, accounts, null!, null!, dialogs);
+            var sut = new MenuViewModel(settings, projectData, null!, null!, dialogs);
             long counter = 0;
             var tcs = new TaskCompletionSource<bool>();
             dialogs.ShowOpenFileDialog(Arg.Any<string>()).Returns((DialogResult.OK, "dummy"));
@@ -122,6 +121,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 MessageBoxImage.Question,
                 MessageBoxResult.No).Returns(MessageBoxResult.No);
             projectData.Load(Samples.SampleProject);
+            sut.OnDataLoaded();
 
             sut.CloseYearCommand.Execute(null);
 
@@ -137,6 +137,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
             projectData.Load(Samples.SampleProject);
+            sut.OnDataLoaded();
             sut.BookingYears.First().Command.Execute(null);
 
             sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
@@ -150,7 +151,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.CloseYearCommand.CanExecute(null).Should().BeTrue();
         }
-        
+
         [Fact]
         public void AccountJournalReportCommand_HappyPath_Completed()
         {
@@ -337,7 +338,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             processApi.Received(1).ShellExecute(Arg.Any<string>());
         }
-        
+
         private static MenuViewModel CreateSut(out ProjectData projectData)
         {
             var sut = CreateSut(out projectData, out IDialogs _, out IReportFactory _);
@@ -349,7 +350,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out ProjectData _, out dialogs, out IReportFactory _);
             return sut;
         }
-        
+
         private static MenuViewModel CreateSut(out ProjectData projectData, out IReportFactory reportFactory)
         {
             var sut = CreateSut(out projectData, out IDialogs _, out reportFactory);
@@ -365,11 +366,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory = Substitute.For<IReportFactory>();
             var settings = new Settings();
             projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-            var accounts = new AccountsViewModel(windowManager, projectData);
-            var sut = new MenuViewModel(settings, projectData, accounts, reportFactory, processApi, dialogs);
+            var sut = new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs);
             return sut;
         }
-        
+
         private static MenuViewModel CreateSut(out IProcess processApi)
         {
             var windowManager = Substitute.For<IWindowManager>();
@@ -379,8 +379,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             var settings = new Settings();
             var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-            var accounts = new AccountsViewModel(windowManager, projectData);
-            var sut = new MenuViewModel(settings, projectData, accounts, reportFactory, processApi, dialogs);
+            var sut = new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs);
             return sut;
         }
     }

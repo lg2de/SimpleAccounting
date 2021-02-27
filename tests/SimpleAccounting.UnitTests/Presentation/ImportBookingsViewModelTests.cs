@@ -151,7 +151,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(null!, projectData);
             var settings = new Settings();
             var parent = new ShellViewModel(
-                settings, projectData, new MenuViewModel(settings, projectData, accountsViewModel, null!, null!, null!),
+                settings, projectData, new MenuViewModel(settings, projectData, null!, null!, null!),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, null!);
             var accounts = projectData.Storage.AllAccounts.ToList();

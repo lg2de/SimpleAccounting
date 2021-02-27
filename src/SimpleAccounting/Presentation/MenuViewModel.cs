@@ -25,7 +25,6 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     internal class MenuViewModel : Screen, IMenuViewModel
     {
-        private readonly IAccountsViewModel accounts;
         private readonly IDialogs dialogs;
         private readonly IProcess processApi;
         private readonly IProjectData projectData;
@@ -36,24 +35,14 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public MenuViewModel(
             Settings settings, IProjectData projectData,
-            IAccountsViewModel accounts, IReportFactory reportFactory,
+            IReportFactory reportFactory,
             IProcess processApi, IDialogs dialogs)
         {
             this.settings = settings;
             this.projectData = projectData;
-            this.accounts = accounts;
             this.processApi = processApi;
             this.dialogs = dialogs;
             this.reportFactory = reportFactory;
-
-            this.projectData.DataLoaded += (_, __) =>
-            {
-                // build the list of booking years from loaded data
-                this.UpdateBookingYears();
-
-                // select last booking year after loading
-                this.BookingYears.LastOrDefault()?.Command.Execute(null);
-            };
         }
 
         public ICommand NewProjectCommand => new RelayCommand(
@@ -95,7 +84,7 @@ namespace lg2de.SimpleAccounting.Presentation
             = new ObservableCollection<MenuItemViewModel>();
 
         public ICommand AddBookingsCommand => new RelayCommand(
-            _ => this.projectData.ShowAddBookingDialog(this.accounts.ShowInactiveAccounts),
+            _ => this.projectData.ShowAddBookingDialog(this.projectData.ShowInactiveAccounts),
             _ => !this.projectData.CurrentYear.Closed);
 
         public ICommand EditBookingCommand => new RelayCommand(
@@ -168,6 +157,15 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        public void OnDataLoaded()
+        {
+            // build the list of booking years from loaded data
+            this.UpdateBookingYears();
+
+            // select last booking year after loading
+            this.BookingYears.LastOrDefault()?.Command.Execute(null);
+        }
+
         private async Task OnLoadRecentProjectAsync(string project)
         {
             var loadResult = await this.projectData.LoadFromFileAsync(project);
@@ -220,7 +218,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            this.projectData.ShowEditBookingDialog(journalItem.Identifier, this.accounts.ShowInactiveAccounts);
+            this.projectData.ShowEditBookingDialog(journalItem.Identifier, this.projectData.ShowInactiveAccounts);
         }
 
         private void OnCloseYear(object _)

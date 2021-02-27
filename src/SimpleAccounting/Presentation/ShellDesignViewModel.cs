@@ -30,7 +30,7 @@ namespace lg2de.SimpleAccounting.Presentation
             : base(
                 DesignSettings,
                 DesignProject,
-                new MenuViewModel(DesignSettings, DesignProject, null!, null!, null!, null!),
+                new MenuViewModel(DesignSettings, DesignProject, null!, null!, null!),
                 new FullJournalViewModel(DesignProject),
                 new AccountJournalViewModel(DesignProject),
                 new AccountsViewModel(null!, DesignProject), null!)

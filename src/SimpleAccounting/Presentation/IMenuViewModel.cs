@@ -41,5 +41,6 @@ namespace lg2de.SimpleAccounting.Presentation
         ICommand HelpFeedbackCommand { get; }
 
         void BuildRecentProjectsMenu();
+        void OnDataLoaded();
     }
 }

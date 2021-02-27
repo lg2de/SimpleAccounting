@@ -22,6 +22,8 @@ namespace lg2de.SimpleAccounting.Model
         
         AccountingDataJournal CurrentYear { get; }
         
+        bool ShowInactiveAccounts { get; set; }
+        
         bool IsModified { get; set; }
         
         ulong MaxBookIdent { get; }

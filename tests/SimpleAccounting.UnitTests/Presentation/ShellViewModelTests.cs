@@ -152,7 +152,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData, new MenuViewModel(settings, projectData, accountsViewModel, null!, null!, null!),
+                    settings, projectData, new MenuViewModel(settings, projectData, null!, null!, null!),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             dialogs.ShowMessageBox(
@@ -704,7 +704,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut =
                 new ShellViewModel(
                     settings, projectData,
-                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -724,7 +724,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut =
                 new ShellViewModel(
                     settings, projectData,
-                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -744,7 +744,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut =
                 new ShellViewModel(
                     settings, projectData,
-                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -764,7 +764,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut =
                 new ShellViewModel(
                     settings, projectData,
-                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -784,7 +784,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut =
                 new ShellViewModel(
                     settings, projectData,
-                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -804,7 +804,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut =
                 new ShellViewModel(
                     settings, projectData,
-                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -824,7 +824,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut =
                 new ShellViewModel(
                     settings, projectData,
-                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -844,7 +844,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut =
                 new ShellViewModel(
                     settings, projectData,
-                    new MenuViewModel(settings, projectData, accountsViewModel, reportFactory, processApi, dialogs),
+                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
