@@ -17,6 +17,10 @@ namespace lg2de.SimpleAccounting
     using lg2de.SimpleAccounting.Reports;
 
     [ExcludeFromCodeCoverage]
+    [SuppressMessage(
+        "Major Code Smell",
+        "S1200:Classes should not be coupled to too many other classes (Single Responsibility Principle)",
+        Justification = "The bootstrapper is responsible to configure all classes.")]
     public class AppBootstrapper : BootstrapperBase
     {
         private readonly SimpleContainer container = new SimpleContainer();
@@ -28,6 +32,7 @@ namespace lg2de.SimpleAccounting
             // register default implementations for our interfaces
             this.container.RegisterInstance(typeof(Settings), null, Settings.Default);
             this.container.Singleton<IProjectData, ProjectData>()
+                .Singleton<IBusy, BusyControlModel>()
                 .Singleton<IMenuViewModel, MenuViewModel>()
                 .Singleton<IFullJournalViewModel, FullJournalViewModel>()
                 .Singleton<IAccountJournalViewModel, AccountJournalViewModel>()

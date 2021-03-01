@@ -108,7 +108,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.SelectedAccount = this.AccountList.FirstOrDefault();
             }
         }
-        
+
         public void ShowNewAccountDialog()
         {
             var accountVm = new AccountViewModel

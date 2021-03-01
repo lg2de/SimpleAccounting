@@ -19,49 +19,49 @@ namespace lg2de.SimpleAccounting.Model
         string AutoSaveFileName { get; }
 
         AccountingData Storage { get; }
-        
+
         AccountingDataJournal CurrentYear { get; }
-        
+
         bool ShowInactiveAccounts { get; set; }
-        
+
         bool IsModified { get; set; }
-        
+
         ulong MaxBookIdent { get; }
-        
+
         TimeSpan AutoSaveInterval { get; set; }
-        
+
         event EventHandler DataLoaded;
 
-        event EventHandler YearChanged; 
+        event EventHandler YearChanged;
 
         event EventHandler<JournalChangedEventArgs> JournalChanged;
 
         void NewProject();
-        
+
         void Load(AccountingData accountingData);
-        
+
         Task<OperationResult> LoadFromFileAsync(string projectFileName);
-        
+
         void SaveProject();
-        
+
         Task AutoSaveAsync(CancellationToken cancellationToken);
-        
+
         void RemoveAutoSaveFile();
-        
+
         void ShowAddBookingDialog(bool showInactiveAccounts);
-        
+
         void ShowEditBookingDialog(ulong bookingId, bool showInactiveAccounts);
-        
+
         void ShowImportDialog();
-        
+
         bool CloseYear();
-        
+
         bool CanDiscardModifiedProject();
-        
+
         void TriggerJournalChanged();
-        
+
         void AddBooking(AccountingDataJournalBooking booking);
-        
+
         void SelectYear(string yearName);
     }
 }

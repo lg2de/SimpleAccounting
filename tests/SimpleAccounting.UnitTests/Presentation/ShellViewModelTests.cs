@@ -137,6 +137,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [WpfFact]
         public async Task OnActivate_TwoRecentProjectsOneOnSecuredDrive_AllProjectListed()
         {
+            var busy = Substitute.For<IBusy>();
             var windowManager = Substitute.For<IWindowManager>();
             var applicationUpdate = Substitute.For<IApplicationUpdate>();
             var dialogs = Substitute.For<IDialogs>();
@@ -152,9 +153,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData, new MenuViewModel(settings, projectData, null!, null!, null!),
-                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    accountsViewModel, applicationUpdate);
+                    settings, projectData, busy,
+                    new MenuViewModel(settings, projectData, busy, null!, null!, null!), new FullJournalViewModel(projectData),
+                    new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate);
             dialogs.ShowMessageBox(
                     Arg.Is<string>(s => s.Contains("Cryptomator")),
                     Arg.Any<string>(),
@@ -692,6 +693,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
         private static ShellViewModel CreateSut()
         {
+            var busy = Substitute.For<IBusy>();
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             var applicationUpdate = Substitute.For<IApplicationUpdate>();
@@ -704,14 +706,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut =
                 new ShellViewModel(
                     settings, projectData,
-                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
-                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    accountsViewModel, applicationUpdate);
+                    busy,
+                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs), new FullJournalViewModel(projectData),
+                    new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate);
             return sut;
         }
 
         private static ShellViewModel CreateSut(out IWindowManager windowManager)
         {
+            var busy = Substitute.For<IBusy>();
             windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             var applicationUpdate = Substitute.For<IApplicationUpdate>();
@@ -723,28 +726,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData,
-                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
-                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    accountsViewModel, applicationUpdate);
-            return sut;
-        }
-
-        private static ShellViewModel CreateSut(out IReportFactory reportFactory)
-        {
-            var windowManager = Substitute.For<IWindowManager>();
-            reportFactory = Substitute.For<IReportFactory>();
-            var applicationUpdate = Substitute.For<IApplicationUpdate>();
-            var dialogs = Substitute.For<IDialogs>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            var processApi = Substitute.For<IProcess>();
-            var settings = new Settings();
-            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
-            var sut =
-                new ShellViewModel(
-                    settings, projectData,
-                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
+                    settings, projectData, busy,
+                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -752,6 +735,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
         private static ShellViewModel CreateSut(out IApplicationUpdate applicationUpdate)
         {
+            var busy = Substitute.For<IBusy>();
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             applicationUpdate = Substitute.For<IApplicationUpdate>();
@@ -763,8 +747,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData,
-                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
+                    settings, projectData, busy,
+                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -772,6 +756,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
         private static ShellViewModel CreateSut(out IDialogs dialogs)
         {
+            var busy = Substitute.For<IBusy>();
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             var applicationUpdate = Substitute.For<IApplicationUpdate>();
@@ -783,8 +768,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData,
-                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
+                    settings, projectData, busy,
+                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -792,6 +777,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
         private static ShellViewModel CreateSut(out IFileSystem fileSystem)
         {
+            var busy = Substitute.For<IBusy>();
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             var applicationUpdate = Substitute.For<IApplicationUpdate>();
@@ -803,28 +789,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData,
-                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
-                    new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                    accountsViewModel, applicationUpdate);
-            return sut;
-        }
-
-        private static ShellViewModel CreateSut(out IProcess processApi)
-        {
-            var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var applicationUpdate = Substitute.For<IApplicationUpdate>();
-            var dialogs = Substitute.For<IDialogs>();
-            var fileSystem = Substitute.For<IFileSystem>();
-            processApi = Substitute.For<IProcess>();
-            var settings = new Settings();
-            var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-            var accountsViewModel = new AccountsViewModel(windowManager, projectData);
-            var sut =
-                new ShellViewModel(
-                    settings, projectData,
-                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
+                    settings, projectData, busy,
+                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -832,6 +798,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
         private static ShellViewModel CreateSut(out IDialogs dialogs, out IFileSystem fileSystem)
         {
+            var busy = Substitute.For<IBusy>();
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             var applicationUpdate = Substitute.For<IApplicationUpdate>();
@@ -843,8 +810,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData,
-                    new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs),
+                    settings, projectData, busy,
+                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;

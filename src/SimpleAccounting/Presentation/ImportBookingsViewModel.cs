@@ -23,7 +23,6 @@ namespace lg2de.SimpleAccounting.Presentation
     {
         private readonly List<AccountDefinition> accounts;
         private readonly IDialogs dialogs;
-        private bool isBusy;
         private ulong selectedAccountNumber;
         private DateTime startDate;
 
@@ -112,25 +111,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool IsForceEnglish { get; set; }
 
-        public bool IsBusy
-        {
-            get => this.isBusy;
-            private set
-            {
-                if (value == this.isBusy)
-                {
-                    return;
-                }
-
-                this.isBusy = value;
-                this.NotifyOfPropertyChange();
-            }
-        }
+        public IBusy Busy { get; } = new BusyControlModel();
 
         public ICommand LoadDataCommand => new RelayCommand(
             _ =>
             {
-                this.IsBusy = true;
+                this.Busy.IsBusy = true;
 
                 (DialogResult result, var fileName) = this.dialogs.ShowOpenFileDialog(Resources.FileFilter_ImportData);
 
@@ -141,7 +127,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 this.OnLoadData(fileName);
 
-                this.IsBusy = false;
+                this.Busy.IsBusy = false;
             }, _ => this.SelectedAccount != null);
 
         public ICommand BookAllCommand => new RelayCommand(

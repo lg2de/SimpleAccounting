@@ -17,7 +17,7 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Extensions;
 
     /// <summary>
-    ///     Implements the conversion of XML into print preview (Windows Forms). 
+    ///     Implements the conversion of XML into print preview (Windows Forms).
     /// </summary>
     internal class XmlPrinter : IXmlPrinter
     {
@@ -440,7 +440,7 @@ namespace lg2de.SimpleAccounting.Reports
             {
                 return;
             }
-            
+
             int innerLineCount = 1;
             for (int i = 0; i < rowNodes.Count; i++)
             {
@@ -562,7 +562,7 @@ namespace lg2de.SimpleAccounting.Reports
             {
                 return;
             }
-            
+
             foreach (var pageWrap in pageWraps.OfType<XmlNode>())
             {
                 pageNumber++;
@@ -581,7 +581,7 @@ namespace lg2de.SimpleAccounting.Reports
                 {
                     continue;
                 }
-                
+
                 string pageNumberText = pageNumber.ToString(CultureInfo.InvariantCulture);
                 foreach (var element in textElements.OfType<XmlElement>())
                 {

@@ -16,6 +16,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using FluentAssertions.Execution;
     using FluentAssertions.Extensions;
     using lg2de.SimpleAccounting.Abstractions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
@@ -33,7 +34,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var fileSystem = Substitute.For<IFileSystem>();
             var projectData = new ProjectData(settings, null!, null!, fileSystem, null!);
             var dialogs = Substitute.For<IDialogs>();
-            var sut = new MenuViewModel(settings, projectData, null!, null!, dialogs);
+            var busy = new BusyControlModel();
+            var sut = new MenuViewModel(settings, projectData, busy, null!, null!, dialogs);
             long counter = 0;
             var tcs = new TaskCompletionSource<bool>();
             dialogs.ShowOpenFileDialog(Arg.Any<string>()).Returns((DialogResult.OK, "dummy"));
@@ -41,14 +43,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             // Because awaiting "ExecuteUIThread" does not really await the action
             // we need to wait for two property changed events.
             var values = new List<bool>();
-            sut.PropertyChanged += (sender, args) =>
+            busy.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName != "IsBusy")
                 {
                     return;
                 }
 
-                values.Add(sut.IsBusy);
+                values.Add(busy.IsBusy);
                 if (Interlocked.Increment(ref counter) == 2)
                 {
                     tcs.SetResult(true);
@@ -363,10 +365,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
             dialogs = Substitute.For<IDialogs>();
+            var busy = Substitute.For<IBusy>();
             reportFactory = Substitute.For<IReportFactory>();
             var settings = new Settings();
             projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-            var sut = new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs);
+            var sut = new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs);
             return sut;
         }
 
@@ -376,10 +379,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var fileSystem = Substitute.For<IFileSystem>();
             processApi = Substitute.For<IProcess>();
             var dialogs = Substitute.For<IDialogs>();
+            var busy = Substitute.For<IBusy>();
             var reportFactory = Substitute.For<IReportFactory>();
             var settings = new Settings();
             var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-            var sut = new MenuViewModel(settings, projectData, reportFactory, processApi, dialogs);
+            var sut = new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs);
             return sut;
         }
     }

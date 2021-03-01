@@ -7,9 +7,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System;
     using System.Linq;
     using FluentAssertions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
+    using NSubstitute;
     using Xunit;
 
     public class ImportBookingsViewModelTests
@@ -110,7 +112,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts)
                 {
-                    RemoteAccount = accounts.First(), IsSkip = false, IsExisting = false
+                    RemoteAccount = accounts.First(),
+                    IsSkip = false,
+                    IsExisting = false
                 });
 
             sut.BookAllCommand.CanExecute(null).Should().BeTrue();
@@ -150,15 +154,17 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var projectData = Samples.SampleProjectData;
             var accountsViewModel = new AccountsViewModel(null!, projectData);
             var settings = new Settings();
+            var busy = Substitute.For<IBusy>();
             var parent = new ShellViewModel(
-                settings, projectData, new MenuViewModel(settings, projectData, null!, null!, null!),
-                new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                accountsViewModel, null!);
+                settings, projectData, busy,
+                new MenuViewModel(settings, projectData, busy, null!, null!, null!), new FullJournalViewModel(projectData),
+                new AccountJournalViewModel(projectData), accountsViewModel, null!);
             var accounts = projectData.Storage.AllAccounts.ToList();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
             var sut = new ImportBookingsViewModel(
                 null!,
-                projectData) { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
+                projectData)
+            { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
             var remoteAccount = accounts.Single(x => x.ID == 600);
             int year = DateTime.Today.Year;
             sut.StartDate = new DateTime(year, 1, 2);

@@ -28,6 +28,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ShellViewModel(
             Settings settings,
             IProjectData projectData,
+            IBusy busy,
             IMenuViewModel menu,
             IFullJournalViewModel fullJournal,
             IAccountJournalViewModel accountJournal,
@@ -36,6 +37,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.Settings = settings;
             this.ProjectData = projectData;
+            this.Busy = busy;
             this.Menu = menu;
             this.FullJournal = fullJournal;
             this.AccountJournal = accountJournal;
@@ -79,6 +81,8 @@ namespace lg2de.SimpleAccounting.Presentation
             };
         }
 
+        public IBusy Busy { get; }
+
         public IMenuViewModel Menu { get; }
 
         public IFullJournalViewModel FullJournal { get; }
@@ -89,7 +93,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
 
-        public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this.Menu, this.OnCheckForUpdateAsync);
+        public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this.Busy, this.OnCheckForUpdateAsync);
 
         public ICommand NewAccountCommand => new RelayCommand(_ => this.Accounts.ShowNewAccountDialog());
 
@@ -150,10 +154,10 @@ namespace lg2de.SimpleAccounting.Presentation
                         await dispatcher.Invoke(
                             async () =>
                             {
-                                this.Menu.IsBusy = true;
+                                this.Busy.IsBusy = true;
                                 await this.ProjectData.LoadFromFileAsync(this.Settings.RecentProject);
                                 this.Menu.BuildRecentProjectsMenu();
-                                this.Menu.IsBusy = false;
+                                this.Busy.IsBusy = false;
                             });
                         this.autoSaveTask = this.ProjectData.AutoSaveAsync(this.cancellationTokenSource.Token);
                     });

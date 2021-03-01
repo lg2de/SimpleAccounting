@@ -33,10 +33,13 @@
           </Style>
         </Menu.Resources>
         <MenuItem Header="{x:Static properties:Resources.Menu_Project}">
-          <MenuItem Header="{x:Static properties:Resources.Menu_Project_New}" Command="{Binding Menu.NewProjectCommand}" />
-          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Open}" Command="{Binding Menu.OpenProjectCommand}"
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_New}"
+                    Command="{Binding Menu.NewProjectCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Open}"
+                    Command="{Binding Menu.OpenProjectCommand}"
                     InputGestureText="STRG-O" />
-          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Save}" Command="{Binding Menu.SaveProjectCommand}"
+          <MenuItem Header="{x:Static properties:Resources.Menu_Project_Save}"
+                    Command="{Binding Menu.SaveProjectCommand}"
                     InputGestureText="STRG-S" />
           <Separator />
           <MenuItem
@@ -85,7 +88,8 @@
         </MenuItem>
         <MenuItem Header="{x:Static properties:Resources.Menu_Help}">
           <MenuItem Header="{x:Static properties:Resources.Menu_Help_About}" Command="{Binding Menu.HelpAboutCommand}" />
-          <MenuItem Header="{x:Static properties:Resources.Menu_Help_Feedback}" Command="{Binding Menu.HelpFeedbackCommand}" />
+          <MenuItem Header="{x:Static properties:Resources.Menu_Help_Feedback}"
+                    Command="{Binding Menu.HelpFeedbackCommand}" />
           <MenuItem Header="{x:Static properties:Resources.Menu_Help_CheckUpdate}"
                     Command="{Binding HelpCheckForUpdateCommand}" />
         </MenuItem>
@@ -271,12 +275,6 @@
         </DockPanel>
       </Grid>
     </DockPanel>
-    <Grid Background="Gray" Opacity="0.5"
-          Visibility="{Binding Menu.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-      <Rectangle Width="150" Height="50" Fill="White" />
-      <ProgressBar
-        Width="100" Height="20"
-        IsIndeterminate="True" />
-    </Grid>
+    <local:BusyControl DataContext="{Binding Busy}" />
   </Grid>
 </Window>

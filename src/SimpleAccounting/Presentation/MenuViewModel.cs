@@ -25,20 +25,20 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     internal class MenuViewModel : Screen, IMenuViewModel
     {
+        private readonly IBusy busy;
         private readonly IDialogs dialogs;
         private readonly IProcess processApi;
         private readonly IProjectData projectData;
         private readonly IReportFactory reportFactory;
         private readonly Settings settings;
 
-        private bool isBusy;
-
         public MenuViewModel(
             Settings settings, IProjectData projectData,
-            IReportFactory reportFactory,
+            IBusy busy, IReportFactory reportFactory,
             IProcess processApi, IDialogs dialogs)
         {
             this.settings = settings;
+            this.busy = busy;
             this.projectData = projectData;
             this.processApi = processApi;
             this.dialogs = dialogs;
@@ -79,7 +79,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public bool IsGermanCulture => this.settings.Culture == "de";
         public bool IsEnglishCulture => this.settings.Culture == "en";
         public bool IsSystemCulture => this.settings.Culture == string.Empty;
-        
+
         public ObservableCollection<MenuItemViewModel> RecentProjects { get; }
             = new ObservableCollection<MenuItemViewModel>();
 
@@ -128,21 +128,6 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand HelpFeedbackCommand => new RelayCommand(
             _ => this.processApi.ShellExecute(Defines.NewIssueUrl));
 
-        public bool IsBusy
-        {
-            get => this.isBusy;
-            set
-            {
-                if (value == this.isBusy)
-                {
-                    return;
-                }
-
-                this.isBusy = value;
-                this.NotifyOfPropertyChange();
-            }
-        }
-
         public void BuildRecentProjectsMenu()
         {
             if (this.settings.RecentProjects == null)
@@ -152,7 +137,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             foreach (var project in this.settings.RecentProjects)
             {
-                var command = new AsyncCommand(this, () => this.OnLoadRecentProjectAsync(project));
+                var command = new AsyncCommand(this.busy, () => this.OnLoadRecentProjectAsync(project));
                 this.RecentProjects.Add(new MenuItemViewModel(project, command));
             }
         }
@@ -190,12 +175,12 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            this.IsBusy = true;
+            this.busy.IsBusy = true;
             Task.Run(
                 async () =>
                 {
                     await this.projectData.LoadFromFileAsync(fileName);
-                    await Execute.OnUIThreadAsync(() => this.IsBusy = false);
+                    await Execute.OnUIThreadAsync(() => this.busy.IsBusy = false);
                 });
         }
 
@@ -206,11 +191,11 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 var menu = new MenuItemViewModel(
                     year.Year.ToString(CultureInfo.InvariantCulture),
-                    new AsyncCommand(this, () => this.projectData.SelectYear(year.Year)));
+                    new AsyncCommand(this.busy, () => this.projectData.SelectYear(year.Year)));
                 this.BookingYears.Add(menu);
             }
         }
-        
+
         private void OnEditBooking(object commandParameter)
         {
             if (!(commandParameter is IJournalItem journalItem))
