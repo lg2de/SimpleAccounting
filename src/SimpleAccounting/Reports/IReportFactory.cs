@@ -7,25 +7,18 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Collections.Generic;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Defines abstraction for <see cref="ReportFactory"/>.
+    /// </summary>
     internal interface IReportFactory
     {
-        IAccountJournalReport CreateAccountJournal(
-            AccountingDataJournal journal,
-            IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup);
+        IAccountJournalReport CreateAccountJournal(IProjectData projectData);
 
-        ITotalJournalReport CreateTotalJournal(
-            AccountingDataJournal journal,
-            AccountingDataSetup setup);
+        ITotalJournalReport CreateTotalJournal(IProjectData projectData);
 
-        IAnnualBalanceReport CreateAnnualBalance(
-            AccountingDataJournal journal,
-            IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup);
+        IAnnualBalanceReport CreateAnnualBalance(IProjectData projectData);
 
         ITotalsAndBalancesReport CreateTotalsAndBalances(
-            AccountingDataJournal journal,
-            IEnumerable<AccountingDataAccountGroup> accounts,
-            AccountingDataSetup setup);
+            IProjectData projectData, IEnumerable<AccountingDataAccountGroup> accounts);
     }
 }

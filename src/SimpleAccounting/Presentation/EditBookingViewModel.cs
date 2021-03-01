@@ -17,24 +17,21 @@ namespace lg2de.SimpleAccounting.Presentation
 
     internal class EditBookingViewModel : Screen
     {
-        private readonly ShellViewModel parent;
+        private readonly IProjectData projectData;
 
         private ulong creditAccount;
         private ulong debitAccount;
         private BookingTemplate? selectedTemplate;
 
-        public EditBookingViewModel(
-            ShellViewModel parent,
-            DateTime date,
-            DateTime dateStart,
-            DateTime dateEnd,
-            bool editMode = false)
+        public EditBookingViewModel(IProjectData projectData, DateTime date, bool editMode = false)
         {
-            this.EditMode = editMode;
-            this.parent = parent;
+            this.projectData = projectData;
             this.Date = date;
-            this.DateStart = dateStart;
-            this.DateEnd = dateEnd;
+            this.EditMode = editMode;
+
+            this.DateStart = this.projectData.CurrentYear.DateStart.ToDateTime();
+            this.DateEnd = this.projectData.CurrentYear.DateEnd.ToDateTime();
+            this.BookingIdentifier = this.projectData.MaxBookIdent + 1;
 
             if (this.Date > this.DateEnd)
             {
@@ -181,7 +178,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ =>
             {
                 var newBooking = this.CreateJournalEntry();
-                this.parent.AddBooking(newBooking);
+                this.projectData.AddBooking(newBooking);
 
                 // update for next booking
                 this.BookingIdentifier++;
@@ -210,7 +207,10 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             var newBooking = new AccountingDataJournalBooking
             {
-                Date = this.Date.ToAccountingDate(), ID = this.BookingIdentifier, Followup = this.IsFollowup, Opening = this.IsOpening
+                Date = this.Date.ToAccountingDate(),
+                ID = this.BookingIdentifier,
+                Followup = this.IsFollowup,
+                Opening = this.IsOpening
             };
             var baseValue = new BookingValue { Text = this.BookingText, Value = this.BookingValue.ToModelValue() };
 
@@ -275,7 +275,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.ExpenseRemoteAccounts =
                 this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense).ToList();
-
         }
 
         private bool IsDataValid()

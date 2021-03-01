@@ -19,11 +19,11 @@ namespace lg2de.SimpleAccounting
     {
         public App()
         {
-            // upgrade settings from older versions
+            // upgrade Settings from older versions
             var settings = Settings.Default;
             settings.Upgrade();
 
-            var provider = Settings.Default.Providers.OfType<LocalFileSettingsProvider>().FirstOrDefault();
+            var provider = settings.Providers.OfType<LocalFileSettingsProvider>().FirstOrDefault();
             var fileName = provider?.GetType().GetField(
                     "_prevLocalConfigFileName",
                     BindingFlags.Instance | BindingFlags.NonPublic)?
@@ -42,9 +42,10 @@ namespace lg2de.SimpleAccounting
             Justification = "FP")]
         private void ApplicationStartup(object sender, StartupEventArgs e)
         {
-            if (!string.IsNullOrEmpty(Settings.Default.Culture))
+            var settings = Settings.Default;
+            if (!string.IsNullOrEmpty(settings.Culture))
             {
-                var culture = CultureInfo.GetCultureInfo(Settings.Default.Culture);
+                var culture = CultureInfo.GetCultureInfo(settings.Culture);
                 CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = culture;
             }
 

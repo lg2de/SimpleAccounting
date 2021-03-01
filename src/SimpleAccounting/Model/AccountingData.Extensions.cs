@@ -12,6 +12,9 @@ namespace lg2de.SimpleAccounting.Model
     using System.Xml.Serialization;
     using lg2de.SimpleAccounting.Extensions;
 
+    /// <summary>
+    ///     Implements the root storage class. 
+    /// </summary>
     public partial class AccountingData
     {
         internal const string DefaultXsiSchemaLocation = DefaultSchemaNamespace + " " + DefaultSchemaLocation;
@@ -20,6 +23,12 @@ namespace lg2de.SimpleAccounting.Model
         private const string DefaultSchemaLocation = "https://lg2de.github.io/SimpleAccounting/AccountingData.xsd";
 
         private string schema = DefaultXsiSchemaLocation;
+
+        public AccountingData()
+        {
+            this.Accounts = new List<AccountingDataAccountGroup>();
+            this.Journal = new List<AccountingDataJournal>();
+        }
 
         [XmlAttribute("schemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
         [SuppressMessage(
@@ -42,6 +51,9 @@ namespace lg2de.SimpleAccounting.Model
         internal IEnumerable<AccountDefinition> AllAccounts =>
             this.Accounts?.SelectMany(g => g.Account) ?? Enumerable.Empty<AccountDefinition>();
 
+        /// <summary>
+        ///     Creates new project with some template data.
+        /// </summary>
         internal static AccountingData GetTemplateProject()
         {
             var year = (ushort)DateTime.Now.Year;
@@ -75,6 +87,10 @@ namespace lg2de.SimpleAccounting.Model
             return Deserialize(xml);
         }
 
+        /// <summary>
+        ///     Migrates the project from earlier versions.
+        /// </summary>
+        /// <returns><c>true</c> if the project has been modified while migration, otherwise <c>false</c>.</returns>
         internal bool Migrate()
         {
             var result = false;
@@ -83,7 +99,8 @@ namespace lg2de.SimpleAccounting.Model
             return result;
         }
 
-        internal AccountingDataJournal CloseYear(AccountingDataJournal currentModelJournal, AccountDefinition carryForwardAccount)
+        internal AccountingDataJournal CloseYear(
+            AccountingDataJournal currentModelJournal, AccountDefinition carryForwardAccount)
         {
             currentModelJournal.Closed = true;
 
@@ -135,8 +152,7 @@ namespace lg2de.SimpleAccounting.Model
                 newYearJournal.Booking.Add(newBooking);
                 var newDebit = new BookingValue
                 {
-                    Value = Math.Abs(creditAmount - debitAmount),
-                    Text = $"Eröffnungsbetrag {bookingId}"
+                    Value = Math.Abs(creditAmount - debitAmount), Text = $"Eröffnungsbetrag {bookingId}"
                 };
                 newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };
@@ -180,7 +196,10 @@ namespace lg2de.SimpleAccounting.Model
                 var journal = this.Journal.SingleOrDefault(x => x.Year == oldYearName);
                 if (journal == null)
                 {
-                    journal = new AccountingDataJournal { Year = oldYearName };
+                    journal = new AccountingDataJournal
+                    {
+                        Year = oldYearName, Booking = new List<AccountingDataJournalBooking>()
+                    };
                     this.Journal.Add(journal);
                 }
 
@@ -218,6 +237,44 @@ namespace lg2de.SimpleAccounting.Model
             }
 
             return anyAccountFixed;
+        }
+    }
+
+    /// <summary>
+    ///     Implements extension on <see cref="AccountingDataJournal"/>.
+    /// </summary>
+    internal static class AccountDataJournalExtensions
+    {
+        public static AccountingDataJournal SafeGetLatest(this IList<AccountingDataJournal> journals)
+        {
+            if (journals.Count == 0)
+            {
+                var today = DateTime.Today;
+                const int december = 12;
+                const int decemberLast = 31;
+                journals.Add(
+                    new AccountingDataJournal
+                    {
+                        Year = today.Year.ToString(CultureInfo.InvariantCulture),
+                        DateStart = new DateTime(today.Year, 1, 1).ToAccountingDate(),
+                        DateEnd = new DateTime(today.Year, december, decemberLast).ToAccountingDate(),
+                        Booking = new List<AccountingDataJournalBooking>()
+                    });
+            }
+
+            return journals.Last();
+        }
+    }
+
+    public partial class AccountingDataJournalBooking
+    {
+        internal IReadOnlyCollection<ulong> GetAccounts()
+        {
+            return this
+                .Credit.Select(x => x.Account)
+                .Concat(this.Debit.Select(x => x.Account))
+                .Distinct()
+                .ToList();
         }
     }
 

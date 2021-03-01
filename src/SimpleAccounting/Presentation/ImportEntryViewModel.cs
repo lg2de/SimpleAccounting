@@ -9,7 +9,10 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
 
-    public class ImportEntryViewModel : JournalBaseViewModel
+    /// <summary>
+    ///     Implements the view model for a single item in the import dialog.
+    /// </summary>
+    public class ImportEntryViewModel : JournalItemBaseViewModel
     {
         private AccountDefinition? remoteAccount;
         private bool isSkip;

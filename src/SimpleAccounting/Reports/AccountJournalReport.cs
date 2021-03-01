@@ -22,13 +22,10 @@ namespace lg2de.SimpleAccounting.Reports
         private double debitTotal;
         private bool firstAccount;
 
-        public AccountJournalReport(
-            AccountingDataJournal yearData,
-            IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup)
-            : base(ResourceName, setup, yearData)
+        public AccountJournalReport(IProjectData projectData)
+            : base(ResourceName, projectData)
         {
-            this.accounts = accounts.OrderBy(a => a.ID);
+            this.accounts = projectData.Storage.AllAccounts.OrderBy(a => a.ID);
         }
 
         /// <summary>

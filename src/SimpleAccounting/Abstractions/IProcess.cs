@@ -24,5 +24,7 @@ namespace lg2de.SimpleAccounting.Abstractions
         void BringProcessToFront(Process process);
 
         void MinimizeProcess(Process process);
+
+        void ShellExecute(string fileName);
     }
 }

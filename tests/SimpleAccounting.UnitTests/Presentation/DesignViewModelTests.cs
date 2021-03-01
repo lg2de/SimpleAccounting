@@ -47,5 +47,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             Action action = () => new ShellDesignViewModel();
             action.Should().NotThrow();
         }
+
+        [Fact]
+        public void BusyDesignControlModel_ConstructorSucceed()
+        {
+            Action action = () => new BusyDesignControlModel();
+            action.Should().NotThrow();
+        }
     }
 }

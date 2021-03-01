@@ -13,6 +13,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
+    using lg2de.SimpleAccounting.Properties;
     using NSubstitute;
     using Xunit;
 
@@ -22,6 +23,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
         public void ImportBookings_SampleInput_DataImportedAndFiltered()
         {
             #region project definition
+
             var project = new AccountingData
             {
                 Accounts = new List<AccountingDataAccountGroup>
@@ -100,12 +102,15 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
                         new BookingValue { Account = 600, Text = "Shopping Mall - Shoes", Value = 5000 },
                     }
                 });
+
             #endregion
 
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var accounts = project.AllAccounts.ToList();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
-            var sut = new ImportBookingsViewModel(messageBox, null, dataJournal, accounts, 5)
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
+            projectData.Load(project);
+            var sut = new ImportBookingsViewModel(dialogs, projectData)
             {
                 SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID, IsForceEnglish = true
             };
@@ -121,7 +126,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
 
             File.Delete(fileName);
 
-            messageBox.DidNotReceive().Show(
+            dialogs.DidNotReceive().ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(),
@@ -134,18 +139,53 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
                 new { Date = new DateTime(2000, 12, 1), Name = "Name2", Text = "Text2", Value = 23.45 },
                 new { Date = new DateTime(2000, 12, 31), Name = "Name3", Text = "Text3", Value = -42.42 });
             sut.ImportDataFiltered.Should().BeEquivalentTo(
-                new { Identifier = 5, Date = new DateTime(2000, 12, 1), Name = "Name2", Text = "Text2", Value = 23.45 },
-                new { Identifier = 6, Date = new DateTime(2000, 12, 31), Name = "Name3", Text = "Text3", Value = -42.42 });
+                new
+                {
+                    Identifier = 2,
+                    Date = new DateTime(2000, 12, 1),
+                    Name = "Name2",
+                    Text = "Text2",
+                    Value = 23.45
+                },
+                new
+                {
+                    Identifier = 3,
+                    Date = new DateTime(2000, 12, 31),
+                    Name = "Name3",
+                    Text = "Text3",
+                    Value = -42.42
+                });
 
             // set start date to year begin to import data skipped before
             sut.StartDate = new DateTime(2000, 1, 1);
 
             // note that all identifiers will be changed
             sut.ImportDataFiltered.Should().BeEquivalentTo(
-                new { Identifier = 5, Date = new DateTime(2000, 1, 10), Name = "Name1", Text = "Text1", Value = 12.34 },
+                new
+                {
+                    Identifier = 2,
+                    Date = new DateTime(2000, 1, 10),
+                    Name = "Name1",
+                    Text = "Text1",
+                    Value = 12.34
+                },
                 new { Identifier = 1, Date = new DateTime(2000, 1, 15), Text = "Shopping Mall - Shoes", Value = -50 },
-                new { Identifier = 6, Date = new DateTime(2000, 12, 1), Name = "Name2", Text = "Text2", Value = 23.45 },
-                new { Identifier = 7, Date = new DateTime(2000, 12, 31), Name = "Name3", Text = "Text3", Value = -42.42 });
+                new
+                {
+                    Identifier = 3,
+                    Date = new DateTime(2000, 12, 1),
+                    Name = "Name2",
+                    Text = "Text2",
+                    Value = 23.45
+                },
+                new
+                {
+                    Identifier = 4,
+                    Date = new DateTime(2000, 12, 31),
+                    Name = "Name3",
+                    Text = "Text3",
+                    Value = -42.42
+                });
         }
     }
 }

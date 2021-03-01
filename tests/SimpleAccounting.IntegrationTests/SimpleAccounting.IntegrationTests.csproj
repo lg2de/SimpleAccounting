@@ -8,14 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Ressources\import.csv" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Ressources\import.csv" />
-  </ItemGroup>
-
-  <ItemGroup>
     <!-- license is apache 2.0 -->
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <!-- license is MS.NET -->
@@ -28,10 +20,20 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <!-- license is MS.PL -->
+    <PackageReference Include="Xunit.StaFact" Version="1.0.37" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SimpleAccounting\SimpleAccounting.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Ressources\import.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Ressources\import.csv" />
+  </ItemGroup>
+  
 </Project>

@@ -1,5 +1,5 @@
 // <copyright>
-//     Copyright (c) Lukas Grützmacher. All rights reserved.
+//     Copyright (c) Lukas GrÃ¼tzmacher. All rights reserved.
 // </copyright>
 
 namespace lg2de.SimpleAccounting.IntegrationTests.Infrastructure
@@ -18,10 +18,10 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Infrastructure
         [Fact]
         public async Task GetAllReleasesAsync_ReturnKnownVersions()
         {
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi);
+            var sut = new ApplicationUpdate(dialogs, fileSystem, processApi);
 
             var task = sut.GetAllReleasesAsync();
             (await this.Awaiting(x => task).Should().CompleteWithinAsync(10.Seconds()))

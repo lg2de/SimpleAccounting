@@ -32,11 +32,16 @@ namespace lg2de.SimpleAccounting.Reports
         private long overallTotalCredit;
         private long overallTotalDebit;
 
+        /// <summary>
+        ///     Implements the report for the report showing totals and balances.
+        /// </summary>
+        /// <remarks>
+        ///     This is an overview over all accounts with totals and balances, grouped by account groups.
+        /// </remarks>
         public TotalsAndBalancesReport(
-            AccountingDataJournal yearData,
-            IEnumerable<AccountingDataAccountGroup> accountGroups,
-            AccountingDataSetup setup)
-            : base(ResourceName, setup, yearData)
+            IProjectData projectData,
+            IEnumerable<AccountingDataAccountGroup> accountGroups)
+            : base(ResourceName, projectData)
         {
             this.accountGroups = accountGroups.ToList();
         }

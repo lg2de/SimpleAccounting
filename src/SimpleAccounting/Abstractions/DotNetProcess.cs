@@ -10,6 +10,9 @@ namespace lg2de.SimpleAccounting.Abstractions
     using System.Linq;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    ///     Implements <see cref="IProcess"/> using default framework implementations.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     internal class DotNetProcess : IProcess
     {
@@ -54,8 +57,13 @@ namespace lg2de.SimpleAccounting.Abstractions
             WinApi.MinimizeProcess(process);
         }
 
+        public void ShellExecute(string fileName)
+        {
+            Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
+        }
+
         [ExcludeFromCodeCoverage]
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Names are following external API.")]
         private static class WinApi
         {
             private const int SW_MINIMIZE = 6;

@@ -10,38 +10,33 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+    using System.Windows.Forms;
     using System.Windows.Input;
-    using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
+    using Screen = Caliburn.Micro.Screen;
 
     internal class ImportBookingsViewModel : Screen
     {
         private readonly List<AccountDefinition> accounts;
-        private readonly IMessageBox messageBox;
-        private readonly ShellViewModel parent;
-        private bool isBusy;
+        private readonly IDialogs dialogs;
         private ulong selectedAccountNumber;
         private DateTime startDate;
 
         public ImportBookingsViewModel(
-            IMessageBox messageBox,
-            ShellViewModel parent,
-            AccountingDataJournal journal,
-            IEnumerable<AccountDefinition> accounts,
-            ulong firstBookingNumber)
+            IDialogs dialogs,
+            IProjectData projectData)
         {
-            this.messageBox = messageBox;
-            this.parent = parent;
-            this.Journal = journal;
-            this.accounts = accounts.ToList();
-            this.FirstBookingNumber = firstBookingNumber;
+            this.dialogs = dialogs;
+            this.ProjectData = projectData;
+            this.accounts = projectData.Storage.AllAccounts.ToList();
+            this.FirstBookingNumber = projectData.MaxBookIdent + 1;
 
-            this.RangeMin = this.Journal.DateStart.ToDateTime();
-            this.RangeMax = this.Journal.DateEnd.ToDateTime();
+            this.RangeMin = this.ProjectData.CurrentYear.DateStart.ToDateTime();
+            this.RangeMax = this.ProjectData.CurrentYear.DateEnd.ToDateTime();
             this.StartDate = this.RangeMin;
 
             // ReSharper disable once VirtualMemberCallInConstructor
@@ -60,10 +55,6 @@ namespace lg2de.SimpleAccounting.Presentation
         public DateTime RangeMin { get; }
 
         public DateTime RangeMax { get; }
-
-        public AccountingDataJournal Journal { get; }
-
-        public ulong FirstBookingNumber { get; }
 
         public ulong SelectedAccountNumber
         {
@@ -120,39 +111,23 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool IsForceEnglish { get; set; }
 
-        public bool IsBusy
-        {
-            get => this.isBusy;
-            private set
-            {
-                if (value == this.isBusy)
-                {
-                    return;
-                }
-
-                this.isBusy = value;
-                this.NotifyOfPropertyChange();
-            }
-        }
+        public IBusy Busy { get; } = new BusyControlModel();
 
         public ICommand LoadDataCommand => new RelayCommand(
             _ =>
             {
-                this.IsBusy = true;
+                this.Busy.IsBusy = true;
 
-                using var openFileDialog = new System.Windows.Forms.OpenFileDialog
-                {
-                    Filter = Resources.FileFilter_ImportData, RestoreDirectory = true
-                };
+                (DialogResult result, var fileName) = this.dialogs.ShowOpenFileDialog(Resources.FileFilter_ImportData);
 
-                if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                if (result != DialogResult.OK)
                 {
                     return;
                 }
 
-                this.OnLoadData(openFileDialog.FileName);
+                this.OnLoadData(fileName);
 
-                this.IsBusy = false;
+                this.Busy.IsBusy = false;
             }, _ => this.SelectedAccount != null);
 
         public ICommand BookAllCommand => new RelayCommand(
@@ -162,6 +137,10 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand BookMappedCommand => new RelayCommand(
             _ => this.ProcessData(),
             _ => this.LoadedData.Any(x => x.RemoteAccount != null));
+
+        protected IProjectData ProjectData { get; }
+
+        private ulong FirstBookingNumber { get; }
 
         protected void UpdateIdentifierInLoadedData()
         {
@@ -176,7 +155,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.ExistingData.Clear();
             this.ExistingData.AddRange(
-                this.Journal.Booking
+                this.ProjectData.CurrentYear.Booking
                     .Where(
                         x => x.Credit.Any(c => c.Account == this.selectedAccountNumber)
                              || x.Debit.Any(d => d.Account == this.selectedAccountNumber))
@@ -258,8 +237,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 if (!this.LoadedData.Any())
                 {
-                    this.messageBox.Show(
-                        string.Format(CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFoundInX, fileName),
+                    this.dialogs.ShowMessageBox(
+                        string.Format(
+                            CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFoundInX, fileName),
                         Resources.ImportData_MessageTitle);
                 }
 
@@ -268,13 +248,14 @@ namespace lg2de.SimpleAccounting.Presentation
             }
             catch (Exception e)
             {
-                string message = string.Format(
-                    CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, fileName) + "\n" + e.Message;
-                this.messageBox.Show(message, Resources.ImportData_MessageTitle);
+                string message =
+                    string.Format(CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, fileName)
+                    + Environment.NewLine + e.Message;
+                this.dialogs.ShowMessageBox(message, Resources.ImportData_MessageTitle);
             }
         }
 
-        internal void ProcessData()
+        private void ProcessData()
         {
             foreach (var importing in this.ImportDataFiltered)
             {
@@ -287,7 +268,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (importing.RemoteAccount == null)
                 {
                     // mapping missing - abort
-                    break;
+                    this.TryClose();
+                    return;
                 }
 
                 var newBooking = new AccountingDataJournalBooking
@@ -318,7 +300,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 newBooking.Credit = new List<BookingValue> { creditValue };
                 newBooking.Debit = new List<BookingValue> { debitValue };
-                this.parent.AddBooking(newBooking);
+                this.ProjectData.AddBooking(newBooking);
             }
 
             this.TryClose();

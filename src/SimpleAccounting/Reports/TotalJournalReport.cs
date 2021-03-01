@@ -10,14 +10,15 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Implements the report for the full journal of a booking year.
+    /// </summary>
     internal class TotalJournalReport : ReportBase, ITotalJournalReport
     {
         public const string ResourceName = "TotalJournal.xml";
 
-        public TotalJournalReport(
-            AccountingDataJournal yearData,
-            AccountingDataSetup setup)
-            : base(ResourceName, setup, yearData)
+        public TotalJournalReport(IProjectData projectData)
+            : base(ResourceName, projectData)
         {
         }
 

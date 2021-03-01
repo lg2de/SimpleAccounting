@@ -11,10 +11,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using FluentAssertions;
     using FluentAssertions.Execution;
     using lg2de.SimpleAccounting.Abstractions;
-    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
-    using lg2de.SimpleAccounting.Reports;
+    using lg2de.SimpleAccounting.Properties;
     using NSubstitute;
     using Xunit;
 
@@ -26,7 +25,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void Ctor_DateBeforeStart_DateLimited()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin - TimeSpan.FromDays(1), YearBegin, YearEnd);
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin - TimeSpan.FromDays(1));
 
             sut.Date.Should().Be(YearBegin);
         }
@@ -34,7 +38,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void Ctor_DateAfterStart_DateCorrect()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin + TimeSpan.FromDays(1), YearBegin, YearEnd);
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin + TimeSpan.FromDays(1));
 
             sut.Date.Should().Be(YearBegin + TimeSpan.FromDays(1));
         }
@@ -42,7 +51,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void Ctor_DateAfterEnd_DateLimited()
         {
-            var sut = new EditBookingViewModel(null!, YearEnd + TimeSpan.FromDays(1), YearBegin, YearEnd);
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearEnd + TimeSpan.FromDays(1));
 
             sut.Date.Should().Be(YearEnd);
         }
@@ -51,15 +65,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void AddCommand_FirstBooking_BookingNumberIncremented()
         {
             var windowManager = Substitute.For<IWindowManager>();
-            var reportFactory = Substitute.For<IReportFactory>();
-            var applicationUpdate = Substitute.For<IApplicationUpdate>();
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var parent = new ShellViewModel(
-                windowManager, reportFactory, applicationUpdate, messageBox, fileSystem, processApi);
-            parent.LoadProjectData(Samples.SampleProject);
-            var sut = new EditBookingViewModel(parent, YearBegin, YearBegin, YearEnd);
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin);
 
             var oldNumber = sut.BookingIdentifier;
             sut.CreditAccount = 100;
@@ -75,9 +85,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_InvalidYear_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 2,
@@ -91,12 +105,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_MissingCredit_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
-                BookingText = "abc",
-                DebitIndex = 2,
-                BookingValue = 42
+                BookingText = "abc", DebitIndex = 2, BookingValue = 42
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -105,12 +121,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_MissingDebit_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
-                BookingText = "abc",
-                CreditIndex = 1,
-                BookingValue = 42
+                BookingText = "abc", CreditIndex = 1, BookingValue = 42
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -119,8 +137,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_MissingNumber_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
+                BookingIdentifier = 0,
                 BookingText = "abc",
                 CreditIndex = 1,
                 DebitIndex = 2,
@@ -133,12 +157,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_MissingText_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
-                CreditIndex = 1,
-                DebitIndex = 2,
-                BookingValue = 42
+                CreditIndex = 1, DebitIndex = 2, BookingValue = 42
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -147,12 +173,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_MissingValue_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
-                BookingText = "abc",
-                CreditIndex = 1,
-                DebitIndex = 2
+                BookingText = "abc", CreditIndex = 1, DebitIndex = 2
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -161,13 +189,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_SameAccount_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
-                BookingText = "abc",
-                CreditIndex = 1,
-                DebitIndex = 1,
-                BookingValue = 42
+                BookingText = "abc", CreditIndex = 1, DebitIndex = 1, BookingValue = 42
             };
 
             sut.AddCommand.CanExecute(null).Should().BeFalse();
@@ -176,13 +205,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_ValidValues_CanExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
-                BookingText = "abc",
-                CreditIndex = 1,
-                DebitIndex = 2,
-                BookingValue = 42
+                BookingText = "abc", CreditIndex = 1, DebitIndex = 2, BookingValue = 42
             };
 
             sut.AddCommand.CanExecute(null).Should().BeTrue();
@@ -191,17 +221,27 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_ConsistentCreditSplitBooking_CanExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
                 BookingText = "abc",
                 DebitIndex = 1,
                 DebitAccount = 100,
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -211,17 +251,27 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_ConsistentDebitSplitBooking_CanExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 CreditAccount = 100,
                 BookingValue = 3,
                 DebitSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -231,17 +281,27 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_InconsistentDebitSplitBooking_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
                 BookingText = "abc",
                 CreditIndex = 1,
                 CreditAccount = 100,
                 BookingValue = 3,
                 DebitSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -251,17 +311,27 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_SplitBookingWithZeroValue_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
                 BookingText = "abc",
                 DebitIndex = 1,
                 DebitAccount = 100,
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 1, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 0, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 1, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -271,17 +341,27 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_SplitBookingMissingText_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
                 BookingText = "abc",
                 DebitIndex = 1,
                 DebitAccount = 100,
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "", BookingValue = 1, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -291,17 +371,27 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_SplitBookingMissingAccount_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
                 BookingText = "abc",
                 DebitIndex = 1,
                 DebitAccount = 100,
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = -1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = -1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -311,17 +401,27 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_SplitBookingSameAccount_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
                 BookingText = "abc",
                 DebitIndex = 1,
                 DebitAccount = 100,
                 BookingValue = 3,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 0, AccountNumber = 100 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = 0, AccountNumber = 100
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -331,17 +431,27 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void AddCommand_SplitBookingNonMatchingValues_CannotExecute()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                BookingIdentifier = 1,
                 BookingText = "abc",
                 DebitIndex = 1,
                 DebitAccount = 100,
                 BookingValue = 4,
                 CreditSplitEntries =
                 {
-                    new SplitBookingViewModel { BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200 },
-                    new SplitBookingViewModel { BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300 }
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "X", BookingValue = 1, AccountIndex = 1, AccountNumber = 200
+                    },
+                    new SplitBookingViewModel
+                    {
+                        BookingText = "Y", BookingValue = 2, AccountIndex = 2, AccountNumber = 300
+                    }
                 }
             };
 
@@ -351,7 +461,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void OnInitialize_Initialized()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd);
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin);
 
             ((IActivate)sut).Activate();
 
@@ -362,7 +477,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void OnInitialize_AllAccountTypesAdded_AccountRelatedPropertiesNotEmpty()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd);
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin);
             foreach (AccountDefinitionType type in Enum.GetValues(typeof(AccountDefinitionType)))
             {
                 sut.Accounts.Add(new AccountDefinition { Name = type.ToString(), Type = type });
@@ -377,16 +497,17 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.ExpenseRemoteAccounts.Should().NotBeEmpty();
         }
 
-
         [Fact]
         public void SelectedTemplate_SetNull_PropertiesUnchanged()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                CreditAccount = 1,
-                DebitAccount = 2,
-                BookingText = "default",
-                BookingValue = 42
+                CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42
             };
             sut.Accounts.Add(new AccountDefinition { ID = 1 });
             sut.Accounts.Add(new AccountDefinition { ID = 2 });
@@ -405,12 +526,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SelectedTemplate_SetTemplateWithCredit_CreditAccountSet()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                CreditAccount = 1,
-                DebitAccount = 2,
-                BookingText = "default",
-                BookingValue = 42
+                CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42
             };
             sut.Accounts.Add(new AccountDefinition { ID = 1 });
             sut.Accounts.Add(new AccountDefinition { ID = 2 });
@@ -429,12 +552,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SelectedTemplate_SetTemplateWithDebit_DebitAccountSet()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
-                CreditAccount = 1,
-                DebitAccount = 2,
-                BookingText = "default",
-                BookingValue = 42
+                CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42
             };
             sut.Accounts.Add(new AccountDefinition { ID = 1 });
             sut.Accounts.Add(new AccountDefinition { ID = 2 });
@@ -453,7 +578,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void SelectedTemplate_SetTemplateWithValue_ValueSet()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
                 CreditAccount = 1,
                 DebitAccount = 2,
@@ -478,7 +608,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CreateJournalEntry_SplitCreditEntries_JournalEntryCorrect()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
                 BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
             };
@@ -512,7 +647,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CreateJournalEntry_SplitSingleCreditEntry_JournalEntryCorrect()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
                 BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
             };
@@ -543,7 +683,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CreateJournalEntry_SplitDebitEntries_JournalEntryCorrect()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
                 BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
             };
@@ -577,7 +722,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CreateJournalEntry_SplitSingleDebitEntry_JournalEntryCorrect()
         {
-            var sut = new EditBookingViewModel(null!, YearBegin, YearBegin, YearEnd)
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin)
             {
                 BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
             };

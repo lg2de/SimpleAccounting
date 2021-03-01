@@ -9,9 +9,17 @@ namespace lg2de.SimpleAccounting.Extensions
     using JetBrains.Annotations;
     using lg2de.SimpleAccounting.Presentation;
 
+    /// <summary>
+    ///     Implements extensions on <see cref="JournalItemBaseViewModel"/>.
+    /// </summary>
     public static class JournalBaseViewModelExtensions
     {
-        public static void UpdateRowHighlighting([NotNull] this IEnumerable<JournalBaseViewModel> journal)
+        /// <summary>
+        ///     Updates the alternating highlight based on the booking identifier.
+        /// </summary>
+        /// <param name="journal"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static void UpdateRowHighlighting([NotNull] this IEnumerable<JournalItemBaseViewModel> journal)
         {
             if (journal == null)
             {

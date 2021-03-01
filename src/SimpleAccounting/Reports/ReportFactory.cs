@@ -8,38 +8,32 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Diagnostics.CodeAnalysis;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Implements <see cref="IReportFactory"/> using real report implementations.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     internal class ReportFactory : IReportFactory
     {
-        public IAccountJournalReport CreateAccountJournal(
-            AccountingDataJournal journal,
-            IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup)
+        public IAccountJournalReport CreateAccountJournal(IProjectData projectData)
         {
-            return new AccountJournalReport(journal, accounts, setup);
+            return new AccountJournalReport(projectData);
         }
 
-        public ITotalJournalReport CreateTotalJournal(
-            AccountingDataJournal journal,
-            AccountingDataSetup setup)
+        public ITotalJournalReport CreateTotalJournal(IProjectData projectData)
         {
-            return new TotalJournalReport(journal, setup);
+            return new TotalJournalReport(projectData);
         }
 
-        public IAnnualBalanceReport CreateAnnualBalance(
-            AccountingDataJournal journal,
-            IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup)
+        public IAnnualBalanceReport CreateAnnualBalance(IProjectData projectData)
         {
-            return new AnnualBalanceReport(journal, accounts, setup);
+            return new AnnualBalanceReport(projectData);
         }
 
         public ITotalsAndBalancesReport CreateTotalsAndBalances(
-            AccountingDataJournal journal,
-            IEnumerable<AccountingDataAccountGroup> accounts,
-            AccountingDataSetup setup)
+            IProjectData projectData,
+            IEnumerable<AccountingDataAccountGroup> accounts)
         {
-            return new TotalsAndBalancesReport(journal, accounts, setup);
+            return new TotalsAndBalancesReport(projectData, accounts);
         }
     }
 }
