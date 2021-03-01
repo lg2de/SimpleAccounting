@@ -23,15 +23,13 @@ namespace lg2de.SimpleAccounting.Presentation
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellDesignViewModel : ShellViewModel
     {
-        private static readonly Settings DesignSettings = new Settings();
-        private static readonly ProjectData DesignProject = new ProjectData(DesignSettings, null!, null!, null!, null!);
+        private static readonly ProjectData DesignProject = new ProjectData(new Settings(), null!, null!, null!, null!);
 
         public ShellDesignViewModel()
             : base(
-                DesignSettings,
                 DesignProject,
                 new BusyControlModel(),
-                new MenuViewModel(DesignSettings, DesignProject, null!, null!, null!, null!),
+                new MenuViewModel(DesignProject, null!, null!, null!, null!),
                 new FullJournalViewModel(DesignProject),
                 new AccountJournalViewModel(DesignProject), new AccountsViewModel(null!, DesignProject), null!)
         {

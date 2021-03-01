@@ -15,7 +15,6 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
-    using lg2de.SimpleAccounting.Properties;
 
     internal class ShellViewModel : Screen, IDisposable
     {
@@ -26,7 +25,6 @@ namespace lg2de.SimpleAccounting.Presentation
         private CancellationTokenSource? cancellationTokenSource;
 
         public ShellViewModel(
-            Settings settings,
             IProjectData projectData,
             IBusy busy,
             IMenuViewModel menu,
@@ -35,7 +33,6 @@ namespace lg2de.SimpleAccounting.Presentation
             IAccountsViewModel accounts,
             IApplicationUpdate applicationUpdate)
         {
-            this.Settings = settings;
             this.ProjectData = projectData;
             this.Busy = busy;
             this.Menu = menu;
@@ -99,8 +96,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public ICommand EditAccountCommand => new RelayCommand(this.Accounts.OnEditAccount);
 
-        internal Settings Settings { get; }
-
         internal IProjectData ProjectData { get; }
 
         internal Task LoadingTask { get; private set; } = Task.CompletedTask;
@@ -142,7 +137,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
             var dispatcher = Dispatcher.CurrentDispatcher;
             this.cancellationTokenSource = new CancellationTokenSource();
-            if (!string.IsNullOrEmpty(this.Settings.RecentProject))
+            if (!string.IsNullOrEmpty(this.ProjectData.Settings.RecentProject))
             {
                 // We move execution into thread pool thread.
                 // In case there is an auto-save file, the dialog should be shown on top of main window.
@@ -155,7 +150,7 @@ namespace lg2de.SimpleAccounting.Presentation
                             async () =>
                             {
                                 this.Busy.IsBusy = true;
-                                await this.ProjectData.LoadFromFileAsync(this.Settings.RecentProject);
+                                await this.ProjectData.LoadFromFileAsync(this.ProjectData.Settings.RecentProject);
                                 this.Menu.BuildRecentProjectsMenu();
                                 this.Busy.IsBusy = false;
                             });
@@ -183,7 +178,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.cancellationTokenSource.Dispose();
             this.cancellationTokenSource = null;
 
-            this.Settings.Save();
+            this.ProjectData.Settings.Save();
 
             base.OnDeactivate(close);
         }

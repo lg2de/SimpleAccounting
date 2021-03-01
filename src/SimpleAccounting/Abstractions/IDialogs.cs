@@ -14,6 +14,7 @@ namespace lg2de.SimpleAccounting.Abstractions
     /// </summary>
     public interface IDialogs
     {
+        [ExcludeFromCodeCoverage]
         [SuppressMessage(
             "Critical Code Smell", "S2360:Optional parameters should not be used",
             Justification = "Signature follows wrapped framework API")]

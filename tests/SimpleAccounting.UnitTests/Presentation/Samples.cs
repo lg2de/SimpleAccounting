@@ -8,6 +8,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.Linq;
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Model;
@@ -24,7 +25,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             get
             {
                 var year = (uint)DateTime.Now.Year;
-                return new AccountingData
+                var accountingData = new AccountingData
                 {
                     Accounts = new List<AccountingDataAccountGroup>
                     {
@@ -123,6 +124,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                         }
                     }
                 };
+                accountingData.Accounts.Last().Account.AddRange(
+                    Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>().Select(
+                        type => new AccountDefinition
+                        {
+                            ID = (ulong)(9000 + type), Name = $"Active empty {type}", Type = type, Active = true
+                        }));
+                return accountingData;
             }
         }
 
@@ -140,13 +148,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             }
         }
 
+        [SuppressMessage("ReSharper", "RedundantAssignment")]
         public static IEnumerable<AccountingDataJournalBooking> SampleBookings
         {
             get
             {
+                ulong bookingIdent = 1;
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = 1,
+                    ID = bookingIdent++,
                     Date = BaseDate + 101,
                     Credit = new List<BookingValue>
                     {
@@ -161,7 +171,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = 2,
+                    ID = bookingIdent++,
                     Date = BaseDate + 101,
                     Credit = new List<BookingValue>
                     {
@@ -176,7 +186,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = 3,
+                    ID = bookingIdent++,
                     Date = BaseDate + 128,
                     Credit = new List<BookingValue>
                     {
@@ -190,7 +200,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 };
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = 4,
+                    ID = bookingIdent++,
                     Date = BaseDate + 129,
                     Credit = new List<BookingValue>
                     {
@@ -204,7 +214,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = 5,
+                    ID = bookingIdent++,
                     Date = BaseDate + 201,
                     Credit = new List<BookingValue>
                     {
@@ -219,7 +229,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = 6,
+                    ID = bookingIdent++,
                     Date = BaseDate + 205,
                     Credit = new List<BookingValue>
                     {

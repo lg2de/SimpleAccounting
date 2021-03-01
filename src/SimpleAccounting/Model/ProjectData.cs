@@ -26,16 +26,17 @@ namespace lg2de.SimpleAccounting.Model
     /// </remarks>
     internal class ProjectData : IProjectData
     {
-        private readonly Settings settings;
-        private readonly IWindowManager windowManager;
         private readonly IDialogs dialogs;
         private readonly IFileSystem fileSystem;
         private readonly IProcess processApi;
+        private readonly IWindowManager windowManager;
         private AccountingData storage;
 
-        public ProjectData(Settings settings, IWindowManager windowManager, IDialogs dialogs, IFileSystem fileSystem, IProcess processApi)
+        public ProjectData(
+            Settings settings, IWindowManager windowManager, IDialogs dialogs, IFileSystem fileSystem,
+            IProcess processApi)
         {
-            this.settings = settings;
+            this.Settings = settings;
             this.windowManager = windowManager;
             this.dialogs = dialogs;
             this.fileSystem = fileSystem;
@@ -44,6 +45,8 @@ namespace lg2de.SimpleAccounting.Model
             this.storage = new AccountingData();
             this.CurrentYear = this.storage.Journal.SafeGetLatest();
         }
+
+        public Settings Settings { get; }
 
         public string FileName { get; set; } = string.Empty;
 
@@ -96,7 +99,7 @@ namespace lg2de.SimpleAccounting.Model
 
             this.IsModified = false;
 
-            var loader = new ProjectFileLoader(this.settings, this.dialogs, this.fileSystem, this.processApi);
+            var loader = new ProjectFileLoader(this.Settings, this.dialogs, this.fileSystem, this.processApi);
             var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName));
             if (loadResult != OperationResult.Completed)
             {
@@ -140,8 +143,8 @@ namespace lg2de.SimpleAccounting.Model
         {
             if (this.FileName == "<new>")
             {
-                (DialogResult result, var fileName) =
-                    this.dialogs.ShowSaveFileDialog(filter: Resources.FileFilter_MainProject);
+                (DialogResult result, string fileName) =
+                    this.dialogs.ShowSaveFileDialog(Resources.FileFilter_MainProject);
                 if (result != DialogResult.OK)
                 {
                     return;
@@ -150,8 +153,8 @@ namespace lg2de.SimpleAccounting.Model
                 this.FileName = fileName;
             }
 
-            DateTime fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
-            string backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
+            var fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
+            var backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
             if (this.fileSystem.FileExists(this.FileName))
             {
                 this.fileSystem.FileMove(this.FileName, backupFileName);

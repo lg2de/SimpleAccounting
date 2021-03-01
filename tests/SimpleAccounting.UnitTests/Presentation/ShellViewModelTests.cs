@@ -63,7 +63,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IFileSystem fileSystem);
             sut.ProjectData.AutoSaveInterval = 100.Milliseconds();
-            sut.Settings.RecentProject = "recent.project";
+            sut.ProjectData.Settings.RecentProject = "recent.project";
             var sample = new AccountingData
             {
                 Accounts = new List<AccountingDataAccountGroup>
@@ -103,7 +103,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IFileSystem fileSystem);
             sut.ProjectData.AutoSaveInterval = 10.Milliseconds();
-            sut.Settings.RecentProject = "recent.project";
+            sut.ProjectData.Settings.RecentProject = "recent.project";
             var sample = new AccountingData
             {
                 Accounts = new List<AccountingDataAccountGroup>
@@ -153,8 +153,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData, busy,
-                    new MenuViewModel(settings, projectData, busy, null!, null!, null!), new FullJournalViewModel(projectData),
+                    projectData, busy,
+                    new MenuViewModel(projectData, busy, null!, null!, null!), new FullJournalViewModel(projectData),
                     new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate);
             dialogs.ShowMessageBox(
                     Arg.Is<string>(s => s.Contains("Cryptomator")),
@@ -191,13 +191,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             ((IActivate)sut).Activate();
 
             using var _ = new AssertionScope();
-            sut.Accounts.AccountList.Should().BeEquivalentTo(
-                new { Name = "Bank account" },
-                new { Name = "Salary" },
-                new { Name = "Shoes" },
-                new { Name = "Carryforward" },
-                new { Name = "Bank credit" },
-                new { Name = "Friends debit" });
+            sut.Accounts.AccountList.Select(x => x.Name).Should().Equal(
+                "Bank account", "Salary", "Shoes", "Carryforward", "Bank credit",
+                "Friends debit", "Active empty Asset", "Active empty Income", "Active empty Expense",
+                "Active empty Credit", "Active empty Debit", "Active empty Carryforward");
 
             sut.FullJournal.Items.Should().BeEquivalentTo(
                 new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
@@ -229,7 +226,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public void OnActivate_TwoRecentProjectsOneExisting_AllProjectListed()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            sut.Settings.RecentProjects = new StringCollection { "file1", "file2" };
+            sut.ProjectData.Settings.RecentProjects = new StringCollection { "file1", "file2" };
             fileSystem.FileExists(Arg.Is("file1")).Returns(true);
             fileSystem.FileExists(Arg.Is("file2")).Returns(false);
 
@@ -243,7 +240,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task RecentFileCommand_NonExisting_ProjectRemovedFromList()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            sut.Settings.RecentProjects = new StringCollection { "file1", "file2" };
+            sut.ProjectData.Settings.RecentProjects = new StringCollection { "file1", "file2" };
             fileSystem.FileExists(Arg.Is("file1")).Returns(true);
             fileSystem.FileExists(Arg.Is("file2")).Returns(false);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
@@ -256,15 +253,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             }
 
             sut.Menu.RecentProjects.Select(x => x.Header).Should().BeEquivalentTo("file1");
-            sut.Settings.RecentProjects.OfType<string>().Should().BeEquivalentTo("file1");
+            sut.ProjectData.Settings.RecentProjects.OfType<string>().Should().BeEquivalentTo("file1");
         }
 
         [Fact]
         public async Task RecentFileCommand_FileOnSecureDriveNotStarted_ProjectKept()
         {
             var sut = CreateSut(out IDialogs dialogs, out IFileSystem fileSystem);
-            sut.Settings.RecentProjects = new StringCollection { "K:\\file1", "file2" };
-            sut.Settings.SecuredDrives = new StringCollection { "K:\\" };
+            sut.ProjectData.Settings.RecentProjects = new StringCollection { "K:\\file1", "file2" };
+            sut.ProjectData.Settings.SecuredDrives = new StringCollection { "K:\\" };
             fileSystem.FileExists(Arg.Is("K:\\file1")).Returns(false);
             fileSystem.FileExists(Arg.Is("file2")).Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
@@ -283,7 +280,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             }
 
             sut.Menu.RecentProjects.Select(x => x.Header).Should().BeEquivalentTo("K:\\file1", "file2");
-            sut.Settings.RecentProjects.OfType<string>().Should().BeEquivalentTo("K:\\file1", "file2");
+            sut.ProjectData.Settings.RecentProjects.OfType<string>().Should().BeEquivalentTo("K:\\file1", "file2");
         }
 
         [Fact]
@@ -435,8 +432,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var _ = new AssertionScope();
             sut.ProjectData.FileName.Should().Be("the.fileName");
             sut.ProjectData.IsModified.Should().BeFalse();
-            sut.Settings.RecentProject.Should().Be("the.fileName");
-            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
+            sut.ProjectData.Settings.RecentProject.Should().Be("the.fileName");
+            sut.ProjectData.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
         }
 
@@ -460,8 +457,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var _ = new AssertionScope();
             sut.ProjectData.FileName.Should().Be("the.fileName");
             sut.ProjectData.IsModified.Should().BeTrue("changes are (still) not yet saved");
-            sut.Settings.RecentProject.Should().Be("the.fileName");
-            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
+            sut.ProjectData.Settings.RecentProject.Should().Be("the.fileName");
+            sut.ProjectData.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
         }
 
@@ -485,8 +482,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var _ = new AssertionScope();
             sut.ProjectData.FileName.Should().Be("the.fileName");
             sut.ProjectData.IsModified.Should().BeFalse();
-            sut.Settings.RecentProject.Should().Be("the.fileName");
-            sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
+            sut.ProjectData.Settings.RecentProject.Should().Be("the.fileName");
+            sut.ProjectData.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
             fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
             fileSystem.Received(1).FileDelete("the.fileName~");
         }
@@ -509,7 +506,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
-            sut.Settings.SecuredDrives.Should().Equal(new object[] { "K:\\" });
+            sut.ProjectData.Settings.SecuredDrives.Should().Equal(new object[] { "K:\\" });
             messageBox.DidNotReceive().ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator")),
                 Arg.Any<string>(),
@@ -522,7 +519,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         public async Task LoadProjectFromFileAsync_FullRecentList_NewFileOnTop()
         {
             var sut = CreateSut(out IFileSystem fileSystem);
-            sut.Settings.RecentProjects = new StringCollection
+            sut.ProjectData.Settings.RecentProjects = new StringCollection
             {
                 "A",
                 "B",
@@ -542,7 +539,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
-            sut.Settings.RecentProjects.OfType<string>().Should()
+            sut.ProjectData.Settings.RecentProjects.OfType<string>().Should()
                 .Equal("the.fileName", "A", "B", "C", "D", "E", "F", "G", "H", "I");
         }
 
@@ -634,14 +631,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
 
-            sut.Accounts.AccountList.Should().BeEquivalentTo(
-                new { Name = "Bank account" },
-                new { Name = "Salary" },
-                new { Name = "Shoes" },
-                new { Name = "Carryforward" },
-                new { Name = "Bank credit" },
-                new { Name = "Friends debit" },
-                new { Name = "Inactive" });
+            sut.Accounts.AccountList.Select(x => x.Name).Should().Equal(
+                "Bank account", "Salary", "Shoes", "Carryforward", "Bank credit", "Friends debit",
+                "Active empty Asset", "Active empty Income", "Active empty Expense", "Active empty Credit",
+                "Active empty Debit", "Active empty Carryforward",
+                "Inactive");
         }
 
         [Fact]
@@ -705,9 +699,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData,
+                    projectData,
                     busy,
-                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs), new FullJournalViewModel(projectData),
+                    new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs), new FullJournalViewModel(projectData),
                     new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate);
             return sut;
         }
@@ -726,8 +720,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData, busy,
-                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
+                    projectData, busy,
+                    new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -747,8 +741,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData, busy,
-                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
+                    projectData, busy,
+                    new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -768,8 +762,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData, busy,
-                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
+                    projectData, busy,
+                    new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -789,8 +783,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData, busy,
-                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
+                    projectData, busy,
+                    new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;
@@ -810,8 +804,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var accountsViewModel = new AccountsViewModel(windowManager, projectData);
             var sut =
                 new ShellViewModel(
-                    settings, projectData, busy,
-                    new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs),
+                    projectData, busy,
+                    new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
                     new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                     accountsViewModel, applicationUpdate);
             return sut;

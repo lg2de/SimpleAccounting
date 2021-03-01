@@ -112,7 +112,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.NewAccountCommand.Execute(null);
 
             sut.Accounts.AccountList.Select(x => x.Name).Should().Equal(
-                "Bank account", "Salary", "New Account", "Shoes", "Carryforward", "Bank credit", "Friends debit");
+                "Bank account", "Salary", "New Account", "Shoes", "Carryforward", "Bank credit", "Friends debit",
+                "Active empty Asset", "Active empty Income", "Active empty Expense", "Active empty Credit",
+                "Active empty Debit", "Active empty Carryforward");
         }
 
         [Fact]
@@ -163,7 +165,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             {
                 sut.ProjectData.IsModified.Should().BeTrue();
                 sut.Accounts.AccountList.Select(x => x.Name).Should().Equal(
-                    "Salary", "Shoes", "Carryforward", "Bank account", "Bank credit", "Friends debit");
+                    "Salary", "Shoes", "Carryforward", "Bank account", "Bank credit", "Friends debit",
+                    "Active empty Asset", "Active empty Income", "Active empty Expense", "Active empty Credit",
+                    "Active empty Debit", "Active empty Carryforward");
                 sut.FullJournal.Items.Should().BeEquivalentTo(
                     new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
                     new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });
@@ -450,6 +454,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [CulturedFact("en")]
         public void CloseYearCommand_SecondCarryForwardAccount_OpeningsWithSelectedAccount()
         {
+            const ulong myCarryForwardNumber = 999;
             var sut = CreateSut(out IWindowManager windowManager);
             windowManager.ShowDialog(
                 Arg.Any<CloseYearViewModel>(),
@@ -458,13 +463,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 info =>
                 {
                     var vm = info.Arg<CloseYearViewModel>();
-                    vm.RemoteAccount = vm.Accounts.Last();
+                    vm.RemoteAccount = vm.Accounts.Single(x => x.ID == myCarryForwardNumber);
                     return true;
                 });
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             project.Accounts.First().Account.Add(
-                new AccountDefinition { ID = 999, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward });
+                new AccountDefinition { ID = myCarryForwardNumber, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward });
             sut.ProjectData.Load(project);
 
             sut.Menu.CloseYearCommand.Execute(null);

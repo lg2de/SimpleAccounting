@@ -30,14 +30,12 @@ namespace lg2de.SimpleAccounting.Presentation
         private readonly IProcess processApi;
         private readonly IProjectData projectData;
         private readonly IReportFactory reportFactory;
-        private readonly Settings settings;
 
         public MenuViewModel(
-            Settings settings, IProjectData projectData,
+            IProjectData projectData,
             IBusy busy, IReportFactory reportFactory,
             IProcess processApi, IDialogs dialogs)
         {
-            this.settings = settings;
             this.busy = busy;
             this.projectData = projectData;
             this.processApi = processApi;
@@ -66,7 +64,7 @@ namespace lg2de.SimpleAccounting.Presentation
         public ICommand SwitchCultureCommand => new RelayCommand(
             cultureName =>
             {
-                this.settings.Culture = cultureName.ToString();
+                this.projectData.Settings.Culture = cultureName.ToString();
                 this.NotifyOfPropertyChange(nameof(this.IsGermanCulture));
                 this.NotifyOfPropertyChange(nameof(this.IsEnglishCulture));
                 this.NotifyOfPropertyChange(nameof(this.IsSystemCulture));
@@ -76,9 +74,9 @@ namespace lg2de.SimpleAccounting.Presentation
                     icon: MessageBoxImage.Information);
             });
 
-        public bool IsGermanCulture => this.settings.Culture == "de";
-        public bool IsEnglishCulture => this.settings.Culture == "en";
-        public bool IsSystemCulture => this.settings.Culture == string.Empty;
+        public bool IsGermanCulture => this.projectData.Settings.Culture == "de";
+        public bool IsEnglishCulture => this.projectData.Settings.Culture == "en";
+        public bool IsSystemCulture => this.projectData.Settings.Culture == string.Empty;
 
         public ObservableCollection<MenuItemViewModel> RecentProjects { get; }
             = new ObservableCollection<MenuItemViewModel>();
@@ -130,12 +128,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public void BuildRecentProjectsMenu()
         {
-            if (this.settings.RecentProjects == null)
+            if (this.projectData.Settings.RecentProjects == null)
             {
                 return;
             }
 
-            foreach (var project in this.settings.RecentProjects)
+            foreach (var project in this.projectData.Settings.RecentProjects)
             {
                 var command = new AsyncCommand(this.busy, () => this.OnLoadRecentProjectAsync(project));
                 this.RecentProjects.Add(new MenuItemViewModel(project, command));
@@ -163,7 +161,7 @@ namespace lg2de.SimpleAccounting.Presentation
             // keep in menu if aborted (e.g. SecureDrive not available)
             var item = this.RecentProjects.FirstOrDefault(x => x.Header == project);
             this.RecentProjects.Remove(item);
-            this.settings.RecentProjects.Remove(project);
+            this.projectData.Settings.RecentProjects.Remove(project);
         }
 
         private void OnOpenProject()

@@ -35,7 +35,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var projectData = new ProjectData(settings, null!, null!, fileSystem, null!);
             var dialogs = Substitute.For<IDialogs>();
             var busy = new BusyControlModel();
-            var sut = new MenuViewModel(settings, projectData, busy, null!, null!, dialogs);
+            var sut = new MenuViewModel(projectData, busy, null!, null!, dialogs);
             long counter = 0;
             var tcs = new TaskCompletionSource<bool>();
             dialogs.ShowOpenFileDialog(Arg.Any<string>()).Returns((DialogResult.OK, "dummy"));
@@ -369,7 +369,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             reportFactory = Substitute.For<IReportFactory>();
             var settings = new Settings();
             projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-            var sut = new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs);
+            var sut = new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs);
             return sut;
         }
 
@@ -383,7 +383,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var reportFactory = Substitute.For<IReportFactory>();
             var settings = new Settings();
             var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-            var sut = new MenuViewModel(settings, projectData, busy, reportFactory, processApi, dialogs);
+            var sut = new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs);
             return sut;
         }
     }

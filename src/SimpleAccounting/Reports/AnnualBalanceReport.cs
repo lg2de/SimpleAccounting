@@ -58,6 +58,7 @@ namespace lg2de.SimpleAccounting.Reports
                 long balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
+                    // account with balance zero is skipped
                     continue;
                 }
 
@@ -80,6 +81,7 @@ namespace lg2de.SimpleAccounting.Reports
                 long balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
+                    // account with balance zero is skipped
                     continue;
                 }
 
@@ -104,19 +106,21 @@ namespace lg2de.SimpleAccounting.Reports
             foreach (var account in accounts)
             {
                 long balance = this.GetAccountBalance(account, creditFromDebit: false);
+                if (balance == 0)
+                {
+                    // account with balance zero is skipped
+                    continue;
+                }
+
                 if (balance > 0)
                 {
                     totalReceivable += balance;
                     receivableNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
                 }
-                else if (balance < 0)
+                else // balance < 0
                 {
                     totalLiability += balance;
                     liabilityNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
-                }
-                else
-                {
-                    // cells remains empty
                 }
             }
 

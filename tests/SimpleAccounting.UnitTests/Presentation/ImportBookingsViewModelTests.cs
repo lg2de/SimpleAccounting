@@ -153,11 +153,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var projectData = Samples.SampleProjectData;
             var accountsViewModel = new AccountsViewModel(null!, projectData);
-            var settings = new Settings();
             var busy = Substitute.For<IBusy>();
             var parent = new ShellViewModel(
-                settings, projectData, busy,
-                new MenuViewModel(settings, projectData, busy, null!, null!, null!), new FullJournalViewModel(projectData),
+                projectData, busy,
+                new MenuViewModel(projectData, busy, null!, null!, null!), new FullJournalViewModel(projectData),
                 new AccountJournalViewModel(projectData), accountsViewModel, null!);
             var accounts = projectData.Storage.AllAccounts.ToList();
             var bankAccount = accounts.Single(x => x.Name == "Bank account");

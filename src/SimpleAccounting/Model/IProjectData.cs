@@ -8,12 +8,15 @@ namespace lg2de.SimpleAccounting.Model
     using System.Threading;
     using System.Threading.Tasks;
     using lg2de.SimpleAccounting.Infrastructure;
+    using lg2de.SimpleAccounting.Properties;
 
     /// <summary>
     ///     Defines the interface for the runtime information of a single project loaded.
     /// </summary>
     internal interface IProjectData
     {
+        Settings Settings { get; }
+
         string FileName { get; set; }
 
         string AutoSaveFileName { get; }
