@@ -1,0 +1,19 @@
+﻿<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
+<UserControl
+  x:Class="lg2de.SimpleAccounting.Presentation.BusyControl"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
+  mc:Ignorable="d"
+  d:DesignWidth="400" d:DesignHeight="300"
+  d:DataContext="{d:DesignInstance Type=local:BusyDesignControlModel, IsDesignTimeCreatable=True}">
+  <Grid Background="Gray" Opacity="0.5"
+        Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+    <Rectangle Width="150" Height="50" Fill="White" />
+    <ProgressBar
+      Width="100" Height="20"
+      IsIndeterminate="True" />
+  </Grid>
+</UserControl>

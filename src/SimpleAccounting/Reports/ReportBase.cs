@@ -11,18 +11,18 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Implements the base class for the reports.
+    /// </summary>
     internal class ReportBase
     {
         protected const int TitleSize = 10;
         private readonly AccountingDataSetup setup;
 
-        protected ReportBase(
-            string resourceName,
-            AccountingDataSetup setup,
-            AccountingDataJournal yearData)
+        protected ReportBase(string resourceName, IProjectData projectData)
         {
-            this.setup = setup;
-            this.YearData = yearData;
+            this.setup = projectData.Storage.Setup;
+            this.YearData = projectData.CurrentYear;
 
             this.Printer.LoadDocument(resourceName);
         }

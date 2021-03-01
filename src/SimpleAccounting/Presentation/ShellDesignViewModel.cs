@@ -5,35 +5,64 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
+    /// <summary>
+    ///     Implements the root view model for the designer.
+    /// </summary>
     [SuppressMessage(
         "Major Code Smell", "S109:Magic numbers should not be used",
         Justification = "Design view model defines useful values")]
     [SuppressMessage(
         "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
         Justification = "Design view model defines useful values")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal class ShellDesignViewModel : ShellViewModel
     {
+        private static readonly ProjectData DesignProject = new ProjectData(new Settings(), null!, null!, null!, null!);
+
         public ShellDesignViewModel()
-            : base(null!, null!, null!, null!, null!, null!)
+            : base(
+                DesignProject,
+                new BusyControlModel(),
+                new MenuViewModel(DesignProject, null!, null!, null!, null!),
+                new FullJournalViewModel(DesignProject),
+                new AccountJournalViewModel(DesignProject), new AccountsViewModel(null!, DesignProject), null!)
         {
-            var menuItem = new MenuViewModel("c:\\Test.acml", null!);
-            this.RecentProjects.Add(menuItem);
+            var menuItem = new MenuItemViewModel("c:\\Test.acml", null!);
+            this.Menu.RecentProjects.Add(menuItem);
 
-            var accountItem = new AccountViewModel
-            {
-                Identifier = 100,
-                Name = "Kasse",
-                Group = new AccountingDataAccountGroup { Name = "Bestandskonten" },
-                Type = AccountDefinitionType.Asset
-            };
-            this.AccountList.Add(accountItem);
-            this.SelectedAccount = accountItem;
+            // load sample accounts and journal
+            this.LoadAccounts();
+            this.LoadJournal();
+        }
 
-            var journalItem = new FullJournalViewModel
+        private void LoadAccounts()
+        {
+            this.Accounts.LoadAccounts(
+                new List<AccountingDataAccountGroup>
+                {
+                    new AccountingDataAccountGroup
+                    {
+                        Name = "Bestandskonten",
+                        Account = new List<AccountDefinition>
+                        {
+                            new AccountDefinition
+                            {
+                                ID = 100, Name = "Kasse", Type = AccountDefinitionType.Asset
+                            }
+                        }
+                    }
+                });
+        }
+
+        private void LoadJournal()
+        {
+            var journalItem = new FullJournalItemViewModel
             {
                 Identifier = 41,
                 Date = DateTime.Now,
@@ -42,8 +71,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditAccount = "100",
                 DebitAccount = "400"
             };
-            this.FullJournal.Add(journalItem);
-            journalItem = new FullJournalViewModel
+            this.FullJournal.Items.Add(journalItem);
+            journalItem = new FullJournalItemViewModel
             {
                 Identifier = 42,
                 Date = DateTime.Now,
@@ -53,8 +82,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 DebitAccount = "401",
                 IsFollowup = true
             };
-            this.FullJournal.Add(journalItem);
-            journalItem = new FullJournalViewModel
+            this.FullJournal.Items.Add(journalItem);
+            journalItem = new FullJournalItemViewModel
             {
                 Identifier = 43,
                 Date = DateTime.Now,
@@ -63,8 +92,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditAccount = "101",
                 DebitAccount = "401",
             };
-            this.FullJournal.Add(journalItem);
-            journalItem = new FullJournalViewModel
+            this.FullJournal.Items.Add(journalItem);
+            journalItem = new FullJournalItemViewModel
             {
                 Identifier = 44,
                 Date = DateTime.Now,
@@ -73,10 +102,10 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditAccount = "101",
                 DebitAccount = "401",
             };
-            this.FullJournal.Add(journalItem);
-            this.FullJournal.UpdateRowHighlighting();
+            this.FullJournal.Items.Add(journalItem);
+            this.FullJournal.Items.UpdateRowHighlighting();
 
-            var accountJournalItem = new AccountJournalViewModel
+            var accountJournalItem = new AccountJournalItemViewModel
             {
                 Identifier = 42,
                 Date = DateTime.Now,
@@ -84,8 +113,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditValue = 123.4,
                 RemoteAccount = "Div."
             };
-            this.AccountJournal.Add(accountJournalItem);
-            accountJournalItem = new AccountJournalViewModel
+            this.AccountJournal.Items.Add(accountJournalItem);
+            accountJournalItem = new AccountJournalItemViewModel
             {
                 Identifier = 44,
                 Date = DateTime.Now,
@@ -93,13 +122,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 CreditValue = 1.222,
                 RemoteAccount = "Div."
             };
-            this.AccountJournal.Add(accountJournalItem);
-            accountJournalItem = new AccountJournalViewModel
+            this.AccountJournal.Items.Add(accountJournalItem);
+            accountJournalItem = new AccountJournalItemViewModel
             {
                 IsSummary = true, Text = "Summe", CreditValue = 123.4, RemoteAccount = "Div."
             };
-            this.AccountJournal.Add(accountJournalItem);
-            this.AccountJournal.UpdateRowHighlighting();
+            this.AccountJournal.Items.Add(accountJournalItem);
+            this.AccountJournal.Items.UpdateRowHighlighting();
         }
     }
 }

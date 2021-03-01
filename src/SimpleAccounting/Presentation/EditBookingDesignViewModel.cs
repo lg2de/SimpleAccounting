@@ -7,7 +7,11 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Diagnostics.CodeAnalysis;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
+    /// <summary>
+    ///     Implements the view model for booking editor to be used in the designer.
+    /// </summary>
     [SuppressMessage(
         "Major Code Smell", "S109:Magic numbers should not be used",
         Justification = "Design view model defines useful values")]
@@ -17,7 +21,7 @@ namespace lg2de.SimpleAccounting.Presentation
     internal class EditBookingDesignViewModel : EditBookingViewModel
     {
         public EditBookingDesignViewModel()
-            : base(null!, DateTime.Now, DateTime.Now, DateTime.Now, editMode: false)
+            : base(new ProjectData(new Settings(), null!, null!, null!, null!), DateTime.Now, editMode: false)
         {
             this.BookingIdentifier = 42;
             this.BookingText = "shoes";
@@ -28,7 +32,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 new AccountDefinition { ID = 600, Name = "Shopping", Type = AccountDefinitionType.Expense });
 
             this.DebitSplitEntries.Add(new SplitBookingViewModel { AccountNumber = 600, BookingText = "Booking1" });
-            this.DebitSplitEntries.Add(new SplitBookingViewModel { AccountNumber = 600, BookingText = "Booking2"  });
+            this.DebitSplitEntries.Add(new SplitBookingViewModel { AccountNumber = 600, BookingText = "Booking2" });
             this.CreditAccount = 100;
         }
     }

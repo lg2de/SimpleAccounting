@@ -13,7 +13,7 @@ namespace lg2de.SimpleAccounting.Reports
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
-    [SuppressMessage("ReSharper", "CommentTypo")]
+    [SuppressMessage("ReSharper", "CommentTypo", Justification = "additional german comments")]
     internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
     {
         public const string ResourceName = "AnnualBalance.xml";
@@ -21,13 +21,10 @@ namespace lg2de.SimpleAccounting.Reports
 
         private readonly List<AccountDefinition> allAccounts;
 
-        public AnnualBalanceReport(
-            AccountingDataJournal yearData,
-            IEnumerable<AccountDefinition> accounts,
-            AccountingDataSetup setup)
-            : base(ResourceName, setup, yearData)
+        public AnnualBalanceReport(IProjectData projectData)
+            : base(ResourceName, projectData)
         {
-            this.allAccounts = accounts.ToList();
+            this.allAccounts = projectData.Storage.AllAccounts.ToList();
         }
 
         public void CreateReport(string title)
@@ -61,6 +58,7 @@ namespace lg2de.SimpleAccounting.Reports
                 long balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
+                    // account with balance zero is skipped
                     continue;
                 }
 
@@ -83,6 +81,7 @@ namespace lg2de.SimpleAccounting.Reports
                 long balance = this.GetAccountBalance(account, creditFromDebit: true);
                 if (balance == 0)
                 {
+                    // account with balance zero is skipped
                     continue;
                 }
 
@@ -107,12 +106,18 @@ namespace lg2de.SimpleAccounting.Reports
             foreach (var account in accounts)
             {
                 long balance = this.GetAccountBalance(account, creditFromDebit: false);
+                if (balance == 0)
+                {
+                    // account with balance zero is skipped
+                    continue;
+                }
+
                 if (balance > 0)
                 {
                     totalReceivable += balance;
                     receivableNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
                 }
-                else if (balance < 0)
+                else // balance < 0
                 {
                     totalLiability += balance;
                     liabilityNode.AppendChild(this.CreateAccountBalanceNode(account, balance));

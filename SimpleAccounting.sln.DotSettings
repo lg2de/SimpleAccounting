@@ -9,7 +9,6 @@
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/INDENT_CASE_FROM_SWITCH/@EntryValue">False</s:Boolean>
 	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/KEEP_BLANK_LINES_IN_DECLARATIONS/@EntryValue">1</s:Int64>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/LINE_FEED_AT_FILE_END/@EntryValue">True</s:Boolean>
-
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_WITHIN_SINGLE_LINE_ARRAY_INITIALIZER_BRACES/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_AFTER_DECLARATION_LPAR/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_AFTER_INVOCATION_LPAR/@EntryValue">True</s:Boolean>
@@ -207,6 +206,8 @@
     Copyright (c) Lukas Grützmacher. All rights reserved.&#xD;
 &lt;/copyright&gt;&#xD;
 </s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateInstanceFields/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateStaticFields/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FBLOCK_005FSCOPE_005FCONSTANT/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FBLOCK_005FSCOPE_005FFUNCTION/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FBLOCK_005FSCOPE_005FVARIABLE/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
@@ -248,6 +249,7 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/XamlNaming/UserRules/=NAMESPACE_005FALIAS/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/XamlNaming/UserRules/=XAML_005FFIELD/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/XamlNaming/UserRules/=XAML_005FRESOURCE/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=_002A_003B_002A_003B_002ATests_003B_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchBehaviour/=Antivirus/@EntryIndexedValue">DO_NOTHING</s:String>
 	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchBehaviour/=AutoRecoverer/@EntryIndexedValue">LIVE_MONITOR</s:String>
 	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchBehaviour/=Format/@EntryIndexedValue">LIVE_MONITOR</s:String>
@@ -273,6 +275,61 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Cryptomator/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Gr_00FCtzmacher/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Lukas/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=oversized/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Saldo/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Summe/@EntryIndexedValue">True</s:Boolean>
+  <!--code cleanup profile-->
+  <s:String x:Key="/Default/CodeStyle/CodeCleanup/Profiles/=lg2de/@EntryIndexedValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;Profile name="lg2de"&gt;
+  &lt;!-- C# --&gt;
+  &lt;CSCodeStyleAttributes
+    ArrangeTypeAccessModifier="False"
+    ArrangeTypeMemberAccessModifier="False"
+    SortModifiers="True"
+    RemoveRedundantParentheses="False"
+    AddMissingParentheses="False"
+    ArrangeBraces="True"
+    ArrangeAttributes="False"
+    ArrangeArgumentsStyle="False"
+    ArrangeCodeBodyStyle="False"
+    ArrangeVarStyle="False" /&gt;
+
+  &lt;!-- C# --&gt;
+  &lt;!-- add copyright header --&gt;
+  &lt;CSUpdateFileHeader&gt;True&lt;/CSUpdateFileHeader&gt;
+
+  &lt;!-- optimize namespace usings --&gt;
+  &lt;CSOptimizeUsings&gt;
+    &lt;OptimizeUsings&gt;True&lt;/OptimizeUsings&gt;
+    &lt;EmbraceInRegion&gt;False&lt;/EmbraceInRegion&gt;
+    &lt;RegionName&gt;&lt;/RegionName&gt;
+  &lt;/CSOptimizeUsings&gt;
+
+  &lt;!-- reorder type members using the layout defined in FileLayout.xml --&gt;
+  &lt;CSReorderTypeMembers&gt;True&lt;/CSReorderTypeMembers&gt;
+
+  &lt;!-- format C# code --&gt;
+  &lt;CSReformatCode&gt;True&lt;/CSReformatCode&gt;
+
+  &lt;!-- make fields readonly if possible --&gt;
+  &lt;CSMakeFieldReadonly&gt;True&lt;/CSMakeFieldReadonly&gt;
+
+  &lt;!-- arrange qualifiers, like 'this' --&gt;
+  &lt;CSArrangeQualifiers&gt;True&lt;/CSArrangeQualifiers&gt;
+
+  &lt;!-- format XML comments --&gt;
+  &lt;CSharpFormatDocComments&gt;True&lt;/CSharpFormatDocComments&gt;
+
+  &lt;!-- C++ --&gt;
+  &lt;CppUpdateFileHeader&gt;True&lt;/CppUpdateFileHeader&gt;
+  &lt;CppRemoveElseKeyword&gt;True&lt;/CppRemoveElseKeyword&gt;
+  &lt;CppRemoveRedundantParentheses&gt;True&lt;/CppRemoveRedundantParentheses&gt;
+  &lt;CppRemoveUnusedIncludes&gt;True&lt;/CppRemoveUnusedIncludes&gt;
+  &lt;CppCStyleToStaticCastDescriptor&gt;True&lt;/CppCStyleToStaticCastDescriptor&gt;
+  &lt;CppReformatCode&gt;True&lt;/CppReformatCode&gt;
+
+  &lt;!-- XML --&gt;
+  &lt;XMLReformatCode&gt;True&lt;/XMLReformatCode&gt;
+&lt;/Profile&gt;</s:String>
+  <s:String x:Key="/Default/CodeStyle/CodeCleanup/SilentCleanupProfile/@EntryValue">lg2de</s:String>
 </wpf:ResourceDictionary>

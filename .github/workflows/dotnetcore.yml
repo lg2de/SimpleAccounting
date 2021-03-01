@@ -59,16 +59,13 @@ jobs:
         # Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
         # bash codecov.sh -f "CoverOutput/coverage.xml" -t ${{ secrets.CODECOV_TOKEN }}
       shell: pwsh
-    - name: Build Release
-      run: dotnet build --configuration Release --no-restore
+    - name: Publish Release
+      run: dotnet publish --configuration Release --no-restore
     - name: Complete SonarScanner
       run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
-    - name: Prepare artifact
-      run: Get-ChildItem .\src\SimpleAccounting\bin\Release\netcoreapp3.1 -Filter *.json | % { if ($_.FullName.EndsWith("runtimeconfig.json") -eq $false) { Remove-Item $_.FullName } }
-      shell: pwsh
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
       with:
         name: SimpleAccounting
-        path: src\SimpleAccounting\bin\Release\netcoreapp3.1
+        path: src\SimpleAccounting\bin\Release\netcoreapp3.1\publish

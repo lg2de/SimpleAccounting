@@ -20,19 +20,19 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
         [Fact]
         public void AskForUpdate_NoNewVersion_AppIsUpToDate()
         {
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi);
+            var sut = new ApplicationUpdate(dialogs, fileSystem, processApi);
             var releases = GithubReleaseExtensionTests.CreateRelease("2.0");
 
             sut.AskForUpdate(releases, "2.0").Should().BeFalse();
-            messageBox.Received(1).Show(
+            dialogs.Received(1).ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.OK, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-            messageBox.DidNotReceive().Show(
+            dialogs.DidNotReceive().ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
@@ -42,12 +42,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
         [Fact]
         public void AskForUpdate_NewVersionNo_NoUpdate()
         {
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi);
+            var sut = new ApplicationUpdate(dialogs, fileSystem, processApi);
             var releases = GithubReleaseExtensionTests.CreateRelease("2.1");
-            messageBox.Show(
+            dialogs.ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
@@ -55,12 +55,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
                 .Returns(MessageBoxResult.No);
 
             sut.AskForUpdate(releases, "2.0").Should().BeFalse();
-            messageBox.DidNotReceive().Show(
+            dialogs.DidNotReceive().ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.OK, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-            messageBox.Received(1).Show(
+            dialogs.Received(1).ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
@@ -70,12 +70,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
         [Fact]
         public void AskForUpdate_NewVersionYes_StartUpdate()
         {
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi);
+            var sut = new ApplicationUpdate(dialogs, fileSystem, processApi);
             var releases = GithubReleaseExtensionTests.CreateRelease("2.1");
-            messageBox.Show(
+            dialogs.ShowMessageBox(
                     Arg.Any<string>(),
                     Arg.Any<string>(),
                     MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
@@ -83,12 +83,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
                 .Returns(MessageBoxResult.Yes);
 
             sut.AskForUpdate(releases, "2.0").Should().BeTrue();
-            messageBox.DidNotReceive().Show(
+            dialogs.DidNotReceive().ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.OK, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-            messageBox.Received(1).Show(
+            dialogs.Received(1).ShowMessageBox(
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
@@ -98,17 +98,17 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
         [Fact]
         public void StartUpdateProcess_NewVersionYes_StartUpdate()
         {
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
             processApi.Start(Arg.Any<ProcessStartInfo>())
                 .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c ping 127.0.0.1")));
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi)
+            var sut = new ApplicationUpdate(dialogs, fileSystem, processApi)
             {
                 WaitTimeMilliseconds = 0
             };
             var releases = GithubReleaseExtensionTests.CreateRelease("2.1");
-            messageBox.Show(
+            dialogs.ShowMessageBox(
                     Arg.Any<string>(),
                     Arg.Any<string>(),
                     MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
@@ -126,12 +126,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
         [CulturedFact("en")]
         public void StartUpdateProcess_UpdateProcessFailed_UpdateAborted()
         {
-            var messageBox = Substitute.For<IMessageBox>();
+            var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
             processApi.Start(Arg.Any<ProcessStartInfo>())
                 .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c exit 5")));
-            var sut = new ApplicationUpdate(messageBox, fileSystem, processApi)
+            var sut = new ApplicationUpdate(dialogs, fileSystem, processApi)
             {
                 WaitTimeMilliseconds = 1000
             };
@@ -139,7 +139,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             sut.AskForUpdate(releases, "2.0");
 
             sut.StartUpdateProcess().Should().BeFalse();
-            messageBox.Received(1).Show(
+            dialogs.Received(1).ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("code 5.")), Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
         }
     }

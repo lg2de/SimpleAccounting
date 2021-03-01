@@ -141,12 +141,6 @@
         </DataGrid.CellStyle>
       </DataGrid>
     </DockPanel>
-    <Grid Background="Gray" Opacity="0.5"
-          Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-      <Rectangle Width="150" Height="50" Fill="White" />
-      <ProgressBar
-        Width="100" Height="20"
-        IsIndeterminate="True" />
-    </Grid>
+    <local:BusyControl DataContext="{Binding Busy}" />
   </Grid>
 </UserControl>

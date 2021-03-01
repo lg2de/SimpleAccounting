@@ -24,13 +24,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         [InlineData(false)]
         public void CreateReport_SampleData_Converted(bool pageBreakBetweenAccounts)
         {
-            var project = Samples.SampleProject;
-            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            var setup = new AccountingDataSetup();
-            var sut = new AccountJournalReport(project.Journal.Last(), project.AllAccounts, setup)
-            {
-                PageBreakBetweenAccounts = pageBreakBetweenAccounts
-            };
+            var projectData = Samples.SampleProjectData;
+            projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
+            var sut = new AccountJournalReport(projectData) { PageBreakBetweenAccounts = pageBreakBetweenAccounts };
 
             sut.CreateReport("dummy");
 
@@ -95,7 +91,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedSalary = string.Format(@"
+            var expectedSalary = string.Format(
+                @"
 <data>
   <tr topLine=""True"">
     <td>1/28/{0}</td>
@@ -122,7 +119,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedShoes = string.Format(@"
+            var expectedShoes = string.Format(
+                @"
 <data>
   <tr topLine=""True"">
     <td>2/1/{0}</td>
@@ -149,7 +147,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedCarryforward = string.Format(@"
+            var expectedCarryforward = string.Format(
+                @"
 <data>
   <tr topLine=""True"">
     <td>1/1/{0}</td>
@@ -184,7 +183,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedBankCredit = string.Format(@"
+            var expectedBankCredit = string.Format(
+                @"
 <data>
   <tr topLine=""True"">
     <td>1/1/{0}</td>
@@ -219,7 +219,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedFriendsDebit = string.Format(@"
+            var expectedFriendsDebit = string.Format(
+                @"
 <data>
   <tr topLine=""True"">
     <td>2/5/{0}</td>

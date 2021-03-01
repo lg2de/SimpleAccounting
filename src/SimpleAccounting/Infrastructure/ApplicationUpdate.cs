@@ -21,14 +21,14 @@ namespace lg2de.SimpleAccounting.Infrastructure
     internal class ApplicationUpdate : IApplicationUpdate
     {
         private readonly IFileSystem fileSystem;
-        private readonly IMessageBox messageBox;
+        private readonly IDialogs dialogs;
         private readonly IProcess process;
 
         private Release? newRelease;
 
-        public ApplicationUpdate(IMessageBox messageBox, IFileSystem fileSystem, IProcess process)
+        public ApplicationUpdate(IDialogs dialogs, IFileSystem fileSystem, IProcess process)
         {
-            this.messageBox = messageBox;
+            this.dialogs = dialogs;
             this.fileSystem = fileSystem;
             this.process = process;
         }
@@ -87,7 +87,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
             var message = string.Format(
                 CultureInfo.CurrentUICulture, Resources.Update_ProcessFailed, updateProcess.ExitCode);
-            this.messageBox.Show(message, Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
+            this.dialogs.ShowMessageBox(message, Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
             return false;
         }
 
@@ -107,7 +107,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
                     }
                     catch (Exception exception)
                     {
-                        this.messageBox.Show(
+                        this.dialogs.ShowMessageBox(
                             Resources.Update_QueryVersionsFailed + $"\n{exception.Message}",
                             Resources.Header_CheckForUpdates,
                             icon: MessageBoxImage.Error);
@@ -122,13 +122,13 @@ namespace lg2de.SimpleAccounting.Infrastructure
             string caption = Resources.Header_CheckForUpdates;
             if (this.newRelease == null)
             {
-                this.messageBox.Show(Resources.Update_UpToDate, caption);
+                this.dialogs.ShowMessageBox(Resources.Update_UpToDate, caption);
                 return false;
             }
 
             string message = string.Format(
                 CultureInfo.CurrentUICulture, Resources.Question_UpdateToVersionX, this.newRelease.TagName);
-            var result = this.messageBox.Show(
+            var result = this.dialogs.ShowMessageBox(
                 message,
                 caption,
                 MessageBoxButton.YesNo,
