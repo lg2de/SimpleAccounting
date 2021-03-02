@@ -366,9 +366,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CanDiscardModifiedProject_AnswerNo_NotSavedAndReturnsTrue()
         {
-            var sut = CreateSut(out var messageBox, out var fileSystem);
+            var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
             sut.ProjectData.IsModified = true;
-            messageBox.ShowMessageBox(
+            dialogs.ShowMessageBox(
                     Arg.Any<string>(), Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -377,7 +377,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.ProjectData.CanDiscardModifiedProject().Should().BeTrue();
 
-            messageBox.Received(1).ShowMessageBox(
+            dialogs.Received(1).ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
@@ -387,7 +387,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public void CanDiscardModifiedProject_AnswerYes_SavedAndReturnsTrue()
         {
-            var sut = CreateSut(out var messageBox, out var fileSystem);
+            var sut = CreateSut(out var messageBox, out IFileSystem fileSystem);
             sut.ProjectData.IsModified = true;
             messageBox.ShowMessageBox(
                     Arg.Any<string>(), Arg.Any<string>(),
@@ -440,8 +440,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [CulturedFact("en")]
         public async Task LoadProjectFromFileAsync_UserWantsAutoSaveFile_AutoSaveFileLoaded()
         {
-            var sut = CreateSut(out var messageBox, out var fileSystem);
-            messageBox.ShowMessageBox(
+            var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
+            dialogs.ShowMessageBox(
                     Arg.Is<string>(s => s.Contains("automatically created backup file")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -465,8 +465,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [CulturedFact("en")]
         public async Task LoadProjectFromFileAsync_UserDoesNotWantAutoSaveFileExists_AutoSaveFileLoaded()
         {
-            var sut = CreateSut(out var messageBox, out var fileSystem);
-            messageBox.ShowMessageBox(
+            var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
+            dialogs.ShowMessageBox(
                     Arg.Is<string>(s => s.Contains("automatically created backup file")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -491,7 +491,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public async Task LoadProjectFromFileAsync_NewFileOnSecureDrive_StoreOpenedAndFileLoaded()
         {
-            var sut = CreateSut(out var messageBox, out var fileSystem);
+            var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
             fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
             fileSystem.GetDrives().Returns(
@@ -507,7 +507,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .Which.Should().Be(OperationResult.Completed);
 
             sut.ProjectData.Settings.SecuredDrives.Should().Equal(new object[] { "K:\\" });
-            messageBox.DidNotReceive().ShowMessageBox(
+            dialogs.DidNotReceive().ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator")),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
@@ -564,10 +564,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [CulturedFact("en")]
         public async Task LoadProjectFromFileAsync_UserDoesNotWantSaveCurrentProject_LoadingAborted()
         {
-            var sut = CreateSut(out var messageBox, out var fileSystem);
+            var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
             sut.ProjectData.FileName = "old.fileName";
             sut.ProjectData.IsModified = true;
-            messageBox.ShowMessageBox(
+            dialogs.ShowMessageBox(
                     Arg.Is<string>(s => s.Contains("Project data has been changed.")), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -727,13 +727,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             return sut;
         }
 
-        private static ShellViewModel CreateSut(out IApplicationUpdate applicationUpdate)
+        private static ShellViewModel CreateSut(out IApplicationUpdate applicationUpdate, out IDialogs dialogs)
         {
             var busy = Substitute.For<IBusy>();
             var windowManager = Substitute.For<IWindowManager>();
             var reportFactory = Substitute.For<IReportFactory>();
             applicationUpdate = Substitute.For<IApplicationUpdate>();
-            var dialogs = Substitute.For<IDialogs>();
+            dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
             var settings = new Settings();
