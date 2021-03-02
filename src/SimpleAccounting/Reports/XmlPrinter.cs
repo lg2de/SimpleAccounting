@@ -369,9 +369,9 @@ namespace lg2de.SimpleAccounting.Reports
 
             this.TransformTableHeader(tableNode);
 
-            for (int nodeIndex = 0; nodeIndex < dataNodes.Count; nodeIndex++)
+            for (int rowIndex = 0; rowIndex < dataNodes.Count; rowIndex++)
             {
-                this.TransformTableRow(tableNode, tableLineHeight, columnNodes, dataNodes, nodeIndex);
+                this.TransformTableRow(tableNode, tableLineHeight, columnNodes, dataNodes, rowIndex);
             }
 
             tableNode.ParentNode!.RemoveChild(tableNode);
@@ -428,28 +428,27 @@ namespace lg2de.SimpleAccounting.Reports
         }
 
         private void TransformTableRow(
-            XmlNode tableNode, int tableLineHeight, XmlNodeList columnNodes,
-            XmlNodeList dataNodes, int nodeIndex)
+            XmlNode tableNode, int tableLineHeight, XmlNodeList columnDefinitions,
+            XmlNodeList dataRows, int rowIndex)
         {
-            const int maxLength = 50;
-
-            var dataNode = dataNodes[nodeIndex];
-
-            var rowNodes = dataNode.SelectNodes("td");
-            if (rowNodes == null)
+            var dataRow = dataRows[rowIndex];
+            var rowColumn = dataRow.SelectNodes("td");
+            if (rowColumn == null)
             {
+                // no data found
                 return;
             }
 
-            int innerLineCount = 1;
-            for (int i = 0; i < rowNodes.Count; i++)
+            var wrappedTexts = new string[columnDefinitions.Count];
+            for (int columnIndex = 0; columnIndex < columnDefinitions.Count; columnIndex++)
             {
-                var rowNode = rowNodes[i];
-                string text = rowNode.InnerText;
-                innerLineCount += text.Length / maxLength;
+                var columnDefinition = columnDefinitions[columnIndex];
+                var columnText = columnIndex < rowColumn.Count ? rowColumn[columnIndex].InnerText : string.Empty;
+                wrappedTexts[columnIndex] = columnText.Wrap(columnDefinition.GetAttribute<int>(WidthNode));
             }
 
-            var lineHeight = dataNode.GetAttribute(LineHeightNode, tableLineHeight * innerLineCount);
+            int innerLineCount = wrappedTexts.Max(x => x.Count(c => c == '\n')) + 1;
+            var lineHeight = dataRow.GetAttribute(LineHeightNode, tableLineHeight * innerLineCount);
 
             // check if oversized line still fits in page
             if (this.CursorY + lineHeight > this.DocumentHeight - this.DocumentBottomMargin)
@@ -458,24 +457,17 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             int xPosition = 0;
-            for (int columnIndex = 0; columnIndex < rowNodes.Count; columnIndex++)
+            for (int columnIndex = 0; columnIndex < rowColumn.Count; columnIndex++)
             {
-                XmlNode columnNode = columnNodes[columnIndex];
-                XmlNode rowNode = rowNodes[columnIndex];
+                var columnDefinition = columnDefinitions[columnIndex];
+                var columnData = rowColumn[columnIndex];
+                var wrappedText = wrappedTexts[columnIndex];
                 XmlNode textNode = this.Document.CreateElement(TextNode);
-                string strText = rowNode.InnerText;
-
-                // line break
-                for (int j = maxLength; j < strText.Length; j += maxLength + 1)
-                {
-                    strText = strText.Insert(j, "\n");
-                }
-
-                textNode.InnerText = strText;
-                int columnWidth = columnNode.GetAttribute<int>(WidthNode);
+                textNode.InnerText = wrappedText;
+                int columnWidth = columnDefinition.GetAttribute<int>(WidthNode);
                 int xAdoption = 0;
-                var align = rowNode.Attributes!.GetNamedItem(AlignNode)
-                            ?? columnNode.Attributes!.GetNamedItem(AlignNode);
+                var align = columnData.Attributes!.GetNamedItem(AlignNode)
+                            ?? columnDefinition.Attributes!.GetNamedItem(AlignNode);
                 if (align != null)
                 {
                     textNode.SetAttribute(AlignNode, align.Value);
@@ -489,16 +481,16 @@ namespace lg2de.SimpleAccounting.Reports
 
                 textNode.SetAttribute(RelativeXNode, (xPosition + xAdoption));
                 tableNode.ParentNode!.InsertBefore(textNode, tableNode);
-                this.CreateFrame(columnNode, textNode, xPosition, 0, xPosition + columnWidth, lineHeight);
+                this.CreateFrame(columnDefinition, textNode, xPosition, 0, xPosition + columnWidth, lineHeight);
                 xPosition += columnWidth;
             }
 
-            this.CreateFrame(dataNode, tableNode, 0, 0, xPosition, lineHeight);
+            this.CreateFrame(dataRow, tableNode, 0, 0, xPosition, lineHeight);
 
             this.CursorY += lineHeight;
 
             // check whether next line exists and fits into page
-            if (nodeIndex + 1 < dataNodes.Count
+            if (rowIndex + 1 < dataRows.Count
                 && this.CursorY + tableLineHeight > this.DocumentHeight - this.DocumentBottomMargin)
             {
                 StartNewPage();
