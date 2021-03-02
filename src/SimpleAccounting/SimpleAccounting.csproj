@@ -30,7 +30,7 @@
     <!-- licecnse is MIT -->
     <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
     <!-- license is MIT -->
-    <PackageReference Include="Octokit" Version="0.48.0" />
+    <PackageReference Include="Octokit" Version="0.50.0" />
     <!-- license is MIT -->
     <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
   </ItemGroup>
