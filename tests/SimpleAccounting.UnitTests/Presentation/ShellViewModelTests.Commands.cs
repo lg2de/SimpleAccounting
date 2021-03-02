@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
     using Caliburn.Micro;
     using FluentAssertions;
     using FluentAssertions.Execution;
@@ -525,20 +526,49 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public async Task HelpCheckForUpdateCommand_Execute_InterfaceInvoked()
+        public async Task HelpCheckForUpdateCommand_StartProcessFailed_Aborted()
         {
-            var sut = CreateSut(out IApplicationUpdate applicationUpdate);
+            var sut = CreateSut(out IApplicationUpdate applicationUpdate, out var dialogs);
+            dialogs.ShowMessageBox(
+                    Arg.Any<string>(), Arg.Any<string>(),
+                    Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.No);
+            sut.ProjectData.IsModified = true;
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
+            applicationUpdate.StartUpdateProcess().Returns(false);
+            var monitor = sut.Monitor();
 
             await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
 
-            applicationUpdate.Received(1).StartUpdateProcess();
+            sut.ProjectData.IsModified.Should().BeTrue("unsaved project remains unsaved");
+            monitor.Should().NotRaise(nameof(sut.Deactivated));
+        }
+
+        [Fact]
+        public async Task HelpCheckForUpdateCommand_StartProcessSucceed_ProjectClosed()
+        {
+            var sut = CreateSut(out IApplicationUpdate applicationUpdate, out var dialogs);
+            dialogs.ShowMessageBox(
+                Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                .Returns(MessageBoxResult.No);
+            sut.ProjectData.IsModified = true;
+            applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
+            applicationUpdate.StartUpdateProcess().Returns(true);
+            var monitor = sut.Monitor();
+
+            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
+
+            sut.ProjectData.IsModified.Should().BeFalse();
+            monitor.Should().NotRaise(nameof(sut.Deactivated));
         }
 
         [Fact]
         public async Task HelpCheckForUpdateCommand_NoUpdateAvailable_UpdateProcessNotStarted()
         {
-            var sut = CreateSut(out IApplicationUpdate applicationUpdate);
+            var sut = CreateSut(out IApplicationUpdate applicationUpdate, out _);
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(false);
 
             await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
@@ -549,7 +579,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [Fact]
         public async Task HelpCheckForUpdateCommand_UserDoesNotWantToSave_UpdateProcessNotStarted()
         {
-            var sut = CreateSut(out IApplicationUpdate applicationUpdate);
+            var sut = CreateSut(out IApplicationUpdate applicationUpdate, out _);
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
             sut.ProjectData.IsModified = true;
 

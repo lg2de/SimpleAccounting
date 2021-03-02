@@ -512,4 +512,7 @@ Mit 'Nein' wird diese Sicherung gelöscht.</value>
   <data name="Question_UpdateToVersionX" xml:space="preserve">
     <value>Wollen Sie auf die neue Version {0} aktualisieren?</value>
   </data>
+  <data name="Update_ProcessFailed" xml:space="preserve">
+    <value>Der Aktualisierungsprozess ist mit dem Fehlercode {0} fehlgeschlagen.</value>
+  </data>
 </root>

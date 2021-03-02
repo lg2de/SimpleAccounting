@@ -517,7 +517,7 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Send feedback.
+        ///   Looks up a localized string similar to Create feedback.
         /// </summary>
         public static string Menu_Help_Feedback {
             get {
@@ -764,6 +764,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Tooltip_SplitBookingValue {
             get {
                 return ResourceManager.GetString("Tooltip_SplitBookingValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string Update_ProcessFailed {
+            get {
+                return ResourceManager.GetString("Update_ProcessFailed", resourceCulture);
             }
         }
         

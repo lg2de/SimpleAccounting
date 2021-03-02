@@ -33,13 +33,15 @@ namespace lg2de.SimpleAccounting.Infrastructure
             this.process = process;
         }
 
+        internal int WaitTimeMilliseconds { get; set; } = 5000;
+
         public async Task<bool> IsUpdateAvailableAsync(string currentVersion)
         {
             IEnumerable<Release> releases = await this.GetAllReleasesAsync();
             return this.AskForUpdate(releases, currentVersion);
         }
 
-        public void StartUpdateProcess()
+        public bool StartUpdateProcess()
         {
             if (this.newRelease == null)
             {
@@ -52,7 +54,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
             if (stream == null)
             {
                 // script not found :(
-                return;
+                return false;
             }
 
             using var reader = new StreamReader(stream);
@@ -66,7 +68,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
             if (asset == null)
             {
                 // asset not found :(
-                return;
+                return false;
             }
 
             string assetUrl = asset.BrowserDownloadUrl;
@@ -75,7 +77,18 @@ namespace lg2de.SimpleAccounting.Infrastructure
             var info = new ProcessStartInfo(
                 "powershell",
                 $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
-            this.process.Start(info);
+            var updateProcess = this.process.Start(info);
+
+            var exited = updateProcess.WaitForExit(this.WaitTimeMilliseconds);
+            if (!exited)
+            {
+                return true;
+            }
+
+            var message = string.Format(
+                CultureInfo.CurrentUICulture, Resources.Update_ProcessFailed, updateProcess.ExitCode);
+            this.dialogs.ShowMessageBox(message, Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
+            return false;
         }
 
         [SuppressMessage(
@@ -113,9 +126,10 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 return false;
             }
 
+            string message = string.Format(
+                CultureInfo.CurrentUICulture, Resources.Question_UpdateToVersionX, this.newRelease.TagName);
             var result = this.dialogs.ShowMessageBox(
-                string.Format(
-                    CultureInfo.CurrentUICulture, Resources.Question_UpdateToVersionX, this.newRelease.TagName),
+                message,
                 caption,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question,
