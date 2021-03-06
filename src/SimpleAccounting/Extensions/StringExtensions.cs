@@ -4,6 +4,9 @@
 
 namespace lg2de.SimpleAccounting.Extensions
 {
+    using System.Drawing;
+    using System.Windows.Forms;
+
     /// <summary>
     ///     Implements extensions on <see cref="string"/>.
     /// </summary>
@@ -14,28 +17,60 @@ namespace lg2de.SimpleAccounting.Extensions
         /// </summary>
         /// <param name="input">The string to be wrapped.</param>
         /// <param name="maxWidth">The maximum width per row.</param>
+        /// <param name="font"></param>
+        /// <param name="printFactor"></param>
         /// <returns>The wrapped string.</returns>
-        public static string Wrap(this string input, int maxWidth)
+        public static string Wrap(this string input, double maxWidth, Font font, double printFactor)
         {
-            const double characterWidthFactor = 95.0 / 50;
-
             var result = input;
             var position = 0;
             
             while (position < result.Length)
             {
                 var remainingText = result.Substring(position);
-                if (remainingText.Length * characterWidthFactor <= maxWidth)
+                if (GetWidth(remainingText) <= maxWidth)
                 {
                     return result;
                 }
 
-                var wrapPosition = (int)(maxWidth / characterWidthFactor);
-                result = result.Insert(position + wrapPosition, "\n");
-                position += wrapPosition + 1;
+                SearchPosition(remainingText);
             }
 
             return result;
+
+            void SearchPosition(string remainingText)
+            {
+                while (true)
+                {
+                    var wrapPosition = remainingText.LastIndexOfAny(" -/".ToCharArray()) + 1;
+                    if (wrapPosition <= 0)
+                    {
+                        // no wrap character available, just break in word
+                        wrapPosition = remainingText.Length - 1;
+                    }
+
+                    if (wrapPosition > 1)
+                    {
+                        remainingText = remainingText.Substring(0, wrapPosition);
+                        if (GetWidth(remainingText) > maxWidth)
+                        {
+                            remainingText = remainingText.Substring(0, wrapPosition - 1);
+                            continue;
+                        }
+                    }
+
+                    result = result.Insert(position + wrapPosition, "\n");
+                    position += wrapPosition + 1;
+                    return;
+                }
+            }
+
+            double GetWidth(string text)
+            {
+                var size = TextRenderer.MeasureText(text, font);
+                var width = size.Width / printFactor;
+                return width;
+            }
         }
     }
 }

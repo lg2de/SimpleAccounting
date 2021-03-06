@@ -444,7 +444,9 @@ namespace lg2de.SimpleAccounting.Reports
             {
                 var columnDefinition = columnDefinitions[columnIndex];
                 var columnText = columnIndex < rowColumn.Count ? rowColumn[columnIndex].InnerText : string.Empty;
-                wrappedTexts[columnIndex] = columnText.Wrap(columnDefinition.GetAttribute<int>(WidthNode));
+                using var dummyFont = new Font("Arial", 8); // TODO actual font!
+                wrappedTexts[columnIndex] = columnText.Wrap(
+                    columnDefinition.GetAttribute<int>(WidthNode), dummyFont, 5.4);
             }
 
             int innerLineCount = wrappedTexts.Max(x => x.Count(c => c == '\n')) + 1;
