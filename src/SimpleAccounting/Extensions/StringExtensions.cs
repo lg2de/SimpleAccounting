@@ -59,8 +59,17 @@ namespace lg2de.SimpleAccounting.Extensions
                         }
                     }
 
-                    result = result.Insert(position + wrapPosition, "\n");
-                    position += wrapPosition + 1;
+                    if (position + wrapPosition + 1 < result.Length)
+                    {
+                        result = result.Insert(position + wrapPosition, "\n");
+                        position += wrapPosition + 1;
+                    }
+                    else
+                    {
+                        // ???
+                        position = result.Length;
+                    }
+
                     return;
                 }
             }

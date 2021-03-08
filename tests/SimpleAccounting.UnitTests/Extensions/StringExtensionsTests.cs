@@ -22,6 +22,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
             result.Should().BeEmpty();
         }
         
+        [Fact]
+        public void Wrap_InsufficientSpace_InputReturnedUnchanged()
+        {
+            var result = "1".Wrap(0, this.testFont, PrintFactor);
+
+            result.Should().Be("1");
+        }
+        
         [Theory]
         [InlineData("A", 50)]
         [InlineData("A123", 50)]

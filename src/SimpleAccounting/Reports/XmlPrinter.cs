@@ -445,12 +445,14 @@ namespace lg2de.SimpleAccounting.Reports
                 var columnDefinition = columnDefinitions[columnIndex];
                 var columnText = columnIndex < rowColumn.Count ? rowColumn[columnIndex].InnerText : string.Empty;
                 using var dummyFont = new Font("Arial", 8); // TODO actual font!
-                wrappedTexts[columnIndex] = columnText.Wrap(
-                    columnDefinition.GetAttribute<int>(WidthNode), dummyFont, 5.4);
+                int maxWidth = columnDefinition.GetAttribute<int>(WidthNode);
+                wrappedTexts[columnIndex] = columnText.Wrap(this.ToPhysical(maxWidth), dummyFont, 1.35);
             }
 
-            int innerLineCount = wrappedTexts.Max(x => x.Count(c => c == '\n')) + 1;
-            var lineHeight = dataRow.GetAttribute(LineHeightNode, tableLineHeight * innerLineCount);
+            var linesFactor = 1.0;
+            linesFactor += wrappedTexts.Max(x => x.Count(c => c == '\n')) * 0.8;
+            var automaticHeight = (int)(tableLineHeight * linesFactor);
+            var lineHeight = dataRow.GetAttribute(LineHeightNode, automaticHeight);
 
             // check if oversized line still fits in page
             if (this.CursorY + lineHeight > this.DocumentHeight - this.DocumentBottomMargin)
