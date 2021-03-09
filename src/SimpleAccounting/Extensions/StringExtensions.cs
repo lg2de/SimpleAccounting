@@ -5,22 +5,25 @@
 namespace lg2de.SimpleAccounting.Extensions
 {
     using System.Drawing;
-    using System.Windows.Forms;
+    using lg2de.SimpleAccounting.Abstractions;
 
     /// <summary>
     ///     Implements extensions on <see cref="string"/>.
     /// </summary>
     internal static class StringExtensions
     {
+        private static readonly char[] WrapCharacters = " -/".ToCharArray();
+
         /// <summary>
-        ///     Wraps the string according to specified max width.
+        ///     Wraps the string according to specified max width, font and device context.
         /// </summary>
         /// <param name="input">The string to be wrapped.</param>
         /// <param name="maxWidth">The maximum width per row.</param>
-        /// <param name="font"></param>
-        /// <param name="printFactor"></param>
+        /// <param name="font">The font to be used for size calculation.</param>
+        /// <param name="graphics">The graphics providing rendering context.</param>
         /// <returns>The wrapped string.</returns>
-        public static string Wrap(this string input, double maxWidth, Font font, double printFactor)
+        public static string Wrap(
+            this string input, double maxWidth, Font font, IGraphics graphics)
         {
             var result = input;
             var position = 0;
@@ -28,7 +31,8 @@ namespace lg2de.SimpleAccounting.Extensions
             while (position < result.Length)
             {
                 var remainingText = result.Substring(position);
-                if (GetWidth(remainingText) <= maxWidth)
+                var size = graphics.MeasureString(remainingText, font);
+                if (size.Width <= maxWidth)
                 {
                     return result;
                 }
@@ -42,7 +46,9 @@ namespace lg2de.SimpleAccounting.Extensions
             {
                 while (true)
                 {
-                    var wrapPosition = remainingText.LastIndexOfAny(" -/".ToCharArray()) + 1;
+                    var lastPosition = remainingText.Length - 1;
+                    var latestWrapPosition = lastPosition - 1;
+                    var wrapPosition = remainingText.LastIndexOfAny(WrapCharacters, latestWrapPosition) + 1;
                     if (wrapPosition <= 0)
                     {
                         // no wrap character available, just break in word
@@ -51,34 +57,24 @@ namespace lg2de.SimpleAccounting.Extensions
 
                     if (wrapPosition > 1)
                     {
+                        // wrap position identified
+                        // check whether remaining text fits into available space
                         remainingText = remainingText.Substring(0, wrapPosition);
-                        if (GetWidth(remainingText) > maxWidth)
+                        var size = graphics.MeasureString(remainingText, font);
+                        if (size.Width > maxWidth)
                         {
-                            remainingText = remainingText.Substring(0, wrapPosition - 1);
+                            // search for another wrap position
                             continue;
                         }
                     }
 
-                    if (position + wrapPosition + 1 < result.Length)
-                    {
-                        result = result.Insert(position + wrapPosition, "\n");
-                        position += wrapPosition + 1;
-                    }
-                    else
-                    {
-                        // ???
-                        position = result.Length;
-                    }
+                    // remaining text fits
+                    // insert line wrap at identified position
+                    result = result.Insert(position + wrapPosition, "\n");
+                    position += wrapPosition + 1;
 
                     return;
                 }
-            }
-
-            double GetWidth(string text)
-            {
-                var size = TextRenderer.MeasureText(text, font);
-                var width = size.Width / printFactor;
-                return width;
             }
         }
     }

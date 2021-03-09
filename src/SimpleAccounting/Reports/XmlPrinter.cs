@@ -117,12 +117,6 @@ namespace lg2de.SimpleAccounting.Reports
             var paperSizes = printDocument.PrinterSettings.PaperSizes;
             this.SetupDocument(printDocument, paperSizes.OfType<PaperSize>());
 
-            // The setup and cleanup procedures must be executed manually and by event handlers
-            // because they are required for transformation, for preview AND real printing.
-            this.TransformDocument();
-            printDocument.BeginPrint += (_, printArgs) => this.SetupGraphics();
-            printDocument.EndPrint += (_, printArgs) => this.CleanupGraphics();
-
             using var dialog = new PrintPreviewDialog
             {
                 Document = printDocument, WindowState = FormWindowState.Maximized,
@@ -137,11 +131,41 @@ namespace lg2de.SimpleAccounting.Reports
 
         internal void SetupDocument(PrintDocument printDocument, IEnumerable<PaperSize> paperSizes)
         {
+            bool firstPageSetupRequired = true;
+            bool transformationRequired = true;
+            
+            // The setup and cleanup procedures must be executed by event handlers
+            // because they are required for transformation, for preview and real printing.
+            printDocument.BeginPrint += (_, printArgs) => firstPageSetupRequired = true;
+            printDocument.EndPrint += (_, printArgs) => this.CleanupGraphics();
+            
             printDocument.PrintPage += (_, printArgs) =>
             {
+                var graphics = new DrawingGraphics(printArgs);
+
+                // Transformation is required only once before printing.
+                // But for text wrapping the device context (graphics) is required.
+                // This is only available withing this event handler.
+                // Transformation is using Setup- and CleanupGraphics (internally).
+                // Preview and Printing is using them too. So, we need to handle them all in this handler.
+                if (transformationRequired)
+                {
+                    this.TransformDocument(graphics);
+                    transformationRequired = false;
+                }
+
+                // After Transformation (SetupGraphics and) CleanupGraphics has been executed.
+                // For Preview and Printing it required once again.
+                if (firstPageSetupRequired)
+                {
+                    this.SetupGraphics();
+                    firstPageSetupRequired = false;
+                }
+
+                // Page initialization
                 this.ProcessNewPage();
 
-                var graphics = new DrawingGraphics(printArgs);
+                // Process all nodes for the current page 
                 this.PrintNodes(graphics);
             };
 
@@ -205,7 +229,7 @@ namespace lg2de.SimpleAccounting.Reports
             this.fontStack.Pop().Dispose();
         }
 
-        internal void TransformDocument()
+        internal void TransformDocument(IGraphics referenceGraphics)
         {
             this.SetupGraphics();
 
@@ -232,7 +256,7 @@ namespace lg2de.SimpleAccounting.Reports
                         this.TransformRectangle(transformingNode);
                         break;
                     case TableNode:
-                        this.TransformTable(transformingNode);
+                        this.TransformTable(transformingNode, referenceGraphics);
                         break;
                     case PageTextsNode:
                         this.pageTextsNode = transformingNode;
@@ -356,7 +380,7 @@ namespace lg2de.SimpleAccounting.Reports
             rectNode.ParentNode.RemoveChild(rectNode);
         }
 
-        private void TransformTable(XmlNode tableNode)
+        private void TransformTable(XmlNode tableNode, IGraphics referenceGraphics)
         {
             int tableLineHeight = tableNode.GetAttribute(LineHeightNode, DefaultLineHeight);
 
@@ -379,7 +403,7 @@ namespace lg2de.SimpleAccounting.Reports
 
             for (int rowIndex = 0; rowIndex < dataNodes.Count; rowIndex++)
             {
-                this.TransformTableRow(tableNode, tableLineHeight, columnNodes, dataNodes, rowIndex);
+                this.TransformTableRow(tableNode, tableLineHeight, columnNodes, dataNodes, rowIndex, referenceGraphics);
             }
 
             tableNode.ParentNode!.RemoveChild(tableNode);
@@ -437,7 +461,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         private void TransformTableRow(
             XmlNode tableNode, int tableLineHeight, XmlNodeList columnDefinitions,
-            XmlNodeList dataRows, int rowIndex)
+            XmlNodeList dataRows, int rowIndex, IGraphics referenceGraphics)
         {
             var dataRow = dataRows[rowIndex];
             var rowColumn = dataRow.SelectNodes("td");
@@ -454,11 +478,12 @@ namespace lg2de.SimpleAccounting.Reports
                 var columnText = columnIndex < rowColumn.Count ? rowColumn[columnIndex].InnerText : string.Empty;
                 int maxWidth = columnDefinition.GetAttribute<int>(WidthNode);
                 var currentFont = this.fontStack.Peek();
-                wrappedTexts[columnIndex] = columnText.Wrap(this.ToPhysical(maxWidth), currentFont, 1.35);
+                wrappedTexts[columnIndex] = columnText.Wrap(this.ToPhysical(maxWidth), currentFont, referenceGraphics);
             }
 
             var linesFactor = 1.0;
-            linesFactor += wrappedTexts.Max(x => x.Count(c => c == '\n')) * 0.8;
+            const double heightFactorForWrappedLines = 0.8;
+            linesFactor += wrappedTexts.Max(x => x.Count(c => c == '\n')) * heightFactorForWrappedLines;
             var automaticHeight = (int)(tableLineHeight * linesFactor);
             var lineHeight = dataRow.GetAttribute(LineHeightNode, automaticHeight);
 

@@ -390,7 +390,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -416,7 +417,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CursorX = 5;
             sut.CursorY = 8;
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             using (new AssertionScope())
             {
@@ -433,7 +435,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CursorX = 5;
             sut.CursorY = 8;
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             using (new AssertionScope())
             {
@@ -450,7 +453,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CursorX = 5;
             sut.CursorY = 8;
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             using (new AssertionScope())
             {
@@ -469,7 +473,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             sut.CursorX = 5;
             sut.CursorY = 8;
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             using (new AssertionScope())
             {
@@ -493,7 +498,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -517,7 +523,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var sut = new XmlPrinter();
             sut.LoadXml("<root><rectangle relFromX=\"10\" relFromY=\"20\" relToX=\"30\" relToY=\"40\" /></root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -543,7 +550,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -571,7 +579,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -601,7 +610,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -629,7 +639,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -659,7 +670,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -687,7 +699,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -718,7 +731,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -748,7 +762,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
@@ -779,7 +794,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
                 + "</data></table>"
                 + "</root>");
 
-            sut.TransformDocument();
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
 
             XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
                 XDocument.Parse(
