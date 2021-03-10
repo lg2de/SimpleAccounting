@@ -117,13 +117,6 @@ namespace lg2de.SimpleAccounting.Reports
             var paperSizes = printDocument.PrinterSettings.PaperSizes;
             this.SetupDocument(printDocument, paperSizes.OfType<PaperSize>());
 
-            this.TransformDocument();
-
-            // The setup and cleanup procedures must be executed by event handlers
-            // because they are executed for preview AND real printing.
-            printDocument.BeginPrint += (_, printArgs) => this.SetupGraphics();
-            printDocument.EndPrint += (_, printArgs) => this.CleanupGraphics();
-
             using var dialog = new PrintPreviewDialog
             {
                 Document = printDocument, WindowState = FormWindowState.Maximized,
@@ -138,13 +131,44 @@ namespace lg2de.SimpleAccounting.Reports
 
         internal void SetupDocument(PrintDocument printDocument, IEnumerable<PaperSize> paperSizes)
         {
-            printDocument.PrintPage += (_, printArgs) =>
+            bool firstPageSetupRequired = true;
+            bool transformationRequired = true;
+            
+            // The setup and cleanup procedures must be executed by event handlers
+            // because they are required for transformation, for preview and real printing.
+            printDocument.BeginPrint += (_, printArgs) => firstPageSetupRequired = true;
+            printDocument.EndPrint += (_, printArgs) => this.CleanupGraphics();
+            
+            printDocument.PrintPage += (_, printArgs) => OnPrintPage(printArgs);
+            void OnPrintPage(PrintPageEventArgs printPageEventArgs)
             {
+                var graphics = new DrawingGraphics(printPageEventArgs);
+
+                // Transformation is required only once before printing.
+                // But for text wrapping the device context (graphics) is required.
+                // This is only available withing this event handler.
+                // Transformation is using Setup- and CleanupGraphics (internally).
+                // Preview and Printing is using them too. So, we need to handle them all in this handler.
+                if (transformationRequired)
+                {
+                    this.TransformDocument(graphics);
+                    transformationRequired = false;
+                }
+
+                // After Transformation (SetupGraphics and) CleanupGraphics has been executed.
+                // For Preview and Printing it required once again.
+                if (firstPageSetupRequired)
+                {
+                    this.SetupGraphics();
+                    firstPageSetupRequired = false;
+                }
+
+                // Page initialization
                 this.ProcessNewPage();
 
-                var graphics = new DrawingGraphics(printArgs);
+                // Process all nodes for the current page 
                 this.PrintNodes(graphics);
-            };
+            }
 
             this.printFactor = DefaultPrintFactor;
             var documentPaperSize = this.Document.DocumentElement.GetAttribute<string>(PaperSizeNode, "A4");
@@ -206,58 +230,61 @@ namespace lg2de.SimpleAccounting.Reports
             this.fontStack.Pop().Dispose();
         }
 
-        internal void TransformDocument()
+        internal void TransformDocument(IGraphics referenceGraphics)
         {
+            this.SetupGraphics();
+
             this.currentNode = this.Document.DocumentElement!.FirstChild;
-            this.TransformNodes(this.currentNode);
+            TransformNodes(this.currentNode);
             this.ProcessPageTexts();
-        }
+            
+            this.CleanupGraphics();
 
-        internal void TransformNodes(XmlNode firstNode)
-        {
-            XmlNode? nextNode = firstNode;
-            while (nextNode != null)
+            void TransformNodes(XmlNode firstNode)
             {
-                XmlNode transformingNode = nextNode;
-                nextNode = nextNode.NextSibling;
+                XmlNode? nextNode = firstNode;
+                while (nextNode != null)
+                {
+                    XmlNode transformingNode = nextNode;
+                    nextNode = nextNode.NextSibling;
 
-                if (transformingNode.Name == MoveNode)
-                {
-                    this.ProcessMoveNode(transformingNode);
-                }
-                else if (transformingNode.Name == RectangleNode)
-                {
-                    this.TransformRectangle(transformingNode);
-                }
-                else if (transformingNode.Name == TableNode)
-                {
-                    this.TransformTable(transformingNode);
-                }
-                else if (transformingNode.Name == PageTextsNode)
-                {
-                    this.pageTextsNode = transformingNode;
-                    this.InsertPageTexts(transformingNode, 1);
-                    transformingNode.ParentNode!.RemoveChild(transformingNode);
-                    continue;
-                }
-                else if (transformingNode.Name == NewPageNode)
-                {
-                    this.ProcessNewPage();
-                }
-                else
-                {
-                    // nothing to do
-                }
+                    switch (transformingNode.Name)
+                    {
+                    case MoveNode:
+                        this.ProcessMoveNode(transformingNode);
+                        break;
+                    case RectangleNode:
+                        this.TransformRectangle(transformingNode);
+                        break;
+                    case TableNode:
+                        this.TransformTable(transformingNode, referenceGraphics);
+                        break;
+                    case PageTextsNode:
+                        this.pageTextsNode = transformingNode;
+                        this.InsertPageTexts(transformingNode, 1);
+                        transformingNode.ParentNode!.RemoveChild(transformingNode);
+                        continue;
+                    case NewPageNode:
+                        this.ProcessNewPage();
+                        break;
+                    case FontNode:
+                        this.ProcessFontNode(transformingNode, () => TransformNodes(transformingNode.FirstChild));
+                        continue;
+                    default:
+                        // nothing to do
+                        break;
+                    }
 
-                this.TransformNodes(transformingNode.FirstChild);
+                    TransformNodes(transformingNode.FirstChild);
 
-                if (nextNode != null
-                    && this.CursorY >= this.DocumentHeight - this.DocumentBottomMargin)
-                {
-                    XmlNode newPage = this.Document.CreateElement(NewPageNode);
-                    nextNode.ParentNode!.InsertBefore(newPage, nextNode);
+                    if (nextNode != null
+                        && this.CursorY >= this.DocumentHeight - this.DocumentBottomMargin)
+                    {
+                        XmlNode newPage = this.Document.CreateElement(NewPageNode);
+                        nextNode.ParentNode!.InsertBefore(newPage, nextNode);
 
-                    this.ProcessNewPage();
+                        this.ProcessNewPage();
+                    }
                 }
             }
         }
@@ -283,7 +310,13 @@ namespace lg2de.SimpleAccounting.Reports
                     this.PrintLineNode(graphics);
                     break;
                 case FontNode:
-                    this.PrintFontNode(graphics);
+                    this.ProcessFontNode(this.currentNode, () =>
+                    {
+                        var stackNode = this.currentNode;
+                        this.currentNode = this.currentNode.FirstChild;
+                        this.PrintNodes(graphics);
+                        this.currentNode = stackNode;
+                    });
                     break;
                 case NewPageNode:
                     graphics.HasMorePages = true;
@@ -348,7 +381,7 @@ namespace lg2de.SimpleAccounting.Reports
             rectNode.ParentNode.RemoveChild(rectNode);
         }
 
-        private void TransformTable(XmlNode tableNode)
+        private void TransformTable(XmlNode tableNode, IGraphics referenceGraphics)
         {
             int tableLineHeight = tableNode.GetAttribute(LineHeightNode, DefaultLineHeight);
 
@@ -369,9 +402,9 @@ namespace lg2de.SimpleAccounting.Reports
 
             this.TransformTableHeader(tableNode);
 
-            for (int nodeIndex = 0; nodeIndex < dataNodes.Count; nodeIndex++)
+            for (int rowIndex = 0; rowIndex < dataNodes.Count; rowIndex++)
             {
-                this.TransformTableRow(tableNode, tableLineHeight, columnNodes, dataNodes, nodeIndex);
+                this.TransformTableRow(tableNode, tableLineHeight, columnNodes, dataNodes, rowIndex, referenceGraphics);
             }
 
             tableNode.ParentNode!.RemoveChild(tableNode);
@@ -428,28 +461,32 @@ namespace lg2de.SimpleAccounting.Reports
         }
 
         private void TransformTableRow(
-            XmlNode tableNode, int tableLineHeight, XmlNodeList columnNodes,
-            XmlNodeList dataNodes, int nodeIndex)
+            XmlNode tableNode, int tableLineHeight, XmlNodeList columnDefinitions,
+            XmlNodeList dataRows, int rowIndex, IGraphics referenceGraphics)
         {
-            const int maxLength = 40;
-
-            var dataNode = dataNodes[nodeIndex];
-
-            var rowNodes = dataNode.SelectNodes("td");
-            if (rowNodes == null)
+            var dataRow = dataRows[rowIndex];
+            var rowColumn = dataRow.SelectNodes("td");
+            if (rowColumn == null)
             {
+                // no data found
                 return;
             }
 
-            int innerLineCount = 1;
-            for (int i = 0; i < rowNodes.Count; i++)
+            var wrappedTexts = new string[columnDefinitions.Count];
+            for (int columnIndex = 0; columnIndex < columnDefinitions.Count; columnIndex++)
             {
-                var rowNode = rowNodes[i];
-                string text = rowNode.InnerText;
-                innerLineCount += text.Length / maxLength;
+                var columnDefinition = columnDefinitions[columnIndex];
+                var columnText = columnIndex < rowColumn.Count ? rowColumn[columnIndex].InnerText : string.Empty;
+                int maxWidth = columnDefinition.GetAttribute<int>(WidthNode);
+                var currentFont = this.fontStack.Peek();
+                wrappedTexts[columnIndex] = columnText.Wrap(this.ToPhysical(maxWidth), currentFont, referenceGraphics);
             }
 
-            var lineHeight = dataNode.GetAttribute(LineHeightNode, tableLineHeight * innerLineCount);
+            var linesFactor = 1.0;
+            const double heightFactorForWrappedLines = 0.8;
+            linesFactor += wrappedTexts.Max(x => x.Count(c => c == '\n')) * heightFactorForWrappedLines;
+            var automaticHeight = (int)(tableLineHeight * linesFactor);
+            var lineHeight = dataRow.GetAttribute(LineHeightNode, automaticHeight);
 
             // check if oversized line still fits in page
             if (this.CursorY + lineHeight > this.DocumentHeight - this.DocumentBottomMargin)
@@ -458,24 +495,17 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             int xPosition = 0;
-            for (int columnIndex = 0; columnIndex < rowNodes.Count; columnIndex++)
+            for (int columnIndex = 0; columnIndex < rowColumn.Count; columnIndex++)
             {
-                XmlNode columnNode = columnNodes[columnIndex];
-                XmlNode rowNode = rowNodes[columnIndex];
+                var columnDefinition = columnDefinitions[columnIndex];
+                var columnData = rowColumn[columnIndex];
+                var wrappedText = wrappedTexts[columnIndex];
                 XmlNode textNode = this.Document.CreateElement(TextNode);
-                string strText = rowNode.InnerText;
-
-                // line break
-                for (int j = maxLength; j < strText.Length; j += maxLength + 1)
-                {
-                    strText = strText.Insert(j, "\n");
-                }
-
-                textNode.InnerText = strText;
-                int columnWidth = columnNode.GetAttribute<int>(WidthNode);
+                textNode.InnerText = wrappedText;
+                int columnWidth = columnDefinition.GetAttribute<int>(WidthNode);
                 int xAdoption = 0;
-                var align = rowNode.Attributes!.GetNamedItem(AlignNode)
-                            ?? columnNode.Attributes!.GetNamedItem(AlignNode);
+                var align = columnData.Attributes!.GetNamedItem(AlignNode)
+                            ?? columnDefinition.Attributes!.GetNamedItem(AlignNode);
                 if (align != null)
                 {
                     textNode.SetAttribute(AlignNode, align.Value);
@@ -489,16 +519,16 @@ namespace lg2de.SimpleAccounting.Reports
 
                 textNode.SetAttribute(RelativeXNode, (xPosition + xAdoption));
                 tableNode.ParentNode!.InsertBefore(textNode, tableNode);
-                this.CreateFrame(columnNode, textNode, xPosition, 0, xPosition + columnWidth, lineHeight);
+                this.CreateFrame(columnDefinition, textNode, xPosition, 0, xPosition + columnWidth, lineHeight);
                 xPosition += columnWidth;
             }
 
-            this.CreateFrame(dataNode, tableNode, 0, 0, xPosition, lineHeight);
+            this.CreateFrame(dataRow, tableNode, 0, 0, xPosition, lineHeight);
 
             this.CursorY += lineHeight;
 
             // check whether next line exists and fits into page
-            if (nodeIndex + 1 < dataNodes.Count
+            if (rowIndex + 1 < dataRows.Count
                 && this.CursorY + tableLineHeight > this.DocumentHeight - this.DocumentBottomMargin)
             {
                 StartNewPage();
@@ -776,18 +806,13 @@ namespace lg2de.SimpleAccounting.Reports
                 this.ToPhysical(y2));
         }
 
-        private void PrintFontNode(IGraphics graphics)
+        private void ProcessFontNode(XmlNode fontNode, Action recurseAction)
         {
-            if (this.currentNode == null)
-            {
-                throw new InvalidOperationException("The current node is uninitialized.");
-            }
-
             Font drawFont = this.fontStack.Peek();
 
-            XmlNode nodeBold = this.currentNode.Attributes!.GetNamedItem("bold");
-            var fontName = this.currentNode.GetAttribute("name", drawFont.Name);
-            var fontSize = this.currentNode.GetAttribute("size", drawFont.SizeInPoints);
+            XmlNode nodeBold = fontNode.Attributes!.GetNamedItem("bold");
+            var fontName = fontNode.GetAttribute("name", drawFont.Name);
+            var fontSize = fontNode.GetAttribute("size", drawFont.SizeInPoints);
             FontStyle fontStyle = drawFont.Style;
 
             if (nodeBold != null)
@@ -804,14 +829,11 @@ namespace lg2de.SimpleAccounting.Reports
 
             var newFont = new Font(fontName, fontSize, fontStyle);
 
-            if (this.currentNode.ChildNodes.Count > 0)
+            if (fontNode.ChildNodes.Count > 0)
             {
                 // change font temporary for sub-nodes
                 this.fontStack.Push(newFont);
-                var stackNode = this.currentNode;
-                this.currentNode = this.currentNode.FirstChild;
-                this.PrintNodes(graphics);
-                this.currentNode = stackNode;
+                recurseAction();
                 this.fontStack.Pop().Dispose();
             }
             else

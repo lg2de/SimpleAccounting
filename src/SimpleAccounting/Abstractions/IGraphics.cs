@@ -9,6 +9,8 @@ namespace lg2de.SimpleAccounting.Abstractions
     internal interface IGraphics
     {
         bool HasMorePages { get; set; }
+        
+        SizeF MeasureString(string text, Font font);
 
         void DrawString(string s, Font font, Brush brush, float x, float y, StringAlignment alignment);
 
