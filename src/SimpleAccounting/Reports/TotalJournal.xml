@@ -21,10 +21,10 @@
       <column width="20" rightLine="true">@Word_Date@</column>
       <column width="10" rightLine="true">@Word_Number_Short@</column>
       <column width="80" rightLine="true">@Word_BookingText@</column>
-      <column width="15" rightLine="true" align="right">@Word_DebitAccount_Wrapped@</column>
-      <column width="15" rightLine="true" align="right">@Word_DebitValue_Wrapped@</column>
-      <column width="15" rightLine="true" align="right">@Word_CreditAccount_Wrapped@</column>
-      <column width="15" align="right">@Word_CreditValue_Wrapped@</column>
+      <column width="12" rightLine="true" align="right">@Word_DebitAccount_Wrapped@</column>
+      <column width="18" rightLine="true" align="right">@Word_DebitValue_Wrapped@</column>
+      <column width="12" rightLine="true" align="right">@Word_CreditAccount_Wrapped@</column>
+      <column width="18" align="right">@Word_CreditValue_Wrapped@</column>
     </columns>
     <data />
   </table>
