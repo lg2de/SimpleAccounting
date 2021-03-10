@@ -34,6 +34,13 @@ namespace lg2de.SimpleAccounting.Extensions
                 var size = graphics.MeasureString(remainingText, font);
                 if (size.Width <= maxWidth)
                 {
+                    // The remaining text fits into available space.
+                    return result;
+                }
+
+                if (remainingText.Length == 1)
+                {
+                    // The last character must not be wrapped anymore.
                     return result;
                 }
 

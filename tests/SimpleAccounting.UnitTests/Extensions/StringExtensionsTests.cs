@@ -24,13 +24,17 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
             result.Should().BeEmpty();
         }
         
-        [Fact]
-        public void Wrap_InsufficientSpace_InputReturnedUnchanged()
+        [Theory]
+        [InlineData("1", "1")]
+        [InlineData("12", "1\n2")]
+        public void Wrap_InsufficientSpace_WrappedWithOneCharacter(string input, string expected)
         {
             var graphics = Substitute.For<IGraphics>();
-            var result = "1".Wrap(0, this.testFont, graphics);
+            graphics.MeasureString(Arg.Any<string>(), Arg.Any<Font>())
+                .Returns(call => new SizeF(call.Arg<string>().Length, 0));
+            var result = input.Wrap(0, this.testFont, graphics);
 
-            result.Should().Be("1");
+            result.Should().Be(expected);
         }
         
         [Theory]

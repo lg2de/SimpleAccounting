@@ -139,9 +139,10 @@ namespace lg2de.SimpleAccounting.Reports
             printDocument.BeginPrint += (_, printArgs) => firstPageSetupRequired = true;
             printDocument.EndPrint += (_, printArgs) => this.CleanupGraphics();
             
-            printDocument.PrintPage += (_, printArgs) =>
+            printDocument.PrintPage += (_, printArgs) => OnPrintPage(printArgs);
+            void OnPrintPage(PrintPageEventArgs printPageEventArgs)
             {
-                var graphics = new DrawingGraphics(printArgs);
+                var graphics = new DrawingGraphics(printPageEventArgs);
 
                 // Transformation is required only once before printing.
                 // But for text wrapping the device context (graphics) is required.
@@ -167,7 +168,7 @@ namespace lg2de.SimpleAccounting.Reports
 
                 // Process all nodes for the current page 
                 this.PrintNodes(graphics);
-            };
+            }
 
             this.printFactor = DefaultPrintFactor;
             var documentPaperSize = this.Document.DocumentElement.GetAttribute<string>(PaperSizeNode, "A4");

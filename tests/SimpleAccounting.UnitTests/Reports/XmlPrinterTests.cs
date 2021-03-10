@@ -566,6 +566,39 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         }
 
         [Fact]
+        public void TransformDocument_TableWithFont_ConvertedToTextsFontKept()
+        {
+            var sut = new XmlPrinter { DocumentHeight = 100 };
+            sut.LoadXml(
+                "<root>"
+                + "<font size=\"20\">"
+                + "<table><columns>"
+                + "<column width=\"10\">C1</column>"
+                + "<column width=\"20\">C2</column>"
+                + "</columns><data>"
+                + "<tr><td>1</td><td>2</td></tr>"
+                + "</data></table>"
+                + "</font>"
+                + "</root>");
+
+            var graphics = Substitute.For<IGraphics>();
+            sut.TransformDocument(graphics);
+
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse(
+                    "<root>"
+                    + "<font size=\"20\">"
+                    + "<text relX=\"0\">C1</text>"
+                    + "<text relX=\"10\">C2</text>"
+                    + "<move relY=\"4\" />" // DefaultLineHeight
+                    + "<text relX=\"0\">1</text>"
+                    + "<text relX=\"10\">2</text>"
+                    + "<move relY=\"4\" />"
+                    + "</font>"
+                    + "</root>"));
+        }
+
+        [Fact]
         public void TransformDocument_TableBottomLine_ConvertedToTexts()
         {
             var sut = new XmlPrinter { DocumentHeight = 100 };
