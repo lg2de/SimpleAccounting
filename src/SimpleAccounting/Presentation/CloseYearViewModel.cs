@@ -24,8 +24,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.TextOptions = new List<TextOptionViewModel>
             {
-                new TextOptionViewModel(1, "A"),
-                new TextOptionViewModel(2, "B")
+                new TextOptionViewModel(OpeningTextOption.Numbered, Resources.CloseYear_TextOptionNumbered),
+                new TextOptionViewModel(OpeningTextOption.AccountName, Resources.CloseYear_TextOptionAccountName)
             };
             this.TextOption = this.TextOptions.First(); // TODO store selection in user settings
         }
@@ -54,18 +54,5 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.RemoteAccount = this.Accounts.FirstOrDefault();
         }
-    }
-
-    public class TextOptionViewModel
-    {
-        public TextOptionViewModel(int option, string name)
-        {
-            this.Option = option;
-            this.Name = name;
-        }
-
-        public int Option { get; }
-
-        public string Name { get; }
     }
 }

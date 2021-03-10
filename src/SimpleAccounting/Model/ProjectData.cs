@@ -313,7 +313,7 @@ namespace lg2de.SimpleAccounting.Model
                 return false;
             }
 
-            this.Storage.CloseYear(this.CurrentYear, viewModel.RemoteAccount);
+            this.Storage.CloseYear(this.CurrentYear, viewModel.RemoteAccount, viewModel.TextOption.Option);
 
             this.IsModified = true;
             return true;

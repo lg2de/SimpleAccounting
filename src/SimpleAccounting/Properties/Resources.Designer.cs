@@ -151,6 +151,42 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Opening value {0}.
+        /// </summary>
+        public static string CloseYear_OpeningValueX {
+            get {
+                return ResourceManager.GetString("CloseYear_OpeningValueX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to With account name.
+        /// </summary>
+        public static string CloseYear_TextOptionAccountName {
+            get {
+                return ResourceManager.GetString("CloseYear_TextOptionAccountName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text for opening bookings.
+        /// </summary>
+        public static string CloseYear_TextOptionDescription {
+            get {
+                return ResourceManager.GetString("CloseYear_TextOptionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Numbered.
+        /// </summary>
+        public static string CloseYear_TextOptionNumbered {
+            get {
+                return ResourceManager.GetString("CloseYear_TextOptionNumbered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Booking data files (*.csv)|*.csv.
         /// </summary>
         public static string FileFilter_ImportData {
@@ -1147,15 +1183,6 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_OpeningBooking {
             get {
                 return ResourceManager.GetString("Word_OpeningBooking", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Text for opening bookings.
-        /// </summary>
-        public static string Word_OpeningTextOption {
-            get {
-                return ResourceManager.GetString("Word_OpeningTextOption", resourceCulture);
             }
         }
         

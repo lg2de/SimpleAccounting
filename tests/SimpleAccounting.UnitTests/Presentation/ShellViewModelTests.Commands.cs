@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -21,7 +20,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using NSubstitute;
     using Xunit;
 
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public partial class ShellViewModelTests
     {
         [CulturedFact("en")]
@@ -415,7 +413,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Identifier = 1,
                     Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 1",
+                    Text = "Opening value 1",
                     Value = 651,
                     CreditAccount = "990 (Carryforward)",
                     DebitAccount = "100 (Bank account)"
@@ -424,7 +422,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Identifier = 2,
                     Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 2",
+                    Text = "Opening value 2",
                     Value = 2600,
                     CreditAccount = "5000 (Bank credit)",
                     DebitAccount = "990 (Carryforward)"
@@ -433,7 +431,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Identifier = 3,
                     Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 3",
+                    Text = "Opening value 3",
                     Value = 99,
                     CreditAccount = "990 (Carryforward)",
                     DebitAccount = "6000 (Friends debit)"
@@ -443,7 +441,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Identifier = 1,
                     Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 1",
+                    Text = "Opening value 1",
                     DebitValue = 651,
                     CreditValue = 0,
                     RemoteAccount = "990 (Carryforward)"
@@ -488,7 +486,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Identifier = 1,
                     Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 1",
+                    Text = "Opening value 1",
                     Value = 651,
                     CreditAccount = "999 (MyCarryForward)",
                     DebitAccount = "100 (Bank account)"
@@ -497,7 +495,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Identifier = 2,
                     Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 2",
+                    Text = "Opening value 2",
                     Value = 2600,
                     CreditAccount = "5000 (Bank credit)",
                     DebitAccount = "999 (MyCarryForward)"
@@ -506,7 +504,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Identifier = 3,
                     Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 3",
+                    Text = "Opening value 3",
                     Value = 99,
                     CreditAccount = "999 (MyCarryForward)",
                     DebitAccount = "6000 (Friends debit)"
@@ -516,7 +514,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 {
                     Identifier = 1,
                     Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Eröffnungsbetrag 1",
+                    Text = "Opening value 1",
                     DebitValue = 651,
                     CreditValue = 0,
                     RemoteAccount = "999 (MyCarryForward)"

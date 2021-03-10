@@ -42,20 +42,17 @@
         TextSearch.TextPath="Name" />
     </StackPanel>
 
-    <StackPanel
-      Grid.Row="2"
-      Orientation="Horizontal">
+    <DockPanel Grid.Row="2">
       <TextBlock
         Padding="5">
-        <Run Text="{x:Static properties:Resources.Word_OpeningTextOption}" />
+        <Run Text="{x:Static properties:Resources.CloseYear_TextOptionDescription}" />
         <Run Text=":" />
       </TextBlock>
       <ComboBox
-        Width="100" HorizontalAlignment="Right"
         ItemsSource="{Binding TextOptions}"
         SelectedItem="{Binding TextOption, Mode=TwoWay}"
         DisplayMemberPath="Name" />
-    </StackPanel>
+    </DockPanel>
 
     <StackPanel
       Grid.Row="3"
