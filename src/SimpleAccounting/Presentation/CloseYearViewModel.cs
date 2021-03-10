@@ -21,6 +21,13 @@ namespace lg2de.SimpleAccounting.Presentation
         public CloseYearViewModel(AccountingDataJournal currentYear)
         {
             this.currentYear = currentYear ?? throw new ArgumentNullException(nameof(currentYear));
+
+            this.TextOptions = new List<TextOptionViewModel>
+            {
+                new TextOptionViewModel(1, "A"),
+                new TextOptionViewModel(2, "B")
+            };
+            this.TextOption = this.TextOptions.First(); // TODO store selection in user settings
         }
 
         public string InstructionText { get; private set; } = string.Empty;
@@ -28,6 +35,10 @@ namespace lg2de.SimpleAccounting.Presentation
         public IList<AccountDefinition> Accounts { get; } = new List<AccountDefinition>();
 
         public AccountDefinition? RemoteAccount { get; set; }
+
+        public IList<TextOptionViewModel> TextOptions { get; }
+
+        public TextOptionViewModel TextOption { get; set; }
 
         public ICommand CloseYearCommand => new RelayCommand(
             _ => this.TryClose(true),
@@ -43,5 +54,18 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.RemoteAccount = this.Accounts.FirstOrDefault();
         }
+    }
+
+    public class TextOptionViewModel
+    {
+        public TextOptionViewModel(int option, string name)
+        {
+            this.Option = option;
+            this.Name = name;
+        }
+
+        public int Option { get; }
+
+        public string Name { get; }
     }
 }

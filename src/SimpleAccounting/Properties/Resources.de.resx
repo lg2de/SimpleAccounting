@@ -515,4 +515,7 @@ Mit 'Nein' wird diese Sicherung gelöscht.</value>
   <data name="Update_ProcessFailed" xml:space="preserve">
     <value>Der Aktualisierungsprozess ist mit dem Fehlercode {0} fehlgeschlagen.</value>
   </data>
+  <data name="Word_OpeningTextOption" xml:space="preserve">
+    <value>Text für die Eröffnungsbuchungen</value>
+  </data>
 </root>

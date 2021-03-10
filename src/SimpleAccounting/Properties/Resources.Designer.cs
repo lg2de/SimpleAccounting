@@ -19,7 +19,7 @@ namespace lg2de.SimpleAccounting.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -768,7 +768,7 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to The update process failed with exit code {0}..
         /// </summary>
         public static string Update_ProcessFailed {
             get {
@@ -1147,6 +1147,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_OpeningBooking {
             get {
                 return ResourceManager.GetString("Word_OpeningBooking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text for opening bookings.
+        /// </summary>
+        public static string Word_OpeningTextOption {
+            get {
+                return ResourceManager.GetString("Word_OpeningTextOption", resourceCulture);
             }
         }
         

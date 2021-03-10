@@ -527,4 +527,7 @@ When answering 'No' the backup file will be deleted.</value>
   <data name="Update_ProcessFailed" xml:space="preserve">
     <value>The update process failed with exit code {0}.</value>
   </data>
+  <data name="Word_OpeningTextOption" xml:space="preserve">
+    <value>Text for opening bookings</value>
+  </data>
 </root>

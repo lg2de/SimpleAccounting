@@ -8,8 +8,8 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
-  Width="300" Height="200"
-  d:DataContext="{d:DesignInstance Type=local:CloseYearDesignViewModel, IsDesignTimeCreatable=True}">
+  d:DataContext="{d:DesignInstance Type=local:CloseYearDesignViewModel, IsDesignTimeCreatable=True}"
+  d:Background="Azure">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -26,21 +26,40 @@
       Grid.Row="0"
       Padding="10" HorizontalAlignment="Center"
       Text="{Binding InstructionText}" />
-    <TextBlock
+
+    <StackPanel
       Grid.Row="1"
-      Padding="5">
-      <Run Text="{x:Static properties:Resources.Word_CarriedForwardAccount}" />
-      <Run Text=":" />
-    </TextBlock>
-    <ComboBox
+      Orientation="Horizontal">
+      <TextBlock Padding="5">
+        <Run Text="{x:Static properties:Resources.Word_CarriedForwardAccount}" />
+        <Run Text=":" />
+      </TextBlock>
+      <ComboBox
+        Width="200" HorizontalAlignment="Right"
+        ItemsSource="{Binding Accounts}"
+        SelectedItem="{Binding RemoteAccount, Mode=TwoWay}"
+        ItemTemplate="{StaticResource AccountSelectionTemplate}"
+        TextSearch.TextPath="Name" />
+    </StackPanel>
+
+    <StackPanel
       Grid.Row="2"
-      Width="200" HorizontalAlignment="Right"
-      ItemsSource="{Binding Accounts}"
-      SelectedItem="{Binding RemoteAccount, Mode=TwoWay}"
-      ItemTemplate="{StaticResource AccountSelectionTemplate}"
-      TextSearch.TextPath="Name" />
+      Orientation="Horizontal">
+      <TextBlock
+        Padding="5">
+        <Run Text="{x:Static properties:Resources.Word_OpeningTextOption}" />
+        <Run Text=":" />
+      </TextBlock>
+      <ComboBox
+        Width="100" HorizontalAlignment="Right"
+        ItemsSource="{Binding TextOptions}"
+        SelectedItem="{Binding TextOption, Mode=TwoWay}"
+        DisplayMemberPath="Name" />
+    </StackPanel>
+
     <StackPanel
       Grid.Row="3"
+      Grid.Column="0"
       Margin="0 30 0 0"
       Orientation="Horizontal" HorizontalAlignment="Right">
       <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding CloseYearCommand}" />
