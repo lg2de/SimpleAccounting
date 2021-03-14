@@ -98,6 +98,7 @@ namespace lg2de.SimpleAccounting.Model
             var result = false;
             result |= this.MergeYearsIntoJournal();
             result |= this.RemoveEmptyElements();
+            this.InitializeFields();
             return result;
         }
 
@@ -159,11 +160,7 @@ namespace lg2de.SimpleAccounting.Model
                     textOption == OpeningTextOption.Numbered
                         ? bookingId.ToString(CultureInfo.InvariantCulture)
                         : account.Name);
-                var newDebit = new BookingValue
-                {
-                    Value = Math.Abs(creditAmount - debitAmount),
-                    Text = text
-                };
+                var newDebit = new BookingValue { Value = Math.Abs(creditAmount - debitAmount), Text = text };
                 newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };
                 newBooking.Credit.Add(newCredit);
@@ -247,6 +244,34 @@ namespace lg2de.SimpleAccounting.Model
             }
 
             return anyAccountFixed;
+        }
+
+        private void InitializeFields()
+        {
+            this.Setup ??= new AccountingDataSetup();
+            this.Setup.Behavior ??= new AccountingDataSetupBehavior();
+            this.Setup.Reports ??= new AccountingDataSetupReports();
+            this.Setup.BookingTemplates ??= new AccountingDataSetupBookingTemplates();
+        }
+    }
+
+    public partial class AccountingDataSetup
+    {
+        public AccountingDataSetup()
+        {
+            this.behaviorField = new AccountingDataSetupBehavior();
+            this.reportsField = new AccountingDataSetupReports();
+            this.bookingTemplatesField = new AccountingDataSetupBookingTemplates();
+        }
+    }
+    
+    internal static class AccountDataSetupBehaviorExtensions
+    {
+        public static OpeningTextOption GetOpeningTextPattern(this AccountingDataSetupBehavior behavior)
+        {
+            return Enum.TryParse<OpeningTextOption>(behavior.OpeningTextPattern, out var option)
+                ? option
+                : OpeningTextOption.Numbered;
         }
     }
 

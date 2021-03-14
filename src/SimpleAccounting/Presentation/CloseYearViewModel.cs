@@ -27,7 +27,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 new TextOptionViewModel(OpeningTextOption.Numbered, Resources.CloseYear_TextOptionNumbered),
                 new TextOptionViewModel(OpeningTextOption.AccountName, Resources.CloseYear_TextOptionAccountName)
             };
-            this.TextOption = this.TextOptions.First(); // TODO store selection in user settings
+            this.TextOption = this.TextOptions.First();
         }
 
         public string InstructionText { get; private set; } = string.Empty;

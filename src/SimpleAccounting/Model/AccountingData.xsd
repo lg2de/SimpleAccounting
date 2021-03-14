@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
+<!--suppress XmlDefaultAttributeValue -->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="AccountingData">
     <xs:complexType>
@@ -38,6 +39,14 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Behavior" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="OpeningTextPattern" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="LastCarryForward" type="xs:unsignedLong" minOccurs="0" maxOccurs="1" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
