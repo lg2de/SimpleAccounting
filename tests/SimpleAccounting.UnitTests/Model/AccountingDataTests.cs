@@ -108,7 +108,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
         }
 
         [Fact]
-        public void Migrate_Empty_Initialized()
+        public void Migrate_Empty_Unchanged()
         {
             var sut = new AccountingData();
 
