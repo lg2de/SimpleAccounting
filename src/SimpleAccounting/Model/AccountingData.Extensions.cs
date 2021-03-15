@@ -30,6 +30,7 @@ namespace lg2de.SimpleAccounting.Model
         {
             this.Accounts = new List<AccountingDataAccountGroup>();
             this.Journal = new List<AccountingDataJournal>();
+            this.Setup = new AccountingDataSetup();
         }
 
         [XmlAttribute("schemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
@@ -251,7 +252,6 @@ namespace lg2de.SimpleAccounting.Model
             this.Setup ??= new AccountingDataSetup();
             this.Setup.Behavior ??= new AccountingDataSetupBehavior();
             this.Setup.Reports ??= new AccountingDataSetupReports();
-            this.Setup.BookingTemplates ??= new AccountingDataSetupBookingTemplates();
         }
     }
 
@@ -261,7 +261,6 @@ namespace lg2de.SimpleAccounting.Model
         {
             this.behaviorField = new AccountingDataSetupBehavior();
             this.reportsField = new AccountingDataSetupReports();
-            this.bookingTemplatesField = new AccountingDataSetupBookingTemplates();
         }
     }
     

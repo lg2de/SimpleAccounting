@@ -66,7 +66,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 }
             };
 
-            sut.Migrate();
+            sut.Migrate().Should().BeTrue();
 
             var expectation = new AccountingData
             {
@@ -108,11 +108,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
         }
 
         [Fact]
-        public void Migrate_Empty_Unchanged()
+        public void Migrate_Empty_Initialized()
         {
             var sut = new AccountingData();
 
-            sut.Migrate();
+            sut.Migrate().Should().BeFalse("no (relevant) changes made");
 
             sut.Should().BeEquivalentTo(new AccountingData());
         }
@@ -122,7 +122,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
         {
             var sut = new AccountingData { Years = new List<AccountingDataYear>() };
 
-            sut.Migrate();
+            sut.Migrate().Should().BeFalse("just removing the empty not is not a relevant change");
 
             sut.Should().BeEquivalentTo(new AccountingData());
             sut.Years.Should().BeNull();
@@ -146,7 +146,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 }
             };
 
-            sut.Migrate();
+            sut.Migrate().Should().BeTrue();
 
             var expectation = new
             {
