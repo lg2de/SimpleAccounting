@@ -307,15 +307,34 @@ namespace lg2de.SimpleAccounting.Model
             this.Storage.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward)
                 .ToList().ForEach(viewModel.Accounts.Add);
 
+            // restore project options
+            var textOption = viewModel.TextOptions.Single(
+                x => x.Option == this.Storage.Setup.Behavior.ParsedOpeningTextPattern);
+            viewModel.TextOption = textOption;
+            var remoteAccount =
+                viewModel.Accounts.FirstOrDefault(x => x.ID == this.Storage.Setup.Behavior.LastCarryForward);
+            if (remoteAccount != null)
+            {
+                viewModel.RemoteAccount = remoteAccount;
+            }
+
+            // show dialog
             var result = this.windowManager.ShowDialog(viewModel);
             if (result != true || viewModel.RemoteAccount == null)
             {
+                // abort
                 return false;
             }
 
-            this.Storage.CloseYear(this.CurrentYear, viewModel.RemoteAccount);
+            // proceed closing year
+            this.Storage.CloseYear(this.CurrentYear, viewModel.RemoteAccount, viewModel.TextOption.Option);
 
+            this.Storage.Setup.Behavior.LastCarryForwardSpecified = true;
+            this.Storage.Setup.Behavior.LastCarryForward = viewModel.RemoteAccount.ID;
+            this.Storage.Setup.Behavior.OpeningTextPattern = viewModel.TextOption.Option.ToString();
+            
             this.IsModified = true;
+            
             return true;
         }
 

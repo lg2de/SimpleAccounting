@@ -515,4 +515,16 @@ Mit 'Nein' wird diese Sicherung gelöscht.</value>
   <data name="Update_ProcessFailed" xml:space="preserve">
     <value>Der Aktualisierungsprozess ist mit dem Fehlercode {0} fehlgeschlagen.</value>
   </data>
+  <data name="CloseYear_TextOptionDescription" xml:space="preserve">
+    <value>Text für die Eröffnungsbuchungen</value>
+  </data>
+  <data name="CloseYear_TextOptionNumbered" xml:space="preserve">
+    <value>Nummeriert</value>
+  </data>
+  <data name="CloseYear_TextOptionAccountName" xml:space="preserve">
+    <value>Mit Kontoname</value>
+  </data>
+  <data name="CloseYear_OpeningValueX" xml:space="preserve">
+    <value>Eröffnungsbetrag {0}</value>
+  </data>
 </root>

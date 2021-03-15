@@ -527,4 +527,16 @@ When answering 'No' the backup file will be deleted.</value>
   <data name="Update_ProcessFailed" xml:space="preserve">
     <value>The update process failed with exit code {0}.</value>
   </data>
+  <data name="CloseYear_TextOptionDescription" xml:space="preserve">
+    <value>Text for opening bookings</value>
+  </data>
+  <data name="CloseYear_TextOptionNumbered" xml:space="preserve">
+    <value>Numbered</value>
+  </data>
+  <data name="CloseYear_TextOptionAccountName" xml:space="preserve">
+    <value>With account name</value>
+  </data>
+  <data name="CloseYear_OpeningValueX" xml:space="preserve">
+    <value>Opening value {0}</value>
+  </data>
 </root>

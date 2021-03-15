@@ -19,7 +19,7 @@ namespace lg2de.SimpleAccounting.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -147,6 +147,42 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Action_Save {
             get {
                 return ResourceManager.GetString("Action_Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opening value {0}.
+        /// </summary>
+        public static string CloseYear_OpeningValueX {
+            get {
+                return ResourceManager.GetString("CloseYear_OpeningValueX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to With account name.
+        /// </summary>
+        public static string CloseYear_TextOptionAccountName {
+            get {
+                return ResourceManager.GetString("CloseYear_TextOptionAccountName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text for opening bookings.
+        /// </summary>
+        public static string CloseYear_TextOptionDescription {
+            get {
+                return ResourceManager.GetString("CloseYear_TextOptionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Numbered.
+        /// </summary>
+        public static string CloseYear_TextOptionNumbered {
+            get {
+                return ResourceManager.GetString("CloseYear_TextOptionNumbered", resourceCulture);
             }
         }
         
@@ -768,7 +804,7 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to The update process failed with exit code {0}..
         /// </summary>
         public static string Update_ProcessFailed {
             get {

@@ -5,9 +5,12 @@
 namespace lg2de.SimpleAccounting.UnitTests.Model
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using FluentAssertions;
+    using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.UnitTests.Presentation;
     using Xunit;
 
     public class AccountingDataTests
@@ -63,7 +66,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 }
             };
 
-            sut.Migrate();
+            sut.Migrate().Should().BeTrue();
 
             var expectation = new AccountingData
             {
@@ -109,7 +112,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
         {
             var sut = new AccountingData();
 
-            sut.Migrate();
+            sut.Migrate().Should().BeFalse("no (relevant) changes made");
 
             sut.Should().BeEquivalentTo(new AccountingData());
         }
@@ -119,7 +122,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
         {
             var sut = new AccountingData { Years = new List<AccountingDataYear>() };
 
-            sut.Migrate();
+            sut.Migrate().Should().BeFalse("just removing the empty not is not a relevant change");
 
             sut.Should().BeEquivalentTo(new AccountingData());
             sut.Years.Should().BeNull();
@@ -143,7 +146,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 }
             };
 
-            sut.Migrate();
+            sut.Migrate().Should().BeTrue();
 
             var expectation = new
             {
@@ -154,6 +157,118 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 }
             };
             sut.Should().BeEquivalentTo(expectation);
+        }
+
+        [CulturedFact("en")]
+        public void CloseYear_SampleDataEnglish_AllRelevantDataCorrect()
+        {
+            var sut = Samples.SampleProject;
+            var currentYear = sut.Journal.Last();
+            currentYear.Booking.AddRange(Samples.SampleBookings);
+            var carryforwardAccount =
+                sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+
+            sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
+
+            var newYear = sut.Journal.Last();
+            newYear.Should().NotBeEquivalentTo(currentYear);
+            currentYear.Closed.Should().BeTrue();
+            newYear.Closed.Should().BeFalse();
+            newYear.Booking.Should().BeEquivalentTo(
+                new
+                {
+                    ID = 1,
+                    Opening = true,
+                    Credit = new[] { new { Account = 990, Text = "Opening value 1", Value = 65100 } },
+                    Debit = new[] { new { Account = 100, Text = "Opening value 1", Value = 65100 } }
+                },
+                new
+                {
+                    ID = 2,
+                    Opening = true,
+                    Credit = new[] { new { Account = 5000, Text = "Opening value 2", Value = 260000 } },
+                    Debit = new[] { new { Account = 990, Text = "Opening value 2", Value = 260000 } }
+                },
+                new
+                {
+                    ID = 3,
+                    Opening = true,
+                    Credit = new[] { new { Account = 990, Text = "Opening value 3", Value = 9900 } },
+                    Debit = new[] { new { Account = 6000, Text = "Opening value 3", Value = 9900 } }
+                });
+        }
+
+        [CulturedFact("de")]
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        public void CloseYear_SampleDataGerman_TextCorrect()
+        {
+            var sut = Samples.SampleProject;
+            var currentYear = sut.Journal.Last();
+            currentYear.Booking.AddRange(Samples.SampleBookings);
+            var carryforwardAccount =
+                sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+
+            sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
+
+            var newYear = sut.Journal.Last();
+            newYear.Should().NotBeEquivalentTo(currentYear);
+            currentYear.Closed.Should().BeTrue();
+            newYear.Closed.Should().BeFalse();
+            newYear.Booking.Should().BeEquivalentTo(
+                new
+                {
+                    ID = 1,
+                    Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 1" } },
+                    Debit = new[] { new { Account = 100, Text = "Eröffnungsbetrag 1" } }
+                },
+                new
+                {
+                    ID = 2,
+                    Credit = new[] { new { Account = 5000, Text = "Eröffnungsbetrag 2" } },
+                    Debit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 2" } }
+                },
+                new
+                {
+                    ID = 3,
+                    Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 3" } },
+                    Debit = new[] { new { Account = 6000, Text = "Eröffnungsbetrag 3" } }
+                });
+        }
+
+        [CulturedFact("en")]
+        public void CloseYear_TextOptionAccountName_TextCorrect()
+        {
+            var sut = Samples.SampleProject;
+            var currentYear = sut.Journal.Last();
+            currentYear.Booking.AddRange(Samples.SampleBookings);
+            var carryforwardAccount =
+                sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+
+            sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.AccountName);
+
+            var newYear = sut.Journal.Last();
+            newYear.Should().NotBeEquivalentTo(currentYear);
+            currentYear.Closed.Should().BeTrue();
+            newYear.Closed.Should().BeFalse();
+            newYear.Booking.Should().BeEquivalentTo(
+                new
+                {
+                    ID = 1,
+                    Credit = new[] { new { Account = 990, Text = "Opening value Bank account" } },
+                    Debit = new[] { new { Account = 100, Text = "Opening value Bank account" } }
+                },
+                new
+                {
+                    ID = 2,
+                    Credit = new[] { new { Account = 5000, Text = "Opening value Bank credit" } },
+                    Debit = new[] { new { Account = 990, Text = "Opening value Bank credit" } }
+                },
+                new
+                {
+                    ID = 3,
+                    Credit = new[] { new { Account = 990, Text = "Opening value Friends debit" } },
+                    Debit = new[] { new { Account = 6000, Text = "Opening value Friends debit" } }
+                });
         }
 
         [Fact]
@@ -181,7 +296,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 }
             };
 
-            sut.CloseYear(sut.Journal.Last(), sut.Accounts.Last().Account.Last());
+            sut.CloseYear(sut.Journal.Last(), sut.Accounts.Last().Account.Last(), OpeningTextOption.Numbered);
 
             sut.Journal.First().Closed.Should().BeTrue();
             sut.Journal.Last().Closed.Should().BeFalse();

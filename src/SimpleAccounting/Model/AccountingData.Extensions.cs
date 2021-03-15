@@ -11,9 +11,11 @@ namespace lg2de.SimpleAccounting.Model
     using System.Linq;
     using System.Xml.Serialization;
     using lg2de.SimpleAccounting.Extensions;
+    using lg2de.SimpleAccounting.Infrastructure;
+    using lg2de.SimpleAccounting.Properties;
 
     /// <summary>
-    ///     Implements the root storage class. 
+    ///     Implements the root storage class.
     /// </summary>
     public partial class AccountingData
     {
@@ -28,6 +30,7 @@ namespace lg2de.SimpleAccounting.Model
         {
             this.Accounts = new List<AccountingDataAccountGroup>();
             this.Journal = new List<AccountingDataJournal>();
+            this.Setup = new AccountingDataSetup();
         }
 
         [XmlAttribute("schemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
@@ -96,11 +99,14 @@ namespace lg2de.SimpleAccounting.Model
             var result = false;
             result |= this.MergeYearsIntoJournal();
             result |= this.RemoveEmptyElements();
+            this.InitializeFields();
             return result;
         }
 
         internal AccountingDataJournal CloseYear(
-            AccountingDataJournal currentModelJournal, AccountDefinition carryForwardAccount)
+            AccountingDataJournal currentModelJournal,
+            AccountDefinition carryForwardAccount,
+            OpeningTextOption textOption)
         {
             currentModelJournal.Closed = true;
 
@@ -150,10 +156,12 @@ namespace lg2de.SimpleAccounting.Model
                     Opening = true
                 };
                 newYearJournal.Booking.Add(newBooking);
-                var newDebit = new BookingValue
-                {
-                    Value = Math.Abs(creditAmount - debitAmount), Text = $"Eröffnungsbetrag {bookingId}"
-                };
+                string text = string.Format(
+                    CultureInfo.CurrentUICulture, Resources.CloseYear_OpeningValueX,
+                    textOption == OpeningTextOption.Numbered
+                        ? bookingId.ToString(CultureInfo.InvariantCulture)
+                        : account.Name);
+                var newDebit = new BookingValue { Value = Math.Abs(creditAmount - debitAmount), Text = text };
                 newBooking.Debit.Add(newDebit);
                 var newCredit = new BookingValue { Value = newDebit.Value, Text = newDebit.Text };
                 newBooking.Credit.Add(newCredit);
@@ -238,6 +246,33 @@ namespace lg2de.SimpleAccounting.Model
 
             return anyAccountFixed;
         }
+
+        private void InitializeFields()
+        {
+            this.Setup ??= new AccountingDataSetup();
+            this.Setup.Behavior ??= new AccountingDataSetupBehavior();
+            this.Setup.Reports ??= new AccountingDataSetupReports();
+        }
+    }
+
+    public partial class AccountingDataSetup
+    {
+        public AccountingDataSetup()
+        {
+            this.behaviorField = new AccountingDataSetupBehavior();
+            this.reportsField = new AccountingDataSetupReports();
+        }
+    }
+    
+    public partial class AccountingDataSetupBehavior
+    {
+        /// <summary>
+        ///     Gets <see cref="OpeningTextPattern"/> parsed to <see cref="OpeningTextOption"/>.
+        /// </summary>
+        public OpeningTextOption ParsedOpeningTextPattern =>
+            Enum.TryParse<OpeningTextOption>(this.OpeningTextPattern, out var option)
+                ? option
+                : OpeningTextOption.Numbered;
     }
 
     /// <summary>
