@@ -264,14 +264,15 @@ namespace lg2de.SimpleAccounting.Model
         }
     }
     
-    internal static class AccountDataSetupBehaviorExtensions
+    public partial class AccountingDataSetupBehavior
     {
-        public static OpeningTextOption GetOpeningTextPattern(this AccountingDataSetupBehavior behavior)
-        {
-            return Enum.TryParse<OpeningTextOption>(behavior.OpeningTextPattern, out var option)
+        /// <summary>
+        ///     Gets <see cref="OpeningTextPattern"/> parsed to <see cref="OpeningTextOption"/>.
+        /// </summary>
+        public OpeningTextOption ParsedOpeningTextPattern =>
+            Enum.TryParse<OpeningTextOption>(this.OpeningTextPattern, out var option)
                 ? option
                 : OpeningTextOption.Numbered;
-        }
     }
 
     /// <summary>

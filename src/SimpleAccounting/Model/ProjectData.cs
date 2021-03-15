@@ -308,13 +308,9 @@ namespace lg2de.SimpleAccounting.Model
                 .ToList().ForEach(viewModel.Accounts.Add);
 
             // restore project options
-            var textOption = viewModel.TextOptions.FirstOrDefault(
-                x => x.Option == this.Storage.Setup.Behavior.GetOpeningTextPattern());
-            if (textOption != null)
-            {
-                viewModel.TextOption = textOption;
-            }
-
+            var textOption = viewModel.TextOptions.Single(
+                x => x.Option == this.Storage.Setup.Behavior.ParsedOpeningTextPattern);
+            viewModel.TextOption = textOption;
             var remoteAccount =
                 viewModel.Accounts.FirstOrDefault(x => x.ID == this.Storage.Setup.Behavior.LastCarryForward);
             if (remoteAccount != null)
