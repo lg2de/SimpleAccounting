@@ -52,7 +52,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.InstructionText = string.Format(
                 CultureInfo.CurrentUICulture, Resources.Question_CloseYearX, this.currentYear.Year);
 
-            this.RemoteAccount = this.Accounts.FirstOrDefault();
+            this.RemoteAccount ??= this.Accounts.FirstOrDefault();
         }
     }
 }

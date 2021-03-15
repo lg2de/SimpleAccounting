@@ -322,14 +322,18 @@ namespace lg2de.SimpleAccounting.Model
                 viewModel.RemoteAccount = remoteAccount;
             }
 
+            // show dialog
             var result = this.windowManager.ShowDialog(viewModel);
             if (result != true || viewModel.RemoteAccount == null)
             {
+                // abort
                 return false;
             }
 
+            // proceed closing year
             this.Storage.CloseYear(this.CurrentYear, viewModel.RemoteAccount, viewModel.TextOption.Option);
 
+            this.Storage.Setup.Behavior.LastCarryForwardSpecified = true;
             this.Storage.Setup.Behavior.LastCarryForward = viewModel.RemoteAccount.ID;
             this.Storage.Setup.Behavior.OpeningTextPattern = viewModel.TextOption.Option.ToString();
             

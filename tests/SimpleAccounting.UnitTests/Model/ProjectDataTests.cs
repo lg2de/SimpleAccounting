@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
     using System;
     using System.Collections.Specialized;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
     using Caliburn.Micro;
@@ -15,6 +16,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
     using lg2de.SimpleAccounting.UnitTests.Presentation;
     using NSubstitute;
@@ -120,6 +122,38 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
 
             dialogs.Received(1).ShowSaveFileDialog(Arg.Any<string>());
             fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+        }
+
+        [Fact]
+        public void CloseYear_NonDefaultConfiguration_SettingsRestored()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var settings = new Settings();
+            var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            sut.Load(Samples.SampleProject);
+            sut.Storage.Accounts.Last().Account.Add(
+                new AccountDefinition { ID = 99999, Name = "C2", Type = AccountDefinitionType.Carryforward });
+            sut.Storage.Setup.Behavior.LastCarryForward = 99999;
+            sut.Storage.Setup.Behavior.LastCarryForwardSpecified = true;
+            sut.Storage.Setup.Behavior.OpeningTextPattern = OpeningTextOption.AccountName.ToString();
+            CloseYearViewModel invokedViewModel = null;
+            windowManager.ShowDialog(Arg.Any<CloseYearViewModel>()).Returns(
+                info =>
+                {
+                    invokedViewModel = info.Arg<CloseYearViewModel>();
+                    return false;
+                });
+
+            sut.CloseYear().Should().BeFalse();
+
+            invokedViewModel.Should().BeEquivalentTo(
+                new
+                {
+                    TextOption = new { Option = OpeningTextOption.AccountName }, RemoteAccount = new { ID = 99999 }
+                });
         }
     }
 }
