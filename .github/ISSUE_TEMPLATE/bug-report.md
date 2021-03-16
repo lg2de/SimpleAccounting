@@ -28,8 +28,8 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Version [e.g. 22]
+ - OS: [e.g. Windows 10 Version 1903]
+ - Version [e.g. 2.1.0]
 
 **Additional context**
 Add any other context about the problem here.
@@ -55,7 +55,7 @@ Wenn möglich füge bitte Bildschirmfotos bei, die das Problem zeigen.
 
 **Umgebung (bitte vervollständige die folgende Liste):**
  - Betriebssystem: [z.B. Windows 10 Version 1903]
- - Programmversion [z.B. 2.0.1]
+ - Programmversion [z.B. 2.1.0]
 
 **Zusätzliche Informationen**
 Ergänze hier alle sonstigen Informationen, die Du für hilfreich hältst.
