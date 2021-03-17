@@ -275,8 +275,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             vm.CreditSplitEntries.Should().BeEquivalentTo(
-                new { AccountNumber = 400, BookingText = "Salary1", BookingValue = 120 },
-                new { AccountNumber = 400, BookingText = "Salary2", BookingValue = 80 });
+                new { AccountNumber = Samples.Salary, BookingText = "Salary1", BookingValue = 120 },
+                new { AccountNumber = Samples.Salary, BookingText = "Salary2", BookingValue = 80 });
         }
 
         [Fact]
@@ -293,8 +293,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             vm.DebitSplitEntries.Should().BeEquivalentTo(
-                new { AccountNumber = 600, BookingText = "Shoes1", BookingValue = 20 },
-                new { AccountNumber = 600, BookingText = "Shoes2", BookingValue = 30 });
+                new { AccountNumber = Samples.Shoes, BookingText = "Shoes1", BookingValue = 20 },
+                new { AccountNumber = Samples.Shoes, BookingText = "Shoes2", BookingValue = 30 });
         }
 
         [Fact]

@@ -87,11 +87,11 @@ namespace lg2de.SimpleAccounting.Infrastructure
             }
         }
 
-        internal ImportEntryViewModel ImportBooking(
+        private ImportEntryViewModel ImportBooking(
             CsvReader csv,
             string dateField,
             string nameField,
-            AccountDefinitionImportMappingColumn textField,
+            AccountDefinitionImportMappingColumn? textField,
             string valueField)
         {
             csv.TryGetField(dateField, out DateTime date);
@@ -99,13 +99,9 @@ namespace lg2de.SimpleAccounting.Infrastructure
             // date and value are required
             // name and text may be empty
             csv.TryGetField<double>(valueField, out var value);
-            string name = string.Empty;
-            string text = string.Empty;
-            if (nameField != null)
-            {
-                csv.TryGetField(nameField, out name);
-            }
+            csv.TryGetField(nameField, out string name);
 
+            string text = string.Empty;
             if (textField != null)
             {
                 csv.TryGetField(textField.Source, out text);
@@ -120,27 +116,29 @@ namespace lg2de.SimpleAccounting.Infrastructure
             var item = new ImportEntryViewModel(this.accounts) { Date = date, Name = name, Text = text, Value = value };
 
             var modelValue = value.ToModelValue();
-            var patterns = this.importMapping?.Patterns ?? Enumerable.Empty<AccountDefinitionImportMappingPattern>();
-            foreach (var mappingPattern in patterns)
+            var patterns = this.importMapping.Patterns ?? Enumerable.Empty<AccountDefinitionImportMappingPattern>();
+            var matchedPattern = patterns.FirstOrDefault(PatternPredicate);
+            item.RemoteAccount = this.accounts.SingleOrDefault(a => a.ID == matchedPattern?.AccountID);
+
+            return item;
+
+            bool PatternPredicate(AccountDefinitionImportMappingPattern pattern)
             {
-                if (!Regex.IsMatch(text, mappingPattern.Expression))
+                if (!pattern.Regex.IsMatch(text))
                 {
-                    // mapping does not match
-                    continue;
+                    // mapping pattern does not match
+                    return false;
                 }
 
-                if (mappingPattern.ValueSpecified && modelValue != mappingPattern.Value)
+                if (pattern.ValueSpecified && modelValue != pattern.Value)
                 {
-                    // mapping does not match
-                    continue;
+                    // mapping value does not match
+                    return false;
                 }
 
                 // use first match
-                item.RemoteAccount = this.accounts.SingleOrDefault(a => a.ID == mappingPattern.AccountID);
-                break;
+                return true;
             }
-
-            return item;
         }
     }
 }
