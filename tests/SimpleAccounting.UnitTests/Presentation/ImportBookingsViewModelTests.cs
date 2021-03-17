@@ -227,6 +227,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                         RemoteAccount = remoteAccount
                     }
                 });
+            var projectDataMonitor = projectData.Monitor();
 
             sut.BookAllCommand.Execute(null);
 
@@ -252,6 +253,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     CreditAccount = "100 (Bank account)",
                     DebitAccount = "600 (Shoes)"
                 });
+            projectDataMonitor.Should().Raise(nameof(projectData.JournalChanged)).Should().HaveCount(1);
         }
     }
 }

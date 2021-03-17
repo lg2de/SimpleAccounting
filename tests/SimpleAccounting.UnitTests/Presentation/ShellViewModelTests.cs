@@ -309,7 +309,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var fullJournalMonitor = sut.FullJournal.Monitor();
             using var accountJournalMonitor = sut.AccountJournal.Monitor();
-            sut.ProjectData.AddBooking(booking);
+            sut.ProjectData.AddBooking(booking, updateJournal: true);
 
             using var _ = new AssertionScope();
             sut.FullJournal.Items.Should().BeEquivalentTo(
@@ -356,7 +356,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var monitor1 = sut.AccountJournal.Monitor();
             using var monitor2 = sut.AccountJournal.Items.Monitor();
-            sut.ProjectData.AddBooking(booking);
+            sut.ProjectData.AddBooking(booking, updateJournal: true);
 
             using var _ = new AssertionScope();
             monitor1.Should().NotRaisePropertyChangeFor(x => x.SelectedItem);

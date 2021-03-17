@@ -198,13 +198,16 @@ namespace lg2de.SimpleAccounting.Model
             }
         }
 
-        public void AddBooking(AccountingDataJournalBooking booking)
+        public void AddBooking(AccountingDataJournalBooking booking, bool updateJournal)
         {
             this.CurrentYear.Booking.Add(booking);
 
             this.IsModified = true;
 
-            this.JournalChanged(this, new JournalChangedEventArgs(booking.ID, booking.GetAccounts()));
+            if (updateJournal)
+            {
+                this.JournalChanged(this, new JournalChangedEventArgs(booking.ID, booking.GetAccounts()));
+            }
         }
 
         public void SelectYear(string yearName)

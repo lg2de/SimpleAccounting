@@ -178,7 +178,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ =>
             {
                 var newBooking = this.CreateJournalEntry();
-                this.projectData.AddBooking(newBooking);
+                this.projectData.AddBooking(newBooking, updateJournal: true);
 
                 // update for next booking
                 this.BookingIdentifier++;

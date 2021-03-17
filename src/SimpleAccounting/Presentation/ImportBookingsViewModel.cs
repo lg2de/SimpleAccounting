@@ -272,7 +272,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (importing.RemoteAccount == null)
                 {
                     // mapping missing - abort
-                    this.TryClose();
+                    AfterImport();
                     return;
                 }
 
@@ -304,10 +304,16 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 newBooking.Credit = new List<BookingValue> { creditValue };
                 newBooking.Debit = new List<BookingValue> { debitValue };
-                this.ProjectData.AddBooking(newBooking);
+                this.ProjectData.AddBooking(newBooking, updateJournal: false);
             }
 
-            this.TryClose();
+            AfterImport();
+
+            void AfterImport()
+            {
+                this.TryClose();
+                this.ProjectData.TriggerJournalChanged();
+            }
         }
     }
 }
