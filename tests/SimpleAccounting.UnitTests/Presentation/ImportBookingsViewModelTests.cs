@@ -28,52 +28,49 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             var year = Convert.ToInt32(Samples.SampleProject.Journal.Last().Year);
             sut.ImportDataFiltered.Should().BeEmpty("start date should be set after last booking");
-            sut.ExistingData.Should().BeEquivalentTo(
-                new
-                {
-                    Date = new DateTime(year, 1, 1),
-                    Identifier = 1,
-                    Name = "<already booked>",
-                    Text = "Open 1",
-                    Value = 1000,
-                    RemoteAccount = new { ID = 990 }
-                },
-                new
-                {
-                    Date = new DateTime(year, 1, 28),
-                    Identifier = 3,
-                    Name = "<already booked>",
-                    Text = "Salary",
-                    Value = 200,
-                    RemoteAccount = (AccountDefinition)null
-                },
-                new
-                {
-                    Date = new DateTime(year, 1, 29),
-                    Identifier = 4,
-                    Name = "<already booked>",
-                    Text = "Credit rate",
-                    Value = -400,
-                    RemoteAccount = new { ID = 5000 }
-                },
-                new
-                {
-                    Date = new DateTime(year, 2, 1),
-                    Identifier = 5,
-                    Name = "<already booked>",
-                    Text = "Shoes",
-                    Value = -50,
-                    RemoteAccount = (AccountDefinition)null
-                },
-                new
-                {
-                    Date = new DateTime(year, 2, 5),
-                    Identifier = 6,
-                    Name = "<already booked>",
-                    Text = "Rent to friend",
-                    Value = -99,
-                    RemoteAccount = new { ID = 6000 }
-                });
+            sut.ExistingData.Should()
+                .BeEquivalentTo(
+                    new
+                    {
+                        Date = new DateTime(year, 1, 1),
+                        Identifier = 1,
+                        Text = "Open 1",
+                        Value = 1000,
+                        RemoteAccount = new { ID = 990 }
+                    },
+                    new
+                    {
+                        Date = new DateTime(year, 1, 28),
+                        Identifier = 3,
+                        Text = "Salary",
+                        Value = 200,
+                        RemoteAccount = new { ID = 400 }
+                    },
+                    new
+                    {
+                        Date = new DateTime(year, 1, 29),
+                        Identifier = 4,
+                        Text = "Credit rate",
+                        Value = -400,
+                        RemoteAccount = new { ID = 5000 }
+                    },
+                    new
+                    {
+                        Date = new DateTime(year, 2, 1),
+                        Identifier = 5,
+                        Text = "Shoes",
+                        Value = -50,
+                        RemoteAccount = new { ID = 600 }
+                    },
+                    new
+                    {
+                        Date = new DateTime(year, 2, 5),
+                        Identifier = 6,
+                        Text = "Rent to friend",
+                        Value = -99,
+                        RemoteAccount = new { ID = 6000 }
+                    })
+                .And.AllBeEquivalentTo(new { Name = "<already booked>", IsExisting = true });
         }
 
         [Fact]
@@ -208,16 +205,25 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     {
                         Date = new DateTime(year, 1, 3),
                         Identifier = 105,
-                        Name = "Ignore",
+                        Name = "Already booked",
                         Value = -2,
-                        RemoteAccount = null
+                        RemoteAccount = remoteAccount,
+                        IsExisting = true
                     },
                     new ImportEntryViewModel(accounts)
                     {
                         Date = new DateTime(year, 1, 3),
                         Identifier = 106,
-                        Name = "Ignore too",
+                        Name = "Ignore",
                         Value = -3,
+                        RemoteAccount = null
+                    },
+                    new ImportEntryViewModel(accounts)
+                    {
+                        Date = new DateTime(year, 1, 3),
+                        Identifier = 107,
+                        Name = "Ignore too",
+                        Value = -4,
                         RemoteAccount = remoteAccount
                     }
                 });
@@ -226,8 +232,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             // 101 should be skipped because of selected start date
             // 103 should be skipped because it is configured to be skipped
-            // 105 should be skipped because it is not mapped
-            // 106 should be skipped because it is valid entry AFTER unmapped entry => stop
+            // 105 should be skipped because it is already existing
+            // 106 should be skipped because it is not mapped
+            // 107 should be skipped because it is valid entry AFTER unmapped entry => stopped
             parent.FullJournal.Items.Should().BeEquivalentTo(
                 new
                 {

@@ -175,11 +175,15 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 ulong remoteIdentifier = 0;
-                if (remotes.Count == 1)
+                var remoteAccounts = remotes.Select(x => x.Account).Distinct().ToArray();
+                if (remoteAccounts.Length == 1)
                 {
-                    remoteIdentifier = remotes.First().Account;
+                    remoteIdentifier = remoteAccounts[0];
                 }
 
+                // remote account may be null in case of split booking
+                var remoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier);
+                
                 return new ImportEntryViewModel(this.accounts)
                 {
                     IsExisting = true,
@@ -188,7 +192,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     Text = me.Text,
                     Name = Resources.ImportData_AlreadyBooked,
                     Value = value,
-                    RemoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier)
+                    RemoteAccount = remoteAccount
                 };
             }
         }
@@ -259,7 +263,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             foreach (var importing in this.ImportDataFiltered)
             {
-                if (importing.IsSkip)
+                if (importing.IsSkip || importing.IsExisting)
                 {
                     // ignore
                     continue;
