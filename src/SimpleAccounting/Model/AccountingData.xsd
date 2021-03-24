@@ -45,6 +45,7 @@
               <xs:element name="Behavior" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
                   <xs:sequence>
+                    <xs:element name="LastBookingImportFolder" type="xs:string" minOccurs="0" maxOccurs="1" />
                     <xs:element name="OpeningTextPattern" type="xs:string" minOccurs="0" maxOccurs="1" />
                     <xs:element name="LastCarryForward" type="xs:unsignedLong" minOccurs="0" maxOccurs="1" />
                   </xs:sequence>

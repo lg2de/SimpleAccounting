@@ -45,9 +45,12 @@ namespace lg2de.SimpleAccounting.Abstractions
             return result;
         }
 
-        public (DialogResult Result, string FileName) ShowOpenFileDialog(string filter)
+        public (DialogResult Result, string FileName) ShowOpenFileDialog(string filter, string initialDirectory)
         {
-            using var dialog = new OpenFileDialog { Filter = filter, RestoreDirectory = true };
+            using var dialog = new OpenFileDialog
+            {
+                Filter = filter, RestoreDirectory = true, InitialDirectory = initialDirectory
+            };
 
             var result = dialog.ShowDialog();
             return (result, dialog.FileName);

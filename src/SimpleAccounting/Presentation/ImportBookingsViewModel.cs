@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Windows.Forms;
     using System.Windows.Input;
@@ -114,21 +115,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public IBusy Busy { get; } = new BusyControlModel();
 
         public ICommand LoadDataCommand => new RelayCommand(
-            _ =>
-            {
-                this.Busy.IsBusy = true;
-
-                (DialogResult result, var fileName) = this.dialogs.ShowOpenFileDialog(Resources.FileFilter_ImportData);
-
-                if (result != DialogResult.OK)
-                {
-                    return;
-                }
-
-                this.OnLoadData(fileName);
-
-                this.Busy.IsBusy = false;
-            }, _ => this.SelectedAccount != null);
+            _ => this.OnLoadData(),
+            _ => this.SelectedAccount != null);
 
         public ICommand BookAllCommand => new RelayCommand(
             _ => this.ProcessData(),
@@ -183,7 +171,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 // remote account may be null in case of split booking
                 var remoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier);
-                
+
                 return new ImportEntryViewModel(this.accounts)
                 {
                     IsExisting = true,
@@ -200,7 +188,7 @@ namespace lg2de.SimpleAccounting.Presentation
         [SuppressMessage(
             "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
             Justification = "Exception while processing external file must not cause crash at all")]
-        internal void OnLoadData(string fileName)
+        internal void LoadFromFile(string fileName)
         {
             try
             {
@@ -256,6 +244,30 @@ namespace lg2de.SimpleAccounting.Presentation
                     string.Format(CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, fileName)
                     + Environment.NewLine + e.Message;
                 this.dialogs.ShowMessageBox(message, Resources.ImportData_MessageTitle);
+            }
+        }
+
+        private void OnLoadData()
+        {
+            this.Busy.IsBusy = true;
+
+            try
+            {
+                (DialogResult result, var fileName) = this.dialogs.ShowOpenFileDialog(
+                    Resources.FileFilter_ImportData, this.ProjectData.Storage.Setup.Behavior.LastBookingImportFolder);
+
+                if (result != DialogResult.OK)
+                {
+                    return;
+                }
+
+                this.LoadFromFile(fileName);
+
+                this.ProjectData.Storage.Setup.Behavior.LastBookingImportFolder = Path.GetDirectoryName(fileName);
+            }
+            finally
+            {
+                this.Busy.IsBusy = false;
             }
         }
 

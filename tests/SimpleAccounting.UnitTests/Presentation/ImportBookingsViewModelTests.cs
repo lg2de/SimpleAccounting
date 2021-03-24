@@ -6,7 +6,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Linq;
+    using System.Windows.Forms;
     using FluentAssertions;
+    using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
@@ -16,6 +18,17 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
     public class ImportBookingsViewModelTests
     {
+        [Fact]
+        public void Ctor_SampleData_AccountsFiltered()
+        {
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
+            projectData.Load(Samples.SampleProject);
+            projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            var sut = new ImportBookingsViewModel(null!, projectData);
+
+            sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
+        }
+
         [CulturedFact("en")]
         public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
         {
@@ -74,16 +87,65 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void ImportBookings_SampleData_AccountsFiltered()
+        public void LoadDataCommand_NoAccountSelected_CannotExecute()
         {
-            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-            projectData.Load(Samples.SampleProject);
-            projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
-            var sut = new ImportBookingsViewModel(null!, projectData);
+            var dialogs = Substitute.For<IDialogs>();
+            var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!);
+            var sut = new ImportBookingsViewModel(dialogs, projectData);
 
-            sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
+            sut.LoadDataCommand.CanExecute(null).Should().BeFalse();
         }
+        
+        [Fact]
+        public void LoadDataCommand_NoLastImportFolder_DefaultUsedAndSelectedStored()
+        {
+            var dialogs = Substitute.For<IDialogs>();
+            var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!);
+            var sut = new ImportBookingsViewModel(dialogs, projectData) { SelectedAccountNumber = 100 };
+            dialogs
+                .ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
+                .Returns((DialogResult.OK, "D:\\MySelectedFolder\\import.csv"));
 
+            sut.LoadDataCommand.Execute(null);
+
+            projectData.Storage.Setup.Behavior.LastBookingImportFolder.Should().Be("D:\\MySelectedFolder");
+            dialogs.Received(1).ShowOpenFileDialog(Arg.Any<string>(), Arg.Is<string>(x => x == null));
+        }
+        
+        [Fact]
+        public void LoadDataCommand_LoadFileCancelled_IsBusyReset()
+        {
+            var dialogs = Substitute.For<IDialogs>();
+            var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!);
+            var sut = new ImportBookingsViewModel(dialogs, projectData) { SelectedAccountNumber = 100 };
+            dialogs
+                .ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
+                .Returns((DialogResult.Cancel, string.Empty));
+
+            sut.LoadDataCommand.Execute(null);
+
+            projectData.Storage.Setup.Behavior.LastBookingImportFolder.Should()
+                .BeNullOrEmpty("last folder should remain unchanged");
+            sut.Busy.IsBusy.Should().BeFalse();
+        }
+        
+        [Fact]
+        public void LoadDataCommand_LastImportFolder_LastUsedAndNewStored()
+        {
+            var dialogs = Substitute.For<IDialogs>();
+            var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!);
+            projectData.Storage.Setup.Behavior.LastBookingImportFolder = "E:\\MySelectedFolder";
+            var sut = new ImportBookingsViewModel(dialogs, projectData) { SelectedAccountNumber = 100 };
+            dialogs
+                .ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
+                .Returns((DialogResult.OK, "F:\\MySelectedFolder\\import.csv"));
+
+            sut.LoadDataCommand.Execute(null);
+
+            projectData.Storage.Setup.Behavior.LastBookingImportFolder.Should().Be("F:\\MySelectedFolder");
+            dialogs.Received(1).ShowOpenFileDialog(Arg.Any<string>(), Arg.Is<string>(x => x == "E:\\MySelectedFolder"));
+        }
+        
         [Fact]
         public void BookAllCommand_EntryNotMapped_CannotExecute()
         {

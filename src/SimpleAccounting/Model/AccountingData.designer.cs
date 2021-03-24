@@ -2305,6 +2305,8 @@ namespace lg2de.SimpleAccounting.Model {
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
     public partial class AccountingDataSetupBehavior
     {
+        private string lastBookingImportFolder;
+        
         private string openingTextPattern;
         
         private ulong lastCarryForwardField;
@@ -2313,6 +2315,15 @@ namespace lg2de.SimpleAccounting.Model {
         
         private static System.Xml.Serialization.XmlSerializer serializer;
 
+        public string LastBookingImportFolder {
+            get {
+                return this.lastBookingImportFolder;
+            }
+            set {
+                this.lastBookingImportFolder = value;
+            }
+        }
+        
         public string OpeningTextPattern {
             get {
                 return this.openingTextPattern;

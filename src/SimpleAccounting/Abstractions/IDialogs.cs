@@ -26,7 +26,7 @@ namespace lg2de.SimpleAccounting.Abstractions
             MessageBoxResult defaultResult = MessageBoxResult.None,
             MessageBoxOptions options = MessageBoxOptions.None);
 
-        (DialogResult Result, string FileName) ShowOpenFileDialog(string filter);
+        (DialogResult Result, string FileName) ShowOpenFileDialog(string filter, string initialDirectory);
         
         (DialogResult Result, string FileName) ShowSaveFileDialog(string filter);
     }

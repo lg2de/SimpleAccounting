@@ -122,7 +122,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
             var script = reader.ReadToEnd();
             File.WriteAllText(fileName, script);
 
-            sut.OnLoadData(fileName);
+            sut.LoadFromFile(fileName);
 
             File.Delete(fileName);
 
