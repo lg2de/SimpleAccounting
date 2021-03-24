@@ -182,7 +182,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                         Identifier = 102,
                         Text = "Text",
                         Value = 2,
-                        RemoteAccount = remoteAccount
+                        RemoteAccount = remoteAccount,
+                        IsFollowup = true
                     },
                     new ImportEntryViewModel(accounts)
                     {
@@ -243,7 +244,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Text = "Text",
                     Value = 2,
                     CreditAccount = "600 (Shoes)",
-                    DebitAccount = "100 (Bank account)"
+                    DebitAccount = "100 (Bank account)",
+                    IsFollowup = true
                 },
                 new
                 {
