@@ -6,7 +6,7 @@ on:
   create:
     tags:
       - '*'
-  pull_request:
+  pull_request_target:
     types: [opened, edited, reopened, synchronize]
 
 jobs:
@@ -37,6 +37,8 @@ jobs:
     - name: Restore packages
       run: dotnet restore --configfile nuget.config
     - name: Prepare SonarScanner
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         $prNo=${{ github.event.number }}
         if ($prNo -gt 0) {
@@ -49,7 +51,7 @@ jobs:
           $branchCommand="/d:sonar.branch.name=$branch"
         }
         Write-Host CMDs=$branchCommand
-        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
+        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
       shell: pwsh
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore
