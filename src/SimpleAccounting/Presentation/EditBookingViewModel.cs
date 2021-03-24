@@ -259,6 +259,17 @@ namespace lg2de.SimpleAccounting.Presentation
             return newBooking;
         }
 
+        public void AddTemplates(AccountingDataSetupBookingTemplates bookingTemplates)
+        {
+            bookingTemplates.Template
+                .Select(
+                    t => new BookingTemplate
+                    {
+                        Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value.ToViewModel()
+                    })
+                .ToList().ForEach(this.BindingTemplates.Add);
+        }
+
         protected override void OnInitialize()
         {
             base.OnInitialize();

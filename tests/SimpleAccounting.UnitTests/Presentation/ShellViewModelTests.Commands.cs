@@ -235,7 +235,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AddBookingsCommand_HideInactiveAccounts_DialogInitialized()
+        public void AddBookingsCommand_HideInactiveAccounts_OnlyActiveAccountsVisible()
         {
             var sut = CreateSut(out IWindowManager windowManager);
             EditBookingViewModel vm = null;
@@ -250,6 +250,41 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var _ = new AssertionScope();
             vm.BookingIdentifier.Should().Be(1);
             vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts.Where(x => x.Active));
+        }
+
+        [Fact]
+        public void AddBookingsCommand_BookingTemplatesDefined_BookingTemplatesTransformed()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(
+                Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
+            sut.ProjectData.Load(Samples.SampleProject);
+            sut.ProjectData.Storage.Setup.BookingTemplates = new AccountingDataSetupBookingTemplates
+            {
+                Template = new List<AccountingDataSetupBookingTemplatesTemplate>
+                {
+                    new AccountingDataSetupBookingTemplatesTemplate { Text = "Template1" },
+                    new AccountingDataSetupBookingTemplatesTemplate
+                    {
+                        Text = "Template2",
+                        Credit = 1,
+                        Debit = 2,
+                        Value = 3,
+                        CreditSpecified = true,
+                        DebitSpecified = true,
+                        ValueSpecified = true
+                    }
+                }
+            };
+
+            sut.Menu.AddBookingsCommand.Execute(null);
+
+            using var _ = new AssertionScope();
+            vm.BindingTemplates.Should().BeEquivalentTo(
+                new { Text = "Template1", Credit = 0, Debit = 0, Value = 0.0 },
+                new { Text = "Template2", Credit = 1, Debit = 2, Value = 0.03 });
         }
 
         [Fact]

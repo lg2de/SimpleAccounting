@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.Model
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -223,14 +222,11 @@ namespace lg2de.SimpleAccounting.Model
                 new EditBookingViewModel(this, DateTime.Today, editMode: false);
             var allAccounts = this.Storage.AllAccounts;
             bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
-
-            this.Storage.Setup?.BookingTemplates?.Template
-                .Select(
-                    t => new BookingTemplate
-                    {
-                        Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value.ToViewModel()
-                    })
-                .ToList().ForEach(bookingModel.BindingTemplates.Add);
+            var bookingTemplates = this.Storage.Setup?.BookingTemplates;
+            if (bookingTemplates != null)
+            {
+                bookingModel.AddTemplates(bookingTemplates);
+            }
 
             this.windowManager.ShowDialog(bookingModel);
         }
@@ -304,7 +300,7 @@ namespace lg2de.SimpleAccounting.Model
             var importModel = new ImportBookingsViewModel(this.dialogs, this);
             this.windowManager.ShowDialog(
                 importModel,
-                settings: new Dictionary<string, object> { { nameof(Window.SizeToContent), SizeToContent.Manual } });
+                settings: WindowsDialogs.SizeToContentManualSettings);
         }
 
         public bool CloseYear()

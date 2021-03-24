@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Abstractions
 {
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using System.Windows.Forms;
@@ -14,12 +15,15 @@ namespace lg2de.SimpleAccounting.Abstractions
     using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
     /// <summary>
-    ///     Default implementation of <see cref="IDialogs"/> using <see cref="System.Windows.MessageBox"/>.
+    ///     Default implementation of <see cref="IDialogs" /> using <see cref="System.Windows.MessageBox" />.
     /// </summary>
     [ExcludeFromCodeCoverage]
     [UsedImplicitly]
     internal class WindowsDialogs : IDialogs
     {
+        public static IDictionary<string, object> SizeToContentManualSettings { get; } =
+            new Dictionary<string, object> { { nameof(Window.SizeToContent), SizeToContent.Manual } };
+
         public MessageBoxResult ShowMessageBox(
             string messageBoxText,
             string caption,
