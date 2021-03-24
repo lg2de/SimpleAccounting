@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Model
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -301,7 +302,9 @@ namespace lg2de.SimpleAccounting.Model
         public void ShowImportDialog()
         {
             var importModel = new ImportBookingsViewModel(this.dialogs, this);
-            this.windowManager.ShowDialog(importModel);
+            this.windowManager.ShowDialog(
+                importModel,
+                settings: new Dictionary<string, object> { { nameof(Window.SizeToContent), SizeToContent.Manual } });
         }
 
         public bool CloseYear()
@@ -335,9 +338,9 @@ namespace lg2de.SimpleAccounting.Model
             this.Storage.Setup.Behavior.LastCarryForwardSpecified = true;
             this.Storage.Setup.Behavior.LastCarryForward = viewModel.RemoteAccount.ID;
             this.Storage.Setup.Behavior.OpeningTextPattern = viewModel.TextOption.Option.ToString();
-            
+
             this.IsModified = true;
-            
+
             return true;
         }
 

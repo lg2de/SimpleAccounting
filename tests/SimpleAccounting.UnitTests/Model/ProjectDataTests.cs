@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.UnitTests.Model
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Diagnostics;
     using System.Linq;
@@ -140,12 +141,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
             sut.Storage.Setup.Behavior.LastCarryForwardSpecified = true;
             sut.Storage.Setup.Behavior.OpeningTextPattern = OpeningTextOption.AccountName.ToString();
             CloseYearViewModel invokedViewModel = null;
-            windowManager.ShowDialog(Arg.Any<CloseYearViewModel>()).Returns(
-                info =>
-                {
-                    invokedViewModel = info.Arg<CloseYearViewModel>();
-                    return false;
-                });
+            windowManager
+                .ShowDialog(Arg.Any<CloseYearViewModel>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
+                .Returns(
+                    info =>
+                    {
+                        invokedViewModel = info.Arg<CloseYearViewModel>();
+                        return false;
+                    });
 
             sut.CloseYear().Should().BeFalse();
 

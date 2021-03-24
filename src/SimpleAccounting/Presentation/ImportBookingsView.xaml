@@ -8,20 +8,26 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
-  MinWidth="900" MinHeight="600"
+  d:DesignWidth="1000" d:DesignHeight="500"
   d:DataContext="{d:DesignInstance Type=local:ImportBookingsDesignViewModel, IsDesignTimeCreatable=True}">
-  <Grid>
-    <DockPanel>
-      <DockPanel.Resources>
+  <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+      <Grid.Resources>
         <Style TargetType="local:NumberTextBox">
           <Setter Property="Margin" Value="5" />
           <Setter Property="Height" Value="30" />
           <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-      </DockPanel.Resources>
+      </Grid.Resources>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
       <StackPanel
-        DockPanel.Dock="Top"
+        Grid.Row="0"
         Orientation="Horizontal">
         <TextBlock Padding="5" Text="{x:Static properties:Resources.ImportData_Notes}" />
         <local:NumberTextBox
@@ -35,7 +41,7 @@
           SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
       </StackPanel>
       <StackPanel
-        DockPanel.Dock="Top"
+        Grid.Row="1"
         Orientation="Horizontal">
         <CheckBox
           VerticalAlignment="Center"
@@ -55,7 +61,7 @@
           IsTodayHighlighted="True" />
       </StackPanel>
       <StackPanel
-        DockPanel.Dock="Top"
+        Grid.Row="2"
         Orientation="Horizontal">
         <Button
           Width="100"
@@ -70,7 +76,7 @@
         <Button Content="CloseDummy" IsCancel="True" Width="0" Height="0" />
       </StackPanel>
       <DataGrid
-        DockPanel.Dock="Bottom"
+        Grid.Row="3"
         ItemsSource="{Binding ImportDataFiltered}"
         AutoGenerateColumns="False"
         CanUserResizeColumns="True"
@@ -140,7 +146,7 @@
           </Style>
         </DataGrid.CellStyle>
       </DataGrid>
-    </DockPanel>
+    </Grid>
     <local:BusyControl DataContext="{Binding Busy}" />
   </Grid>
 </UserControl>
