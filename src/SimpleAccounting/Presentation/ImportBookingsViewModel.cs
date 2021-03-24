@@ -194,7 +194,6 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 this.LoadedData.Clear();
 
-                // TODO use all culture configuration
                 var cultureInfo = CultureInfo.CurrentUICulture;
                 if (this.IsForceEnglish)
                 {
