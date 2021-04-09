@@ -20,6 +20,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Properties;
     using Screen = Caliburn.Micro.Screen;
 
+    /// <summary>
+    ///     Implements the view model to import bookings.
+    /// </summary>
     internal class ImportBookingsViewModel : Screen
     {
         private readonly List<AccountDefinition> accounts;
@@ -44,17 +47,24 @@ namespace lg2de.SimpleAccounting.Presentation
             this.DisplayName = Resources.ImportData_Title;
         }
 
+        /// <summary>
+        ///     Gets all accounts available for importing (mapping available).
+        /// </summary>
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
             .Where(
                 a =>
-                    a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) ==
-                    true
-                    && a.ImportMapping?.Columns.Any(
-                        x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) ==
-                    true);
+                    a.ImportMapping != null
+                    && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
+                    && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value));
 
+        /// <summary>
+        ///     Gets the minimal date valid for selecting <see cref="StartDate"/>.
+        /// </summary>
         public DateTime RangeMin { get; }
 
+        /// <summary>
+        ///     Gets the maximal date valid for selecting <see cref="StartDate"/>.
+        /// </summary>
         public DateTime RangeMax { get; }
 
         public ulong SelectedAccountNumber
@@ -262,6 +272,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 this.LoadFromFile(fileName);
 
+                // save the folder for next import session
                 this.ProjectData.Storage.Setup.Behavior.LastBookingImportFolder = Path.GetDirectoryName(fileName);
             }
             finally
