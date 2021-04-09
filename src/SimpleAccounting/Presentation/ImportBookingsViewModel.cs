@@ -121,6 +121,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     .OrderBy(x => x.Date));
 
         public bool IsForceEnglish { get; set; }
+        
+        public  bool IsReverseOrder { get; set; }
 
         public IBusy Busy { get; } = new BusyControlModel();
 
@@ -215,7 +217,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 using var loader = new ImportFileLoader(
                     fileName, cultureInfo, filteredAccounts, this.SelectedAccount!.ImportMapping);
 
-                foreach (var item in loader.Load())
+                var loadedEntries = loader.Load();
+                if (this.IsReverseOrder)
+                {
+                    loadedEntries = loadedEntries.Reverse();
+                }
+                
+                foreach (var item in loadedEntries)
                 {
                     if (item.Date < this.RangeMin || item.Date > this.RangeMax)
                     {

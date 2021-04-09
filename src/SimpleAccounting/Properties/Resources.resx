@@ -539,4 +539,7 @@ When answering 'No' the backup file will be deleted.</value>
   <data name="CloseYear_OpeningValueX" xml:space="preserve">
     <value>Opening value {0}</value>
   </data>
+  <data name="ImportData_UseReverseOrder" xml:space="preserve">
+    <value>Import in reverse order</value>
+  </data>
 </root>
