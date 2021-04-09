@@ -304,6 +304,15 @@ namespace lg2de.SimpleAccounting.Model
 
     public partial class AccountingDataJournalBooking
     {
+        public long UniqueId
+        {
+            get
+            {
+                var singleBooking = this.Credit.Count == 1 ? this.Credit[0] : this.Debit[0];
+                return ((long)(this.ID.GetHashCode()) << 32) + singleBooking.Text.GetHashCode();
+            }
+        }
+
         internal IReadOnlyCollection<ulong> GetAccounts()
         {
             return this

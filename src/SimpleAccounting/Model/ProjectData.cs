@@ -231,9 +231,10 @@ namespace lg2de.SimpleAccounting.Model
             this.windowManager.ShowDialog(bookingModel);
         }
 
-        public void ShowEditBookingDialog(ulong bookingId, bool showInactiveAccounts)
+        public void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts)
         {
-            var journalIndex = this.CurrentYear.Booking.FindIndex(x => x.ID == bookingId);
+            var uniqueId = item.UniqueId;
+            var journalIndex = this.CurrentYear.Booking.FindIndex(x => x.UniqueId == uniqueId);
             if (journalIndex < 0)
             {
                 // summary item selected => ignore

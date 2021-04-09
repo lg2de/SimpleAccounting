@@ -40,5 +40,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.NotifyOfPropertyChange();
             }
         }
+
+        public long UniqueId => ((long)(this.Identifier.GetHashCode()) << 32) + this.Text.GetHashCode();
     }
 }

@@ -201,7 +201,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            this.projectData.ShowEditBookingDialog(journalItem.Identifier, this.projectData.ShowInactiveAccounts);
+            this.projectData.ShowEditBookingDialog(journalItem, this.projectData.ShowInactiveAccounts);
         }
 
         private void OnCloseYear(object _)
