@@ -105,7 +105,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             }
 
             var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(Arg.Do<object>(UpdateAction)).Returns(true);
+            windowManager
+                .ShowDialog(Arg.Do<object>(UpdateAction), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
+                .Returns(true);
             sut.ProjectData.Load(Samples.SampleProject);
 
             sut.NewAccountCommand.Execute(null);
@@ -125,20 +127,23 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.EditAccountCommand.Execute(sut.Accounts.AccountList.First());
 
             sut.ProjectData.IsModified.Should().BeFalse();
-            windowManager.Received(1).ShowDialog(Arg.Any<object>());
+            windowManager.Received(1).ShowDialog(
+                Arg.Any<object>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>());
         }
 
         [CulturedFact("en")]
         public void EditAccountCommand_Confirmed_AllDataUpdated()
         {
             var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(
-                Arg.Do<object>(
-                    model =>
-                    {
-                        var vm = (AccountViewModel)model;
-                        vm.Identifier += 1000;
-                    })).Returns(true);
+            windowManager
+                .ShowDialog(
+                    Arg.Do<object>(
+                        model =>
+                        {
+                            var vm = (AccountViewModel)model;
+                            vm.Identifier += 1000;
+                        }), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
+                .Returns(true);
             sut.ProjectData.Load(Samples.SampleProject);
             var booking = new AccountingDataJournalBooking
             {
@@ -187,7 +192,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.EditAccountCommand.Execute(null);
 
             sut.ProjectData.IsModified.Should().BeFalse();
-            windowManager.DidNotReceive().ShowDialog(Arg.Any<object>());
+            windowManager.DidNotReceive().ShowDialog(
+                Arg.Any<object>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>());
         }
 
         [Fact]
@@ -215,7 +221,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IWindowManager windowManager);
             EditBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
+            windowManager.ShowDialog(
+                Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
             sut.ProjectData.Load(Samples.SampleProject);
             sut.Accounts.ShowInactiveAccounts = true;
 
@@ -227,11 +235,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void AddBookingsCommand_HideInactiveAccounts_DialogInitialized()
+        public void AddBookingsCommand_HideInactiveAccounts_OnlyActiveAccountsVisible()
         {
             var sut = CreateSut(out IWindowManager windowManager);
             EditBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
+            windowManager.ShowDialog(
+                Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
             sut.ProjectData.Load(Samples.SampleProject);
             sut.Accounts.ShowInactiveAccounts = false;
 
@@ -243,11 +253,48 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void AddBookingsCommand_BookingTemplatesDefined_BookingTemplatesTransformed()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(
+                Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
+            sut.ProjectData.Load(Samples.SampleProject);
+            sut.ProjectData.Storage.Setup.BookingTemplates = new AccountingDataSetupBookingTemplates
+            {
+                Template = new List<AccountingDataSetupBookingTemplatesTemplate>
+                {
+                    new AccountingDataSetupBookingTemplatesTemplate { Text = "Template1" },
+                    new AccountingDataSetupBookingTemplatesTemplate
+                    {
+                        Text = "Template2",
+                        Credit = 1,
+                        Debit = 2,
+                        Value = 3,
+                        CreditSpecified = true,
+                        DebitSpecified = true,
+                        ValueSpecified = true
+                    }
+                }
+            };
+
+            sut.Menu.AddBookingsCommand.Execute(null);
+
+            using var _ = new AssertionScope();
+            vm.BindingTemplates.Should().BeEquivalentTo(
+                new { Text = "Template1", Credit = 0, Debit = 0, Value = 0.0 },
+                new { Text = "Template2", Credit = 1, Debit = 2, Value = 0.03 });
+        }
+
+        [Fact]
         public void EditBookingCommand_NoSave_DialogInitialized()
         {
             var sut = CreateSut(out IWindowManager windowManager);
             EditBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
+            windowManager.ShowDialog(
+                Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
@@ -266,7 +313,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IWindowManager windowManager);
             EditBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
+            windowManager.ShowDialog(
+                Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
@@ -275,8 +324,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             vm.CreditSplitEntries.Should().BeEquivalentTo(
-                new { AccountNumber = 400, BookingText = "Salary1", BookingValue = 120 },
-                new { AccountNumber = 400, BookingText = "Salary2", BookingValue = 80 });
+                new { AccountNumber = Samples.Salary, BookingText = "Salary1", BookingValue = 120 },
+                new { AccountNumber = Samples.Salary, BookingText = "Salary2", BookingValue = 80 });
         }
 
         [Fact]
@@ -284,7 +333,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IWindowManager windowManager);
             EditBookingViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as EditBookingViewModel));
+            windowManager.ShowDialog(
+                Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
@@ -293,8 +344,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             vm.DebitSplitEntries.Should().BeEquivalentTo(
-                new { AccountNumber = 600, BookingText = "Shoes1", BookingValue = 20 },
-                new { AccountNumber = 600, BookingText = "Shoes2", BookingValue = 30 });
+                new { AccountNumber = Samples.Shoes, BookingText = "Shoes1", BookingValue = 20 },
+                new { AccountNumber = Samples.Shoes, BookingText = "Shoes2", BookingValue = 30 });
         }
 
         [Fact]
@@ -309,7 +360,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             }
 
             var sut = CreateSut(out IWindowManager windowManager);
-            windowManager.ShowDialog(Arg.Do<object>(UpdateAction)).Returns(true);
+            windowManager
+                .ShowDialog(Arg.Do<object>(UpdateAction), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
+                .Returns(true);
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             sut.ProjectData.Load(project);
@@ -334,7 +387,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             sut.ProjectData.IsModified.Should().BeFalse("the project remains unchanged");
-            windowManager.DidNotReceive().ShowDialog(Arg.Any<object>());
+            windowManager.DidNotReceive().ShowDialog(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>());
         }
 
         [Fact]
@@ -342,7 +395,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IWindowManager windowManager);
             ImportBookingsViewModel vm = null;
-            windowManager.ShowDialog(Arg.Do<object>(model => vm = model as ImportBookingsViewModel));
+            windowManager.ShowDialog(
+                Arg.Do<object>(model => vm = model as ImportBookingsViewModel), Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
             sut.ProjectData.Load(Samples.SampleProject);
 
             sut.Menu.ImportBookingsCommand.Execute(null);

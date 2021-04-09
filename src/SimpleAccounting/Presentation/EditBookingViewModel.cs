@@ -178,7 +178,7 @@ namespace lg2de.SimpleAccounting.Presentation
             _ =>
             {
                 var newBooking = this.CreateJournalEntry();
-                this.projectData.AddBooking(newBooking);
+                this.projectData.AddBooking(newBooking, updateJournal: true);
 
                 // update for next booking
                 this.BookingIdentifier++;
@@ -257,6 +257,17 @@ namespace lg2de.SimpleAccounting.Presentation
             newBooking.Credit = new List<BookingValue> { baseValue };
             newBooking.Debit = new List<BookingValue> { debitValue };
             return newBooking;
+        }
+
+        public void AddTemplates(AccountingDataSetupBookingTemplates bookingTemplates)
+        {
+            bookingTemplates.Template
+                .Select(
+                    t => new BookingTemplate
+                    {
+                        Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value.ToViewModel()
+                    })
+                .ToList().ForEach(this.BindingTemplates.Add);
         }
 
         protected override void OnInitialize()

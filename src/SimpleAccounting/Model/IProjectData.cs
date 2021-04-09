@@ -63,7 +63,7 @@ namespace lg2de.SimpleAccounting.Model
 
         void TriggerJournalChanged();
 
-        void AddBooking(AccountingDataJournalBooking booking);
+        void AddBooking(AccountingDataJournalBooking booking, bool updateJournal);
 
         void SelectYear(string yearName);
     }

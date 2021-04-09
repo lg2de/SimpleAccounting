@@ -97,7 +97,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
             {
                 if (this.processApi.IsProcessWindowVisible(this.applicationProcess))
                 {
-                    break;
+                    return true;
                 }
 
                 await Task.Delay(WaitMilliseconds);
@@ -108,8 +108,6 @@ namespace lg2de.SimpleAccounting.Infrastructure
                     return false;
                 }
             }
-
-            return true;
         }
     }
 }

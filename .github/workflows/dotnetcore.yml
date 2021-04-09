@@ -2,12 +2,12 @@ name: continous integration
 on:
   push:
     branches:
-      - master
+      - main
   create:
     tags:
       - '*'
-  pull_request_target:
-    types: [opened, edited, reopened, synchronize]
+  pull_request:
+    types: [opened, reopened, synchronize]
 
 jobs:
   build:

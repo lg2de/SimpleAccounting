@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Windows.Forms;
     using System.Windows.Input;
@@ -19,6 +20,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Properties;
     using Screen = Caliburn.Micro.Screen;
 
+    /// <summary>
+    ///     Implements the view model to import bookings.
+    /// </summary>
     internal class ImportBookingsViewModel : Screen
     {
         private readonly List<AccountDefinition> accounts;
@@ -43,17 +47,24 @@ namespace lg2de.SimpleAccounting.Presentation
             this.DisplayName = Resources.ImportData_Title;
         }
 
+        /// <summary>
+        ///     Gets all accounts available for importing (mapping available).
+        /// </summary>
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
             .Where(
                 a =>
-                    a.ImportMapping?.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date) ==
-                    true
-                    && a.ImportMapping?.Columns.Any(
-                        x => x.Target == AccountDefinitionImportMappingColumnTarget.Value) ==
-                    true);
+                    a.ImportMapping != null
+                    && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
+                    && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value));
 
+        /// <summary>
+        ///     Gets the minimal date valid for selecting <see cref="StartDate"/>.
+        /// </summary>
         public DateTime RangeMin { get; }
 
+        /// <summary>
+        ///     Gets the maximal date valid for selecting <see cref="StartDate"/>.
+        /// </summary>
         public DateTime RangeMax { get; }
 
         public ulong SelectedAccountNumber
@@ -110,25 +121,14 @@ namespace lg2de.SimpleAccounting.Presentation
                     .OrderBy(x => x.Date));
 
         public bool IsForceEnglish { get; set; }
+        
+        public  bool IsReverseOrder { get; set; }
 
         public IBusy Busy { get; } = new BusyControlModel();
 
         public ICommand LoadDataCommand => new RelayCommand(
-            _ =>
-            {
-                this.Busy.IsBusy = true;
-
-                (DialogResult result, var fileName) = this.dialogs.ShowOpenFileDialog(Resources.FileFilter_ImportData);
-
-                if (result != DialogResult.OK)
-                {
-                    return;
-                }
-
-                this.OnLoadData(fileName);
-
-                this.Busy.IsBusy = false;
-            }, _ => this.SelectedAccount != null);
+            _ => this.OnLoadData(),
+            _ => this.SelectedAccount != null);
 
         public ICommand BookAllCommand => new RelayCommand(
             _ => this.ProcessData(),
@@ -175,10 +175,14 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 ulong remoteIdentifier = 0;
-                if (remotes.Count == 1)
+                var remoteAccounts = remotes.Select(x => x.Account).Distinct().ToArray();
+                if (remoteAccounts.Length == 1)
                 {
-                    remoteIdentifier = remotes.First().Account;
+                    remoteIdentifier = remoteAccounts[0];
                 }
+
+                // remote account may be null in case of split booking
+                var remoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier);
 
                 return new ImportEntryViewModel(this.accounts)
                 {
@@ -188,7 +192,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     Text = me.Text,
                     Name = Resources.ImportData_AlreadyBooked,
                     Value = value,
-                    RemoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier)
+                    RemoteAccount = remoteAccount
                 };
             }
         }
@@ -196,13 +200,12 @@ namespace lg2de.SimpleAccounting.Presentation
         [SuppressMessage(
             "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
             Justification = "Exception while processing external file must not cause crash at all")]
-        internal void OnLoadData(string fileName)
+        internal void LoadFromFile(string fileName)
         {
             try
             {
                 this.LoadedData.Clear();
 
-                // TODO use all culture configuration
                 var cultureInfo = CultureInfo.CurrentUICulture;
                 if (this.IsForceEnglish)
                 {
@@ -214,7 +217,13 @@ namespace lg2de.SimpleAccounting.Presentation
                 using var loader = new ImportFileLoader(
                     fileName, cultureInfo, filteredAccounts, this.SelectedAccount!.ImportMapping);
 
-                foreach (var item in loader.Load())
+                var loadedEntries = loader.Load();
+                if (this.IsReverseOrder)
+                {
+                    loadedEntries = loadedEntries.Reverse();
+                }
+                
+                foreach (var item in loadedEntries)
                 {
                     if (item.Date < this.RangeMin || item.Date > this.RangeMax)
                     {
@@ -255,11 +264,36 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
+        private void OnLoadData()
+        {
+            this.Busy.IsBusy = true;
+
+            try
+            {
+                (DialogResult result, var fileName) = this.dialogs.ShowOpenFileDialog(
+                    Resources.FileFilter_ImportData, this.ProjectData.Storage.Setup.Behavior.LastBookingImportFolder);
+
+                if (result != DialogResult.OK)
+                {
+                    return;
+                }
+
+                this.LoadFromFile(fileName);
+
+                // save the folder for next import session
+                this.ProjectData.Storage.Setup.Behavior.LastBookingImportFolder = Path.GetDirectoryName(fileName);
+            }
+            finally
+            {
+                this.Busy.IsBusy = false;
+            }
+        }
+
         private void ProcessData()
         {
             foreach (var importing in this.ImportDataFiltered)
             {
-                if (importing.IsSkip)
+                if (importing.IsSkip || importing.IsExisting)
                 {
                     // ignore
                     continue;
@@ -268,7 +302,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 if (importing.RemoteAccount == null)
                 {
                     // mapping missing - abort
-                    this.TryClose();
+                    AfterImport();
                     return;
                 }
 
@@ -300,10 +334,16 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 newBooking.Credit = new List<BookingValue> { creditValue };
                 newBooking.Debit = new List<BookingValue> { debitValue };
-                this.ProjectData.AddBooking(newBooking);
+                this.ProjectData.AddBooking(newBooking, updateJournal: false);
             }
 
-            this.TryClose();
+            AfterImport();
+
+            void AfterImport()
+            {
+                this.TryClose();
+                this.ProjectData.TriggerJournalChanged();
+            }
         }
     }
 }

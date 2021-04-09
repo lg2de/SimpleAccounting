@@ -19,7 +19,7 @@ namespace lg2de.SimpleAccounting.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -420,6 +420,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string ImportData_Title {
             get {
                 return ResourceManager.GetString("ImportData_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import in reverse order.
+        /// </summary>
+        public static string ImportData_UseReverseOrder {
+            get {
+                return ResourceManager.GetString("ImportData_UseReverseOrder", resourceCulture);
             }
         }
         

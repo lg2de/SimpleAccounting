@@ -527,4 +527,7 @@ Mit 'Nein' wird diese Sicherung gelöscht.</value>
   <data name="CloseYear_OpeningValueX" xml:space="preserve">
     <value>Eröffnungsbetrag {0}</value>
   </data>
+  <data name="ImportData_UseReverseOrder" xml:space="preserve">
+    <value>In umgekehrter Reihenfolge importieren</value>
+  </data>
 </root>

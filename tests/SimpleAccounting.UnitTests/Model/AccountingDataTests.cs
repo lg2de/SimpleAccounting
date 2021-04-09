@@ -104,7 +104,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                     }
                 }
             };
-            sut.Should().BeEquivalentTo(expectation);
+            sut.Should().BeEquivalentTo(
+                expectation,
+                o => o.Excluding(
+                    info => info.SelectedMemberPath.EndsWith(nameof(AccountDefinitionImportMappingPattern.Regex))));
         }
 
         [Fact]
@@ -179,22 +182,22 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 {
                     ID = 1,
                     Opening = true,
-                    Credit = new[] { new { Account = 990, Text = "Opening value 1", Value = 65100 } },
-                    Debit = new[] { new { Account = 100, Text = "Opening value 1", Value = 65100 } }
+                    Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 1", Value = 65100 } },
+                    Debit = new[] { new { Account = Samples.BankAccount, Text = "Opening value 1", Value = 65100 } }
                 },
                 new
                 {
                     ID = 2,
                     Opening = true,
-                    Credit = new[] { new { Account = 5000, Text = "Opening value 2", Value = 260000 } },
-                    Debit = new[] { new { Account = 990, Text = "Opening value 2", Value = 260000 } }
+                    Credit = new[] { new { Account = Samples.BankCredit, Text = "Opening value 2", Value = 260000 } },
+                    Debit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 2", Value = 260000 } }
                 },
                 new
                 {
                     ID = 3,
                     Opening = true,
-                    Credit = new[] { new { Account = 990, Text = "Opening value 3", Value = 9900 } },
-                    Debit = new[] { new { Account = 6000, Text = "Opening value 3", Value = 9900 } }
+                    Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 3", Value = 9900 } },
+                    Debit = new[] { new { Account = Samples.FriendsDebit, Text = "Opening value 3", Value = 9900 } }
                 });
         }
 

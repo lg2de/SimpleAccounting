@@ -27,7 +27,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
             bankAccount.ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
             {
-                new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = 600 }
+                new AccountDefinitionImportMappingPattern
+                {
+                    // correct expression, but wrong value 
+                    Expression = "Text1", AccountID = Samples.Carryforward, ValueSpecified = true, Value = 999
+                },
+                new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = Samples.Shoes }
             };
             bankAccount.ImportMapping.Columns.Single(x => x.Source == "Text").IgnorePattern = "ignore.*this";
             var sut = new ImportFileLoader("dummy", new CultureInfo("en-us"), accounts, bankAccount.ImportMapping);

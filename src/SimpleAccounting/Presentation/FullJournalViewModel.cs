@@ -40,7 +40,10 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.Items.Clear();
 
-            foreach (var booking in this.projectData.CurrentYear.Booking.OrderBy(b => b.Date))
+            var bookings = this.projectData.CurrentYear.Booking
+                .OrderBy(b => b.Date)
+                .ThenBy(b => b.ID);
+            foreach (var booking in bookings)
             {
                 var item = new FullJournalItemViewModel
                 {

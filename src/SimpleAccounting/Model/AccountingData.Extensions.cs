@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Model
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Xml.Serialization;
     using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
@@ -321,6 +322,15 @@ namespace lg2de.SimpleAccounting.Model
         }
     }
 
+    /// <summary>
+    ///     Implements a single pattern of an account definition for semi automatic import.
+    /// </summary>
+    public partial class AccountDefinitionImportMappingPattern
+    {
+        private Regex? regex;
+        internal Regex Regex => this.regex ??= new Regex(this.Expression, RegexOptions.Compiled);
+    }
+    
     public partial class BookingValue
     {
         internal BookingValue Clone()

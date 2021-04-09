@@ -18,6 +18,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     [ExcludeFromCodeCoverage]
     internal static class Samples
     {
+        public const int BankAccount = 100;
+        public const int Salary = 400;
+        public const int Shoes = 600;
+        public const int Carryforward = 990;
+        public const int BankCredit = 5000;
+        public const int FriendsDebit = 6000;
+        public const int Inactive = 9999;
         public static readonly uint BaseDate = (uint)DateTime.Now.Year * 10000;
 
         public static AccountingData SampleProject
@@ -36,7 +43,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                             {
                                 new AccountDefinition
                                 {
-                                    ID = 100,
+                                    ID = BankAccount,
                                     Name = "Bank account",
                                     Type = AccountDefinitionType.Asset,
                                     ImportMapping = new AccountDefinitionImportMapping
@@ -76,15 +83,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 400, Name = "Salary", Type = AccountDefinitionType.Income
+                                    ID = Salary, Name = "Salary", Type = AccountDefinitionType.Income
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 600, Name = "Shoes", Type = AccountDefinitionType.Expense
+                                    ID = Shoes, Name = "Shoes", Type = AccountDefinitionType.Expense
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
+                                    ID = Carryforward, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
                                 }
                             }
                         },
@@ -95,13 +102,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                             {
                                 new AccountDefinition
                                 {
-                                    ID = 5000, Name = "Bank credit", Type = AccountDefinitionType.Credit
+                                    ID = BankCredit, Name = "Bank credit", Type = AccountDefinitionType.Credit
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = 6000, Name = "Friends debit", Type = AccountDefinitionType.Debit
+                                    ID = FriendsDebit, Name = "Friends debit", Type = AccountDefinitionType.Debit
                                 },
-                                new AccountDefinition { ID = 9999, Name = "Inactive", Active = false }
+                                new AccountDefinition { ID = Inactive, Name = "Inactive", Active = false }
                             }
                         }
                     },
@@ -160,11 +167,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 101,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 990, Text = "Open 1", Value = 100000 }
+                        new BookingValue { Account = Carryforward, Text = "Open 1", Value = 100000 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 100, Text = "Open 1", Value = 100000 }
+                        new BookingValue { Account = BankAccount, Text = "Open 1", Value = 100000 }
                     },
                     Opening = true
                 };
@@ -175,11 +182,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 101,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 5000, Text = "Open 2", Value = 300000 }
+                        new BookingValue { Account = BankCredit, Text = "Open 2", Value = 300000 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 990, Text = "Open 2", Value = 300000 }
+                        new BookingValue { Account = Carryforward, Text = "Open 2", Value = 300000 }
                     },
                     Opening = true
                 };
@@ -190,12 +197,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 128,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 400, Text = "Salary1", Value = 12000 },
-                        new BookingValue { Account = 400, Text = "Salary2", Value = 8000 }
+                        new BookingValue { Account = Salary, Text = "Salary1", Value = 12000 },
+                        new BookingValue { Account = Salary, Text = "Salary2", Value = 8000 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 100, Text = "Salary", Value = 20000 }
+                        new BookingValue { Account = BankAccount, Text = "Salary", Value = 20000 }
                     }
                 };
                 yield return new AccountingDataJournalBooking
@@ -204,11 +211,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 129,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 100, Text = "Credit rate", Value = 40000 },
+                        new BookingValue { Account = BankAccount, Text = "Credit rate", Value = 40000 },
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 5000, Text = "Credit rate", Value = 40000 }
+                        new BookingValue { Account = BankCredit, Text = "Credit rate", Value = 40000 }
                     }
                 };
 
@@ -218,12 +225,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 201,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 100, Text = "Shoes", Value = 5000 }
+                        new BookingValue { Account = BankAccount, Text = "Shoes", Value = BankCredit }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 600, Text = "Shoes1", Value = 2000 },
-                        new BookingValue { Account = 600, Text = "Shoes2", Value = 3000 }
+                        new BookingValue { Account = Shoes, Text = "Shoes1", Value = 2000 },
+                        new BookingValue { Account = Shoes, Text = "Shoes2", Value = 3000 }
                     }
                 };
 
@@ -233,11 +240,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     Date = BaseDate + 205,
                     Credit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 100, Text = "Rent to friend", Value = 9900 }
+                        new BookingValue { Account = BankAccount, Text = "Rent to friend", Value = 9900 }
                     },
                     Debit = new List<BookingValue>
                     {
-                        new BookingValue { Account = 6000, Text = "Rent to friend", Value = 9900 }
+                        new BookingValue { Account = FriendsDebit, Text = "Rent to friend", Value = 9900 }
                     }
                 };
             }

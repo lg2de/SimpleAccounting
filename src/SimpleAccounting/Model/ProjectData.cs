@@ -198,13 +198,16 @@ namespace lg2de.SimpleAccounting.Model
             }
         }
 
-        public void AddBooking(AccountingDataJournalBooking booking)
+        public void AddBooking(AccountingDataJournalBooking booking, bool updateJournal)
         {
             this.CurrentYear.Booking.Add(booking);
 
             this.IsModified = true;
 
-            this.JournalChanged(this, new JournalChangedEventArgs(booking.ID, booking.GetAccounts()));
+            if (updateJournal)
+            {
+                this.JournalChanged(this, new JournalChangedEventArgs(booking.ID, booking.GetAccounts()));
+            }
         }
 
         public void SelectYear(string yearName)
@@ -219,14 +222,11 @@ namespace lg2de.SimpleAccounting.Model
                 new EditBookingViewModel(this, DateTime.Today, editMode: false);
             var allAccounts = this.Storage.AllAccounts;
             bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
-
-            this.Storage.Setup?.BookingTemplates?.Template
-                .Select(
-                    t => new BookingTemplate
-                    {
-                        Text = t.Text, Credit = t.Credit, Debit = t.Debit, Value = t.Value.ToViewModel()
-                    })
-                .ToList().ForEach(bookingModel.BindingTemplates.Add);
+            var bookingTemplates = this.Storage.Setup?.BookingTemplates;
+            if (bookingTemplates != null)
+            {
+                bookingModel.AddTemplates(bookingTemplates);
+            }
 
             this.windowManager.ShowDialog(bookingModel);
         }
@@ -298,7 +298,9 @@ namespace lg2de.SimpleAccounting.Model
         public void ShowImportDialog()
         {
             var importModel = new ImportBookingsViewModel(this.dialogs, this);
-            this.windowManager.ShowDialog(importModel);
+            this.windowManager.ShowDialog(
+                importModel,
+                settings: WindowsDialogs.SizeToContentManualSettings);
         }
 
         public bool CloseYear()
@@ -332,9 +334,9 @@ namespace lg2de.SimpleAccounting.Model
             this.Storage.Setup.Behavior.LastCarryForwardSpecified = true;
             this.Storage.Setup.Behavior.LastCarryForward = viewModel.RemoteAccount.ID;
             this.Storage.Setup.Behavior.OpeningTextPattern = viewModel.TextOption.Option.ToString();
-            
+
             this.IsModified = true;
-            
+
             return true;
         }
 
