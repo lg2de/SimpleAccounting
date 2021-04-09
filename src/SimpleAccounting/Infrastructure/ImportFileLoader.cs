@@ -94,17 +94,18 @@ namespace lg2de.SimpleAccounting.Infrastructure
             AccountDefinitionImportMappingColumn? textField,
             string valueField)
         {
-            csv.TryGetField(dateField, out DateTime date);
-
             // date and value are required
-            // name and text may be empty
+            csv.TryGetField(dateField, out DateTime date);
             csv.TryGetField<double>(valueField, out var value);
+
+            // name and text may be empty
             csv.TryGetField(nameField, out string name);
 
             string text = string.Empty;
             if (textField != null)
             {
                 csv.TryGetField(textField.Source, out text);
+                text ??= string.Empty;
                 if (!string.IsNullOrEmpty(textField.IgnorePattern))
                 {
                     text = Regex.Replace(text, textField.IgnorePattern, string.Empty);
