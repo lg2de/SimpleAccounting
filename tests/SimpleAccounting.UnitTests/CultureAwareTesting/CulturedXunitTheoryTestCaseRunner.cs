@@ -29,23 +29,23 @@ namespace Xunit
 			CancellationTokenSource cancellationTokenSource)
 				: base(culturedXunitTheoryTestCase, displayName, skipReason, constructorArguments, diagnosticMessageSink, messageBus, aggregator, cancellationTokenSource)
 		{
-			culture = culturedXunitTheoryTestCase.Culture;
+            this.culture = culturedXunitTheoryTestCase.Culture;
 		}
 
 		protected override Task AfterTestCaseStartingAsync()
 		{
 			try
 			{
-				originalCulture = CultureInfo.CurrentCulture;
-				originalUICulture = CultureInfo.CurrentUICulture;
+                this.originalCulture = CultureInfo.CurrentCulture;
+                this.originalUICulture = CultureInfo.CurrentUICulture;
 
-				var cultureInfo = new CultureInfo(culture);
+				var cultureInfo = new CultureInfo(this.culture);
 				CultureInfo.CurrentCulture = cultureInfo;
 				CultureInfo.CurrentUICulture = cultureInfo;
 			}
 			catch (Exception ex)
 			{
-				Aggregator.Add(ex);
+                this.Aggregator.Add(ex);
 				return Task.FromResult(0);
 			}
 
@@ -54,10 +54,15 @@ namespace Xunit
 
 		protected override Task BeforeTestCaseFinishedAsync()
 		{
-			if (originalUICulture != null)
-				CultureInfo.CurrentUICulture = originalUICulture;
-			if (originalCulture != null)
-				CultureInfo.CurrentCulture = originalCulture;
+            if (this.originalUICulture != null)
+            {
+                CultureInfo.CurrentUICulture = this.originalUICulture;
+            }
+
+            if (this.originalCulture != null)
+            {
+                CultureInfo.CurrentCulture = this.originalCulture;
+            }
 
 			return base.BeforeTestCaseFinishedAsync();
 		}

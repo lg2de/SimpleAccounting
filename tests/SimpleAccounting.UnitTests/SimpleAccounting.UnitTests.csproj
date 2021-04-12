@@ -32,6 +32,10 @@
     <PackageReference Include="Xunit.StaFact" Version="1.0.37" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <!-- TODO S1451 (add or update header) is disabled because of external code (cultured fact) --> 
+    <NoWarn>$(NoWarn);S1451</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SimpleAccounting\SimpleAccounting.csproj" />
   </ItemGroup>

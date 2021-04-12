@@ -25,7 +25,7 @@ namespace Xunit
 
 			return cultures.Select(
 				culture => new CulturedXunitTestCase(
-					DiagnosticMessageSink,
+                    this.DiagnosticMessageSink,
 					discoveryOptions.MethodDisplayOrDefault(),
 					discoveryOptions.MethodDisplayOptionsOrDefault(),
 					testMethod,
@@ -43,7 +43,7 @@ namespace Xunit
 			var cultures = GetCultures(theoryAttribute);
 			return cultures.Select(
 				culture => new CulturedXunitTheoryTestCase(
-					DiagnosticMessageSink,
+                    this.DiagnosticMessageSink,
 					discoveryOptions.MethodDisplayOrDefault(),
 					discoveryOptions.MethodDisplayOptionsOrDefault(),
 					testMethod,
@@ -57,8 +57,10 @@ namespace Xunit
 			var ctorArgs = culturedTheoryAttribute.GetConstructorArguments().ToArray();
 			var cultures = Reflector.ConvertArguments(ctorArgs, new[] { typeof(string[]) }).Cast<string[]>().Single();
 
-			if (cultures == null || cultures.Length == 0)
-				cultures = new[] { "en-US", "fr-FR" };
+            if (cultures == null || cultures.Length == 0)
+            {
+                cultures = new[] { "en-US", "fr-FR" };
+            }
 
 			return cultures;
 		}

@@ -236,7 +236,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
             reportFactory.Received(1).CreateTotalsAndBalances(
                 projectData,
-                Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.ToList().All(y => y.Name != "EMPTY")));
+                Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.All(y => y.Name != "EMPTY")));
         }
 
         [Fact]

@@ -1,0 +1,17 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory).sonarlint\lg2de_simpleaccountingcsharp.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- license is LGPL -->
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.20.0.28934">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory).sonarlint\lg2de_simpleaccounting\CSharp\SonarLint.xml" Link="Properties\SonarLint.xml" />
+  </ItemGroup>
+
+</Project>

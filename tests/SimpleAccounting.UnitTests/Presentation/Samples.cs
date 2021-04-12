@@ -156,6 +156,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [SuppressMessage("ReSharper", "RedundantAssignment")]
+        [SuppressMessage("ReSharper", "S1854", Justification = "The 'useless' assignment of 'bookingIdent' helps to build code in future.")]
         public static IEnumerable<AccountingDataJournalBooking> SampleBookings
         {
             get

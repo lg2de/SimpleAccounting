@@ -260,14 +260,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 
             graphics.Received(1).DrawString(
                 "text1",
-                Arg.Is<Font>(x => x.SizeInPoints == 10),
+                Arg.Is<Font>(x => Math.Abs(x.SizeInPoints - 10) < 0.1),
                 Arg.Any<Brush>(),
                 Arg.Any<float>(),
                 Arg.Any<float>(),
                 Arg.Any<StringAlignment>());
             graphics.Received(1).DrawString(
                 "text2",
-                Arg.Is<Font>(x => x.SizeInPoints == 20),
+                Arg.Is<Font>(x => Math.Abs(x.SizeInPoints - 20) < 0.1),
                 Arg.Any<Brush>(),
                 Arg.Any<float>(),
                 Arg.Any<float>(),

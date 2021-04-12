@@ -4,9 +4,11 @@
 // ReSharper disable once CheckNamespace
 namespace Xunit
 {
+    using System;
     using Xunit.Sdk;
 
     [XunitTestCaseDiscoverer("Xunit." + nameof(CulturedTheoryAttributeDiscoverer), "SimpleAccounting.UnitTests")]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     internal sealed class CulturedTheoryAttribute : TheoryAttribute
 	{
 		public CulturedTheoryAttribute(params string[] cultures) { }
