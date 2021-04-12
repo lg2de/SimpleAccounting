@@ -8,6 +8,7 @@ namespace lg2de.SimpleAccounting.Model
     using System.Threading;
     using System.Threading.Tasks;
     using lg2de.SimpleAccounting.Infrastructure;
+    using lg2de.SimpleAccounting.Presentation;
     using lg2de.SimpleAccounting.Properties;
 
     /// <summary>
@@ -53,7 +54,7 @@ namespace lg2de.SimpleAccounting.Model
 
         void ShowAddBookingDialog(bool showInactiveAccounts);
 
-        void ShowEditBookingDialog(ulong bookingId, bool showInactiveAccounts);
+        void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts);
 
         void ShowImportDialog();
 

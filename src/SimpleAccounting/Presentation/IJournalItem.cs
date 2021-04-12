@@ -9,6 +9,6 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     public interface IJournalItem
     {
-        ulong Identifier { get; }
+        int StorageIndex { get; }
     }
 }

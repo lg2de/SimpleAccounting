@@ -40,5 +40,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.NotifyOfPropertyChange();
             }
         }
+
+        public int StorageIndex { get; protected set; } = -1;
     }
 }

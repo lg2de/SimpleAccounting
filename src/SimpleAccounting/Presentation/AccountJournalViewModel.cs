@@ -51,10 +51,11 @@ namespace lg2de.SimpleAccounting.Presentation
             double debitSum = 0;
             foreach (var booking in relevantBookings)
             {
+                var index = this.projectData.CurrentYear.Booking.IndexOf(booking);
                 var debitEntries = booking.Debit.Where(x => x.Account == accountNumber);
                 foreach (var debitEntry in debitEntries)
                 {
-                    var item = new AccountJournalItemViewModel
+                    var item = new AccountJournalItemViewModel(index)
                     {
                         Identifier = booking.ID,
                         Date = booking.Date.ToDateTime(),
@@ -72,7 +73,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 var creditEntries = booking.Credit.Where(x => x.Account == accountNumber);
                 foreach (var creditEntry in creditEntries)
                 {
-                    var item = new AccountJournalItemViewModel
+                    var item = new AccountJournalItemViewModel(index)
                     {
                         Identifier = booking.ID,
                         Date = booking.Date.ToDateTime(),
@@ -96,14 +97,14 @@ namespace lg2de.SimpleAccounting.Presentation
                 return;
             }
 
-            var sumItem = new AccountJournalItemViewModel();
+            var sumItem = new AccountJournalItemViewModel(0);
             this.Items.Add(sumItem);
             sumItem.IsSummary = true;
             sumItem.Text = Resources.Word_Total;
             sumItem.DebitValue = debitSum;
             sumItem.CreditValue = creditSum;
 
-            var balanceItem = new AccountJournalItemViewModel();
+            var balanceItem = new AccountJournalItemViewModel(0);
             this.Items.Add(balanceItem);
             balanceItem.IsSummary = true;
             balanceItem.Text = Resources.Word_Balance;

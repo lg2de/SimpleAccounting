@@ -9,6 +9,11 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     public class FullJournalItemViewModel : JournalItemBaseViewModel
     {
+        public FullJournalItemViewModel(int storageIndex)
+        {
+            this.StorageIndex = storageIndex;
+        }
+
         public double Value { get; set; }
 
         public string CreditAccount { get; set; } = string.Empty;

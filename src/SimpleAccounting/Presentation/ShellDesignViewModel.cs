@@ -62,7 +62,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void LoadJournal()
         {
-            var journalItem = new FullJournalItemViewModel
+            int index = 0;
+            var journalItem = new FullJournalItemViewModel(index++)
             {
                 Identifier = 41,
                 Date = DateTime.Now,
@@ -72,7 +73,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 DebitAccount = "400"
             };
             this.FullJournal.Items.Add(journalItem);
-            journalItem = new FullJournalItemViewModel
+            journalItem = new FullJournalItemViewModel(index++)
             {
                 Identifier = 42,
                 Date = DateTime.Now,
@@ -83,7 +84,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 IsFollowup = true
             };
             this.FullJournal.Items.Add(journalItem);
-            journalItem = new FullJournalItemViewModel
+            journalItem = new FullJournalItemViewModel(index++)
             {
                 Identifier = 43,
                 Date = DateTime.Now,
@@ -93,7 +94,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 DebitAccount = "401",
             };
             this.FullJournal.Items.Add(journalItem);
-            journalItem = new FullJournalItemViewModel
+            journalItem = new FullJournalItemViewModel(index)
             {
                 Identifier = 44,
                 Date = DateTime.Now,
@@ -105,7 +106,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.FullJournal.Items.Add(journalItem);
             this.FullJournal.Items.UpdateRowHighlighting();
 
-            var accountJournalItem = new AccountJournalItemViewModel
+            index = 0;
+            var accountJournalItem = new AccountJournalItemViewModel(index++)
             {
                 Identifier = 42,
                 Date = DateTime.Now,
@@ -114,7 +116,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 RemoteAccount = "Div."
             };
             this.AccountJournal.Items.Add(accountJournalItem);
-            accountJournalItem = new AccountJournalItemViewModel
+            accountJournalItem = new AccountJournalItemViewModel(index++)
             {
                 Identifier = 44,
                 Date = DateTime.Now,
@@ -123,7 +125,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 RemoteAccount = "Div."
             };
             this.AccountJournal.Items.Add(accountJournalItem);
-            accountJournalItem = new AccountJournalItemViewModel
+            accountJournalItem = new AccountJournalItemViewModel(index)
             {
                 IsSummary = true, Text = "Summe", CreditValue = 123.4, RemoteAccount = "Div."
             };
