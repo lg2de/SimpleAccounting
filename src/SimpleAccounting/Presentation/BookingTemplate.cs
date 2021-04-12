@@ -4,6 +4,9 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
+    /// <summary>
+    ///     Implements the view model for a single booking template.
+    /// </summary>
     internal class BookingTemplate
     {
         public string Text { get; set; } = string.Empty;

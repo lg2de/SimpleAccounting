@@ -6,6 +6,9 @@ namespace lg2de.SimpleAccounting.Infrastructure
 {
     using System.Diagnostics.CodeAnalysis;
 
+    /// <summary>
+    ///     Implements several constant and static texts.
+    /// </summary>
     [ExcludeFromCodeCoverage]
     internal static class Defines
     {

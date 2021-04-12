@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
 {
+    using System;
     using System.Collections.Specialized;
     using System.Diagnostics;
     using System.Threading.Tasks;
@@ -47,12 +48,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Infrastructure
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
 
-            var result = await sut.Awaiting(x => x.LoadAsync("K:\\the.fileName")).Should().CompleteWithinAsync(1.Seconds());
+            var result = await sut.Awaiting(x => x.LoadAsync("K:\\the.fileName")).Should()
+                .CompleteWithinAsync(1.Seconds());
 
             result.Subject.Should().Be(OperationResult.Aborted);
             processApi.DidNotReceive().Start(Arg.Any<ProcessStartInfo>());
             dialogs.Received(1).ShowMessageBox(
-                Arg.Is<string>(s => s.Contains("Cryptomator")),
+                Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());

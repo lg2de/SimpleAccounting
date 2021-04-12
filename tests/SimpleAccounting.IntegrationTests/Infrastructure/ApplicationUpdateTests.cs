@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.IntegrationTests.Infrastructure
 {
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using FluentAssertions;
@@ -27,7 +28,8 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Infrastructure
             (await this.Awaiting(x => task).Should().CompleteWithinAsync(10.Seconds()))
                 .Which.Should().Contain(
                     r => r.TagName == "2.0.0"
-                         && r.Assets.Any(a => a.BrowserDownloadUrl.EndsWith("SimpleAccounting.zip")));
+                         && r.Assets.Any(
+                             a => a.BrowserDownloadUrl.EndsWith("SimpleAccounting.zip", StringComparison.Ordinal)));
         }
     }
 }

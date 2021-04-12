@@ -14,11 +14,11 @@ namespace Xunit
     using Xunit.Sdk;
 
     internal class CulturedXunitTheoryTestCase : XunitTheoryTestCase
-	{
-		/// <summary/>
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		[Obsolete("Called by the de-serializer; should only be called by deriving classes for de-serialization purposes")]
-		public CulturedXunitTheoryTestCase() { }
+    {
+        /// <summary/>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Called by the de-serializer; should only be called by deriving classes for de-serialization purposes")]
+        public CulturedXunitTheoryTestCase() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CulturedXunitTheoryTestCase"/> class.
@@ -29,49 +29,51 @@ namespace Xunit
         /// <param name="testMethod">The method under test.</param>
         /// <param name="culture">The name of the culture.</param>
         public CulturedXunitTheoryTestCase(
-			IMessageSink diagnosticMessageSink,
-			TestMethodDisplay defaultMethodDisplay,
-			TestMethodDisplayOptions defaultMethodDisplayOptions,
-			ITestMethod testMethod,
-			string culture)
-				: base(diagnosticMessageSink, defaultMethodDisplay, defaultMethodDisplayOptions, testMethod)
-		{
-			Initialize(culture);
-		}
+            IMessageSink diagnosticMessageSink,
+            TestMethodDisplay defaultMethodDisplay,
+            TestMethodDisplayOptions defaultMethodDisplayOptions,
+            ITestMethod testMethod,
+            string culture)
+            : base(diagnosticMessageSink, defaultMethodDisplay, defaultMethodDisplayOptions, testMethod)
+        {
+            Initialize(culture);
+        }
 
-		public string Culture { get; private set; } = "<unset>";
+        public string Culture { get; private set; } = "<unset>";
 
-		public override void Deserialize(IXunitSerializationInfo data)
-		{
-			base.Deserialize(data);
+        public override void Deserialize(IXunitSerializationInfo data)
+        {
+            base.Deserialize(data);
 
-			Initialize(data.GetValue<string>("Culture"));
-		}
+            Initialize(data.GetValue<string>("Culture"));
+        }
 
-		protected override string GetUniqueID() => $"{base.GetUniqueID()}[{Culture}]";
+        protected override string GetUniqueID() => $"{base.GetUniqueID()}[{Culture}]";
 
-		void Initialize(string culture)
-		{
-			Culture = culture;
+        void Initialize(string culture)
+        {
+            Culture = culture;
 
             Traits.Add("Culture", new List<string> { culture });
 
-			DisplayName += $"[{culture}]";
-		}
+            DisplayName += $"[{culture}]";
+        }
 
-		public override Task<RunSummary> RunAsync(
-			IMessageSink diagnosticMessageSink,
-			IMessageBus messageBus,
-			object?[] constructorArguments,
-			ExceptionAggregator aggregator,
-			CancellationTokenSource cancellationTokenSource)
-				=> new CulturedXunitTheoryTestCaseRunner(this, DisplayName, SkipReason, constructorArguments, diagnosticMessageSink, messageBus, aggregator, cancellationTokenSource).RunAsync();
+        public override Task<RunSummary> RunAsync(
+            IMessageSink diagnosticMessageSink,
+            IMessageBus messageBus,
+            object?[] constructorArguments,
+            ExceptionAggregator aggregator,
+            CancellationTokenSource cancellationTokenSource)
+            => new CulturedXunitTheoryTestCaseRunner(
+                this, DisplayName, SkipReason, constructorArguments, diagnosticMessageSink, messageBus, aggregator,
+                cancellationTokenSource).RunAsync();
 
-		public override void Serialize(IXunitSerializationInfo data)
-		{
-			base.Serialize(data);
+        public override void Serialize(IXunitSerializationInfo data)
+        {
+            base.Serialize(data);
 
-			data.AddValue("Culture", Culture);
-		}
-	}
+            data.AddValue("Culture", Culture);
+        }
+    }
 }

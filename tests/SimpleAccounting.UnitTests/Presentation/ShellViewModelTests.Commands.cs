@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -93,7 +94,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.FullJournal.Items.Should().BeEmpty();
             sut.AccountJournal.Items.Should().BeEmpty();
         }
-        
+
         [Fact]
         public void NewAccountCommand_AccountCreatedAndSorted()
         {
@@ -161,7 +162,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 Debit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Back", Value = 5 } }
             };
             sut.ProjectData.CurrentYear!.Booking.Add(booking);
-            sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.FirstOrDefault(x => x.Identifier == 990));
+            sut.Accounts.AccountSelectionCommand.Execute(
+                sut.Accounts.AccountList.FirstOrDefault(x => x.Identifier == 990));
 
             sut.EditAccountCommand.Execute(sut.Accounts.AccountList.First());
 
@@ -387,7 +389,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             sut.ProjectData.IsModified.Should().BeFalse("the project remains unchanged");
-            windowManager.DidNotReceive().ShowDialog(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>());
+            windowManager.DidNotReceive().ShowDialog(
+                Arg.Any<object>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>());
         }
 
         [Fact]
@@ -462,7 +465,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var thisYear = DateTime.Now.Year;
             using var _ = new AssertionScope();
             sut.Menu.BookingYears.Select(x => x.Header).Should()
-                .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
+                .Equal(
+                    "2000", thisYear.ToString(CultureInfo.InvariantCulture),
+                    (thisYear + 1).ToString(CultureInfo.InvariantCulture));
             sut.FullJournal.Items.Should().BeEquivalentTo(
                 new
                 {
@@ -523,7 +528,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var project = Samples.SampleProject;
             project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             project.Accounts.First().Account.Add(
-                new AccountDefinition { ID = myCarryForwardNumber, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward });
+                new AccountDefinition
+                {
+                    ID = myCarryForwardNumber, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward
+                });
             sut.ProjectData.Load(project);
 
             sut.Menu.CloseYearCommand.Execute(null);
@@ -535,7 +543,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var thisYear = DateTime.Now.Year;
             using var _ = new AssertionScope();
             sut.Menu.BookingYears.Select(x => x.Header).Should()
-                .Equal("2000", thisYear.ToString(), (thisYear + 1).ToString());
+                .Equal(
+                    "2000", thisYear.ToString(CultureInfo.InvariantCulture),
+                    (thisYear + 1).ToString(CultureInfo.InvariantCulture));
             sut.FullJournal.Items.Should().BeEquivalentTo(
                 new
                 {
@@ -592,7 +602,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             applicationUpdate.StartUpdateProcess().Returns(false);
             var monitor = sut.Monitor();
 
-            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
+            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
+                .CompleteWithinAsync(1.Seconds());
 
             sut.ProjectData.IsModified.Should().BeTrue("unsaved project remains unsaved");
             monitor.Should().NotRaise(nameof(sut.Deactivated));
@@ -603,16 +614,17 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out IApplicationUpdate applicationUpdate, out var dialogs);
             dialogs.ShowMessageBox(
-                Arg.Any<string>(), Arg.Any<string>(),
-                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                    Arg.Any<string>(), Arg.Any<string>(),
+                    Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                    Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
             sut.ProjectData.IsModified = true;
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
             applicationUpdate.StartUpdateProcess().Returns(true);
             var monitor = sut.Monitor();
 
-            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
+            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
+                .CompleteWithinAsync(1.Seconds());
 
             sut.ProjectData.IsModified.Should().BeFalse();
             monitor.Should().NotRaise(nameof(sut.Deactivated));
@@ -624,7 +636,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var sut = CreateSut(out IApplicationUpdate applicationUpdate, out _);
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(false);
 
-            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
+            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
+                .CompleteWithinAsync(1.Seconds());
 
             applicationUpdate.DidNotReceive().StartUpdateProcess();
         }
@@ -636,7 +649,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
             sut.ProjectData.IsModified = true;
 
-            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should().CompleteWithinAsync(1.Seconds());
+            await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
+                .CompleteWithinAsync(1.Seconds());
 
             applicationUpdate.DidNotReceive().StartUpdateProcess();
         }

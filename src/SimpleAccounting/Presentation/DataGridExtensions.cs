@@ -10,6 +10,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Windows.Controls;
     using System.Windows.Media;
 
+    /// <summary>
+    ///     Implements extensions for the <see cref="DataGrid"/>.
+    /// </summary>
     internal static class DataGridExtensions
     {
         public static void ResetDataGridColumnSizes(this DependencyObject dependencyObject)

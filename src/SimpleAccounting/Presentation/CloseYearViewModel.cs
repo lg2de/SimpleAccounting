@@ -14,6 +14,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
 
+    /// <summary>
+    ///     Implements the view model to configure the closing procedure of a booking year.
+    /// </summary>
     public class CloseYearViewModel : Screen
     {
         private readonly AccountingDataJournal currentYear;

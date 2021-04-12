@@ -12,6 +12,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Implements the view model for a single account.
+    /// </summary>
     public class AccountViewModel : Screen
     {
         static AccountViewModel()

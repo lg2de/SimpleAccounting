@@ -8,6 +8,9 @@ namespace lg2de.SimpleAccounting.Reports
     using System.Text.RegularExpressions;
     using lg2de.SimpleAccounting.Properties;
 
+    /// <summary>
+    ///     Defines extensions for the <see cref="XmlPrinter"/>.
+    /// </summary>
     internal static class XmlPrintExtensions
     {
         private static readonly Regex ReferenceTextExpression = new Regex("@(?<ReferenceText>[a-zA-Z0-9_]+)@", RegexOptions.Compiled);

@@ -9,6 +9,9 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Linq;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Implements the designer view model for <see cref="AccountViewModel"/>.
+    /// </summary>
     [SuppressMessage(
         "Major Code Smell", "S109:Magic numbers should not be used",
         Justification = "Design view model defines useful values")]

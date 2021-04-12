@@ -85,12 +85,6 @@ namespace lg2de.SimpleAccounting.Model
             };
         }
 
-        internal AccountingData Clone()
-        {
-            var xml = this.Serialize();
-            return Deserialize(xml);
-        }
-
         /// <summary>
         ///     Migrates the project from earlier versions.
         /// </summary>

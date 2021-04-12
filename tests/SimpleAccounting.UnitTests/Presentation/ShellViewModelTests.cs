@@ -157,7 +157,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     new MenuViewModel(projectData, busy, null!, null!, null!), new FullJournalViewModel(projectData),
                     new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate);
             dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("Cryptomator")),
+                    Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                     Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -174,7 +174,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("c:\\file1", "k:\\file2");
             dialogs.Received(1).ShowMessageBox(
-                Arg.Is<string>(s => s.Contains("Cryptomator")),
+                Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
@@ -266,7 +266,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists(Arg.Is("file2")).Returns(true);
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
             dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("Cryptomator")),
+                    Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                     Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -442,7 +442,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
             dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("automatically created backup file")), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("automatically created backup file", StringComparison.Ordinal)), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
@@ -467,7 +467,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
             dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("automatically created backup file")), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("automatically created backup file", StringComparison.Ordinal)), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
@@ -508,7 +508,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.ProjectData.Settings.SecuredDrives.Should().Equal(new object[] { "K:\\" });
             dialogs.DidNotReceive().ShowMessageBox(
-                Arg.Is<string>(s => s.Contains("Cryptomator")),
+                Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
@@ -568,7 +568,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.ProjectData.FileName = "old.fileName";
             sut.ProjectData.IsModified = true;
             dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("Project data has been changed.")), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("Project data has been changed.", StringComparison.Ordinal)), Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);

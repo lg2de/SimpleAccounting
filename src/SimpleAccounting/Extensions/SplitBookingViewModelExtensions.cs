@@ -10,6 +10,9 @@ namespace lg2de.SimpleAccounting.Extensions
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
 
+    /// <summary>
+    ///     Implements extensions on <see cref="SplitBookingViewModel"/>.
+    /// </summary>
     internal static class SplitBookingViewModelExtensions
     {
         private const double Tolerance = 0.001;

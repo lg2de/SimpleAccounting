@@ -2,6 +2,7 @@
 // licensed by Apache 2.0 https://github.com/xunit/xunit/blob/main/LICENSE
 
 // ReSharper disable once CheckNamespace
+
 namespace Xunit
 {
     using System;
@@ -9,8 +10,8 @@ namespace Xunit
 
     [XunitTestCaseDiscoverer("Xunit." + nameof(CulturedFactAttributeDiscoverer), "SimpleAccounting.UnitTests")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	internal sealed class CulturedFactAttribute : FactAttribute
-	{
-		public CulturedFactAttribute(params string[] cultures) { }
-	}
+    internal sealed class CulturedFactAttribute : FactAttribute
+    {
+        public CulturedFactAttribute(params string[] cultures) { }
+    }
 }

@@ -6,6 +6,9 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using Caliburn.Micro;
 
+    /// <summary>
+    ///     Implements the view model for one of multiple entries in a split booking.
+    /// </summary>
     public class SplitBookingViewModel : Screen
     {
         private ulong accountNumber;

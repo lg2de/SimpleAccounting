@@ -8,6 +8,9 @@ namespace lg2de.SimpleAccounting.Infrastructure
     using System.Threading.Tasks;
     using System.Windows.Input;
 
+    /// <summary>
+    ///     Implements <see cref="IAsyncCommand"/> for easier handling of asynchronous commands in view models.
+    /// </summary>
     public class AsyncCommand : IAsyncCommand
     {
         private readonly IBusy busy;
