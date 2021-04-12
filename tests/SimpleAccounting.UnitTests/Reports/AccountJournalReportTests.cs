@@ -6,12 +6,12 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq;
     using System.Xml.Linq;
     using System.Xml.XPath;
     using FluentAssertions;
     using FluentAssertions.Execution;
-    using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Reports;
     using lg2de.SimpleAccounting.UnitTests.Presentation;
     using Xunit;
@@ -32,6 +32,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
 
             var year = DateTime.Now.Year;
             var expectedBankAccount = string.Format(
+                CultureInfo.InvariantCulture,
                 @"
 <data>
   <tr topLine=""True"">
@@ -92,6 +93,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   </tr>
 </data>", year);
             var expectedSalary = string.Format(
+                CultureInfo.InvariantCulture,
                 @"
 <data>
   <tr topLine=""True"">
@@ -120,6 +122,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   </tr>
 </data>", year);
             var expectedShoes = string.Format(
+                CultureInfo.InvariantCulture,
                 @"
 <data>
   <tr topLine=""True"">
@@ -148,6 +151,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   </tr>
 </data>", year);
             var expectedCarryforward = string.Format(
+                CultureInfo.InvariantCulture,
                 @"
 <data>
   <tr topLine=""True"">
@@ -184,6 +188,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   </tr>
 </data>", year);
             var expectedBankCredit = string.Format(
+                CultureInfo.InvariantCulture,
                 @"
 <data>
   <tr topLine=""True"">
@@ -220,6 +225,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   </tr>
 </data>", year);
             var expectedFriendsDebit = string.Format(
+                CultureInfo.InvariantCulture,
                 @"
 <data>
   <tr topLine=""True"">

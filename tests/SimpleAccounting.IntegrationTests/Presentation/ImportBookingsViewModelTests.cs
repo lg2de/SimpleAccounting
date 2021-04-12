@@ -318,8 +318,8 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
                     new AccountingDataJournal
                     {
                         Year = "2000",
-                        DateStart = 20000101,
-                        DateEnd = 20001231,
+                        DateStart = 2000_0101,
+                        DateEnd = 2000_1231,
                         Booking = new List<AccountingDataJournalBooking>()
                     }
                 }
@@ -329,7 +329,7 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation
                 new AccountingDataJournalBooking
                 {
                     ID = 1,
-                    Date = 20000115,
+                    Date = 2000_0115,
                     Credit = new List<BookingValue>
                     {
                         new BookingValue { Account = 100, Text = "Shopping Mall - Shoes", Value = 5000 }

@@ -7,6 +7,9 @@ namespace lg2de.SimpleAccounting.Infrastructure
     using System;
     using System.Windows.Input;
 
+    /// <summary>
+    ///     Implements <see cref="ICommand"/> for synchronous commands.
+    /// </summary>
     public class RelayCommand : ICommand
     {
         private readonly Predicate<object>? canExecute;

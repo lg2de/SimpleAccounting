@@ -2,13 +2,16 @@
 // licensed by Apache 2.0 https://github.com/xunit/xunit/blob/main/LICENSE
 
 // ReSharper disable once CheckNamespace
+
 namespace Xunit
 {
+    using System;
     using Xunit.Sdk;
 
     [XunitTestCaseDiscoverer("Xunit." + nameof(CulturedTheoryAttributeDiscoverer), "SimpleAccounting.UnitTests")]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     internal sealed class CulturedTheoryAttribute : TheoryAttribute
-	{
-		public CulturedTheoryAttribute(params string[] cultures) { }
-	}
+    {
+        public CulturedTheoryAttribute(params string[] cultures) { }
+    }
 }

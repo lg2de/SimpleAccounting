@@ -6,6 +6,9 @@ namespace lg2de.SimpleAccounting.Abstractions
 {
     using System.Drawing;
 
+    /// <summary>
+    ///     Defines abstraction for the graphics/drawing API.
+    /// </summary>
     internal interface IGraphics
     {
         bool HasMorePages { get; set; }

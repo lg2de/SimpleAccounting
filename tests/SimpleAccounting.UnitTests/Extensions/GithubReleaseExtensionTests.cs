@@ -61,7 +61,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
             var assetsProperty = releaseType.GetProperty(nameof(Release.Assets));
             var release = new Release();
             tagProperty.SetValue(release, tag);
-            if (tag.Contains("beta"))
+            if (tag.Contains("beta", StringComparison.Ordinal))
             {
                 preReleaseProperty.SetValue(release, true);
             }

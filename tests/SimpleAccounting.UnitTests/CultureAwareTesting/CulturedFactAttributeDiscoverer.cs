@@ -2,6 +2,7 @@
 // licensed by Apache 2.0 https://github.com/xunit/xunit/blob/main/LICENSE
 
 // ReSharper disable once CheckNamespace
+
 namespace Xunit
 {
     using System.Collections.Generic;
@@ -10,32 +11,36 @@ namespace Xunit
     using Xunit.Sdk;
 
     internal class CulturedFactAttributeDiscoverer : IXunitTestCaseDiscoverer
-	{
-		readonly IMessageSink diagnosticMessageSink;
+    {
+        readonly IMessageSink diagnosticMessageSink;
 
-		public CulturedFactAttributeDiscoverer(IMessageSink diagnosticMessageSink)
-		{
-			this.diagnosticMessageSink = diagnosticMessageSink;
-		}
+        public CulturedFactAttributeDiscoverer(IMessageSink diagnosticMessageSink)
+        {
+            this.diagnosticMessageSink = diagnosticMessageSink;
+        }
 
-		public IEnumerable<IXunitTestCase> Discover(
-			ITestFrameworkDiscoveryOptions discoveryOptions,
-			ITestMethod testMethod,
-			IAttributeInfo factAttribute)
-		{
-			var ctorArgs = factAttribute.GetConstructorArguments().ToArray();
-			var cultures = Reflector.ConvertArguments(ctorArgs, new[] { typeof(string[]) }).Cast<string[]>().Single();
+        public IEnumerable<IXunitTestCase> Discover(
+            ITestFrameworkDiscoveryOptions discoveryOptions,
+            ITestMethod testMethod,
+            IAttributeInfo factAttribute)
+        {
+            var ctorArgs = factAttribute.GetConstructorArguments().ToArray();
+            var cultures = Reflector.ConvertArguments(ctorArgs, new[] { typeof(string[]) }).Cast<string[]>().Single();
 
-			if (cultures == null || cultures.Length == 0)
-				cultures = new[] { "en-US", "fr-FR" };
+            if (cultures == null || cultures.Length == 0)
+            {
+                cultures = new[] { "en-US", "fr-FR" };
+            }
 
-			var methodDisplay = discoveryOptions.MethodDisplayOrDefault();
-			var methodDisplayOptions = discoveryOptions.MethodDisplayOptionsOrDefault();
+            var methodDisplay = discoveryOptions.MethodDisplayOrDefault();
+            var methodDisplayOptions = discoveryOptions.MethodDisplayOptionsOrDefault();
 
-			return
-				cultures
-					.Select(culture => new CulturedXunitTestCase(diagnosticMessageSink, methodDisplay, methodDisplayOptions, testMethod, culture))
-					.ToList();
-		}
-	}
+            return
+                cultures
+                    .Select(
+                        culture => new CulturedXunitTestCase(
+                            diagnosticMessageSink, methodDisplay, methodDisplayOptions, testMethod, culture))
+                    .ToList();
+        }
+    }
 }

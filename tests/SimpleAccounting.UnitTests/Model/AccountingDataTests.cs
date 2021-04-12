@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Model
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
@@ -107,7 +108,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
             sut.Should().BeEquivalentTo(
                 expectation,
                 o => o.Excluding(
-                    info => info.SelectedMemberPath.EndsWith(nameof(AccountDefinitionImportMappingPattern.Regex))));
+                    info => info.SelectedMemberPath.EndsWith(
+                        nameof(AccountDefinitionImportMappingPattern.Regex), StringComparison.Ordinal)));
         }
 
         [Fact]
@@ -140,11 +142,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 {
                     new AccountingDataYear
                     {
-                        Name = 2001, DateStart = 20010101, DateEnd = 20011231, Closed = true
+                        Name = 2001, DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true
                     },
                     new AccountingDataYear
                     {
-                        Name = 2002, DateStart = 20020101, DateEnd = 20021231, Closed = false
+                        Name = 2002, DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false
                     }
                 }
             };
@@ -155,8 +157,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
             {
                 Journal = new[]
                 {
-                    new { Year = "2001", DateStart = 20010101, DateEnd = 20011231, Closed = true },
-                    new { Year = "2002", DateStart = 20020101, DateEnd = 20021231, Closed = false }
+                    new { Year = "2001", DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true },
+                    new { Year = "2002", DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false }
                 }
             };
             sut.Should().BeEquivalentTo(expectation);
@@ -295,7 +297,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 },
                 Journal = new List<AccountingDataJournal>
                 {
-                    new AccountingDataJournal { Booking = null, DateStart = 20200101, DateEnd = 20201231 }
+                    new AccountingDataJournal { Booking = null, DateStart = 2020_0101, DateEnd = 2020_1231 }
                 }
             };
 

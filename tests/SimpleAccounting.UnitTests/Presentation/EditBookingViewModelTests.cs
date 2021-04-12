@@ -630,7 +630,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             journalEntry.Should().BeEquivalentTo(
                 new AccountingDataJournalBooking
                 {
-                    Date = 20200620,
+                    Date = 2020_0620,
                     ID = 42,
                     Credit = new List<BookingValue>
                     {
@@ -667,7 +667,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             journalEntry.Should().BeEquivalentTo(
                 new AccountingDataJournalBooking
                 {
-                    Date = 20200620,
+                    Date = 2020_0620,
                     ID = 42,
                     Credit = new List<BookingValue>
                     {
@@ -705,7 +705,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             journalEntry.Should().BeEquivalentTo(
                 new AccountingDataJournalBooking
                 {
-                    Date = 20200620,
+                    Date = 2020_0620,
                     ID = 42,
                     Credit = new List<BookingValue>
                     {
@@ -742,7 +742,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             journalEntry.Should().BeEquivalentTo(
                 new AccountingDataJournalBooking
                 {
-                    Date = 20200620,
+                    Date = 2020_0620,
                     ID = 42,
                     Credit = new List<BookingValue>
                     {

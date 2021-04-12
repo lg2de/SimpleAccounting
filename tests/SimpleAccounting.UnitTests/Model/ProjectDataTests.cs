@@ -35,7 +35,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
             var settings = new Settings { SecuredDrives = new StringCollection { "K:\\" } };
             var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
             dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("Cryptomator")),
+                    Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                     Arg.Any<string>(),
                     Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())

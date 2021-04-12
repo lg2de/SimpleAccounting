@@ -13,53 +13,60 @@ namespace Xunit
     using Xunit.Sdk;
 
     internal class CulturedXunitTheoryTestCaseRunner : XunitTheoryTestCaseRunner
-	{
-		readonly string culture;
-		CultureInfo? originalCulture;
-		CultureInfo? originalUICulture;
+    {
+        readonly string culture;
+        CultureInfo? originalCulture;
+        CultureInfo? originalUICulture;
 
-		public CulturedXunitTheoryTestCaseRunner(
-			CulturedXunitTheoryTestCase culturedXunitTheoryTestCase,
-			string displayName,
-			string? skipReason,
-			object?[] constructorArguments,
-			IMessageSink diagnosticMessageSink,
-			IMessageBus messageBus,
-			ExceptionAggregator aggregator,
-			CancellationTokenSource cancellationTokenSource)
-				: base(culturedXunitTheoryTestCase, displayName, skipReason, constructorArguments, diagnosticMessageSink, messageBus, aggregator, cancellationTokenSource)
-		{
-			culture = culturedXunitTheoryTestCase.Culture;
-		}
+        public CulturedXunitTheoryTestCaseRunner(
+            CulturedXunitTheoryTestCase culturedXunitTheoryTestCase,
+            string displayName,
+            string? skipReason,
+            object?[] constructorArguments,
+            IMessageSink diagnosticMessageSink,
+            IMessageBus messageBus,
+            ExceptionAggregator aggregator,
+            CancellationTokenSource cancellationTokenSource)
+            : base(
+                culturedXunitTheoryTestCase, displayName, skipReason, constructorArguments, diagnosticMessageSink,
+                messageBus, aggregator, cancellationTokenSource)
+        {
+            this.culture = culturedXunitTheoryTestCase.Culture;
+        }
 
-		protected override Task AfterTestCaseStartingAsync()
-		{
-			try
-			{
-				originalCulture = CultureInfo.CurrentCulture;
-				originalUICulture = CultureInfo.CurrentUICulture;
+        protected override Task AfterTestCaseStartingAsync()
+        {
+            try
+            {
+                this.originalCulture = CultureInfo.CurrentCulture;
+                this.originalUICulture = CultureInfo.CurrentUICulture;
 
-				var cultureInfo = new CultureInfo(culture);
-				CultureInfo.CurrentCulture = cultureInfo;
-				CultureInfo.CurrentUICulture = cultureInfo;
-			}
-			catch (Exception ex)
-			{
-				Aggregator.Add(ex);
-				return Task.FromResult(0);
-			}
+                var cultureInfo = new CultureInfo(this.culture);
+                CultureInfo.CurrentCulture = cultureInfo;
+                CultureInfo.CurrentUICulture = cultureInfo;
+            }
+            catch (Exception ex)
+            {
+                this.Aggregator.Add(ex);
+                return Task.FromResult(0);
+            }
 
-			return base.AfterTestCaseStartingAsync();
-		}
+            return base.AfterTestCaseStartingAsync();
+        }
 
-		protected override Task BeforeTestCaseFinishedAsync()
-		{
-			if (originalUICulture != null)
-				CultureInfo.CurrentUICulture = originalUICulture;
-			if (originalCulture != null)
-				CultureInfo.CurrentCulture = originalCulture;
+        protected override Task BeforeTestCaseFinishedAsync()
+        {
+            if (this.originalUICulture != null)
+            {
+                CultureInfo.CurrentUICulture = this.originalUICulture;
+            }
 
-			return base.BeforeTestCaseFinishedAsync();
-		}
-	}
+            if (this.originalCulture != null)
+            {
+                CultureInfo.CurrentCulture = this.originalCulture;
+            }
+
+            return base.BeforeTestCaseFinishedAsync();
+        }
+    }
 }

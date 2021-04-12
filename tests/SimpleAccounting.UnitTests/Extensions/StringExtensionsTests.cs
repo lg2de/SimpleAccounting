@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Extensions
 {
+    using System;
     using System.Drawing;
     using FluentAssertions;
     using lg2de.SimpleAccounting.Abstractions;
@@ -11,7 +12,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
     using NSubstitute;
     using Xunit;
 
-    public class StringExtensionsTests
+    public sealed class StringExtensionsTests : IDisposable
     {
         private readonly Font testFont = new Font("Arial", 10);
 
@@ -77,6 +78,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
             var result = input.Wrap(10, this.testFont, graphics);
         
             result.Should().Be(expected);
+        }
+
+        public void Dispose()
+        {
+            this.testFont?.Dispose();
         }
     }
 }

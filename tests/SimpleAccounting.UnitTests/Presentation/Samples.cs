@@ -91,7 +91,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = Carryforward, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
+                                    ID = Carryforward,
+                                    Name = "Carryforward",
+                                    Type = AccountDefinitionType.Carryforward
                                 }
                             }
                         },
@@ -102,11 +104,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                             {
                                 new AccountDefinition
                                 {
-                                    ID = BankCredit, Name = "Bank credit", Type = AccountDefinitionType.Credit
+                                    ID = BankCredit,
+                                    Name = "Bank credit",
+                                    Type = AccountDefinitionType.Credit
                                 },
                                 new AccountDefinition
                                 {
-                                    ID = FriendsDebit, Name = "Friends debit", Type = AccountDefinitionType.Debit
+                                    ID = FriendsDebit,
+                                    Name = "Friends debit",
+                                    Type = AccountDefinitionType.Debit
                                 },
                                 new AccountDefinition { ID = Inactive, Name = "Inactive", Active = false }
                             }
@@ -117,8 +123,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                         new AccountingDataJournal
                         {
                             Year = "2000",
-                            DateStart = 20000101,
-                            DateEnd = 20001231,
+                            DateStart = 2000_0101,
+                            DateEnd = 2000_1231,
                             Closed = true,
                             Booking = new List<AccountingDataJournalBooking>()
                         },
@@ -156,6 +162,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [SuppressMessage("ReSharper", "RedundantAssignment")]
+        [SuppressMessage(
+            "ReSharper", "S1854",
+            Justification = "The 'useless' assignment of 'bookingIdent' helps to build code in future.")]
         public static IEnumerable<AccountingDataJournalBooking> SampleBookings
         {
             get

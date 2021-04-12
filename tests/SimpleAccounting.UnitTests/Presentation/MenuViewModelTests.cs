@@ -6,14 +6,15 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Forms;
+    using System.Xml.Linq;
     using Caliburn.Micro;
     using FluentAssertions;
-    using FluentAssertions.Execution;
     using FluentAssertions.Extensions;
     using lg2de.SimpleAccounting.Abstractions;
     using lg2de.SimpleAccounting.Infrastructure;
@@ -71,7 +72,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.SwitchCultureCommand.Execute("dummy");
 
             dialogs.Received(1).ShowMessageBox(
-                Arg.Is<string>(x => x.Contains("must restart the application")),
+                Arg.Is<string>(x => x.Contains("must restart the application", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 icon: MessageBoxImage.Information);
             sut.IsGermanCulture.Should().BeFalse();
@@ -84,13 +85,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             MenuViewModel sut = CreateSut(out ProjectData projectData);
             projectData.IsModified = true;
-            var clone = projectData.Storage.Clone();
+            var originalXml = XDocument.Parse(projectData.Storage.Serialize());
 
             sut.NewProjectCommand.Execute(null);
 
-            var _ = new AssertionScope();
             projectData.IsModified.Should().BeTrue("project should still be modified");
-            projectData.Storage.Should().BeEquivalentTo(clone);
+            var newXml = XDocument.Parse(projectData.Storage.Serialize());
+            newXml.Should().BeEquivalentTo(originalXml);
         }
 
         [Fact]
@@ -128,7 +129,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.CloseYearCommand.Execute(null);
 
             var thisYear = DateTime.Now.Year;
-            sut.BookingYears.Select(x => x.Header).Should().Equal("2000", thisYear.ToString());
+            sut.BookingYears.Select(x => x.Header).Should().Equal("2000", thisYear.ToString(CultureInfo.InvariantCulture));
         }
 
         [Fact]
@@ -236,7 +237,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
             reportFactory.Received(1).CreateTotalsAndBalances(
                 projectData,
-                Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.ToList().All(y => y.Name != "EMPTY")));
+                Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.All(y => y.Name != "EMPTY")));
         }
 
         [Fact]

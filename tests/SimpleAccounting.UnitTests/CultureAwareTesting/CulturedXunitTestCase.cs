@@ -15,73 +15,77 @@ namespace Xunit
     using Xunit.Sdk;
 
     internal class CulturedXunitTestCase : XunitTestCase
-	{
-		string culture = "<unset>";
+    {
+        string culture = "<unset>";
 
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		[Obsolete("Called by the de-serializer; should only be called by deriving classes for de-serialization purposes")]
-		public CulturedXunitTestCase() { }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(
+            "Called by the de-serializer; should only be called by deriving classes for de-serialization purposes")]
+        public CulturedXunitTestCase() { }
 
-		public CulturedXunitTestCase(
-			IMessageSink diagnosticMessageSink,
-			TestMethodDisplay defaultMethodDisplay,
-			TestMethodDisplayOptions defaultMethodDisplayOptions,
-			ITestMethod testMethod,
-			string culture,
-			object?[]? testMethodArguments = null)
-				: base(diagnosticMessageSink, defaultMethodDisplay, defaultMethodDisplayOptions, testMethod, testMethodArguments)
-		{
-			Initialize(culture);
-		}
+        public CulturedXunitTestCase(
+            IMessageSink diagnosticMessageSink,
+            TestMethodDisplay defaultMethodDisplay,
+            TestMethodDisplayOptions defaultMethodDisplayOptions,
+            ITestMethod testMethod,
+            string culture,
+            object?[]? testMethodArguments = null)
+            : base(
+                diagnosticMessageSink, defaultMethodDisplay, defaultMethodDisplayOptions, testMethod,
+                testMethodArguments)
+        {
+            this.Initialize(culture);
+        }
 
-		void Initialize(string culture)
-		{
-			this.culture = culture;
+        void Initialize(string culture)
+        {
+            this.culture = culture;
 
-            Traits.Add("Culture", new List<string> { culture });
+            this.Traits.Add("Culture", new List<string> { culture });
 
-			DisplayName += $"[{culture}]";
-		}
+            this.DisplayName += $"[{culture}]";
+        }
 
-		protected override string GetUniqueID() => $"{base.GetUniqueID()}[{culture}]";
+        protected override string GetUniqueID() => $"{base.GetUniqueID()}[{this.culture}]";
 
-		public override void Deserialize(IXunitSerializationInfo data)
-		{
-			base.Deserialize(data);
+        public override void Deserialize(IXunitSerializationInfo data)
+        {
+            base.Deserialize(data);
 
-			Initialize(data.GetValue<string>("Culture"));
-		}
+            this.Initialize(data.GetValue<string>("Culture"));
+        }
 
-		public override void Serialize(IXunitSerializationInfo data)
-		{
-			base.Serialize(data);
+        public override void Serialize(IXunitSerializationInfo data)
+        {
+            base.Serialize(data);
 
-			data.AddValue("Culture", culture);
-		}
+            data.AddValue("Culture", this.culture);
+        }
 
-		public override async Task<RunSummary> RunAsync(
-			IMessageSink diagnosticMessageSink,
-			IMessageBus messageBus,
-			object?[] constructorArguments,
-			ExceptionAggregator aggregator,
-			CancellationTokenSource cancellationTokenSource)
-		{
-			var originalCulture = CultureInfo.CurrentCulture;
-			var originalUICulture = CultureInfo.CurrentUICulture;
+        public override async Task<RunSummary> RunAsync(
+            IMessageSink diagnosticMessageSink,
+            IMessageBus messageBus,
+            object?[] constructorArguments,
+            ExceptionAggregator aggregator,
+            CancellationTokenSource cancellationTokenSource)
+        {
+            var originalCulture = CultureInfo.CurrentCulture;
+            var originalUICulture = CultureInfo.CurrentUICulture;
 
-			try
-			{
-				var cultureInfo = new CultureInfo(culture);
-				CultureInfo.CurrentCulture = cultureInfo;
-				CultureInfo.CurrentUICulture = cultureInfo;
+            try
+            {
+                var cultureInfo = new CultureInfo(this.culture);
+                CultureInfo.CurrentCulture = cultureInfo;
+                CultureInfo.CurrentUICulture = cultureInfo;
 
-				return await base.RunAsync(diagnosticMessageSink, messageBus, constructorArguments, aggregator, cancellationTokenSource);
-			}
-			finally
-			{
-				CultureInfo.CurrentCulture = originalCulture;
-				CultureInfo.CurrentUICulture = originalUICulture;
-			}
-		}
-	}
+                return await base.RunAsync(
+                    diagnosticMessageSink, messageBus, constructorArguments, aggregator, cancellationTokenSource);
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = originalCulture;
+                CultureInfo.CurrentUICulture = originalUICulture;
+            }
+        }
+    }
 }
