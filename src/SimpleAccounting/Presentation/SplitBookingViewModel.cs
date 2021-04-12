@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Presentation
     public class SplitBookingViewModel : Screen
     {
         private ulong accountNumber;
+        private string bookingText = string.Empty;
 
         public ulong AccountNumber
         {
@@ -27,8 +28,24 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public int AccountIndex { get; set; } = -1;
 
-        public string BookingText { get; set; } = string.Empty;
+        public string BookingText
+        {
+            get => this.bookingText;
+            set
+            {
+                if (value == this.bookingText)
+                {
+                    return;
+                }
+
+                this.bookingText = value;
+                this.NotifyOfPropertyChange();
+                this.NotifyOfPropertyChange(nameof(this.IsBookingTextErrorThickness));
+            }
+        }
 
         public double BookingValue { get; set; }
+
+        public int IsBookingTextErrorThickness => string.IsNullOrWhiteSpace(this.BookingText) ? 1 : 0;
     }
 }

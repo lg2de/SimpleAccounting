@@ -65,18 +65,21 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
               </Grid.ColumnDefinitions>
-              <TextBox
+              <Border
                 Grid.Column="0"
-                Height="30"
-                Text="{Binding BookingText}"
-                ToolTip="{x:Static properties:Resources.Tooltip_SplitBookingValue}" />
+                BorderBrush="Red" BorderThickness="{Binding IsBookingTextErrorThickness}">
+                <TextBox
+                  Height="30"
+                  Text="{Binding BookingText, UpdateSourceTrigger=PropertyChanged}"
+                  ToolTip="{x:Static properties:Resources.Word_BookingText}" />
+              </Border>
               <local:NumberTextBox
                 Grid.Column="1"
                 Width="100" Height="30"
                 HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
                 Scale="2"
-                Text="{Binding BookingValue, StringFormat='#0.00'}"
-                ToolTip="{x:Static properties:Resources.Word_BookingText}" />
+                Text="{Binding BookingValue, StringFormat='#0.00', UpdateSourceTrigger=PropertyChanged}"
+                ToolTip="{x:Static properties:Resources.Tooltip_SplitBookingValue}" />
             </Grid>
             <local:NumberTextBox
               Grid.Column="0" Grid.Row="1"
