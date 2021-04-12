@@ -233,15 +233,13 @@ namespace lg2de.SimpleAccounting.Model
 
         public void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts)
         {
-            var uniqueId = item.UniqueId;
-            var journalIndex = this.CurrentYear.Booking.FindIndex(x => x.UniqueId == uniqueId);
-            if (journalIndex < 0)
+            if (item.StorageIndex < 0)
             {
                 // summary item selected => ignore
                 return;
             }
 
-            var journalEntry = this.CurrentYear.Booking[journalIndex];
+            var journalEntry = this.CurrentYear.Booking[item.StorageIndex];
 
             var bookingModel = new EditBookingViewModel(
                 this,
@@ -289,7 +287,7 @@ namespace lg2de.SimpleAccounting.Model
 
             // replace entry
             journalEntry = bookingModel.CreateJournalEntry();
-            this.CurrentYear.Booking[journalIndex] = journalEntry;
+            this.CurrentYear.Booking[item.StorageIndex] = journalEntry;
 
             this.IsModified = true;
 

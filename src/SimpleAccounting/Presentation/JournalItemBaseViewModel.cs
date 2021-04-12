@@ -41,6 +41,6 @@ namespace lg2de.SimpleAccounting.Presentation
             }
         }
 
-        public long UniqueId => ((long)(this.Identifier.GetHashCode()) << 32) + this.Text.GetHashCode();
+        public int StorageIndex { get; protected set; } = -1;
     }
 }

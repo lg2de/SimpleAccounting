@@ -9,6 +9,11 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     public class AccountJournalItemViewModel : JournalItemBaseViewModel
     {
+        public AccountJournalItemViewModel(int storageIndex)
+        {
+            this.StorageIndex = storageIndex;
+        }
+
         public double CreditValue { get; set; }
 
         public double DebitValue { get; set; }

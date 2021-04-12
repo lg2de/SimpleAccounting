@@ -45,9 +45,11 @@ namespace lg2de.SimpleAccounting.Presentation
                 .ThenBy(b => b.ID);
             foreach (var booking in bookings)
             {
-                var item = new FullJournalItemViewModel
+                var index = this.projectData.CurrentYear.Booking.IndexOf(booking);
+                var item = new FullJournalItemViewModel(index)
                 {
-                    Date = booking.Date.ToDateTime(), Identifier = booking.ID, IsFollowup = booking.Followup
+                    Identifier = booking.ID,
+                    Date = booking.Date.ToDateTime(), IsFollowup = booking.Followup
                 };
                 var debitAccounts = booking.Debit;
                 var creditAccounts = booking.Credit;
