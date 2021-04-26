@@ -187,6 +187,24 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to is account active.
+        /// </summary>
+        public static string EditAccount_AccountActive {
+            get {
+                return ResourceManager.GetString("EditAccount_AccountActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string EditAccount_ImportActive {
+            get {
+                return ResourceManager.GetString("EditAccount_ImportActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Booking data files (*.csv)|*.csv.
         /// </summary>
         public static string FileFilter_ImportData {
@@ -385,7 +403,8 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Achtung, keine Konten für einem Import konfiguriert..
+        ///   Looks up a localized string similar to Attention, currently no booking accounts are configured for import.
+        ///Without such configuration for at least one account, this function is disabled..
         /// </summary>
         public static string ImportData_MissingAccountWarning {
             get {
@@ -1129,15 +1148,6 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_IncomeType {
             get {
                 return ResourceManager.GetString("Word_IncomeType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to is active.
-        /// </summary>
-        public static string Word_IsActive {
-            get {
-                return ResourceManager.GetString("Word_IsActive", resourceCulture);
             }
         }
         

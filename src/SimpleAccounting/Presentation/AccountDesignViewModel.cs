@@ -29,6 +29,16 @@ namespace lg2de.SimpleAccounting.Presentation
 
             this.Groups = new List<AccountingDataAccountGroup> { new AccountingDataAccountGroup { Name = "MyGroup" } };
             this.Group = this.Groups.First();
+
+            this.IsImportActive = true;
+            this.DateSource = "Date column";
+            this.DateIgnorePattern = "ignore date";
+            this.NameSource = "Name column";
+            this.NameIgnorePattern = "ignore name";
+            this.TextSource = "Text column";
+            this.TextIgnorePattern = "ignore text";
+            this.ValueSource = "Value column";
+            this.ValueIgnorePattern = "ignore value";
         }
     }
 }

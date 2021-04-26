@@ -51,11 +51,7 @@ namespace lg2de.SimpleAccounting.Presentation
         ///     Gets all accounts available for importing (mapping available).
         /// </summary>
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
-            .Where(
-                a =>
-                    a.ImportMapping != null
-                    && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
-                    && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value));
+            .Where(a => a.ImportMapping != null && a.ImportMapping.IsValid());
 
         public bool IsImportPossible => this.ImportAccounts.Any();
 

@@ -74,22 +74,55 @@ namespace lg2de.SimpleAccounting.Presentation
             this.allAccounts.Clear();
             foreach (var accountGroup in accounts)
             {
-                foreach (var account in accountGroup.Account)
+                foreach (var accountModel in accountGroup.Account.Select(account => CreateViewModel(account, accountGroup)))
                 {
-                    var accountModel = new AccountViewModel
-                    {
-                        Identifier = account.ID,
-                        Name = account.Name,
-                        Group = accountGroup,
-                        Groups = accounts,
-                        Type = account.Type,
-                        IsActivated = account.Active
-                    };
                     this.allAccounts.Add(accountModel);
                 }
             }
 
             this.RefreshAccountList();
+
+            AccountViewModel CreateViewModel(AccountDefinition account, AccountingDataAccountGroup accountGroup)
+            {
+                var accountModel = new AccountViewModel
+                {
+                    Identifier = account.ID,
+                    Name = account.Name,
+                    Group = accountGroup,
+                    Groups = accounts,
+                    Type = account.Type,
+                    IsActivated = account.Active
+                };
+
+                if (account.ImportMapping == null)
+                {
+                    return accountModel;
+                }
+
+                accountModel.IsImportActive = true;
+                var dateColumn = account.ImportMapping.Columns.FirstOrDefault(
+                    x => x.Target == AccountDefinitionImportMappingColumnTarget.Date);
+                accountModel.DateSource = dateColumn?.Source;
+                accountModel.DateIgnorePattern = dateColumn?.IgnorePattern;
+                var nameColumn = account.ImportMapping.Columns.FirstOrDefault(
+                    x => x.Target == AccountDefinitionImportMappingColumnTarget.Name);
+                accountModel.NameSource = nameColumn?.Source;
+                accountModel.NameIgnorePattern = nameColumn?.IgnorePattern;
+                var textColumn = account.ImportMapping.Columns.FirstOrDefault(
+                    x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
+                accountModel.TextSource = textColumn?.Source;
+                accountModel.TextIgnorePattern = textColumn?.IgnorePattern;
+                var valueColumn = account.ImportMapping.Columns.FirstOrDefault(
+                    x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
+                accountModel.ValueSource = valueColumn?.Source;
+                accountModel.ValueIgnorePattern = valueColumn?.IgnorePattern;
+
+                foreach (var mappingPattern in account.ImportMapping.Patterns)
+                {
+                }
+
+                return accountModel;
+            }
         }
 
         public void SelectFirstAccount()

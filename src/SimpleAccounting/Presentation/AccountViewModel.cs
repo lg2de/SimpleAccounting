@@ -40,10 +40,41 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool IsActivated { get; set; } = true;
 
+        public bool IsImportActive { get; set; }
+
+        public string? DateSource { get; set; }
+
+        public string? DateIgnorePattern { get; set; }
+
+        public string? NameSource { get; set; }
+
+        public string? NameIgnorePattern { get; set; }
+
+        public string? TextSource { get; set; }
+
+        public string? TextIgnorePattern { get; set; }
+
+        public string? ValueSource { get; set; }
+
+        public string? ValueIgnorePattern { get; set; }
+
         public ICommand SaveCommand => new RelayCommand(
             _ => this.TryClose(true),
-            _ => !string.IsNullOrWhiteSpace(this.Name)
-                 && (this.IsValidIdentifierFunc?.Invoke(this.Identifier) ?? true));
+            _ =>
+            {
+                if (string.IsNullOrWhiteSpace(this.Name))
+                {
+                    return false;
+                }
+
+                if (this.IsImportActive
+                    && (string.IsNullOrWhiteSpace(this.DateSource) || string.IsNullOrWhiteSpace(this.ValueSource)))
+                {
+                    return false;
+                }
+
+                return this.IsValidIdentifierFunc?.Invoke(this.Identifier) ?? true;
+            });
 
         internal Func<ulong, bool>? IsValidIdentifierFunc { get; set; }
 

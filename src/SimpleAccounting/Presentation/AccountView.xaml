@@ -10,20 +10,8 @@
   mc:Ignorable="d"
   d:Background="Azure"
   d:DataContext="{d:DesignInstance Type=local:AccountDesignViewModel, IsDesignTimeCreatable=True}">
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*" />
-      <ColumnDefinition Width="*" MinWidth="200" />
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-    </Grid.RowDefinitions>
-    <Grid.Resources>
+  <StackPanel Orientation="Vertical">
+    <StackPanel.Resources>
       <Style TargetType="TextBlock">
         <Setter Property="Margin" Value="5" />
       </Style>
@@ -37,50 +25,120 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
       </Style>
-    </Grid.Resources>
-    <TextBlock
-      Grid.Column="0" Grid.Row="0"
-      Text="{x:Static properties:Resources.Word_AccountNumber}" />
-    <local:NumberTextBox
-      Grid.Column="1" Grid.Row="0"
-      Width="100" HorizontalContentAlignment="Right"
-      Text="{Binding Identifier}" />
+    </StackPanel.Resources>
+    <TabControl>
+      <TabItem Header="Basis">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" MinWidth="200" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+          <TextBlock
+            Grid.Column="0" Grid.Row="0"
+            Text="{x:Static properties:Resources.Word_AccountNumber}" />
+          <local:NumberTextBox
+            Grid.Column="1" Grid.Row="0"
+            Width="100" HorizontalContentAlignment="Right"
+            Text="{Binding Identifier}" />
 
-    <TextBlock
-      Grid.Column="0" Grid.Row="1"
-      Text="{x:Static properties:Resources.Word_AccountName}" />
-    <TextBox
-      Grid.Column="1" Grid.Row="1"
-      Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock
+            Grid.Column="0" Grid.Row="1"
+            Text="{x:Static properties:Resources.Word_AccountName}" />
+          <TextBox
+            Grid.Column="1" Grid.Row="1"
+            Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
-    <TextBlock
-      Grid.Column="0" Grid.Row="2"
-      Text="{x:Static properties:Resources.Word_AccountGroup}" />
-    <ComboBox
-      Grid.Column="1" Grid.Row="2"
-      ItemsSource="{Binding Groups}"
-      SelectedItem="{Binding Group}"
-      DisplayMemberPath="Name" />
+          <TextBlock
+            Grid.Column="0" Grid.Row="2"
+            Text="{x:Static properties:Resources.Word_AccountGroup}" />
+          <ComboBox
+            Grid.Column="1" Grid.Row="2"
+            ItemsSource="{Binding Groups}"
+            SelectedItem="{Binding Group}"
+            DisplayMemberPath="Name" />
 
-    <TextBlock
-      Grid.Column="0" Grid.Row="3"
-      Text="{x:Static properties:Resources.Word_AccountType}" />
-    <ComboBox
-      Grid.Column="1" Grid.Row="3"
-      ItemsSource="{Binding Types}"
-      SelectedItem="{Binding Type}" />
+          <TextBlock
+            Grid.Column="0" Grid.Row="3"
+            Text="{x:Static properties:Resources.Word_AccountType}" />
+          <ComboBox
+            Grid.Column="1" Grid.Row="3"
+            ItemsSource="{Binding Types}"
+            SelectedItem="{Binding Type}" />
 
-    <CheckBox
-      Grid.Column="1" Grid.Row="4"
-      Content="{x:Static properties:Resources.Word_IsActive}"
-      IsChecked="{Binding IsActivated}" />
+          <StackPanel
+            Grid.Column="1" Grid.Row="4"
+            Orientation="Vertical">
+            <CheckBox
+              Content="{x:Static properties:Resources.EditAccount_AccountActive}"
+              IsChecked="{Binding IsActivated}" />
+            <CheckBox
+              Content="{x:Static properties:Resources.EditAccount_ImportActive}"
+              IsChecked="{Binding IsImportActive}" />
+          </StackPanel>
+        </Grid>
+      </TabItem>
+      <TabItem Header="Import" IsEnabled="{Binding IsImportEnabled}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" MinWidth="150" />
+            <ColumnDefinition Width="Auto" MinWidth="150" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
 
+          <TextBlock Grid.Column="1" Grid.Row="0" Text="Source"></TextBlock>
+          <TextBlock Grid.Column="2" Grid.Row="0" Text="Ignore Pattern"></TextBlock>
+
+          <TextBlock Grid.Column="0" Grid.Row="1" Text="Date" />
+          <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding DateSource, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBox Grid.Column="2" Grid.Row="1" Text="{Binding DateIgnorePattern}" />
+
+          <TextBlock Grid.Column="0" Grid.Row="2" Text="Value" />
+          <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding ValueSource, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding ValueIgnorePattern}" />
+
+          <TextBlock Grid.Column="0" Grid.Row="3" Text="Text" />
+          <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding TextSource}" />
+          <TextBox Grid.Column="2" Grid.Row="3" Text="{Binding TextIgnorePattern}" />
+
+          <TextBlock Grid.Column="0" Grid.Row="4" Text="Name" />
+          <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding NameSource}" />
+          <TextBox Grid.Column="2" Grid.Row="4" Text="{Binding NameIgnorePattern}" />
+
+          <DataGrid
+            Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="5"
+            Height="150"
+            AutoGenerateColumns="False"
+            CanUserAddRows="True">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Expression" />
+              <DataGridTextColumn Header="Value" />
+              <DataGridTextColumn Header="Account" />
+            </DataGrid.Columns>
+          </DataGrid>
+        </Grid>
+      </TabItem>
+    </TabControl>
     <StackPanel
-      Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5"
       Margin="0 30 0 0"
       Orientation="Horizontal" HorizontalAlignment="Right">
       <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding SaveCommand}" IsDefault="True" />
       <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
     </StackPanel>
-  </Grid>
+  </StackPanel>
 </UserControl>
