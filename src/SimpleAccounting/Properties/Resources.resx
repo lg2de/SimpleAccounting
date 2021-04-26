@@ -542,4 +542,8 @@ When answering 'No' the backup file will be deleted.</value>
   <data name="ImportData_UseReverseOrder" xml:space="preserve">
     <value>Import in reverse order</value>
   </data>
+  <data name="ImportData_MissingAccountWarning" xml:space="preserve">
+    <value>Attention, currently no booking accounts are configured for import.
+Without such configuration for at least one account, this function is disabled.</value>
+  </data>
 </root>

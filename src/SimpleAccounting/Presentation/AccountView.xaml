@@ -8,6 +8,7 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
+  d:Background="Azure"
   d:DataContext="{d:DesignInstance Type=local:AccountDesignViewModel, IsDesignTimeCreatable=True}">
   <Grid>
     <Grid.ColumnDefinitions>

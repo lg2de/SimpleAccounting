@@ -57,6 +57,10 @@ namespace lg2de.SimpleAccounting.Presentation
                     && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
                     && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value));
 
+        public bool IsImportPossible => this.ImportAccounts.Any();
+
+        public bool IsImportBroken => !this.ImportAccounts.Any();
+
         /// <summary>
         ///     Gets the minimal date valid for selecting <see cref="StartDate"/>.
         /// </summary>
@@ -121,7 +125,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     .OrderBy(x => x.Date));
 
         public bool IsForceEnglish { get; set; }
-        
+
         public  bool IsReverseOrder { get; set; }
 
         public IBusy Busy { get; } = new BusyControlModel();
@@ -222,7 +226,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     loadedEntries = loadedEntries.Reverse();
                 }
-                
+
                 foreach (var item in loadedEntries)
                 {
                     if (item.Date < this.RangeMin || item.Date > this.RangeMax)

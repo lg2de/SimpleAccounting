@@ -385,6 +385,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Achtung, keine Konten für einem Import konfiguriert..
+        /// </summary>
+        public static string ImportData_MissingAccountWarning {
+            get {
+                return ResourceManager.GetString("ImportData_MissingAccountWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No relevant data found in {0}..
         /// </summary>
         public static string ImportData_NoRelevantDataFoundInX {
