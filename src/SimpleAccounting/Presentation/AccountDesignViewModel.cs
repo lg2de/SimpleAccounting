@@ -27,14 +27,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.Type = AccountDefinitionType.Asset;
             this.IsActivated = true;
 
-            this.Groups = new List<AccountingDataAccountGroup>
-            {
-                new AccountingDataAccountGroup
-                {
-                    Name = "MyGroup",
-                    Account = new List<AccountDefinition> { new AccountDefinition { ID = 100, Name = "Bank" } }
-                }
-            };
+            this.Groups = new List<AccountingDataAccountGroup> { new AccountingDataAccountGroup { Name = "MyGroup" } };
             this.Group = this.Groups.First();
 
             this.IsImportActive = true;
@@ -47,7 +40,8 @@ namespace lg2de.SimpleAccounting.Presentation
             this.ImportValueSource = "Value column";
             this.ImportValueIgnorePattern = "ignore value";
 
-            this.ImportPatterns.Add(new ImportPatternViewModel("RegEx") { Value = 29.95, AccountNumber = 100 });
+            var accounts = new List<AccountDefinition> { new AccountDefinition { ID = 100, Name = "Bank" } };
+            this.ImportPatterns.Add(new ImportPatternViewModel(accounts, "RegEx") { Value = 29.95, Account = accounts.First()});
         }
     }
 }

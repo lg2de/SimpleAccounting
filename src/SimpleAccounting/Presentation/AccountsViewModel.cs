@@ -73,17 +73,23 @@ namespace lg2de.SimpleAccounting.Presentation
         public void LoadAccounts(IReadOnlyCollection<AccountingDataAccountGroup> accounts)
         {
             this.allAccounts.Clear();
+            var selectableAccounts = accounts.SelectMany(x => x.Account)
+                .Where(x => x.Type != AccountDefinitionType.Carryforward).ToList();
             foreach (var accountGroup in accounts)
             {
-                foreach (var accountModel in accountGroup.Account.Select(account => CreateViewModel(account, accountGroup)))
+                foreach (AccountDefinition account in accountGroup.Account)
                 {
+                    var accountsForImport = selectableAccounts.Where(x => x.ID != account.ID).ToList();
+                    var accountModel = CreateViewModel(account, accountGroup, accountsForImport);
                     this.allAccounts.Add(accountModel);
                 }
             }
 
             this.RefreshAccountList();
 
-            AccountViewModel CreateViewModel(AccountDefinition account, AccountingDataAccountGroup accountGroup)
+            AccountViewModel CreateViewModel(
+                AccountDefinition account, AccountingDataAccountGroup accountGroup,
+                IList<AccountDefinition> accountsForImport)
             {
                 var accountModel = new AccountViewModel
                 {
@@ -125,9 +131,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 accountModel.ImportPatterns = new ObservableCollection<ImportPatternViewModel>(
                     account.ImportMapping.Patterns.Select(
-                        x => new ImportPatternViewModel(x.Expression)
+                        x => new ImportPatternViewModel(accountsForImport, x.Expression)
                         {
-                            AccountNumber = x.AccountID,
+                            Account = accountsForImport.First(a => a.ID == x.AccountID),
                             Value = x.ValueSpecified ? x.Value.ToViewModel() : (double?)null
                         }));
 
@@ -227,6 +233,8 @@ namespace lg2de.SimpleAccounting.Presentation
                         }));
             }
 
+            UpdateImportMapping(vm, accountData);
+
             // update view
             account.Name = vm.Name;
             account.Group = vm.Group;
@@ -245,6 +253,68 @@ namespace lg2de.SimpleAccounting.Presentation
                     entry.Account = newIdentifier;
                 }
             }
+        }
+
+        private void UpdateImportMapping(AccountViewModel viewModel, AccountDefinition accountDefinition)
+        {
+            if (!viewModel.IsImportActive)
+            {
+                accountDefinition.ImportMapping = null;
+                return;
+            }
+
+            accountDefinition.ImportMapping = new AccountDefinitionImportMapping
+            {
+                Columns = new List<AccountDefinitionImportMappingColumn>
+                {
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Target = AccountDefinitionImportMappingColumnTarget.Date,
+                        Source = viewModel.ImportDateSource,
+                        IgnorePattern = viewModel.ImportDateIgnorePattern
+                    },
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Target = AccountDefinitionImportMappingColumnTarget.Value,
+                        Source = viewModel.ImportValueSource,
+                        IgnorePattern = viewModel.ImportValueIgnorePattern
+                    }
+                }
+            };
+
+            if (!string.IsNullOrWhiteSpace(viewModel.ImportTextSource))
+            {
+                accountDefinition.ImportMapping.Columns.Add(new AccountDefinitionImportMappingColumn
+                {
+                    Target = AccountDefinitionImportMappingColumnTarget.Text,
+                    Source = viewModel.ImportTextSource,
+                    IgnorePattern = viewModel.ImportTextIgnorePattern
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(viewModel.ImportNameSource))
+            {
+                accountDefinition.ImportMapping.Columns.Add(new AccountDefinitionImportMappingColumn
+                {
+                    Target = AccountDefinitionImportMappingColumnTarget.Name,
+                    Source = viewModel.ImportNameSource,
+                    IgnorePattern = viewModel.ImportNameIgnorePattern
+                });
+            }
+
+            if (!viewModel.ImportPatterns.Any())
+            {
+                return;
+            }
+
+            accountDefinition.ImportMapping.Patterns = viewModel.ImportPatterns.Select(
+                x => new AccountDefinitionImportMappingPattern
+                {
+                    Expression = x.Expression,
+                    Value = x.Value?.ToModelValue() ?? 0,
+                    ValueSpecified = x.Value.HasValue,
+                    AccountID = x.Account.ID
+                }).ToList();
         }
 
         private void RefreshAccountList()

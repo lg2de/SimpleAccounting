@@ -5,16 +5,23 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Text.RegularExpressions;
+    using lg2de.SimpleAccounting.Model;
 
     public class ImportPatternViewModel
     {
         private string expression;
 
-        public ImportPatternViewModel(string expression)
+        public ImportPatternViewModel(IList<AccountDefinition> accounts, string expression)
         {
+            this.Accounts = accounts;
+            this.Account = accounts.First();
             this.expression = expression;
         }
+
+        public IList<AccountDefinition> Accounts { get; }
 
         public string Expression
         {
@@ -41,6 +48,6 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public double? Value { get; set; }
 
-        public ulong AccountNumber { get; set; }
+        public AccountDefinition Account { get; set; }
     }
 }

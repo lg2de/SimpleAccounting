@@ -134,7 +134,7 @@
             Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="5"
             MinHeight="150"
             AutoGenerateColumns="False"
-            CanUserAddRows="True"
+            CanUserAddRows="True" CanUserDeleteRows="True"
             ItemsSource="{Binding ImportPatterns}">
             <DataGrid.Resources>
               <Style x:Key="ErrorStyle" TargetType="{x:Type TextBox}">
@@ -167,16 +167,38 @@
                 <DataGridTextColumn.Binding>
                   <Binding
                     Path="Value"
-                    Converter="{StaticResource NullableValueConverter}"
-                    UpdateSourceTrigger="PropertyChanged" />
+                    Converter="{StaticResource NullableValueConverter}" />
                 </DataGridTextColumn.Binding>
               </DataGridTextColumn>
-              <DataGridTextColumn Header="Account">
-                <DataGridTextColumn.Binding>
-                  <Binding Path="AccountNumber" />
-                </DataGridTextColumn.Binding>
-              </DataGridTextColumn>
+              <DataGridTemplateColumn
+                Header="{x:Static properties:Resources.Word_RemoteAccount}" MinWidth="150">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate DataType="{x:Type local:ImportPatternViewModel}">
+                    <Grid>
+                      <ComboBox
+                        Margin="0"
+                        ItemsSource="{Binding Accounts}"
+                        SelectedItem="{Binding Account, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        ItemTemplate="{StaticResource AccountSelectionTemplate}"
+                        TextSearch.TextPath="Name" />
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
             </DataGrid.Columns>
+            <DataGrid.CellStyle>
+              <Style TargetType="{x:Type DataGridCell}">
+                <Setter Property="Template">
+                  <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                      <Grid Background="{TemplateBinding Background}">
+                        <ContentPresenter VerticalAlignment="Center" Margin="2" />
+                      </Grid>
+                    </ControlTemplate>
+                  </Setter.Value>
+                </Setter>
+              </Style>
+            </DataGrid.CellStyle>
           </DataGrid>
         </Grid>
       </TabItem>
