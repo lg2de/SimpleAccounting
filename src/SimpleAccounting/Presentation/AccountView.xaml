@@ -9,9 +9,11 @@
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
   d:Background="Azure"
+  d:DesignWidth="500" d:DesignHeight="600"
   d:DataContext="{d:DesignInstance Type=local:AccountDesignViewModel, IsDesignTimeCreatable=True}">
-  <StackPanel Orientation="Vertical">
-    <StackPanel.Resources>
+  <DockPanel>
+    <DockPanel.Resources>
+      <local:NullableValueConverter x:Key="NullableValueConverter" />
       <Style TargetType="TextBlock">
         <Setter Property="Margin" Value="5" />
       </Style>
@@ -25,7 +27,14 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
       </Style>
-    </StackPanel.Resources>
+    </DockPanel.Resources>
+    <StackPanel
+      DockPanel.Dock="Bottom"
+      Margin="0 30 0 0"
+      Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding SaveCommand}" IsDefault="True" />
+      <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
+    </StackPanel>
     <TabControl>
       <TabItem Header="Basis">
         <Grid>
@@ -85,12 +94,13 @@
           </StackPanel>
         </Grid>
       </TabItem>
-      <TabItem Header="Import" IsEnabled="{Binding IsImportEnabled}">
-        <Grid>
+      <TabItem Header="Import" IsEnabled="{Binding IsImportActive}">
+        <Grid VerticalAlignment="Stretch">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" MinWidth="150" />
             <ColumnDefinition Width="Auto" MinWidth="150" />
+            <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -98,47 +108,78 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
           </Grid.RowDefinitions>
 
-          <TextBlock Grid.Column="1" Grid.Row="0" Text="Source"></TextBlock>
-          <TextBlock Grid.Column="2" Grid.Row="0" Text="Ignore Pattern"></TextBlock>
+          <TextBlock Grid.Column="1" Grid.Row="0" Text="Source" />
+          <TextBlock Grid.Column="2" Grid.Row="0" Text="Ignore Pattern" />
 
           <TextBlock Grid.Column="0" Grid.Row="1" Text="Date" />
-          <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding DateSource, UpdateSourceTrigger=PropertyChanged}" />
-          <TextBox Grid.Column="2" Grid.Row="1" Text="{Binding DateIgnorePattern}" />
+          <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding ImportDateSource, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBox Grid.Column="2" Grid.Row="1" Text="{Binding ImportDateIgnorePattern}" />
 
           <TextBlock Grid.Column="0" Grid.Row="2" Text="Value" />
-          <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding ValueSource, UpdateSourceTrigger=PropertyChanged}" />
-          <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding ValueIgnorePattern}" />
+          <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding ImportValueSource, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding ImportValueIgnorePattern}" />
 
           <TextBlock Grid.Column="0" Grid.Row="3" Text="Text" />
-          <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding TextSource}" />
-          <TextBox Grid.Column="2" Grid.Row="3" Text="{Binding TextIgnorePattern}" />
+          <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding ImportTextSource}" />
+          <TextBox Grid.Column="2" Grid.Row="3" Text="{Binding ImportTextIgnorePattern}" />
 
           <TextBlock Grid.Column="0" Grid.Row="4" Text="Name" />
-          <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding NameSource}" />
-          <TextBox Grid.Column="2" Grid.Row="4" Text="{Binding NameIgnorePattern}" />
+          <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding ImportNameSource}" />
+          <TextBox Grid.Column="2" Grid.Row="4" Text="{Binding ImportNameIgnorePattern}" />
 
           <DataGrid
-            Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="5"
-            Height="150"
+            Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="5"
+            MinHeight="150"
             AutoGenerateColumns="False"
-            CanUserAddRows="True">
+            CanUserAddRows="True"
+            ItemsSource="{Binding ImportPatterns}">
+            <DataGrid.Resources>
+              <Style x:Key="ErrorStyle" TargetType="{x:Type TextBox}">
+                <Setter Property="Padding" Value="-2" />
+                <Style.Triggers>
+                  <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="Background" Value="Red" />
+                    <Setter Property="ToolTip">
+                      <Setter.Value>
+                        <Binding
+                          RelativeSource="{RelativeSource Self}"
+                          Path="(Validation.Errors)[0].ErrorContent" />
+                      </Setter.Value>
+                    </Setter>
+                  </Trigger>
+                </Style.Triggers>
+              </Style>
+            </DataGrid.Resources>
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Expression" />
-              <DataGridTextColumn Header="Value" />
-              <DataGridTextColumn Header="Account" />
+              <DataGridTextColumn Header="Expression" EditingElementStyle="{StaticResource ErrorStyle}">
+                <DataGridTextColumn.Binding>
+                  <Binding Path="Expression" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                      <ExceptionValidationRule />
+                    </Binding.ValidationRules>
+                  </Binding>
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
+              <DataGridTextColumn Header="Value" EditingElementStyle="{StaticResource ErrorStyle}">
+                <DataGridTextColumn.Binding>
+                  <Binding
+                    Path="Value"
+                    Converter="{StaticResource NullableValueConverter}"
+                    UpdateSourceTrigger="PropertyChanged" />
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
+              <DataGridTextColumn Header="Account">
+                <DataGridTextColumn.Binding>
+                  <Binding Path="AccountNumber" />
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
             </DataGrid.Columns>
           </DataGrid>
         </Grid>
       </TabItem>
     </TabControl>
-    <StackPanel
-      Margin="0 30 0 0"
-      Orientation="Horizontal" HorizontalAlignment="Right">
-      <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding SaveCommand}" IsDefault="True" />
-      <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
-    </StackPanel>
-  </StackPanel>
+  </DockPanel>
 </UserControl>

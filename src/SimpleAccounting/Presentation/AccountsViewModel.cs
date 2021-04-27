@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
@@ -102,24 +103,33 @@ namespace lg2de.SimpleAccounting.Presentation
                 accountModel.IsImportActive = true;
                 var dateColumn = account.ImportMapping.Columns.FirstOrDefault(
                     x => x.Target == AccountDefinitionImportMappingColumnTarget.Date);
-                accountModel.DateSource = dateColumn?.Source;
-                accountModel.DateIgnorePattern = dateColumn?.IgnorePattern;
+                accountModel.ImportDateSource = dateColumn?.Source;
+                accountModel.ImportDateIgnorePattern = dateColumn?.IgnorePattern;
                 var nameColumn = account.ImportMapping.Columns.FirstOrDefault(
                     x => x.Target == AccountDefinitionImportMappingColumnTarget.Name);
-                accountModel.NameSource = nameColumn?.Source;
-                accountModel.NameIgnorePattern = nameColumn?.IgnorePattern;
+                accountModel.ImportNameSource = nameColumn?.Source;
+                accountModel.ImportNameIgnorePattern = nameColumn?.IgnorePattern;
                 var textColumn = account.ImportMapping.Columns.FirstOrDefault(
                     x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
-                accountModel.TextSource = textColumn?.Source;
-                accountModel.TextIgnorePattern = textColumn?.IgnorePattern;
+                accountModel.ImportTextSource = textColumn?.Source;
+                accountModel.ImportTextIgnorePattern = textColumn?.IgnorePattern;
                 var valueColumn = account.ImportMapping.Columns.FirstOrDefault(
                     x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
-                accountModel.ValueSource = valueColumn?.Source;
-                accountModel.ValueIgnorePattern = valueColumn?.IgnorePattern;
+                accountModel.ImportValueSource = valueColumn?.Source;
+                accountModel.ImportValueIgnorePattern = valueColumn?.IgnorePattern;
 
-                foreach (var mappingPattern in account.ImportMapping.Patterns)
+                if (account.ImportMapping.Patterns == null)
                 {
+                    return accountModel;
                 }
+
+                accountModel.ImportPatterns = new ObservableCollection<ImportPatternViewModel>(
+                    account.ImportMapping.Patterns.Select(
+                        x => new ImportPatternViewModel(x.Expression)
+                        {
+                            AccountNumber = x.AccountID,
+                            Value = x.ValueSpecified ? x.Value.ToViewModel() : (double?)null
+                        }));
 
                 return accountModel;
             }

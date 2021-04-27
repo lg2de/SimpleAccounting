@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
@@ -15,8 +16,10 @@ namespace lg2de.SimpleAccounting.Presentation
     /// <summary>
     ///     Implements the view model for a single account.
     /// </summary>
-    public class AccountViewModel : Screen
+    internal class AccountViewModel : Screen
     {
+        private bool isImportActive;
+
         static AccountViewModel()
         {
             foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)))
@@ -40,23 +43,40 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool IsActivated { get; set; } = true;
 
-        public bool IsImportActive { get; set; }
+        public bool IsImportActive
+        {
+            get => this.isImportActive;
+            set
+            {
+                if (value == this.isImportActive)
+                {
+                    return;
+                }
 
-        public string? DateSource { get; set; }
+                this.isImportActive = value;
+                this.NotifyOfPropertyChange();
+                this.NotifyOfPropertyChange(nameof(this.SaveCommand));
+            }
+        }
 
-        public string? DateIgnorePattern { get; set; }
+        public string? ImportDateSource { get; set; }
 
-        public string? NameSource { get; set; }
+        public string? ImportDateIgnorePattern { get; set; }
 
-        public string? NameIgnorePattern { get; set; }
+        public string? ImportNameSource { get; set; }
 
-        public string? TextSource { get; set; }
+        public string? ImportNameIgnorePattern { get; set; }
 
-        public string? TextIgnorePattern { get; set; }
+        public string? ImportTextSource { get; set; }
 
-        public string? ValueSource { get; set; }
+        public string? ImportTextIgnorePattern { get; set; }
 
-        public string? ValueIgnorePattern { get; set; }
+        public string? ImportValueSource { get; set; }
+
+        public string? ImportValueIgnorePattern { get; set; }
+
+        public ObservableCollection<ImportPatternViewModel> ImportPatterns { get; set; } =
+            new ObservableCollection<ImportPatternViewModel>();
 
         public ICommand SaveCommand => new RelayCommand(
             _ => this.TryClose(true),
@@ -68,7 +88,8 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 if (this.IsImportActive
-                    && (string.IsNullOrWhiteSpace(this.DateSource) || string.IsNullOrWhiteSpace(this.ValueSource)))
+                    && (string.IsNullOrWhiteSpace(this.ImportDateSource) ||
+                        string.IsNullOrWhiteSpace(this.ImportValueSource)))
                 {
                     return false;
                 }

@@ -27,18 +27,27 @@ namespace lg2de.SimpleAccounting.Presentation
             this.Type = AccountDefinitionType.Asset;
             this.IsActivated = true;
 
-            this.Groups = new List<AccountingDataAccountGroup> { new AccountingDataAccountGroup { Name = "MyGroup" } };
+            this.Groups = new List<AccountingDataAccountGroup>
+            {
+                new AccountingDataAccountGroup
+                {
+                    Name = "MyGroup",
+                    Account = new List<AccountDefinition> { new AccountDefinition { ID = 100, Name = "Bank" } }
+                }
+            };
             this.Group = this.Groups.First();
 
             this.IsImportActive = true;
-            this.DateSource = "Date column";
-            this.DateIgnorePattern = "ignore date";
-            this.NameSource = "Name column";
-            this.NameIgnorePattern = "ignore name";
-            this.TextSource = "Text column";
-            this.TextIgnorePattern = "ignore text";
-            this.ValueSource = "Value column";
-            this.ValueIgnorePattern = "ignore value";
+            this.ImportDateSource = "Date column";
+            this.ImportDateIgnorePattern = "ignore date";
+            this.ImportNameSource = "Name column";
+            this.ImportNameIgnorePattern = "ignore name";
+            this.ImportTextSource = "Text column";
+            this.ImportTextIgnorePattern = "ignore text";
+            this.ImportValueSource = "Value column";
+            this.ImportValueIgnorePattern = "ignore value";
+
+            this.ImportPatterns.Add(new ImportPatternViewModel("RegEx") { Value = 29.95, AccountNumber = 100 });
         }
     }
 }
