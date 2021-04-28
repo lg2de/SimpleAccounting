@@ -5,23 +5,15 @@
 namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Text.RegularExpressions;
     using lg2de.SimpleAccounting.Model;
 
+    /// <summary>
+    ///     Implements the view model to visualize single pattern for semi-automatic booking import.
+    /// </summary>
     public class ImportPatternViewModel
     {
-        private string expression;
-
-        public ImportPatternViewModel(IList<AccountDefinition> accounts, string expression)
-        {
-            this.Accounts = accounts;
-            this.Account = accounts.First();
-            this.expression = expression;
-        }
-
-        public IList<AccountDefinition> Accounts { get; }
+        private string expression = string.Empty;
 
         public string Expression
         {
@@ -35,19 +27,19 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 try
                 {
-                    var _ = new Regex(value);
+                    this.expression = (new Regex(value)).ToString();
                 }
                 catch
                 {
                     throw new ArgumentException("The expression must be a valid regular expression.");
                 }
-
-                this.expression = value;
             }
         }
 
         public double? Value { get; set; }
 
-        public AccountDefinition Account { get; set; }
+        public ulong AccountId { get; set; }
+
+        public AccountDefinition? Account { get; set; }
     }
 }

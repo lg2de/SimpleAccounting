@@ -73,14 +73,11 @@ namespace lg2de.SimpleAccounting.Presentation
         public void LoadAccounts(IReadOnlyCollection<AccountingDataAccountGroup> accounts)
         {
             this.allAccounts.Clear();
-            var selectableAccounts = accounts.SelectMany(x => x.Account)
-                .Where(x => x.Type != AccountDefinitionType.Carryforward).ToList();
             foreach (var accountGroup in accounts)
             {
                 foreach (AccountDefinition account in accountGroup.Account)
                 {
-                    var accountsForImport = selectableAccounts.Where(x => x.ID != account.ID).ToList();
-                    var accountModel = CreateViewModel(account, accountGroup, accountsForImport);
+                    var accountModel = CreateViewModel(account, accountGroup);
                     this.allAccounts.Add(accountModel);
                 }
             }
@@ -88,8 +85,7 @@ namespace lg2de.SimpleAccounting.Presentation
             this.RefreshAccountList();
 
             AccountViewModel CreateViewModel(
-                AccountDefinition account, AccountingDataAccountGroup accountGroup,
-                IList<AccountDefinition> accountsForImport)
+                AccountDefinition account, AccountingDataAccountGroup accountGroup)
             {
                 var accountModel = new AccountViewModel
                 {
@@ -131,9 +127,10 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 accountModel.ImportPatterns = new ObservableCollection<ImportPatternViewModel>(
                     account.ImportMapping.Patterns.Select(
-                        x => new ImportPatternViewModel(accountsForImport, x.Expression)
+                        x => new ImportPatternViewModel
                         {
-                            Account = accountsForImport.First(a => a.ID == x.AccountID),
+                            Expression = x.Expression,
+                            AccountId = x.AccountID,
                             Value = x.ValueSpecified ? x.Value.ToViewModel() : (double?)null
                         }));
 
@@ -167,6 +164,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 Groups = this.projectData.Storage.Accounts,
                 IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
             };
+            this.UpdateImportCandidates(accountVm);
             var result = this.windowManager.ShowDialog(accountVm);
             if (result != true)
             {
@@ -208,6 +206,8 @@ namespace lg2de.SimpleAccounting.Presentation
             var invalidIds = this.AllAccounts.Select(x => x.Identifier).Where(x => x != account.Identifier)
                 .ToList();
             vm.IsValidIdentifierFunc = id => !invalidIds.Contains(id);
+            this.UpdateImportCandidates(vm);
+
             var result = this.windowManager.ShowDialog(vm);
             if (result != true)
             {
@@ -233,7 +233,7 @@ namespace lg2de.SimpleAccounting.Presentation
                         }));
             }
 
-            UpdateImportMapping(vm, accountData);
+            this.UpdateImportMapping(vm, accountData);
 
             // update view
             account.Name = vm.Name;
@@ -252,6 +252,18 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     entry.Account = newIdentifier;
                 }
+            }
+        }
+
+        private void UpdateImportCandidates(AccountViewModel accountViewModel)
+        {
+            accountViewModel.ImportRemoteAccounts =
+                this.projectData.Storage.Accounts.SelectMany(x => x.Account)
+                    .Where(x => x.Type != AccountDefinitionType.Carryforward)
+                    .Where(x => x.ID != accountViewModel.Identifier).ToList();
+            foreach (var importPattern in accountViewModel.ImportPatterns)
+            {
+                importPattern.Account = accountViewModel.ImportRemoteAccounts.FirstOrDefault(x => x.ID == importPattern.AccountId);
             }
         }
 
@@ -313,7 +325,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     Expression = x.Expression,
                     Value = x.Value?.ToModelValue() ?? 0,
                     ValueSpecified = x.Value.HasValue,
-                    AccountID = x.Account.ID
+                    AccountID = x.Account?.ID ?? 0
                 }).ToList();
         }
 

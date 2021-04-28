@@ -75,6 +75,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public string? ImportValueIgnorePattern { get; set; }
 
+        public IList<AccountDefinition> ImportRemoteAccounts { get; set; } = new List<AccountDefinition>();
+
         public ObservableCollection<ImportPatternViewModel> ImportPatterns { get; set; } =
             new ObservableCollection<ImportPatternViewModel>();
 
@@ -87,14 +89,27 @@ namespace lg2de.SimpleAccounting.Presentation
                     return false;
                 }
 
-                if (this.IsImportActive
-                    && (string.IsNullOrWhiteSpace(this.ImportDateSource) ||
-                        string.IsNullOrWhiteSpace(this.ImportValueSource)))
+                if (this.IsValidIdentifierFunc?.Invoke(this.Identifier) == false)
                 {
                     return false;
                 }
 
-                return this.IsValidIdentifierFunc?.Invoke(this.Identifier) ?? true;
+                if (!this.IsImportActive)
+                {
+                    return true;
+                }
+
+                if (string.IsNullOrWhiteSpace(this.ImportDateSource))
+                {
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(this.ImportValueSource))
+                {
+                    return false;
+                }
+
+                return this.ImportPatterns.All(x => !string.IsNullOrWhiteSpace(x.Expression) && x.Account != null);
             });
 
         internal Func<ulong, bool>? IsValidIdentifierFunc { get; set; }

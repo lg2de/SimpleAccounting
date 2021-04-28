@@ -154,7 +154,7 @@
               </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Expression" EditingElementStyle="{StaticResource ErrorStyle}">
+              <DataGridTextColumn Header="Expression" MinWidth="100" EditingElementStyle="{StaticResource ErrorStyle}">
                 <DataGridTextColumn.Binding>
                   <Binding Path="Expression" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
@@ -163,7 +163,7 @@
                   </Binding>
                 </DataGridTextColumn.Binding>
               </DataGridTextColumn>
-              <DataGridTextColumn Header="Value" EditingElementStyle="{StaticResource ErrorStyle}">
+              <DataGridTextColumn Header="Value" MinWidth="80" EditingElementStyle="{StaticResource ErrorStyle}">
                 <DataGridTextColumn.Binding>
                   <Binding
                     Path="Value"
@@ -177,10 +177,14 @@
                     <Grid>
                       <ComboBox
                         Margin="0"
-                        ItemsSource="{Binding Accounts}"
                         SelectedItem="{Binding Account, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                        TextSearch.TextPath="Name" />
+                        TextSearch.TextPath="Name">
+                        <ComboBox.ItemsSource>
+                          <Binding Path="DataContext.ImportRemoteAccounts"
+                                   RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:AccountView}}" />
+                        </ComboBox.ItemsSource>
+                      </ComboBox>
                     </Grid>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>

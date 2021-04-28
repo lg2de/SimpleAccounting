@@ -40,8 +40,12 @@ namespace lg2de.SimpleAccounting.Presentation
             this.ImportValueSource = "Value column";
             this.ImportValueIgnorePattern = "ignore value";
 
-            var accounts = new List<AccountDefinition> { new AccountDefinition { ID = 100, Name = "Bank" } };
-            this.ImportPatterns.Add(new ImportPatternViewModel(accounts, "RegEx") { Value = 29.95, Account = accounts.First()});
+            this.ImportRemoteAccounts = new List<AccountDefinition> { new AccountDefinition { ID = 100, Name = "Bank" } };
+            this.ImportPatterns.Add(
+                new ImportPatternViewModel
+                {
+                    Expression = "RegEx", Value = 29.95, Account = this.ImportRemoteAccounts.First()
+                });
         }
     }
 }
