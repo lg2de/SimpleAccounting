@@ -161,6 +161,29 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             }
         }
 
+        public static AccountDefinitionImportMapping SimpleImportConfiguration
+        {
+            get
+            {
+                return new AccountDefinitionImportMapping
+                {
+                    Columns = new List<AccountDefinitionImportMappingColumn>
+                    {
+                        new AccountDefinitionImportMappingColumn
+                        {
+                            Target = AccountDefinitionImportMappingColumnTarget.Date,
+                            Source = "Date"
+                        },
+                        new AccountDefinitionImportMappingColumn
+                        {
+                            Target = AccountDefinitionImportMappingColumnTarget.Value,
+                            Source = "Value"
+                        }
+                    }
+                };
+            }
+        }
+
         [SuppressMessage("ReSharper", "RedundantAssignment")]
         [SuppressMessage(
             "ReSharper", "S1854",

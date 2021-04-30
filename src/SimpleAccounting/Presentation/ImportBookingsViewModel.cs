@@ -53,8 +53,14 @@ namespace lg2de.SimpleAccounting.Presentation
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
             .Where(a => a.ImportMapping != null && a.ImportMapping.IsValid());
 
+        /// <summary>
+        ///     Gets a value indicating whether importing is currently possible.
+        /// </summary>
         public bool IsImportPossible => this.ImportAccounts.Any();
 
+        /// <summary>
+        ///     Gets a value indicating whether importing is currently not possible.
+        /// </summary>
         public bool IsImportBroken => !this.ImportAccounts.Any();
 
         /// <summary>
