@@ -65,13 +65,8 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public void OnDataLoaded()
         {
-            this.LoadAccounts(this.projectData.Storage.Accounts);
-        }
-
-        public void LoadAccounts(IReadOnlyCollection<AccountingDataAccountGroup> accounts)
-        {
             this.allAccounts.Clear();
-            foreach (var accountGroup in accounts)
+            foreach (var accountGroup in this.projectData.Storage.Accounts)
             {
                 foreach (AccountDefinition account in accountGroup.Account)
                 {
@@ -90,7 +85,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     Identifier = account.ID,
                     Name = account.Name,
                     Group = accountGroup,
-                    Groups = accounts,
+                    Groups = this.projectData.Storage.Accounts,
                     Type = account.Type,
                     IsActivated = account.Active
                 };
@@ -101,19 +96,19 @@ namespace lg2de.SimpleAccounting.Presentation
                 }
 
                 accountModel.IsImportActive = true;
-                var dateColumn = account.ImportMapping.Columns.FirstOrDefault(
+                var dateColumn = account.ImportMapping.Columns?.FirstOrDefault(
                     x => x.Target == AccountDefinitionImportMappingColumnTarget.Date);
                 accountModel.ImportDateSource = dateColumn?.Source;
                 accountModel.ImportDateIgnorePattern = dateColumn?.IgnorePattern;
-                var nameColumn = account.ImportMapping.Columns.FirstOrDefault(
+                var nameColumn = account.ImportMapping.Columns?.FirstOrDefault(
                     x => x.Target == AccountDefinitionImportMappingColumnTarget.Name);
                 accountModel.ImportNameSource = nameColumn?.Source;
                 accountModel.ImportNameIgnorePattern = nameColumn?.IgnorePattern;
-                var textColumn = account.ImportMapping.Columns.FirstOrDefault(
+                var textColumn = account.ImportMapping.Columns?.FirstOrDefault(
                     x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
                 accountModel.ImportTextSource = textColumn?.Source;
                 accountModel.ImportTextIgnorePattern = textColumn?.IgnorePattern;
-                var valueColumn = account.ImportMapping.Columns.FirstOrDefault(
+                var valueColumn = account.ImportMapping.Columns?.FirstOrDefault(
                     x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
                 accountModel.ImportValueSource = valueColumn?.Source;
                 accountModel.ImportValueIgnorePattern = valueColumn?.IgnorePattern;

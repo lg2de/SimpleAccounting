@@ -17,59 +17,89 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     public class AccountsViewModelTests
     {
         [Fact]
-        public void LoadAccounts_DifferentImportConfigurations_ViewModelsBuildCorrect()
+        public void OnDataLoaded_DifferentImportConfigurations_ViewModelsBuildCorrect()
         {
             var windowManager = Substitute.For<IWindowManager>();
             var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
             var sut = new AccountsViewModel(windowManager, projectData);
-            var accounts = new List<AccountingDataAccountGroup>
+            projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
             {
                 new AccountingDataAccountGroup
                 {
                     Name = "Group",
                     Account = new List<AccountDefinition>
                     {
-                        new AccountDefinition { ID = 1, Name = "1", ImportMapping = null },
+                        new AccountDefinition { ID = 1, Name = "No import mapping", ImportMapping = null },
                         new AccountDefinition
                         {
-                            ID = 2, Name = "2", ImportMapping = Samples.SimpleImportConfiguration
+                            ID = 2,
+                            Name = "Simple import mapping",
+                            ImportMapping = Samples.SimpleImportConfiguration
                         },
-                        new AccountDefinition { ID = 3, Name = "3", ImportMapping = Samples.SimpleImportConfiguration }
+                        new AccountDefinition
+                        {
+                            ID = 3,
+                            Name = "Incomplete import mapping",
+                            ImportMapping = new AccountDefinitionImportMapping()
+                        },
+                        new AccountDefinition
+                        {
+                            ID = 4,
+                            Name = "Full import mapping",
+                            ImportMapping = Samples.SimpleImportConfiguration
+                        }
                     }
                 }
             };
-            accounts.Last().Account.Last().ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
-            {
-                new AccountDefinitionImportMappingPattern { Expression = "OnlyAccount", AccountID = 1 },
-                new AccountDefinitionImportMappingPattern
+            projectData.Storage.Accounts.Last().Account.Last().ImportMapping.Patterns =
+                new List<AccountDefinitionImportMappingPattern>
                 {
-                    Expression = "ValueSpecified", ValueSpecified = true, AccountID = 2
-                },
-                new AccountDefinitionImportMappingPattern
-                {
-                    Expression = "ValueSet", Value = 5, ValueSpecified = true, AccountID = 3
-                }
-            };
+                    new AccountDefinitionImportMappingPattern { Expression = "OnlyAccount", AccountID = 1 },
+                    new AccountDefinitionImportMappingPattern
+                    {
+                        Expression = "ValueSpecified", ValueSpecified = true, AccountID = 2
+                    },
+                    new AccountDefinitionImportMappingPattern
+                    {
+                        Expression = "ValueSet", Value = 5, ValueSpecified = true, AccountID = 3
+                    }
+                };
 
-            sut.LoadAccounts(accounts);
+            sut.OnDataLoaded();
 
-            var group = accounts.Last();
+            var group = projectData.Storage.Accounts.Last();
             sut.AccountList.Should().BeEquivalentTo(
                 new object[]
                 {
-                    new { Identifier = 1, Name = "1", Group = group, Groups = accounts },
+                    new
+                    {
+                        Identifier = 1,
+                        Name = "No import mapping",
+                        Group = group,
+                        Groups = projectData.Storage.Accounts
+                    },
                     new
                     {
                         Identifier = 2,
-                        Name = "2",
+                        Name = "Simple import mapping",
                         IsImportActive = true,
                         ImportDateSource = "Date",
-                        ImportValueSource = "Value"
+                        ImportValueSource = "Value",
+                        ImportNameSource = (string)null,
+                        ImportTextSource = (string)null
                     },
                     new
                     {
                         Identifier = 3,
-                        Name = "3",
+                        Name = "Incomplete import mapping",
+                        IsImportActive = true,
+                        ImportDateSource = (string)null,
+                        ImportValueSource = (string)null
+                    },
+                    new
+                    {
+                        Identifier = 4,
+                        Name = "Full import mapping",
                         IsImportActive = true,
                         ImportPatterns = new object[]
                         {
@@ -79,6 +109,52 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                         }
                     }
                 }, o => o.WithStrictOrdering());
+        }
+
+        [Fact]
+        public void OnEditAccount_ImportPatternsConfigured_ImportPatternsBuilt()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            AccountViewModel updatedViewModel = null;
+            windowManager.ShowDialog(Arg.Do<object>(o => updatedViewModel = o as AccountViewModel), null, null);
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
+            var sut = new AccountsViewModel(windowManager, projectData);
+            projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
+            {
+                new AccountingDataAccountGroup
+                {
+                    Name = "Group",
+                    Account = new List<AccountDefinition>
+                    {
+                        new AccountDefinition
+                        {
+                            ID = 1, Name = "Asset", Type = AccountDefinitionType.Asset
+                        },
+                        new AccountDefinition
+                        {
+                            ID = 2, Name = "Income", Type = AccountDefinitionType.Income
+                        },
+                        new AccountDefinition
+                        {
+                            ID = 3, Name = "CarryForward", Type = AccountDefinitionType.Carryforward
+                        }
+                    }
+                }
+            };
+            projectData.Storage.Accounts.First().Account.First().ImportMapping = new AccountDefinitionImportMapping
+            {
+                Patterns = new List<AccountDefinitionImportMappingPattern>
+                {
+                    new AccountDefinitionImportMappingPattern { Expression = "Expression", AccountID = 2 }
+                }
+            };
+            sut.OnDataLoaded();
+
+            var accountViewModel = sut.AccountList.First();
+            accountViewModel.ImportRemoteAccounts.Should().BeEmpty();
+            sut.OnEditAccount(accountViewModel);
+
+            updatedViewModel?.ImportRemoteAccounts.Should().BeEquivalentTo(new { ID = 2 });
         }
     }
 }
