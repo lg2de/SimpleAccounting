@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="SonarQube - SimpleAccounting lg2de"
-         Description="This rule set was automatically generated from SonarQube https://sonarcloud.io/profiles/show?key=AXBfQepp7SsyObFKJnMR"
-         ToolsVersion="14.0">
+<RuleSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="SonarQube - SimpleAccounting lg2de" Description="This rule set was automatically generated from SonarQube https://sonarcloud.io/profiles/show?key=AXBfQepp7SsyObFKJnMR" ToolsVersion="14.0">
   <Rules AnalyzerId="SonarAnalyzer.CSharp" RuleNamespace="SonarAnalyzer.CSharp">
     <Rule Id="S100" Action="Info" />
     <Rule Id="S1006" Action="Warning" />
@@ -93,6 +91,7 @@
     <Rule Id="S2053" Action="Warning" />
     <Rule Id="S2070" Action="None" />
     <Rule Id="S2114" Action="Warning" />
+    <Rule Id="S2115" Action="Warning" />
     <Rule Id="S2123" Action="Warning" />
     <Rule Id="S2148" Action="Info" />
     <Rule Id="S2156" Action="Info" />
