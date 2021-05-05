@@ -8,21 +8,12 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
+  Width="450" Height="550"
+  d:Background="Azure"
   d:DataContext="{d:DesignInstance Type=local:AccountDesignViewModel, IsDesignTimeCreatable=True}">
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*" />
-      <ColumnDefinition Width="*" MinWidth="200" />
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-    </Grid.RowDefinitions>
-    <Grid.Resources>
+  <DockPanel>
+    <DockPanel.Resources>
+      <local:NullableValueConverter x:Key="NullableValueConverter" />
       <Style TargetType="TextBlock">
         <Setter Property="Margin" Value="5" />
       </Style>
@@ -36,50 +27,201 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
       </Style>
-    </Grid.Resources>
-    <TextBlock
-      Grid.Column="0" Grid.Row="0"
-      Text="{x:Static properties:Resources.Word_AccountNumber}" />
-    <local:NumberTextBox
-      Grid.Column="1" Grid.Row="0"
-      Width="100" HorizontalContentAlignment="Right"
-      Text="{Binding Identifier}" />
-
-    <TextBlock
-      Grid.Column="0" Grid.Row="1"
-      Text="{x:Static properties:Resources.Word_AccountName}" />
-    <TextBox
-      Grid.Column="1" Grid.Row="1"
-      Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-
-    <TextBlock
-      Grid.Column="0" Grid.Row="2"
-      Text="{x:Static properties:Resources.Word_AccountGroup}" />
-    <ComboBox
-      Grid.Column="1" Grid.Row="2"
-      ItemsSource="{Binding Groups}"
-      SelectedItem="{Binding Group}"
-      DisplayMemberPath="Name" />
-
-    <TextBlock
-      Grid.Column="0" Grid.Row="3"
-      Text="{x:Static properties:Resources.Word_AccountType}" />
-    <ComboBox
-      Grid.Column="1" Grid.Row="3"
-      ItemsSource="{Binding Types}"
-      SelectedItem="{Binding Type}" />
-
-    <CheckBox
-      Grid.Column="1" Grid.Row="4"
-      Content="{x:Static properties:Resources.Word_IsActive}"
-      IsChecked="{Binding IsActivated}" />
-
+    </DockPanel.Resources>
     <StackPanel
-      Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5"
+      DockPanel.Dock="Bottom"
       Margin="0 30 0 0"
       Orientation="Horizontal" HorizontalAlignment="Right">
       <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding SaveCommand}" IsDefault="True" />
       <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
     </StackPanel>
-  </Grid>
+    <TabControl>
+      <TabItem>
+        <TabItem.Header>
+          <TextBlock>Basis</TextBlock>
+        </TabItem.Header>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" MinWidth="200" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+          <TextBlock
+            Grid.Column="0" Grid.Row="0"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_AccountNumber}" />
+          <local:NumberTextBox
+            Grid.Column="1" Grid.Row="0"
+            Width="100" HorizontalContentAlignment="Right"
+            Text="{Binding Identifier}" />
+
+          <TextBlock
+            Grid.Column="0" Grid.Row="1"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_AccountName}" />
+          <TextBox
+            Grid.Column="1" Grid.Row="1"
+            Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+
+          <TextBlock
+            Grid.Column="0" Grid.Row="2"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_AccountGroup}" />
+          <ComboBox
+            Grid.Column="1" Grid.Row="2"
+            ItemsSource="{Binding Groups}"
+            SelectedItem="{Binding Group}"
+            DisplayMemberPath="Name" />
+
+          <TextBlock
+            Grid.Column="0" Grid.Row="3"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_AccountType}" />
+          <ComboBox
+            Grid.Column="1" Grid.Row="3"
+            ItemsSource="{Binding Types}"
+            SelectedItem="{Binding Type}" />
+
+          <StackPanel
+            Grid.Column="1" Grid.Row="4"
+            Orientation="Vertical">
+            <CheckBox
+              Content="{x:Static properties:Resources.EditAccount_AccountActive}"
+              IsChecked="{Binding IsActivated}" />
+            <CheckBox
+              Content="{x:Static properties:Resources.EditAccount_ImportActive}"
+              IsChecked="{Binding IsImportActive}" />
+          </StackPanel>
+        </Grid>
+      </TabItem>
+      <TabItem IsEnabled="{Binding IsImportActive}">
+        <TabItem.Header>
+          <TextBlock>Import</TextBlock>
+        </TabItem.Header>
+        <Grid VerticalAlignment="Stretch">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" MinWidth="150" />
+            <ColumnDefinition Width="Auto" MinWidth="150" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <TextBlock Grid.Column="1" Grid.Row="0"
+                     Text="{x:Static properties:Resources.Word_Source}"
+                     ToolTip="{x:Static properties:Resources.AccountConfiguration_SourceDescription}" />
+          <TextBlock Grid.Column="2" Grid.Row="0"
+                     Text="{x:Static properties:Resources.AccountConfiguration_IgnorePattern}"
+                     ToolTip="{x:Static properties:Resources.AccountConfiguration_IgnorePatternDescription}" />
+
+          <TextBlock Grid.Column="0" Grid.Row="1" Text="{x:Static properties:Resources.Word_Date}" VerticalAlignment="Center" />
+          <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding ImportDateSource, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBox Grid.Column="2" Grid.Row="1" Text="{Binding ImportDateIgnorePattern}" />
+
+          <TextBlock Grid.Column="0" Grid.Row="2" Text="{x:Static properties:Resources.Word_Value}" VerticalAlignment="Center" />
+          <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding ImportValueSource, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding ImportValueIgnorePattern}" />
+
+          <TextBlock Grid.Column="0" Grid.Row="3" Text="{x:Static properties:Resources.Word_BookingText}" VerticalAlignment="Center" />
+          <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding ImportTextSource}" />
+          <TextBox Grid.Column="2" Grid.Row="3" Text="{Binding ImportTextIgnorePattern}" />
+
+          <TextBlock Grid.Column="0" Grid.Row="4" Text="{x:Static properties:Resources.Word_Name}" VerticalAlignment="Center" />
+          <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding ImportNameSource}" />
+          <TextBox Grid.Column="2" Grid.Row="4" Text="{Binding ImportNameIgnorePattern}" />
+
+          <DataGrid
+            Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="5"
+            MinHeight="150"
+            AutoGenerateColumns="False"
+            CanUserAddRows="True" CanUserDeleteRows="True"
+            ItemsSource="{Binding ImportPatterns}">
+            <DataGrid.Resources>
+              <Style x:Key="ErrorStyle" TargetType="{x:Type TextBox}">
+                <Setter Property="Padding" Value="-2" />
+                <Style.Triggers>
+                  <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="Background" Value="Red" />
+                    <Setter Property="ToolTip">
+                      <Setter.Value>
+                        <Binding
+                          RelativeSource="{RelativeSource Self}"
+                          Path="(Validation.Errors)[0].ErrorContent" />
+                      </Setter.Value>
+                    </Setter>
+                  </Trigger>
+                </Style.Triggers>
+              </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_Expression}" MinWidth="100"
+                                  EditingElementStyle="{StaticResource ErrorStyle}">
+                <DataGridTextColumn.Binding>
+                  <Binding Path="Expression" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                      <ExceptionValidationRule />
+                    </Binding.ValidationRules>
+                  </Binding>
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_Value}" MinWidth="80"
+                                  EditingElementStyle="{StaticResource ErrorStyle}">
+                <DataGridTextColumn.Binding>
+                  <Binding
+                    Path="Value"
+                    Converter="{StaticResource NullableValueConverter}" />
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
+              <DataGridTemplateColumn
+                Header="{x:Static properties:Resources.Word_RemoteAccount}" MinWidth="150">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate DataType="{x:Type local:ImportPatternViewModel}">
+                    <Grid>
+                      <ComboBox
+                        Margin="0"
+                        SelectedItem="{Binding Account, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        ItemTemplate="{StaticResource AccountSelectionTemplate}"
+                        TextSearch.TextPath="Name">
+                        <ComboBox.ItemsSource>
+                          <Binding Path="DataContext.ImportRemoteAccounts"
+                                   RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:AccountView}}" />
+                        </ComboBox.ItemsSource>
+                      </ComboBox>
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+            <DataGrid.CellStyle>
+              <Style TargetType="{x:Type DataGridCell}">
+                <Setter Property="Template">
+                  <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                      <Grid Background="{TemplateBinding Background}">
+                        <ContentPresenter VerticalAlignment="Center" Margin="2" />
+                      </Grid>
+                    </ControlTemplate>
+                  </Setter.Value>
+                </Setter>
+              </Style>
+            </DataGrid.CellStyle>
+          </DataGrid>
+        </Grid>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
 </UserControl>

@@ -258,7 +258,7 @@ namespace lg2de.SimpleAccounting.Model
             this.reportsField = new AccountingDataSetupReports();
         }
     }
-    
+
     public partial class AccountingDataSetupBehavior
     {
         /// <summary>
@@ -268,6 +268,22 @@ namespace lg2de.SimpleAccounting.Model
             Enum.TryParse<OpeningTextOption>(this.OpeningTextPattern, out var option)
                 ? option
                 : OpeningTextOption.Numbered;
+    }
+
+    /// <summary>
+    ///     Implements extensions on the import mapping definition.
+    /// </summary>
+    public partial class AccountDefinitionImportMapping
+    {
+        /// <summary>
+        ///     Gets a value whether mapping is consistent and valid.
+        /// </summary>
+        public bool IsValid()
+        {
+            return
+                this.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
+                && this.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
+        }
     }
 
     /// <summary>
@@ -324,7 +340,7 @@ namespace lg2de.SimpleAccounting.Model
         private Regex? regex;
         internal Regex Regex => this.regex ??= new Regex(this.Expression, RegexOptions.Compiled);
     }
-    
+
     public partial class BookingValue
     {
         internal BookingValue Clone()

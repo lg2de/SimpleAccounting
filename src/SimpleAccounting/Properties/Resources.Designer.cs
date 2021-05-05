@@ -61,6 +61,33 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ignore Pattern.
+        /// </summary>
+        public static string AccountConfiguration_IgnorePattern {
+            get {
+                return ResourceManager.GetString("AccountConfiguration_IgnorePattern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Regular expression used to remove substrings.
+        /// </summary>
+        public static string AccountConfiguration_IgnorePatternDescription {
+            get {
+                return ResourceManager.GetString("AccountConfiguration_IgnorePatternDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Column name in the import file (CSV).
+        /// </summary>
+        public static string AccountConfiguration_SourceDescription {
+            get {
+                return ResourceManager.GetString("AccountConfiguration_SourceDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Edit account.
         /// </summary>
         public static string AccountsContextMenu_EditAccount {
@@ -183,6 +210,24 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string CloseYear_TextOptionNumbered {
             get {
                 return ResourceManager.GetString("CloseYear_TextOptionNumbered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to is account active.
+        /// </summary>
+        public static string EditAccount_AccountActive {
+            get {
+                return ResourceManager.GetString("EditAccount_AccountActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to is import active.
+        /// </summary>
+        public static string EditAccount_ImportActive {
+            get {
+                return ResourceManager.GetString("EditAccount_ImportActive", resourceCulture);
             }
         }
         
@@ -381,6 +426,16 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string ImportData_MessageTitle {
             get {
                 return ResourceManager.GetString("ImportData_MessageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attention, currently no booking accounts are configured for import.
+        ///Without such configuration for at least one account, this function is disabled..
+        /// </summary>
+        public static string ImportData_MissingAccountWarning {
+            get {
+                return ResourceManager.GetString("ImportData_MissingAccountWarning", resourceCulture);
             }
         }
         
@@ -1088,6 +1143,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expression.
+        /// </summary>
+        public static string Word_Expression {
+            get {
+                return ResourceManager.GetString("Word_Expression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Follow up.
         /// </summary>
         public static string Word_FollowUp {
@@ -1124,15 +1188,6 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to is active.
-        /// </summary>
-        public static string Word_IsActive {
-            get {
-                return ResourceManager.GetString("Word_IsActive", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to is followup.
         /// </summary>
         public static string Word_IsFollowup {
@@ -1147,6 +1202,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_Liabilities {
             get {
                 return ResourceManager.GetString("Word_Liabilities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string Word_Name {
+            get {
+                return ResourceManager.GetString("Word_Name", resourceCulture);
             }
         }
         
@@ -1256,6 +1320,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_Skip {
             get {
                 return ResourceManager.GetString("Word_Skip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source.
+        /// </summary>
+        public static string Word_Source {
+            get {
+                return ResourceManager.GetString("Word_Source", resourceCulture);
             }
         }
         

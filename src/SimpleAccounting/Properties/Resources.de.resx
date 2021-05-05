@@ -182,8 +182,8 @@ Wollen Sie Speichern?</value>
   <data name="Word_AccountType" xml:space="preserve">
     <value>Kontotyp</value>
   </data>
-  <data name="Word_IsActive" xml:space="preserve">
-    <value>ist aktiv</value>
+  <data name="EditAccount_AccountActive" xml:space="preserve">
+    <value>ist Konto aktiv</value>
   </data>
   <data name="Word_Cancel" xml:space="preserve">
     <value>Abbrechen</value>
@@ -529,5 +529,27 @@ Mit 'Nein' wird diese Sicherung gelöscht.</value>
   </data>
   <data name="ImportData_UseReverseOrder" xml:space="preserve">
     <value>In umgekehrter Reihenfolge importieren</value>
+  </data>
+  <data name="ImportData_MissingAccountWarning" xml:space="preserve">
+    <value>Achtung, aktuell sind keine Buchungskonten für den Import konfiguriert.
+Ohne eine solche Konfiguration für mindestens ein Konto ist diese Funktion deaktiviert.</value>
+  </data>
+  <data name="EditAccount_ImportActive" xml:space="preserve">
+    <value>ist Import aktiv</value>
+  </data>
+  <data name="Word_Source" xml:space="preserve">
+    <value>Quelle</value>
+  </data>
+  <data name="AccountConfiguration_IgnorePattern" xml:space="preserve">
+    <value>Ausdruck für Ausschlüsse</value>
+  </data>
+  <data name="Word_Expression" xml:space="preserve">
+    <value>Ausdruck</value>
+  </data>
+  <data name="AccountConfiguration_SourceDescription" xml:space="preserve">
+    <value>Spaltenname in der Quelldatei (CSV)</value>
+  </data>
+  <data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
+    <value>Regulärer Ausdruck, welcher verwendet wird, um Zeichenketten aus dem Text zu entfernen</value>
   </data>
 </root>

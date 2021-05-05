@@ -8,8 +8,9 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
-  d:DataContext="{d:DesignInstance Type=local:EditBookingDesignViewModel, IsDesignTimeCreatable=True}"
-  d:DesignWidth="600" d:DesignHeight="500">
+  d:DesignWidth="600" d:DesignHeight="500"
+  d:Background="Azure"
+  d:DataContext="{d:DesignInstance Type=local:EditBookingDesignViewModel, IsDesignTimeCreatable=True}">
   <UserControl.InputBindings>
     <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding DefaultCommand, Mode=OneWay}" />
   </UserControl.InputBindings>

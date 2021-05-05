@@ -4,11 +4,9 @@
 
 namespace lg2de.SimpleAccounting.Presentation
 {
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Windows.Input;
-    using lg2de.SimpleAccounting.Model;
 
     /// <summary>
     ///     Defines abstraction for <see cref="AccountsViewModel"/>.
@@ -22,8 +20,6 @@ namespace lg2de.SimpleAccounting.Presentation
         ICommand AccountSelectionCommand { get; }
 
         bool ShowInactiveAccounts { get; set; }
-
-        void LoadAccounts(IReadOnlyCollection<AccountingDataAccountGroup> accounts);
 
         void ShowNewAccountDialog();
 

@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
@@ -15,8 +16,10 @@ namespace lg2de.SimpleAccounting.Presentation
     /// <summary>
     ///     Implements the view model for a single account.
     /// </summary>
-    public class AccountViewModel : Screen
+    internal class AccountViewModel : Screen
     {
+        private bool isImportActive;
+
         static AccountViewModel()
         {
             foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)))
@@ -40,10 +43,74 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool IsActivated { get; set; } = true;
 
+        public bool IsImportActive
+        {
+            get => this.isImportActive;
+            set
+            {
+                if (value == this.isImportActive)
+                {
+                    return;
+                }
+
+                this.isImportActive = value;
+                this.NotifyOfPropertyChange();
+                this.NotifyOfPropertyChange(nameof(this.SaveCommand));
+            }
+        }
+
+        public string? ImportDateSource { get; set; }
+
+        public string? ImportDateIgnorePattern { get; set; }
+
+        public string? ImportNameSource { get; set; }
+
+        public string? ImportNameIgnorePattern { get; set; }
+
+        public string? ImportTextSource { get; set; }
+
+        public string? ImportTextIgnorePattern { get; set; }
+
+        public string? ImportValueSource { get; set; }
+
+        public string? ImportValueIgnorePattern { get; set; }
+
+        public IList<AccountDefinition> ImportRemoteAccounts { get; set; } = new List<AccountDefinition>();
+
+        public ObservableCollection<ImportPatternViewModel> ImportPatterns { get; set; } =
+            new ObservableCollection<ImportPatternViewModel>();
+
         public ICommand SaveCommand => new RelayCommand(
             _ => this.TryClose(true),
-            _ => !string.IsNullOrWhiteSpace(this.Name)
-                 && (this.IsValidIdentifierFunc?.Invoke(this.Identifier) ?? true));
+            _ =>
+            {
+                if (string.IsNullOrWhiteSpace(this.Name))
+                {
+                    return false;
+                }
+
+                if (this.IsValidIdentifierFunc?.Invoke(this.Identifier) == false)
+                {
+                    return false;
+                }
+
+                if (!this.IsImportActive)
+                {
+                    return true;
+                }
+
+                if (string.IsNullOrWhiteSpace(this.ImportDateSource))
+                {
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(this.ImportValueSource))
+                {
+                    return false;
+                }
+
+                return this.ImportPatterns.All(x => !string.IsNullOrWhiteSpace(x.Expression) && x.Account != null);
+            });
 
         internal Func<ulong, bool>? IsValidIdentifierFunc { get; set; }
 

@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Windows.Forms;
     using FluentAssertions;
@@ -29,6 +30,48 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
         }
 
+        [Fact]
+        public void ImportStatus_NoImportAccount()
+        {
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
+            projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
+            {
+                new AccountingDataAccountGroup
+                {
+                    Account = new List<AccountDefinition> { new AccountDefinition { ID = 100, Name = "Bank" } }
+                }
+            };
+            var sut = new ImportBookingsViewModel(null!, projectData);
+
+            sut.IsImportPossible.Should().BeFalse();
+            sut.IsImportBroken.Should().BeTrue();
+        }
+        
+        [Fact]
+        public void ImportStatus_AnyImportAccount()
+        {
+            var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
+            projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
+            {
+                new AccountingDataAccountGroup
+                {
+                    Account = new List<AccountDefinition>
+                    {
+                        new AccountDefinition
+                        {
+                            ID = 100,
+                            Name = "Bank",
+                            ImportMapping = Samples.SimpleImportConfiguration
+                        }
+                    }
+                }
+            };
+            var sut = new ImportBookingsViewModel(null!, projectData);
+
+            sut.IsImportPossible.Should().BeTrue();
+            sut.IsImportBroken.Should().BeFalse();
+        }
+        
         [CulturedFact("en")]
         public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
         {

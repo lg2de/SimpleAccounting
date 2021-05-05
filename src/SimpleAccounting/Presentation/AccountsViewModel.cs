@@ -9,6 +9,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
+    using lg2de.SimpleAccounting.Extensions;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Properties;
@@ -29,8 +30,6 @@ namespace lg2de.SimpleAccounting.Presentation
             this.windowManager = windowManager;
             this.projectData = projectData;
         }
-
-        public IEnumerable<AccountViewModel> AllAccounts => this.allAccounts;
 
         public ObservableCollection<AccountViewModel> AccountList { get; }
             = new ObservableCollection<AccountViewModel>();
@@ -66,30 +65,70 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public void OnDataLoaded()
         {
-            this.LoadAccounts(this.projectData.Storage.Accounts);
-        }
-
-        public void LoadAccounts(IReadOnlyCollection<AccountingDataAccountGroup> accounts)
-        {
             this.allAccounts.Clear();
-            foreach (var accountGroup in accounts)
+            foreach (var accountGroup in this.projectData.Storage.Accounts)
             {
-                foreach (var account in accountGroup.Account)
+                foreach (AccountDefinition account in accountGroup.Account)
                 {
-                    var accountModel = new AccountViewModel
-                    {
-                        Identifier = account.ID,
-                        Name = account.Name,
-                        Group = accountGroup,
-                        Groups = accounts,
-                        Type = account.Type,
-                        IsActivated = account.Active
-                    };
+                    var accountModel = CreateViewModel(account, accountGroup);
                     this.allAccounts.Add(accountModel);
                 }
             }
 
             this.RefreshAccountList();
+
+            AccountViewModel CreateViewModel(
+                AccountDefinition account, AccountingDataAccountGroup accountGroup)
+            {
+                var accountModel = new AccountViewModel
+                {
+                    Identifier = account.ID,
+                    Name = account.Name,
+                    Group = accountGroup,
+                    Groups = this.projectData.Storage.Accounts,
+                    Type = account.Type,
+                    IsActivated = account.Active
+                };
+
+                if (account.ImportMapping == null)
+                {
+                    return accountModel;
+                }
+
+                accountModel.IsImportActive = true;
+                var dateColumn = account.ImportMapping.Columns?.FirstOrDefault(
+                    x => x.Target == AccountDefinitionImportMappingColumnTarget.Date);
+                accountModel.ImportDateSource = dateColumn?.Source;
+                accountModel.ImportDateIgnorePattern = dateColumn?.IgnorePattern;
+                var nameColumn = account.ImportMapping.Columns?.FirstOrDefault(
+                    x => x.Target == AccountDefinitionImportMappingColumnTarget.Name);
+                accountModel.ImportNameSource = nameColumn?.Source;
+                accountModel.ImportNameIgnorePattern = nameColumn?.IgnorePattern;
+                var textColumn = account.ImportMapping.Columns?.FirstOrDefault(
+                    x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
+                accountModel.ImportTextSource = textColumn?.Source;
+                accountModel.ImportTextIgnorePattern = textColumn?.IgnorePattern;
+                var valueColumn = account.ImportMapping.Columns?.FirstOrDefault(
+                    x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
+                accountModel.ImportValueSource = valueColumn?.Source;
+                accountModel.ImportValueIgnorePattern = valueColumn?.IgnorePattern;
+
+                if (account.ImportMapping.Patterns == null)
+                {
+                    return accountModel;
+                }
+
+                accountModel.ImportPatterns = new ObservableCollection<ImportPatternViewModel>(
+                    account.ImportMapping.Patterns.Select(
+                        x => new ImportPatternViewModel
+                        {
+                            Expression = x.Expression,
+                            AccountId = x.AccountID,
+                            Value = x.ValueSpecified ? x.Value.ToViewModel() : (double?)null
+                        }));
+
+                return accountModel;
+            }
         }
 
         public void SelectFirstAccount()
@@ -111,13 +150,18 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public void ShowNewAccountDialog()
         {
+            // setup new view model for the new account
+            var accountGroup = this.projectData.Storage.Accounts.First();
             var accountVm = new AccountViewModel
             {
                 DisplayName = Resources.Header_CreateAccount,
-                Group = this.projectData.Storage.Accounts.First(),
+                Group = accountGroup,
                 Groups = this.projectData.Storage.Accounts,
-                IsValidIdentifierFunc = id => this.AllAccounts.All(a => a.Identifier != id)
+                IsValidIdentifierFunc = id => this.allAccounts.All(a => a.Identifier != id)
             };
+            this.UpdateImportCandidateAccounts(accountVm);
+
+            // get user input
             var result = this.windowManager.ShowDialog(accountVm);
             if (result != true)
             {
@@ -132,13 +176,14 @@ namespace lg2de.SimpleAccounting.Presentation
                 Type = accountVm.Type,
                 Active = accountVm.IsActivated
             };
-            accountVm.Group.Account.Add(newAccount);
-            accountVm.Group.Account = accountVm.Group.Account.OrderBy(x => x.ID).ToList();
+            accountGroup.Account.Add(newAccount);
+            accountGroup.Account = accountVm.Group.Account.OrderBy(x => x.ID).ToList();
 
-            // update view
+            // update view model
             this.allAccounts.Add(accountVm);
             this.RefreshAccountList();
 
+            // raise modification
             this.projectData.IsModified = true;
         }
 
@@ -152,47 +197,62 @@ namespace lg2de.SimpleAccounting.Presentation
             this.ShowEditAccountDialog(account);
         }
 
-        private void ShowEditAccountDialog(AccountViewModel account)
+        private void ShowEditAccountDialog(AccountViewModel selectedAccountViewModel)
         {
-            var vm = account.Clone();
-            vm.DisplayName = Resources.Header_EditAccount;
-            var invalidIds = this.AllAccounts.Select(x => x.Identifier).Where(x => x != account.Identifier)
-                .ToList();
-            vm.IsValidIdentifierFunc = id => !invalidIds.Contains(id);
-            var result = this.windowManager.ShowDialog(vm);
+            // clone view model for easy rollback
+            var clonedViewModel = selectedAccountViewModel.Clone();
+            clonedViewModel.DisplayName = Resources.Header_EditAccount;
+            var invalidIds = this.allAccounts.Select(x => x.Identifier)
+                .Where(x => x != selectedAccountViewModel.Identifier).ToList();
+            clonedViewModel.IsValidIdentifierFunc = id => !invalidIds.Contains(id);
+            this.UpdateImportCandidateAccounts(clonedViewModel);
+
+            // get user input
+            var result = this.windowManager.ShowDialog(clonedViewModel);
             if (result != true)
             {
                 return;
             }
 
             // update database
-            var accountData = this.projectData.Storage.AllAccounts.Single(x => x.ID == account.Identifier);
-            accountData.Name = vm.Name;
-            accountData.Type = vm.Type;
-            accountData.Active = vm.IsActivated;
-            if (account.Identifier != vm.Identifier)
+            var accountData =
+                this.projectData.Storage.AllAccounts.Single(x => x.ID == selectedAccountViewModel.Identifier);
+            accountData.Name = clonedViewModel.Name;
+            accountData.Type = clonedViewModel.Type;
+            accountData.Active = clonedViewModel.IsActivated;
+            if (selectedAccountViewModel.Identifier != clonedViewModel.Identifier)
             {
-                accountData.ID = vm.Identifier;
-                account.Group!.Account = account.Group.Account.OrderBy(x => x.ID).ToList();
+                // account identifier has been changed
+                // update all references of this identifier
+                accountData.ID = clonedViewModel.Identifier;
+
+                selectedAccountViewModel.Group!.Account =
+                    selectedAccountViewModel.Group.Account.OrderBy(x => x.ID).ToList();
 
                 this.projectData.Storage.Journal.ForEach(
                     j => j.Booking?.ForEach(
                         b =>
                         {
-                            b.Credit.ForEach(c => UpdateAccount(c, account.Identifier, vm.Identifier));
-                            b.Debit.ForEach(d => UpdateAccount(d, account.Identifier, vm.Identifier));
+                            b.Credit.ForEach(
+                                c => UpdateAccount(c, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
+                            b.Debit.ForEach(
+                                d => UpdateAccount(d, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
                         }));
             }
 
-            // update view
-            account.Name = vm.Name;
-            account.Group = vm.Group;
-            account.Type = vm.Type;
-            account.Identifier = vm.Identifier;
-            account.IsActivated = vm.IsActivated;
+            this.SaveImportConfiguration(clonedViewModel, accountData);
+
+            // update view model
+            selectedAccountViewModel.Name = clonedViewModel.Name;
+            selectedAccountViewModel.Group = clonedViewModel.Group;
+            selectedAccountViewModel.Type = clonedViewModel.Type;
+            selectedAccountViewModel.Identifier = clonedViewModel.Identifier;
+            selectedAccountViewModel.IsActivated = clonedViewModel.IsActivated;
             this.RefreshAccountList();
-            account.Refresh();
+            selectedAccountViewModel.Refresh();
             this.projectData.TriggerJournalChanged();
+
+            // raise modification
             this.projectData.IsModified = true;
 
             static void UpdateAccount(BookingValue entry, ulong oldIdentifier, ulong newIdentifier)
@@ -202,6 +262,85 @@ namespace lg2de.SimpleAccounting.Presentation
                     entry.Account = newIdentifier;
                 }
             }
+        }
+
+        private void UpdateImportCandidateAccounts(AccountViewModel accountViewModel)
+        {
+            accountViewModel.ImportRemoteAccounts =
+                this.projectData.Storage.Accounts.SelectMany(x => x.Account)
+                    .Where(x => x.Type != AccountDefinitionType.Carryforward)
+                    .Where(x => x.ID != accountViewModel.Identifier).ToList();
+            foreach (var importPattern in accountViewModel.ImportPatterns)
+            {
+                importPattern.Account =
+                    accountViewModel.ImportRemoteAccounts.FirstOrDefault(x => x.ID == importPattern.AccountId);
+            }
+        }
+
+        private void SaveImportConfiguration(AccountViewModel viewModel, AccountDefinition accountDefinition)
+        {
+            if (!viewModel.IsImportActive)
+            {
+                accountDefinition.ImportMapping = null;
+                return;
+            }
+
+            // save required items
+            accountDefinition.ImportMapping = new AccountDefinitionImportMapping
+            {
+                Columns = new List<AccountDefinitionImportMappingColumn>
+                {
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Target = AccountDefinitionImportMappingColumnTarget.Date,
+                        Source = viewModel.ImportDateSource,
+                        IgnorePattern = viewModel.ImportDateIgnorePattern
+                    },
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Target = AccountDefinitionImportMappingColumnTarget.Value,
+                        Source = viewModel.ImportValueSource,
+                        IgnorePattern = viewModel.ImportValueIgnorePattern
+                    }
+                }
+            };
+
+            // save optional items
+            if (!string.IsNullOrWhiteSpace(viewModel.ImportTextSource))
+            {
+                accountDefinition.ImportMapping.Columns.Add(
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Target = AccountDefinitionImportMappingColumnTarget.Text,
+                        Source = viewModel.ImportTextSource,
+                        IgnorePattern = viewModel.ImportTextIgnorePattern
+                    });
+            }
+
+            if (!string.IsNullOrWhiteSpace(viewModel.ImportNameSource))
+            {
+                accountDefinition.ImportMapping.Columns.Add(
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Target = AccountDefinitionImportMappingColumnTarget.Name,
+                        Source = viewModel.ImportNameSource,
+                        IgnorePattern = viewModel.ImportNameIgnorePattern
+                    });
+            }
+
+            if (!viewModel.ImportPatterns.Any())
+            {
+                return;
+            }
+
+            accountDefinition.ImportMapping.Patterns = viewModel.ImportPatterns.Select(
+                x => new AccountDefinitionImportMappingPattern
+                {
+                    Expression = x.Expression,
+                    Value = x.Value?.ToModelValue() ?? 0,
+                    ValueSpecified = x.Value.HasValue,
+                    AccountID = x.Account?.ID ?? 0
+                }).ToList();
         }
 
         private void RefreshAccountList()

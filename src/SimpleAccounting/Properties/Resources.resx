@@ -185,8 +185,8 @@ Do you want to save?</value>
   <data name="Word_AccountType" xml:space="preserve">
     <value>Account type</value>
   </data>
-  <data name="Word_IsActive" xml:space="preserve">
-    <value>is active</value>
+  <data name="EditAccount_AccountActive" xml:space="preserve">
+    <value>is account active</value>
   </data>
   <data name="Word_Ok" xml:space="preserve">
     <value>OK</value>
@@ -541,5 +541,30 @@ When answering 'No' the backup file will be deleted.</value>
   </data>
   <data name="ImportData_UseReverseOrder" xml:space="preserve">
     <value>Import in reverse order</value>
+  </data>
+  <data name="ImportData_MissingAccountWarning" xml:space="preserve">
+    <value>Attention, currently no booking accounts are configured for import.
+Without such configuration for at least one account, this function is disabled.</value>
+  </data>
+  <data name="EditAccount_ImportActive" xml:space="preserve">
+    <value>is import active</value>
+  </data>
+  <data name="Word_Source" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="AccountConfiguration_IgnorePattern" xml:space="preserve">
+    <value>Ignore Pattern</value>
+  </data>
+  <data name="Word_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Word_Expression" xml:space="preserve">
+    <value>Expression</value>
+  </data>
+  <data name="AccountConfiguration_SourceDescription" xml:space="preserve">
+    <value>Column name in the import file (CSV)</value>
+  </data>
+  <data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
+    <value>Regular expression used to remove substrings</value>
   </data>
 </root>

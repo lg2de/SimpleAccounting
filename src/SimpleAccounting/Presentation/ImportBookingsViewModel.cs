@@ -51,11 +51,17 @@ namespace lg2de.SimpleAccounting.Presentation
         ///     Gets all accounts available for importing (mapping available).
         /// </summary>
         public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
-            .Where(
-                a =>
-                    a.ImportMapping != null
-                    && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
-                    && a.ImportMapping.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value));
+            .Where(a => a.ImportMapping != null && a.ImportMapping.IsValid());
+
+        /// <summary>
+        ///     Gets a value indicating whether importing is currently possible.
+        /// </summary>
+        public bool IsImportPossible => this.ImportAccounts.Any();
+
+        /// <summary>
+        ///     Gets a value indicating whether importing is currently not possible.
+        /// </summary>
+        public bool IsImportBroken => !this.ImportAccounts.Any();
 
         /// <summary>
         ///     Gets the minimal date valid for selecting <see cref="StartDate"/>.
@@ -121,7 +127,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     .OrderBy(x => x.Date));
 
         public bool IsForceEnglish { get; set; }
-        
+
         public  bool IsReverseOrder { get; set; }
 
         public IBusy Busy { get; } = new BusyControlModel();
@@ -222,7 +228,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 {
                     loadedEntries = loadedEntries.Reverse();
                 }
-                
+
                 foreach (var item in loadedEntries)
                 {
                     if (item.Date < this.RangeMin || item.Date > this.RangeMax)

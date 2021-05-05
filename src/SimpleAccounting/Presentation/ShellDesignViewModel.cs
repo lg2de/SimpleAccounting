@@ -43,7 +43,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         private void LoadAccounts()
         {
-            this.Accounts.LoadAccounts(
+            this.ProjectData.Storage.Accounts =
                 new List<AccountingDataAccountGroup>
                 {
                     new AccountingDataAccountGroup
@@ -57,7 +57,8 @@ namespace lg2de.SimpleAccounting.Presentation
                             }
                         }
                     }
-                });
+                };
+            this.Accounts.OnDataLoaded();
         }
 
         private void LoadJournal()
