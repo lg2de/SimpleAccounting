@@ -537,4 +537,19 @@ Ohne eine solche Konfiguration für mindestens ein Konto ist diese Funktion deak
   <data name="EditAccount_ImportActive" xml:space="preserve">
     <value>ist Import aktiv</value>
   </data>
+  <data name="Word_Source" xml:space="preserve">
+    <value>Quelle</value>
+  </data>
+  <data name="AccountConfiguration_IgnorePattern" xml:space="preserve">
+    <value>Ausdruck für Ausschlüsse</value>
+  </data>
+  <data name="Word_Expression" xml:space="preserve">
+    <value>Ausdruck</value>
+  </data>
+  <data name="AccountConfiguration_SourceDescription" xml:space="preserve">
+    <value>Spaltenname in der Quelldatei (CSV)</value>
+  </data>
+  <data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
+    <value>Regulärer Ausdruck, welcher verwendet wird, um Zeichenketten aus dem Text zu entfernen</value>
+  </data>
 </root>

@@ -549,4 +549,22 @@ Without such configuration for at least one account, this function is disabled.<
   <data name="EditAccount_ImportActive" xml:space="preserve">
     <value>is import active</value>
   </data>
+  <data name="Word_Source" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="AccountConfiguration_IgnorePattern" xml:space="preserve">
+    <value>Ignore Pattern</value>
+  </data>
+  <data name="Word_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Word_Expression" xml:space="preserve">
+    <value>Expression</value>
+  </data>
+  <data name="AccountConfiguration_SourceDescription" xml:space="preserve">
+    <value>Column name in the import file (CSV)</value>
+  </data>
+  <data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
+    <value>Regular expression used to remove substrings</value>
+  </data>
 </root>
