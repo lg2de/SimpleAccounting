@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Reports
 {
     using System;
     using System.Globalization;
+    using System.Linq;
     using System.Xml;
     using System.Xml.Linq;
     using lg2de.SimpleAccounting.Extensions;
@@ -59,10 +60,11 @@ namespace lg2de.SimpleAccounting.Reports
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"firm\"]");
             textNode.InnerText = this.setup?.Name;
 
-            textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"yearName\"]");
-            if (textNode != null)
+            var elements = this.PrintDocument.SelectNodes("//*[contains(text(),'yearName')]")!;
+            foreach (var element in elements.OfType<XmlElement>())
             {
-                textNode.InnerText = this.YearData.Year;
+                element.InnerText = element.InnerText.Replace(
+                    "{yearName}", this.YearData.Year, StringComparison.InvariantCultureIgnoreCase);
             }
 
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"range\"]");

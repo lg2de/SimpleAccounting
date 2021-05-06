@@ -4,7 +4,7 @@
   <pageTexts>
     <font size="8">
       <text ID="pageTitle" absX="135" absY="-5" align="center">- @Header_TotalsAndBalances@ -</text>
-      <text absX="135" absY="180" align="center">- @Word_Page@ {page} -</text>
+      <text absX="135" absY="180" align="center">- @Word_Page@ {pageNumber} -</text>
     </font>
   </pageTexts>
   <font size="20" />

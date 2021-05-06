@@ -616,7 +616,7 @@ namespace lg2de.SimpleAccounting.Reports
                 foreach (var element in textElements.OfType<XmlElement>())
                 {
                     element.InnerText = element.InnerText.Replace(
-                        "{page}", pageNumberText, StringComparison.InvariantCultureIgnoreCase);
+                        "{pageNumber}", pageNumberText, StringComparison.InvariantCultureIgnoreCase);
                 }
 
                 insertParent.ParentNode!.InsertAfter(copiedChild, insertParent);

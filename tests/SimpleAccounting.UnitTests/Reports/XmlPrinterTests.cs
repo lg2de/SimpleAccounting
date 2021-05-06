@@ -489,7 +489,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
             var sut = new XmlPrinter { DocumentHeight = 10 };
             sut.LoadXml(
                 "<root>"
-                + "<pageTexts><font><text>page {page}</text></font></pageTexts>"
+                + "<pageTexts><font><text>page {pageNumber}</text></font></pageTexts>"
                 + "<table><columns>"
                 + "<column width=\"10\">C1</column>"
                 + "</columns><data>"
