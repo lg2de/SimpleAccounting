@@ -19,7 +19,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         {
             var projectData = Samples.SampleProjectData;
             projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
-            var sut = new TotalsAndBalancesReport(projectData, projectData.Storage.Accounts);
+            var sut = new TotalsAndBalancesReport(
+                new XmlPrinter(), projectData, projectData.Storage.Accounts);
 
             sut.CreateReport("dummy");
 
@@ -134,7 +135,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         public void CreateReport_SampleWithSignature_SignatureLinesCreated()
         {
             var projectData = Samples.SampleProjectData;
-            var sut = new TotalsAndBalancesReport(projectData, projectData.Storage.Accounts);
+            var sut = new TotalsAndBalancesReport(
+                new XmlPrinter(), projectData, projectData.Storage.Accounts);
             sut.Signatures.Add("The Name");
 
             sut.CreateReport("dummy");

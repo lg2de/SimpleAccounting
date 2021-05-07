@@ -22,8 +22,8 @@ namespace lg2de.SimpleAccounting.Reports
         private double debitTotal;
         private bool firstAccount;
 
-        public AccountJournalReport(IProjectData projectData)
-            : base(ResourceName, projectData)
+        public AccountJournalReport(IXmlPrinter printer, IProjectData projectData)
+            : base(printer, ResourceName, projectData)
         {
             this.accounts = projectData.Storage.AllAccounts.OrderBy(a => a.ID);
         }
@@ -35,7 +35,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         public void CreateReport(string title)
         {
-            this.PreparePrintDocument(title);
+            this.PreparePrintDocument(title, DateTime.Now);
 
             XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table");
 

@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
+    using System;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
@@ -17,14 +18,14 @@ namespace lg2de.SimpleAccounting.Reports
     {
         public const string ResourceName = "TotalJournal.xml";
 
-        public TotalJournalReport(IProjectData projectData)
-            : base(ResourceName, projectData)
+        public TotalJournalReport(IXmlPrinter printer, IProjectData projectData)
+            : base(printer, ResourceName, projectData)
         {
         }
 
         public void CreateReport(string title)
         {
-            this.PreparePrintDocument(title);
+            this.PreparePrintDocument(title, DateTime.Now);
 
             XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data");
 
