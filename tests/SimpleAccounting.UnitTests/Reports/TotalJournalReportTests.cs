@@ -19,7 +19,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         {
             var projectData = Samples.SampleProjectData;
             projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
-            var sut = new TotalJournalReport(projectData);
+            var sut = new TotalJournalReport(new XmlPrinter(), projectData);
 
             sut.CreateReport("dummy");
 

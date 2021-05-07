@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
@@ -21,15 +22,15 @@ namespace lg2de.SimpleAccounting.Reports
 
         private readonly List<AccountDefinition> allAccounts;
 
-        public AnnualBalanceReport(IProjectData projectData)
-            : base(ResourceName, projectData)
+        public AnnualBalanceReport(IXmlPrinter printer, IProjectData projectData)
+            : base(printer, ResourceName, projectData)
         {
             this.allAccounts = projectData.Storage.AllAccounts.ToList();
         }
 
         public void CreateReport(string title)
         {
-            this.PreparePrintDocument(title);
+            this.PreparePrintDocument(title, DateTime.Now);
 
             // income / Einnahmen
             this.ProcessIncome(out var totalIncome);

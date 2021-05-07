@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Reports
 {
     using System;
     using System.Globalization;
+    using System.Linq;
     using System.Xml;
     using System.Xml.Linq;
     using lg2de.SimpleAccounting.Extensions;
@@ -17,32 +18,33 @@ namespace lg2de.SimpleAccounting.Reports
     internal class ReportBase
     {
         protected const int TitleSize = 10;
+
+        private readonly IXmlPrinter printer;
         private readonly AccountingDataSetup setup;
 
-        protected ReportBase(string resourceName, IProjectData projectData)
+        protected ReportBase(IXmlPrinter printer, string resourceName, IProjectData projectData)
         {
+            this.printer = printer;
             this.setup = projectData.Storage.Setup;
             this.YearData = projectData.CurrentYear;
 
-            this.Printer.LoadDocument(resourceName);
+            this.printer.LoadDocument(resourceName);
         }
-
-        protected IXmlPrinter Printer { get; set; } = new XmlPrinter();
 
         protected AccountingDataJournal YearData { get; }
 
         protected DateTime PrintingDate { get; set; } = DateTime.Now;
 
-        protected XmlDocument PrintDocument => this.Printer.Document;
+        protected XmlDocument PrintDocument => this.printer.Document;
 
-        internal XDocument DocumentForTests => XDocument.Parse(this.Printer.Document.OuterXml);
+        internal XDocument DocumentForTests => XDocument.Parse(this.printer.Document.OuterXml);
 
         public void ShowPreview(string documentName)
         {
-            this.Printer.PrintDocument($"{this.PrintingDate:yyyy-MM-dd} {documentName} {this.YearData.Year}");
+            this.printer.PrintDocument($"{this.PrintingDate:yyyy-MM-dd} {documentName} {this.YearData.Year}");
         }
 
-        protected void PreparePrintDocument(string title)
+        protected void PreparePrintDocument(string title, DateTime printDate)
         {
             var textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"title\"]");
             if (textNode != null)
@@ -57,12 +59,16 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"firm\"]");
-            textNode.InnerText = this.setup?.Name;
-
-            textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"yearName\"]");
             if (textNode != null)
             {
-                textNode.InnerText = this.YearData.Year;
+                textNode.InnerText = this.setup.Name;
+            }
+
+            var elements = this.PrintDocument.SelectNodes("//*[contains(text(),'yearName')]")!;
+            foreach (var element in elements.OfType<XmlElement>())
+            {
+                element.InnerText = element.InnerText.Replace(
+                    "{yearName}", this.YearData.Year, StringComparison.InvariantCultureIgnoreCase);
             }
 
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"range\"]");
@@ -74,7 +80,11 @@ namespace lg2de.SimpleAccounting.Reports
             }
 
             textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"date\"]");
-            textNode.InnerText = this.setup?.Location + ", " + DateTime.Now.ToString("D", CultureInfo.CurrentCulture);
+            if (textNode != null)
+            {
+                textNode.InnerText =
+                    this.setup.Location + ", " + printDate.ToString("D", CultureInfo.CurrentCulture);
+            }
         }
     }
 }

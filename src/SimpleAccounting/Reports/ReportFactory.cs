@@ -16,24 +16,24 @@ namespace lg2de.SimpleAccounting.Reports
     {
         public IAccountJournalReport CreateAccountJournal(IProjectData projectData)
         {
-            return new AccountJournalReport(projectData);
+            return new AccountJournalReport(new XmlPrinter(), projectData);
         }
 
         public ITotalJournalReport CreateTotalJournal(IProjectData projectData)
         {
-            return new TotalJournalReport(projectData);
+            return new TotalJournalReport(new XmlPrinter(), projectData);
         }
 
         public IAnnualBalanceReport CreateAnnualBalance(IProjectData projectData)
         {
-            return new AnnualBalanceReport(projectData);
+            return new AnnualBalanceReport(new XmlPrinter(), projectData);
         }
 
         public ITotalsAndBalancesReport CreateTotalsAndBalances(
             IProjectData projectData,
             IEnumerable<AccountingDataAccountGroup> accounts)
         {
-            return new TotalsAndBalancesReport(projectData, accounts);
+            return new TotalsAndBalancesReport(new XmlPrinter(), projectData, accounts);
         }
     }
 }

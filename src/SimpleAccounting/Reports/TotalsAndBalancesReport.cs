@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Reports
 {
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -39,9 +40,10 @@ namespace lg2de.SimpleAccounting.Reports
         ///     This is an overview over all accounts with totals and balances, grouped by account groups.
         /// </remarks>
         public TotalsAndBalancesReport(
+            IXmlPrinter printer,
             IProjectData projectData,
             IEnumerable<AccountingDataAccountGroup> accountGroups)
-            : base(ResourceName, projectData)
+            : base(printer, ResourceName, projectData)
         {
             this.accountGroups = accountGroups.ToList();
         }
@@ -50,7 +52,7 @@ namespace lg2de.SimpleAccounting.Reports
 
         public void CreateReport(string title)
         {
-            this.PreparePrintDocument(title);
+            this.PreparePrintDocument(title, DateTime.Now);
 
             XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data");
 

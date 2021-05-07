@@ -2,12 +2,12 @@
 <!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
 <xEport paperSize="A4" left="20" top="15" bottom="15" right="20">
   <font size="20" />
-  <text absX="85" align="center">@Header_AnnualBalance@</text>
+  <text absX="85" align="center">- @Header_AnnualBalance@ -</text>
   <move relY="10" />
   <font size="10" />
   <text ID="firm" absX="85" align="center">-Firm-</text>
   <move relY="5" />
-  <text ID="yearName" absX="85" align="center">-Year-</text>
+  <text absX="85" align="center">{yearName}</text>
   <move relY="10" />
   <font size="8" />
   <table lineHeight="4">

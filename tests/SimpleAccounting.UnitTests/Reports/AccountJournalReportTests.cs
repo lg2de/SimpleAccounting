@@ -26,7 +26,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
         {
             var projectData = Samples.SampleProjectData;
             projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
-            var sut = new AccountJournalReport(projectData) { PageBreakBetweenAccounts = pageBreakBetweenAccounts };
+            var sut = new AccountJournalReport(new XmlPrinter(), projectData)
+            {
+                PageBreakBetweenAccounts = pageBreakBetweenAccounts
+            };
 
             sut.CreateReport("dummy");
 
