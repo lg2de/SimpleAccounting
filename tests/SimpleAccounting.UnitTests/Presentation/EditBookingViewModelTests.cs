@@ -754,5 +754,18 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     }
                 });
         }
+
+        [Fact]
+        public void SaveCommand_Initialized_CannotExecute()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var sut = new EditBookingViewModel(projectData, YearBegin);
+
+            sut.SaveCommand.CanExecute(null).Should().BeFalse();
+        }
     }
 }
