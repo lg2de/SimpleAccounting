@@ -10,7 +10,7 @@
 
 **SimpleAccounting** is a simple software for accounting.
 It supports double-entry accounting including split bookings and several reports.
-Bookings can be imported from text files (CSV).
+Bookings can be imported from text files (CSV), e.g. provided by your bank account web access.
 
 I started `SimpleAccounting` around 2005, only for my personal use to manage accounts and balances of a small club.
 In 2019, I met a colleague from another small club who was looking for a simple solution to get an overview of the balances of several logical and real accounts.
@@ -23,6 +23,7 @@ The name says it all. The software is as simple as possible.
 
 It probably does not follow all rules and laws of double-entry accounting, e.g. the software does not protect accounting entries from changes. Instead it is explicitly possible to change existing entries.
 The data is stored in readable XML format and can be changed manually.
+An XSD document is available online and linked from the XML document which supports editing with code completion support.
 
 The software focuses on journal and balance sheet reporting.
 
@@ -31,8 +32,9 @@ The software focuses on journal and balance sheet reporting.
 * Data management for double-entry accounting, stored as XML (see [example](./samples/sample.acml)) and defined using [XSD](./docs/AccountingData.xsd)
 * User interface (English and German) for the management of accounts, the creation and modification of entries, the listing of account journals
 * Support for split booking entries, either on credit or debit side
-* Import of booking entries from CSV files incl. semi-automatic assignment of offsetting accounts
+* Import of booking entries from your bank account using CSV files incl. semi-automatic assignment of offsetting accounts
 * Printable reports for full journal, account journal, accounts and balances, and annual financial statements
+* Semi automatic update of the application
 
 Some screenshots for first impression:
 
@@ -43,7 +45,7 @@ Some screenshots for first impression:
 ## Getting started
 
 The application is based on [.NET Core 3](https://dotnet.microsoft.com/download/dotnet-core/3.1).
-Please download and install the Runtime in version [3.1](https://dotnet.microsoft.com/download/dotnet-core/thank-you/runtime-desktop-3.1.10-windows-x64-installer) or above.
+Please download and install the Runtime in version [3.1](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.16-windows-x64-installer) or above.
 
 Download the `SimpleAccounting` package from the [release page](https://github.com/lg2de/SimpleAccounting/releases).
 Extract the ZIP archive into your preferred destination directory.
