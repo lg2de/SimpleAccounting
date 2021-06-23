@@ -10,7 +10,7 @@
 
 **SimpleAccounting** is a simple software for accounting.
 It supports double-entry accounting including split bookings and several reports.
-Bookings can be imported from text files (CSV), e.g. provided by your bank account webaccess.
+Bookings can be imported from text files (CSV), e.g. provided by your bank account web access.
 
 I started `SimpleAccounting` around 2005, only for my personal use to manage accounts and balances of a small club.
 In 2019, I met a colleague from another small club who was looking for a simple solution to get an overview of the balances of several logical and real accounts.
@@ -23,7 +23,7 @@ The name says it all. The software is as simple as possible.
 
 It probably does not follow all rules and laws of double-entry accounting, e.g. the software does not protect accounting entries from changes. Instead it is explicitly possible to change existing entries.
 The data is stored in readable XML format and can be changed manually.
-And XSD document is available online and linked from the XML document which supports editing by intellisense.
+An XSD document is available online and linked from the XML document which supports editing with code completion support.
 
 The software focuses on journal and balance sheet reporting.
 
