@@ -46,6 +46,7 @@ namespace lg2de.SimpleAccounting.Reports
                 var accountEntries = this.YearData.Booking
                     .Where(x => x.Debit.Any(a => a.Account == account.ID) || x.Credit.Any(a => a.Account == account.ID))
                     .OrderBy(x => x.Date)
+                    .ThenBy(x => x.ID)
                     .ToList();
 
                 if (accountEntries.Count == 0)

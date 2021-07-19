@@ -46,7 +46,8 @@ namespace lg2de.SimpleAccounting.Presentation
                     .Where(b => b.Credit.Any(x => x.Account == accountNumber))
                     .Concat(
                         this.projectData.CurrentYear.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)))
-                    .OrderBy(x => x.Date).ThenBy(x => x.ID);
+                    .OrderBy(x => x.Date)
+                    .ThenBy(x => x.ID);
             double creditSum = 0;
             double debitSum = 0;
             foreach (var booking in relevantBookings)

@@ -29,7 +29,9 @@ namespace lg2de.SimpleAccounting.Reports
 
             XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data");
 
-            var journalEntries = this.YearData.Booking.OrderBy(b => b.Date);
+            var journalEntries = this.YearData.Booking
+                .OrderBy(b => b.Date)
+                .ThenBy(x => x.ID);
             foreach (var entry in journalEntries)
             {
                 XmlNode dataLineNode = this.PrintDocument.CreateElement("tr");
