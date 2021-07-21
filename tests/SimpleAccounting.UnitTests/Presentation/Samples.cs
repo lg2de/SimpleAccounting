@@ -184,33 +184,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             }
         }
 
-        [SuppressMessage("ReSharper", "RedundantAssignment")]
-        [SuppressMessage(
-            "ReSharper", "S1854",
-            Justification = "The 'useless' assignment of 'bookingIdent' helps to build code in future.")]
         public static IEnumerable<AccountingDataJournalBooking> SampleBookings
         {
             get
             {
-                ulong bookingIdent = 1;
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = bookingIdent++,
-                    Date = BaseDate + 101,
-                    Credit = new List<BookingValue>
-                    {
-                        new BookingValue { Account = Carryforward, Text = "Open 1", Value = 100000 }
-                    },
-                    Debit = new List<BookingValue>
-                    {
-                        new BookingValue { Account = BankAccount, Text = "Open 1", Value = 100000 }
-                    },
-                    Opening = true
-                };
-
-                yield return new AccountingDataJournalBooking
-                {
-                    ID = bookingIdent++,
+                    // attention, explicitly starting with unsorted ID to test sorting by date and ID
+                    ID = 2,
                     Date = BaseDate + 101,
                     Credit = new List<BookingValue>
                     {
@@ -225,7 +206,22 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = bookingIdent++,
+                    ID = 1,
+                    Date = BaseDate + 101,
+                    Credit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = Carryforward, Text = "Open 1", Value = 100000 }
+                    },
+                    Debit = new List<BookingValue>
+                    {
+                        new BookingValue { Account = BankAccount, Text = "Open 1", Value = 100000 }
+                    },
+                    Opening = true
+                };
+
+                yield return new AccountingDataJournalBooking
+                {
+                    ID = 3,
                     Date = BaseDate + 128,
                     Credit = new List<BookingValue>
                     {
@@ -237,9 +233,10 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                         new BookingValue { Account = BankAccount, Text = "Salary", Value = 20000 }
                     }
                 };
+                
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = bookingIdent++,
+                    ID = 4,
                     Date = BaseDate + 129,
                     Credit = new List<BookingValue>
                     {
@@ -253,7 +250,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = bookingIdent++,
+                    ID = 5,
                     Date = BaseDate + 201,
                     Credit = new List<BookingValue>
                     {
@@ -268,7 +265,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
                 yield return new AccountingDataJournalBooking
                 {
-                    ID = bookingIdent++,
+                    ID = 6,
                     Date = BaseDate + 205,
                     Credit = new List<BookingValue>
                     {

@@ -133,7 +133,9 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public void SelectFirstAccount()
         {
-            var firstBooking = this.projectData.CurrentYear.Booking?.FirstOrDefault();
+            var firstBooking = this.projectData.CurrentYear.Booking?
+                .OrderBy(x => x.Date).ThenBy(x => x.ID)
+                .FirstOrDefault();
             if (firstBooking != null)
             {
                 var firstAccount = firstBooking
