@@ -164,6 +164,26 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
             sut.Should().BeEquivalentTo(expectation);
         }
 
+        [Fact]
+        public void SafeGetLatest_EmptyList_BookingsInitialized()
+        {
+            var sut = new List<AccountingDataJournal>();
+
+            var latest = sut.SafeGetLatest();
+
+            latest.Booking.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void SafeGetLatest_MissingBookings_BookingsInitialized()
+        {
+            var sut = new List<AccountingDataJournal> { new AccountingDataJournal { Year = "Year" } };
+
+            var latest = sut.SafeGetLatest();
+
+            latest.Booking.Should().BeEmpty();
+        }
+
         [CulturedFact("en")]
         public void CloseYear_SampleDataEnglish_AllRelevantDataCorrect()
         {

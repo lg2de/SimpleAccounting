@@ -133,7 +133,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public void SelectFirstAccount()
         {
-            var firstBooking = this.projectData.CurrentYear.Booking?.FirstOrDefault();
+            // Note, all constructions of AccountingDataJournal initializes the list of bookins.
+            // We do not need to check for null.
+            var firstBooking = this.projectData.CurrentYear.Booking
+                .OrderBy(x => x.Date)
+                .ThenBy(x => x.ID)
+                .FirstOrDefault();
             if (firstBooking != null)
             {
                 var firstAccount = firstBooking

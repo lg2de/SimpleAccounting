@@ -39,6 +39,7 @@ namespace lg2de.SimpleAccounting.Model
             "Minor Code Smell",
             "S100:Methods and properties should be named in PascalCase",
             Justification = "fixed name")]
+        [SuppressMessage("ReSharper", "RedundantCheckBeforeAssignment")]
         public string xsiSchemaLocation
         {
             get => this.schema;
@@ -308,7 +309,10 @@ namespace lg2de.SimpleAccounting.Model
                     });
             }
 
-            return journals.Last();
+            var latest = journals.Last();
+            latest.Booking ??= new List<AccountingDataJournalBooking>();
+            
+            return latest;
         }
     }
 
