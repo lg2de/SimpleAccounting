@@ -145,6 +145,7 @@
             SelectedItem="{Binding FullJournal.SelectedItem}"
             RowStyle="{StaticResource GridRowStyle}" GridLinesVisibility="Vertical"
             AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+            ClipboardCopyMode="IncludeHeader"
             SelectionChanged="OnGridSelectionChanged"
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
@@ -180,6 +181,7 @@
             SelectedItem="{Binding AccountJournal.SelectedItem}"
             GridLinesVisibility="Vertical"
             AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+            ClipboardCopyMode="IncludeHeader"
             SelectionChanged="OnGridSelectionChanged"
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
@@ -219,7 +221,7 @@
           </DataGrid>
         </DockPanel>
         <GridSplitter
-          Grid.ColumnSpan="3" Grid.Row="1"
+          Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"
           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         <DockPanel Grid.ColumnSpan="3" Grid.Row="2">
           <TextBlock
@@ -236,6 +238,7 @@
             AutoGenerateColumns="False"
             CanUserAddRows="False"
             IsReadOnly="True"
+            ClipboardCopyMode="IncludeHeader"
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_Number}" Binding="{Binding Identifier}" />
