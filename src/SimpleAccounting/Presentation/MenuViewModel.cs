@@ -185,11 +185,11 @@ namespace lg2de.SimpleAccounting.Presentation
         private void UpdateBookingYears()
         {
             this.BookingYears.Clear();
-            foreach (var year in this.projectData.Storage.Journal)
+            foreach (var year in this.projectData.Storage.Journal.Select(x => x.Year))
             {
                 var menu = new MenuItemViewModel(
-                    year.Year.ToString(CultureInfo.InvariantCulture),
-                    new AsyncCommand(this.busy, () => this.projectData.SelectYear(year.Year)));
+                    year.ToString(CultureInfo.InvariantCulture),
+                    new AsyncCommand(this.busy, () => this.projectData.SelectYear(year)));
                 this.BookingYears.Add(menu);
             }
         }
