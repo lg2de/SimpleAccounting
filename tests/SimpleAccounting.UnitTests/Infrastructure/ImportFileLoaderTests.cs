@@ -49,16 +49,18 @@ Date,Name,Text,Value
             }
 
             result.Should().BeEquivalentTo(
-                new { Date = new DateTime(2000, 1, 15), Name = "Shopping Mall", Text = "Shoes", Value = -50 },
-                new
+                new object[]
                 {
-                    Date = new DateTime(2000, 12, 1),
-                    Name = "Name1",
-                    Text = "Text1",
-                    Value = 12.34,
-                    RemoteAccount = new { ID = 600 } // because of mapping pattern
-                },
-                new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2a Text2b", Value = -42.42 });
+                    new { Date = new DateTime(2000, 1, 15), Name = "Shopping Mall", Text = "Shoes", Value = -50 }, new
+                    {
+                        Date = new DateTime(2000, 12, 1),
+                        Name = "Name1",
+                        Text = "Text1",
+                        Value = 12.34,
+                        RemoteAccount = new { ID = 600 } // because of mapping pattern
+                    },
+                    new { Date = new DateTime(2000, 12, 31), Name = "Name2", Text = "Text2a Text2b", Value = -42.42 }
+                });
         }
     }
 }

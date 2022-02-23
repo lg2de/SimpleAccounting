@@ -93,7 +93,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             using var _ = new AssertionScope();
             sut.ProjectData.IsModified.Should()
                 .BeTrue("the project is ONLY auto-saved and not saved to real project file");
-            sut.Accounts.AccountList.Should().BeEquivalentTo(new { Name = "TheAccount" });
+            sut.Accounts.AccountList.Should().BeEquivalentTo(new[] { new { Name = "TheAccount" } });
             fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project", Arg.Any<string>());
             fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
         }
@@ -197,29 +197,34 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 "Active empty Credit", "Active empty Debit", "Active empty Carryforward");
 
             sut.FullJournal.Items.Should().BeEquivalentTo(
-                new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
-                new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
-                new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
-                new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
-                new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
-                new { Text = "Credit rate", CreditAccount = "100 (Bank account)", DebitAccount = "5000 (Bank credit)" },
-                new { Text = "Shoes1", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes2", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = string.Empty },
-                new
+                new[]
                 {
-                    Text = "Rent to friend",
-                    CreditAccount = "100 (Bank account)",
-                    DebitAccount = "6000 (Friends debit)"
+                    new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
+                    new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
+                    new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
+                    new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
+                    new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
+                    new { Text = "Credit rate", CreditAccount = "100 (Bank account)", DebitAccount = "5000 (Bank credit)" },
+                    new { Text = "Shoes1", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+                    new { Text = "Shoes2", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+                    new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = string.Empty },
+                    new
+                    {
+                        Text = "Rent to friend",
+                        CreditAccount = "100 (Bank account)",
+                        DebitAccount = "6000 (Friends debit)"
+                    }
                 });
             sut.AccountJournal.Items.Should().BeEquivalentTo(
-                new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", IsEvenRow = false },
-                new { Text = "Salary", RemoteAccount = "Various", IsEvenRow = true },
-                new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", IsEvenRow = false },
-                new { Text = "Shoes", RemoteAccount = "Various", IsEvenRow = true },
-                new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)", IsEvenRow = false },
-                new { Text = "Total", IsEvenRow = false },
-                new { Text = "Balance", IsEvenRow = false });
+                new object[]
+                {
+                    new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", IsEvenRow = false },
+                    new { Text = "Salary", RemoteAccount = "Various", IsEvenRow = true },
+                    new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", IsEvenRow = false },
+                    new { Text = "Shoes", RemoteAccount = "Various", IsEvenRow = true },
+                    new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)", IsEvenRow = false },
+                    new { Text = "Total", IsEvenRow = false }, new { Text = "Balance", IsEvenRow = false }
+                });
         }
 
         [Fact]
@@ -284,14 +289,14 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void OnDeactivate_HappyPath_Completes()
+        public async Task OnDeactivate_HappyPath_Completes()
         {
             var sut = CreateSut();
             ((IActivate)sut).Activate();
 
             var task = Task.Run(() => ((IDeactivate)sut).Deactivate(close: true));
 
-            task.Awaiting(x => x).Should().CompleteWithin(1.Seconds());
+            await task.Awaiting(x => x).Should().CompleteWithinAsync(1.Seconds());
         }
 
         [CulturedFact("en")]
@@ -313,29 +318,35 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             sut.FullJournal.Items.Should().BeEquivalentTo(
-                new
+                new[]
                 {
-                    Identifier = 4567,
-                    Date = new DateTime(DateTime.Now.Year, 4, 1),
-                    Text = "Init",
-                    Value = 0.42,
-                    CreditAccount = "990 (Carryforward)",
-                    DebitAccount = "100 (Bank account)"
+                    new
+                    {
+                        Identifier = 4567,
+                        Date = new DateTime(DateTime.Now.Year, 4, 1),
+                        Text = "Init",
+                        Value = 0.42,
+                        CreditAccount = "990 (Carryforward)",
+                        DebitAccount = "100 (Bank account)"
+                    }
                 });
             fullJournalMonitor.Should().RaisePropertyChangeFor(x => x.SelectedItem);
             sut.FullJournal.SelectedItem.Should().BeEquivalentTo(new { Identifier = 4567 });
             sut.AccountJournal.Items.Should().BeEquivalentTo(
-                new
+                new object[]
                 {
-                    Identifier = 4567,
-                    Date = new DateTime(DateTime.Now.Year, 4, 1),
-                    Text = "Init",
-                    CreditValue = 0.0,
-                    DebitValue = 0.42,
-                    RemoteAccount = "990 (Carryforward)"
-                },
-                new { Text = "Total", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 },
-                new { Text = "Balance", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 });
+                    new
+                    {
+                        Identifier = 4567,
+                        Date = new DateTime(DateTime.Now.Year, 4, 1),
+                        Text = "Init",
+                        CreditValue = 0.0,
+                        DebitValue = 0.42,
+                        RemoteAccount = "990 (Carryforward)"
+                    },
+                    new { Text = "Total", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 },
+                    new { Text = "Balance", IsSummary = true, CreditValue = 0.0, DebitValue = 0.42 }
+                });
             accountJournalMonitor.Should().RaisePropertyChangeFor(x => x.SelectedItem);
             sut.AccountJournal.SelectedItem.Should().BeEquivalentTo(new { Identifier = 4567 });
         }
@@ -442,7 +453,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
             dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("automatically created backup file", StringComparison.Ordinal)), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("automatically created backup file", StringComparison.Ordinal)),
+                    Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Yes);
@@ -467,7 +479,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         {
             var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
             dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("automatically created backup file", StringComparison.Ordinal)), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("automatically created backup file", StringComparison.Ordinal)),
+                    Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.No);
@@ -506,7 +519,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     .CompleteWithinAsync(1.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
-            sut.ProjectData.Settings.SecuredDrives.Should().Equal(new object[] { "K:\\" });
+            sut.ProjectData.Settings.SecuredDrives.Should().BeEquivalentTo(new object[] { "K:\\" });
             dialogs.DidNotReceive().ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
@@ -568,7 +581,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.ProjectData.FileName = "old.fileName";
             sut.ProjectData.IsModified = true;
             dialogs.ShowMessageBox(
-                    Arg.Is<string>(s => s.Contains("Project data has been changed.", StringComparison.Ordinal)), Arg.Any<string>(),
+                    Arg.Is<string>(s => s.Contains("Project data has been changed.", StringComparison.Ordinal)),
+                    Arg.Any<string>(),
                     MessageBoxButton.YesNo, MessageBoxImage.Question,
                     Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
                 .Returns(MessageBoxResult.Cancel);
@@ -684,7 +698,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.Invoking(x => x.Dispose()).Should().NotThrow();
         }
-
         private static ShellViewModel CreateSut()
         {
             var busy = Substitute.For<IBusy>();
@@ -701,7 +714,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 new ShellViewModel(
                     projectData,
                     busy,
-                    new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs), new FullJournalViewModel(projectData),
+                    new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
+                    new FullJournalViewModel(projectData),
                     new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate);
             return sut;
         }

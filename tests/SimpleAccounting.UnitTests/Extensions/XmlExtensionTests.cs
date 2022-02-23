@@ -63,8 +63,8 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
         [Fact]
         public void SetAttribute_NullNode_ExceptionThrown()
         {
-            XmlNode node = null;
-            node.Invoking(n => n.SetAttribute("name", "value")).Should().Throw<ArgumentNullException>();
+            Action action = () => XmlExtensions.SetAttribute(null, "name", "value");
+            action.Should().Throw<ArgumentNullException>();
         }
     }
 }

@@ -154,7 +154,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             accountViewModel.ImportRemoteAccounts.Should().BeEmpty();
             sut.OnEditAccount(accountViewModel);
 
-            updatedViewModel?.ImportRemoteAccounts.Should().BeEquivalentTo(new { ID = 2 });
+            updatedViewModel?.ImportRemoteAccounts.Should().BeEquivalentTo(new[] { new { ID = 2 } });
         }
     }
 }
