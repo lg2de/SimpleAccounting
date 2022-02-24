@@ -58,7 +58,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
             fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
             (await sut.Awaiting(x => x.LoadFromFileAsync("K:\\the.fileName")).Should()
-                    .CompleteWithinAsync(1.Seconds()))
+                    .CompleteWithinAsync(5.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
             fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");

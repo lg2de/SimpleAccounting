@@ -34,19 +34,22 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 100));
 
             sut.AccountJournal.Items.Should().BeEquivalentTo(
-                new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
-                new { Text = "Salary", RemoteAccount = "Various", CreditValue = 0, DebitValue = 200 },
-                new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", CreditValue = 400, DebitValue = 0 },
-                new { Text = "Shoes", RemoteAccount = "Various", CreditValue = 50, DebitValue = 0 },
-                new
+                new[]
                 {
-                    Text = "Rent to friend",
-                    RemoteAccount = "6000 (Friends debit)",
-                    CreditValue = 99,
-                    DebitValue = 0
-                },
-                new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 549, DebitValue = 1200 },
-                new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 651 });
+                    new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
+                    new { Text = "Salary", RemoteAccount = "Various", CreditValue = 0, DebitValue = 200 },
+                    new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", CreditValue = 400, DebitValue = 0 },
+                    new { Text = "Shoes", RemoteAccount = "Various", CreditValue = 50, DebitValue = 0 },
+                    new
+                    {
+                        Text = "Rent to friend",
+                        RemoteAccount = "6000 (Friends debit)",
+                        CreditValue = 99,
+                        DebitValue = 0
+                    },
+                    new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 549, DebitValue = 1200 },
+                    new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 651 }
+                });
         }
 
         [CulturedFact("en")]
@@ -60,10 +63,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 400));
 
             sut.AccountJournal.Items.Should().BeEquivalentTo(
-                new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 120, DebitValue = 0 },
-                new { Text = "Salary2", RemoteAccount = "100 (Bank account)", CreditValue = 80, DebitValue = 0 },
-                new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 },
-                new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 });
+                new[]
+                {
+                    new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 120, DebitValue = 0 },
+                    new { Text = "Salary2", RemoteAccount = "100 (Bank account)", CreditValue = 80, DebitValue = 0 },
+                    new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 },
+                    new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 }
+                });
         }
 
         [CulturedFact("en")]
@@ -77,10 +83,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 600));
 
             sut.AccountJournal.Items.Should().BeEquivalentTo(
-                new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 20 },
-                new { Text = "Shoes2", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 30 },
-                new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 },
-                new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 });
+                new[]
+                {
+                    new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 20 },
+                    new { Text = "Shoes2", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 30 },
+                    new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 },
+                    new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 }
+                });
         }
 
         [Fact]
@@ -175,13 +184,18 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     "Active empty Asset", "Active empty Income", "Active empty Expense", "Active empty Credit",
                     "Active empty Debit", "Active empty Carryforward");
                 sut.FullJournal.Items.Should().BeEquivalentTo(
-                    new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
-                    new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" });
+                    new[]
+                    {
+                        new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
+                        new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" }
+                    });
                 sut.AccountJournal.Items.Should().BeEquivalentTo(
-                    new { RemoteAccount = "1100 (Bank account)" },
-                    new { RemoteAccount = "1100 (Bank account)" },
-                    new { Text = "Total" },
-                    new { Text = "Balance" });
+                    new object[]
+                    {
+                        new { RemoteAccount = "1100 (Bank account)" },
+                        new { RemoteAccount = "1100 (Bank account)" }, new { Text = "Total" },
+                        new { Text = "Balance" }
+                    });
             }
         }
 
@@ -285,8 +299,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             vm.BindingTemplates.Should().BeEquivalentTo(
-                new { Text = "Template1", Credit = 0, Debit = 0, Value = 0.0 },
-                new { Text = "Template2", Credit = 1, Debit = 2, Value = 0.03 });
+                new[]
+                {
+                    new { Text = "Template1", Credit = 0, Debit = 0, Value = 0.0 },
+                    new { Text = "Template2", Credit = 1, Debit = 2, Value = 0.03 }
+                });
         }
 
         [Fact]
@@ -326,8 +343,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             vm.CreditSplitEntries.Should().BeEquivalentTo(
-                new { AccountNumber = Samples.Salary, BookingText = "Salary1", BookingValue = 120 },
-                new { AccountNumber = Samples.Salary, BookingText = "Salary2", BookingValue = 80 });
+                new[]
+                {
+                    new { AccountNumber = Samples.Salary, BookingText = "Salary1", BookingValue = 120 },
+                    new { AccountNumber = Samples.Salary, BookingText = "Salary2", BookingValue = 80 }
+                });
         }
 
         [Fact]
@@ -346,8 +366,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             using var _ = new AssertionScope();
             vm.DebitSplitEntries.Should().BeEquivalentTo(
-                new { AccountNumber = Samples.Shoes, BookingText = "Shoes1", BookingValue = 20 },
-                new { AccountNumber = Samples.Shoes, BookingText = "Shoes2", BookingValue = 30 });
+                new[]
+                {
+                    new { AccountNumber = Samples.Shoes, BookingText = "Shoes1", BookingValue = 20 },
+                    new { AccountNumber = Samples.Shoes, BookingText = "Shoes2", BookingValue = 30 }
+                });
         }
 
         [Fact]
@@ -469,45 +492,51 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     "2000", thisYear.ToString(CultureInfo.InvariantCulture),
                     (thisYear + 1).ToString(CultureInfo.InvariantCulture));
             sut.FullJournal.Items.Should().BeEquivalentTo(
-                new
+                new[]
                 {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Opening value 1",
-                    Value = 651,
-                    CreditAccount = "990 (Carryforward)",
-                    DebitAccount = "100 (Bank account)"
-                },
-                new
-                {
-                    Identifier = 2,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Opening value 2",
-                    Value = 2600,
-                    CreditAccount = "5000 (Bank credit)",
-                    DebitAccount = "990 (Carryforward)"
-                },
-                new
-                {
-                    Identifier = 3,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Opening value 3",
-                    Value = 99,
-                    CreditAccount = "990 (Carryforward)",
-                    DebitAccount = "6000 (Friends debit)"
+                    new
+                    {
+                        Identifier = 1,
+                        Date = new DateTime(thisYear + 1, 1, 1),
+                        Text = "Opening value 1",
+                        Value = 651,
+                        CreditAccount = "990 (Carryforward)",
+                        DebitAccount = "100 (Bank account)"
+                    },
+                    new
+                    {
+                        Identifier = 2,
+                        Date = new DateTime(thisYear + 1, 1, 1),
+                        Text = "Opening value 2",
+                        Value = 2600,
+                        CreditAccount = "5000 (Bank credit)",
+                        DebitAccount = "990 (Carryforward)"
+                    },
+                    new
+                    {
+                        Identifier = 3,
+                        Date = new DateTime(thisYear + 1, 1, 1),
+                        Text = "Opening value 3",
+                        Value = 99,
+                        CreditAccount = "990 (Carryforward)",
+                        DebitAccount = "6000 (Friends debit)"
+                    }
                 });
             sut.AccountJournal.Items.Should().BeEquivalentTo(
-                new
+                new object[]
                 {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Opening value 1",
-                    DebitValue = 651,
-                    CreditValue = 0,
-                    RemoteAccount = "990 (Carryforward)"
-                },
-                new { Text = "Total", IsSummary = true, DebitValue = 651, CreditValue = 0 },
-                new { Text = "Balance", IsSummary = true, DebitValue = 651, CreditValue = 0 });
+                    new
+                    {
+                        Identifier = 1,
+                        Date = new DateTime(thisYear + 1, 1, 1),
+                        Text = "Opening value 1",
+                        DebitValue = 651,
+                        CreditValue = 0,
+                        RemoteAccount = "990 (Carryforward)"
+                    },
+                    new { Text = "Total", IsSummary = true, DebitValue = 651, CreditValue = 0 },
+                    new { Text = "Balance", IsSummary = true, DebitValue = 651, CreditValue = 0 }
+                });
         }
 
         [CulturedFact("en")]
@@ -547,45 +576,51 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     "2000", thisYear.ToString(CultureInfo.InvariantCulture),
                     (thisYear + 1).ToString(CultureInfo.InvariantCulture));
             sut.FullJournal.Items.Should().BeEquivalentTo(
-                new
+                new[]
                 {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Opening value 1",
-                    Value = 651,
-                    CreditAccount = "999 (MyCarryForward)",
-                    DebitAccount = "100 (Bank account)"
-                },
-                new
-                {
-                    Identifier = 2,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Opening value 2",
-                    Value = 2600,
-                    CreditAccount = "5000 (Bank credit)",
-                    DebitAccount = "999 (MyCarryForward)"
-                },
-                new
-                {
-                    Identifier = 3,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Opening value 3",
-                    Value = 99,
-                    CreditAccount = "999 (MyCarryForward)",
-                    DebitAccount = "6000 (Friends debit)"
+                    new
+                    {
+                        Identifier = 1,
+                        Date = new DateTime(thisYear + 1, 1, 1),
+                        Text = "Opening value 1",
+                        Value = 651,
+                        CreditAccount = "999 (MyCarryForward)",
+                        DebitAccount = "100 (Bank account)"
+                    },
+                    new
+                    {
+                        Identifier = 2,
+                        Date = new DateTime(thisYear + 1, 1, 1),
+                        Text = "Opening value 2",
+                        Value = 2600,
+                        CreditAccount = "5000 (Bank credit)",
+                        DebitAccount = "999 (MyCarryForward)"
+                    },
+                    new
+                    {
+                        Identifier = 3,
+                        Date = new DateTime(thisYear + 1, 1, 1),
+                        Text = "Opening value 3",
+                        Value = 99,
+                        CreditAccount = "999 (MyCarryForward)",
+                        DebitAccount = "6000 (Friends debit)"
+                    }
                 });
             sut.AccountJournal.Items.Should().BeEquivalentTo(
-                new
+                new object[]
                 {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
-                    Text = "Opening value 1",
-                    DebitValue = 651,
-                    CreditValue = 0,
-                    RemoteAccount = "999 (MyCarryForward)"
-                },
-                new { Text = "Total", IsSummary = true, DebitValue = 651, CreditValue = 0 },
-                new { Text = "Balance", IsSummary = true, DebitValue = 651, CreditValue = 0 });
+                    new
+                    {
+                        Identifier = 1,
+                        Date = new DateTime(thisYear + 1, 1, 1),
+                        Text = "Opening value 1",
+                        DebitValue = 651,
+                        CreditValue = 0,
+                        RemoteAccount = "999 (MyCarryForward)"
+                    },
+                    new { Text = "Total", IsSummary = true, DebitValue = 651, CreditValue = 0 },
+                    new { Text = "Balance", IsSummary = true, DebitValue = 651, CreditValue = 0 }
+                });
         }
 
         [Fact]

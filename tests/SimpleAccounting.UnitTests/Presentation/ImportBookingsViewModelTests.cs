@@ -27,7 +27,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
             var sut = new ImportBookingsViewModel(null!, projectData);
 
-            sut.ImportAccounts.Should().BeEquivalentTo(new { Name = "Bank account" });
+            sut.ImportAccounts.Should().BeEquivalentTo(new[] { new { Name = "Bank account" } });
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.IsImportPossible.Should().BeFalse();
             sut.IsImportBroken.Should().BeTrue();
         }
-        
+
         [Fact]
         public void ImportStatus_AnyImportAccount()
         {
@@ -59,9 +59,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                     {
                         new AccountDefinition
                         {
-                            ID = 100,
-                            Name = "Bank",
-                            ImportMapping = Samples.SimpleImportConfiguration
+                            ID = 100, Name = "Bank", ImportMapping = Samples.SimpleImportConfiguration
                         }
                     }
                 }
@@ -71,7 +69,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.IsImportPossible.Should().BeTrue();
             sut.IsImportBroken.Should().BeFalse();
         }
-        
+
         [CulturedFact("en")]
         public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
         {
@@ -86,45 +84,48 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.ImportDataFiltered.Should().BeEmpty("start date should be set after last booking");
             sut.ExistingData.Should()
                 .BeEquivalentTo(
-                    new
+                    new[]
                     {
-                        Date = new DateTime(year, 1, 1),
-                        Identifier = 1,
-                        Text = "Open 1",
-                        Value = 1000,
-                        RemoteAccount = new { ID = 990 }
-                    },
-                    new
-                    {
-                        Date = new DateTime(year, 1, 28),
-                        Identifier = 3,
-                        Text = "Salary",
-                        Value = 200,
-                        RemoteAccount = new { ID = 400 }
-                    },
-                    new
-                    {
-                        Date = new DateTime(year, 1, 29),
-                        Identifier = 4,
-                        Text = "Credit rate",
-                        Value = -400,
-                        RemoteAccount = new { ID = 5000 }
-                    },
-                    new
-                    {
-                        Date = new DateTime(year, 2, 1),
-                        Identifier = 5,
-                        Text = "Shoes",
-                        Value = -50,
-                        RemoteAccount = new { ID = 600 }
-                    },
-                    new
-                    {
-                        Date = new DateTime(year, 2, 5),
-                        Identifier = 6,
-                        Text = "Rent to friend",
-                        Value = -99,
-                        RemoteAccount = new { ID = 6000 }
+                        new
+                        {
+                            Date = new DateTime(year, 1, 1),
+                            Identifier = 1,
+                            Text = "Open 1",
+                            Value = 1000,
+                            RemoteAccount = new { ID = 990 }
+                        },
+                        new
+                        {
+                            Date = new DateTime(year, 1, 28),
+                            Identifier = 3,
+                            Text = "Salary",
+                            Value = 200,
+                            RemoteAccount = new { ID = 400 }
+                        },
+                        new
+                        {
+                            Date = new DateTime(year, 1, 29),
+                            Identifier = 4,
+                            Text = "Credit rate",
+                            Value = -400,
+                            RemoteAccount = new { ID = 5000 }
+                        },
+                        new
+                        {
+                            Date = new DateTime(year, 2, 1),
+                            Identifier = 5,
+                            Text = "Shoes",
+                            Value = -50,
+                            RemoteAccount = new { ID = 600 }
+                        },
+                        new
+                        {
+                            Date = new DateTime(year, 2, 5),
+                            Identifier = 6,
+                            Text = "Rent to friend",
+                            Value = -99,
+                            RemoteAccount = new { ID = 6000 }
+                        }
                     })
                 .And.AllBeEquivalentTo(new { Name = "<already booked>", IsExisting = true });
         }
@@ -138,7 +139,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
             sut.LoadDataCommand.CanExecute(null).Should().BeFalse();
         }
-        
+
         [Fact]
         public void LoadDataCommand_NoLastImportFolder_DefaultUsedAndSelectedStored()
         {
@@ -154,7 +155,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             projectData.Storage.Setup.Behavior.LastBookingImportFolder.Should().Be("D:\\MySelectedFolder");
             dialogs.Received(1).ShowOpenFileDialog(Arg.Any<string>(), Arg.Is<string>(x => x == null));
         }
-        
+
         [Fact]
         public void LoadDataCommand_LoadFileCancelled_IsBusyReset()
         {
@@ -171,7 +172,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 .BeNullOrEmpty("last folder should remain unchanged");
             sut.Busy.IsBusy.Should().BeFalse();
         }
-        
+
         [Fact]
         public void LoadDataCommand_LastImportFolder_LastUsedAndNewStored()
         {
@@ -188,7 +189,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             projectData.Storage.Setup.Behavior.LastBookingImportFolder.Should().Be("F:\\MySelectedFolder");
             dialogs.Received(1).ShowOpenFileDialog(Arg.Any<string>(), Arg.Is<string>(x => x == "E:\\MySelectedFolder"));
         }
-        
+
         [Fact]
         public void BookAllCommand_EntryNotMapped_CannotExecute()
         {
@@ -214,9 +215,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             sut.LoadedData.Add(
                 new ImportEntryViewModel(accounts)
                 {
-                    RemoteAccount = accounts.First(),
-                    IsSkip = false,
-                    IsExisting = false
+                    RemoteAccount = accounts.First(), IsSkip = false, IsExisting = false
                 });
 
             sut.BookAllCommand.CanExecute(null).Should().BeTrue();
@@ -264,8 +263,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             var bankAccount = accounts.Single(x => x.Name == "Bank account");
             var sut = new ImportBookingsViewModel(
                 null!,
-                projectData)
-            { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
+                projectData) { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
             var remoteAccount = accounts.Single(x => x.ID == 600);
             int year = DateTime.Today.Year;
             sut.StartDate = new DateTime(year, 1, 2);
@@ -343,22 +341,25 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             // 106 should be skipped because it is not mapped
             // 107 should be skipped because it is valid entry AFTER unmapped entry => stopped
             parent.FullJournal.Items.Should().BeEquivalentTo(
-                new
+                new object[]
                 {
-                    Identifier = 102,
-                    Text = "Text",
-                    Value = 2,
-                    CreditAccount = "600 (Shoes)",
-                    DebitAccount = "100 (Bank account)",
-                    IsFollowup = true
-                },
-                new
-                {
-                    Identifier = 104,
-                    Text = "Name",
-                    Value = 1,
-                    CreditAccount = "100 (Bank account)",
-                    DebitAccount = "600 (Shoes)"
+                    new
+                    {
+                        Identifier = 102,
+                        Text = "Text",
+                        Value = 2,
+                        CreditAccount = "600 (Shoes)",
+                        DebitAccount = "100 (Bank account)",
+                        IsFollowup = true
+                    },
+                    new
+                    {
+                        Identifier = 104,
+                        Text = "Name",
+                        Value = 1,
+                        CreditAccount = "100 (Bank account)",
+                        DebitAccount = "600 (Shoes)"
+                    }
                 });
             projectDataMonitor.Should().Raise(nameof(projectData.JournalChanged)).Should().HaveCount(1);
         }
