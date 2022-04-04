@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <!-- license is apache 2.0 -->
-    <PackageReference Include="FluentAssertions" Version="6.5.1" />
+    <PackageReference Include="FluentAssertions" Version="6.6.0" />
     <!-- license is MS.NET -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <!-- license is BSD-3-Clause -->
