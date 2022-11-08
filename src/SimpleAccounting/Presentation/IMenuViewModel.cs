@@ -23,6 +23,7 @@ namespace lg2de.SimpleAccounting.Presentation
         ICommand SwitchCultureCommand { get; }
         bool IsGermanCulture { get; }
         bool IsEnglishCulture { get; }
+        bool IsSwissFrenchCulture { get; }
         bool IsSystemCulture { get; }
 
         ICommand AddBookingsCommand { get; }
