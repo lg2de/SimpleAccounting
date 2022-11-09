@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <!-- license is LGPL -->
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.36.0.43782">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.48.0.56517">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
