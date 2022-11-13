@@ -61,6 +61,9 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.projectData.SaveProject(),
             _ => this.projectData.IsModified);
 
+        public ICommand ProjectOptionsCommand => new RelayCommand(
+            _ => this.projectData.EditProjectOptions());
+
         public ICommand SwitchCultureCommand => new RelayCommand(
             cultureName =>
             {

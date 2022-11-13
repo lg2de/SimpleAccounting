@@ -209,8 +209,8 @@ Wollen Sie Speichern?</value>
   <data name="Word_BookingNumber" xml:space="preserve">
     <value>Buchungsnummer</value>
   </data>
-  <data name="Label_ValueWithCurrency" xml:space="preserve">
-    <value>Betrag (€)</value>
+  <data name="Label_ValueWithCurrencyX" xml:space="preserve">
+    <value>Betrag ({0})</value>
   </data>
   <data name="Header_DebitCredit" xml:space="preserve">
     <value>Soll/Haben</value>
@@ -551,5 +551,14 @@ Ohne eine solche Konfiguration für mindestens ein Konto ist diese Funktion deak
   </data>
   <data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
     <value>Regulärer Ausdruck, welcher verwendet wird, um Zeichenketten aus dem Text zu entfernen</value>
+  </data>
+  <data name="Word_Currency" xml:space="preserve">
+    <value>Währung</value>
+  </data>
+  <data name="Menu_Project_Settings_ProjectOptions" xml:space="preserve">
+    <value>Projekteinstellungen</value>
+  </data>
+  <data name="Header_ProjectOptions" xml:space="preserve">
+    <value>Projekteinstellungen bearbeiten</value>
   </data>
 </root>

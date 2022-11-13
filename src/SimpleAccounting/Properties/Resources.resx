@@ -215,8 +215,8 @@ Do you want to save?</value>
   <data name="Word_BookingNumber" xml:space="preserve">
     <value>Booking number</value>
   </data>
-  <data name="Label_ValueWithCurrency" xml:space="preserve">
-    <value>Value (€)</value>
+  <data name="Label_ValueWithCurrencyX" xml:space="preserve">
+    <value>Value ({0})</value>
   </data>
   <data name="Header_DebitCredit" xml:space="preserve">
     <value>Debit/Credit</value>
@@ -566,5 +566,14 @@ Without such configuration for at least one account, this function is disabled.<
   </data>
   <data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
     <value>Regular expression used to remove substrings</value>
+  </data>
+  <data name="Word_Currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="Menu_Project_Settings_ProjectOptions" xml:space="preserve">
+    <value>Project options</value>
+  </data>
+  <data name="Header_ProjectOptions" xml:space="preserve">
+    <value>Edit project options</value>
   </data>
 </root>

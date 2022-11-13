@@ -126,6 +126,40 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
         }
 
         [Fact]
+        public void EditProjectOptions_Changed_ProjectModified()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var settings = new Settings();
+            var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            sut.NewProject();
+            windowManager.ShowDialog(Arg.Any<ProjectOptionsViewModel>()).Returns(true);
+
+            sut.EditProjectOptions();
+
+            sut.IsModified.Should().BeTrue();
+        }
+
+        [Fact]
+        public void EditProjectOptions_Unchanged_ProjectNotModified()
+        {
+            var windowManager = Substitute.For<IWindowManager>();
+            var dialogs = Substitute.For<IDialogs>();
+            var fileSystem = Substitute.For<IFileSystem>();
+            var processApi = Substitute.For<IProcess>();
+            var settings = new Settings();
+            var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+            sut.NewProject();
+            windowManager.ShowDialog(Arg.Any<ProjectOptionsViewModel>()).Returns(false);
+
+            sut.EditProjectOptions();
+
+            sut.IsModified.Should().BeFalse();
+        }
+
+        [Fact]
         public void CloseYear_NonDefaultConfiguration_SettingsRestored()
         {
             var windowManager = Substitute.For<IWindowManager>();
