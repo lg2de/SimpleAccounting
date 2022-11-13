@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.Linq;
     using System.Windows.Input;
     using Caliburn.Micro;
@@ -32,6 +33,9 @@ namespace lg2de.SimpleAccounting.Presentation
             this.DateStart = this.projectData.CurrentYear.DateStart.ToDateTime();
             this.DateEnd = this.projectData.CurrentYear.DateEnd.ToDateTime();
             this.BookingIdentifier = this.projectData.MaxBookIdent + 1;
+            this.ValueLabel = string.Format(
+                CultureInfo.CurrentUICulture,
+                Resources.Label_ValueWithCurrencyX, this.projectData.Storage.Setup.Currency);
 
             if (this.Date > this.DateEnd)
             {
@@ -70,6 +74,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public List<AccountDefinition> ExpenseAccounts { get; private set; } = new List<AccountDefinition>();
 
         public List<AccountDefinition> ExpenseRemoteAccounts { get; private set; } = new List<AccountDefinition>();
+
+        public string ValueLabel { get; }
 
         public DateTime Date { get; set; }
 

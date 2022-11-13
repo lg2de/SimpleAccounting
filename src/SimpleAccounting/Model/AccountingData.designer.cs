@@ -273,6 +273,8 @@ namespace lg2de.SimpleAccounting.Model {
                 this.locationField = value;
             }
         }
+
+        public string Currency { get; set; }
         
         public AccountingDataSetupBookingTemplates BookingTemplates {
             get {

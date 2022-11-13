@@ -78,6 +78,7 @@ namespace lg2de.SimpleAccounting.Model
             };
             return new AccountingData
             {
+                Setup = new AccountingDataSetup { Currency = "€" },
                 Accounts = new List<AccountingDataAccountGroup>
                 {
                     new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }
@@ -94,6 +95,7 @@ namespace lg2de.SimpleAccounting.Model
         {
             var result = false;
             result |= this.MergeYearsIntoJournal();
+            result |= this.IntroduceCurrency();
             result |= this.RemoveEmptyElements();
             this.InitializeFields();
             return result;
@@ -219,6 +221,17 @@ namespace lg2de.SimpleAccounting.Model
             return result;
         }
 
+        private bool IntroduceCurrency()
+        {
+            if (string.IsNullOrWhiteSpace(this.Setup.Currency))
+            {
+                this.Setup.Currency = "€";
+                return true;
+            }
+
+            return false;
+        }
+
         private bool RemoveEmptyElements()
         {
             if (this.Accounts == null)
@@ -257,6 +270,7 @@ namespace lg2de.SimpleAccounting.Model
         {
             this.behaviorField = new AccountingDataSetupBehavior();
             this.reportsField = new AccountingDataSetupReports();
+            this.Currency = "€";
         }
     }
 
@@ -311,7 +325,7 @@ namespace lg2de.SimpleAccounting.Model
 
             var latest = journals.Last();
             latest.Booking ??= new List<AccountingDataJournalBooking>();
-            
+
             return latest;
         }
     }

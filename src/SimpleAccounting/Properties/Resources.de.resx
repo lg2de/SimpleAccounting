@@ -209,8 +209,8 @@ Wollen Sie Speichern?</value>
   <data name="Word_BookingNumber" xml:space="preserve">
     <value>Buchungsnummer</value>
   </data>
-  <data name="Label_ValueWithCurrency" xml:space="preserve">
-    <value>Betrag (€)</value>
+  <data name="Label_ValueWithCurrencyX" xml:space="preserve">
+    <value>Betrag ({0})</value>
   </data>
   <data name="Header_DebitCredit" xml:space="preserve">
     <value>Soll/Haben</value>
