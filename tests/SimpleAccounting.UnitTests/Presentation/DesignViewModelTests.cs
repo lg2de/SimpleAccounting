@@ -28,6 +28,13 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void BusyDesignControlModel_ConstructorSucceed()
+        {
+            Action action = () => new BusyDesignControlModel();
+            action.Should().NotThrow();
+        }
+
+        [Fact]
         public void CloseYearDesignViewModel_ConstructorSucceed()
         {
             Action action = () => new CloseYearDesignViewModel();
@@ -42,16 +49,16 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
-        public void ShellDesignViewModel_ConstructorSucceed()
+        public void ProjectOptionsDesignViewModel_ConstructorSucceed()
         {
-            Action action = () => new ShellDesignViewModel();
+            Action action = () => new ProjectOptionsDesignViewModel();
             action.Should().NotThrow();
         }
 
         [Fact]
-        public void BusyDesignControlModel_ConstructorSucceed()
+        public void ShellDesignViewModel_ConstructorSucceed()
         {
-            Action action = () => new BusyDesignControlModel();
+            Action action = () => new ShellDesignViewModel();
             action.Should().NotThrow();
         }
     }

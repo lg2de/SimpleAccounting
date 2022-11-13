@@ -52,6 +52,8 @@ namespace lg2de.SimpleAccounting.Model
 
         void RemoveAutoSaveFile();
 
+        void EditProjectOptions();
+
         void ShowAddBookingDialog(bool showInactiveAccounts);
 
         void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts);

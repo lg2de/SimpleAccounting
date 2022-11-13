@@ -16,6 +16,7 @@ namespace lg2de.SimpleAccounting.Presentation
         ICommand NewProjectCommand { get; }
         ICommand OpenProjectCommand { get; }
         ICommand SaveProjectCommand { get; }
+        ICommand ProjectOptionsCommand { get; }
 
         ObservableCollection<MenuItemViewModel> RecentProjects { get; }
 

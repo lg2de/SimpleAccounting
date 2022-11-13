@@ -48,6 +48,9 @@
             ItemContainerStyle="{StaticResource CommandMenuStyle}" />
           <Separator />
           <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings}">
+            <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings_ProjectOptions}"
+                      Command="{Binding Menu.ProjectOptionsCommand}"/>
+            <Separator />
             <MenuItem Header="Deutsch" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="de"
                       IsCheckable="True" IsChecked="{Binding Menu.IsGermanCulture, Mode=OneWay}" />
             <MenuItem Header="English" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="en"

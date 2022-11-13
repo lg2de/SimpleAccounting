@@ -376,6 +376,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit project options.
+        /// </summary>
+        public static string Header_ProjectOptions {
+            get {
+                return ResourceManager.GetString("Header_ProjectOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Settings changed.
         /// </summary>
         public static string Header_SettingsChanged {
@@ -685,6 +694,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Menu_Project_Settings {
             get {
                 return ResourceManager.GetString("Menu_Project_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project options.
+        /// </summary>
+        public static string Menu_Project_Settings_ProjectOptions {
+            get {
+                return ResourceManager.GetString("Menu_Project_Settings_ProjectOptions", resourceCulture);
             }
         }
         
@@ -1056,6 +1074,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_CreditValue_Wrapped {
             get {
                 return ResourceManager.GetString("Word_CreditValue_Wrapped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Currency.
+        /// </summary>
+        public static string Word_Currency {
+            get {
+                return ResourceManager.GetString("Word_Currency", resourceCulture);
             }
         }
         

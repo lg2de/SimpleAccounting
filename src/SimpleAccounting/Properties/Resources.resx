@@ -567,4 +567,13 @@ Without such configuration for at least one account, this function is disabled.<
   <data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
     <value>Regular expression used to remove substrings</value>
   </data>
+  <data name="Word_Currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="Menu_Project_Settings_ProjectOptions" xml:space="preserve">
+    <value>Project options</value>
+  </data>
+  <data name="Header_ProjectOptions" xml:space="preserve">
+    <value>Edit project options</value>
+  </data>
 </root>

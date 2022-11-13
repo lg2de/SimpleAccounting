@@ -198,6 +198,17 @@ namespace lg2de.SimpleAccounting.Model
             }
         }
 
+        public void EditProjectOptions()
+        {
+            var vm = new ProjectOptionsViewModel(this.Storage);
+            if (this.windowManager.ShowDialog(vm) != true)
+            {
+                return;
+            }
+
+            this.IsModified = true;
+        }
+
         public void AddBooking(AccountingDataJournalBooking booking, bool updateJournal)
         {
             this.CurrentYear.Booking.Add(booking);

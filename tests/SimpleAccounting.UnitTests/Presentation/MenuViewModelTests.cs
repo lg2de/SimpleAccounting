@@ -24,6 +24,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
     using lg2de.SimpleAccounting.Reports;
     using NSubstitute;
     using Xunit;
+    using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
     using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
     public class MenuViewModelTests
@@ -111,6 +112,21 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             projectData.IsModified = true;
 
             sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ProjectOptionsCommand_Invoked_ProjectOptionEditorStarted()
+        {
+            var projectData = Substitute.For<IProjectData>();
+            var busy = Substitute.For<IBusy>();
+            var reportFactory = Substitute.For<IReportFactory>();
+            var processApi = Substitute.For<IProcess>();
+            var dialogs = Substitute.For<IDialogs>();
+            var sut = new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs);
+
+            sut.ProjectOptionsCommand.Execute(null);
+
+            projectData.Received(1).EditProjectOptions();
         }
 
         [Fact]

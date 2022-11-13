@@ -552,4 +552,13 @@ Ohne eine solche Konfiguration für mindestens ein Konto ist diese Funktion deak
   <data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
     <value>Regulärer Ausdruck, welcher verwendet wird, um Zeichenketten aus dem Text zu entfernen</value>
   </data>
+  <data name="Word_Currency" xml:space="preserve">
+    <value>Währung</value>
+  </data>
+  <data name="Menu_Project_Settings_ProjectOptions" xml:space="preserve">
+    <value>Projekteinstellungen</value>
+  </data>
+  <data name="Header_ProjectOptions" xml:space="preserve">
+    <value>Projekteinstellungen bearbeiten</value>
+  </data>
 </root>
