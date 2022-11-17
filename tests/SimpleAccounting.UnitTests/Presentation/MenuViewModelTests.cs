@@ -78,7 +78,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
                 icon: MessageBoxImage.Information);
             sut.IsGermanCulture.Should().BeFalse();
             sut.IsEnglishCulture.Should().BeFalse();
-            sut.IsSwissFrenchCulture.Should().BeFalse();
+            sut.IsFrenchCulture.Should().BeFalse();
             sut.IsSystemCulture.Should().BeFalse();
         }
 

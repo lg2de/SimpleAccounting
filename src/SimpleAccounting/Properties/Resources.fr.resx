@@ -158,10 +158,7 @@ Voulez-vous enregistrer ?</value>
 	<data name="Word_Various" xml:space="preserve">
     <value>Divers</value>
   </data>
-	<data name="Header_Journal" xml:space="preserve">
-    <value>Journal</value>
-  </data>
-	<data name="Header_AccountSheets" xml:space="preserve">
+  <data name="Header_AccountSheets" xml:space="preserve">
     <value>Feuilles des comptes</value>
   </data>
 	<data name="Header_TotalsAndBalances" xml:space="preserve">
@@ -188,10 +185,7 @@ Voulez-vous enregistrer ?</value>
 	<data name="EditAccount_AccountActive" xml:space="preserve">
     <value>le compte est-il actif</value>
   </data>
-	<data name="Word_Ok" xml:space="preserve">
-    <value>OK</value>
-  </data>
-	<data name="Word_Cancel" xml:space="preserve">
+  <data name="Word_Cancel" xml:space="preserve">
     <value>Annuler</value>
   </data>
 	<data name="Word_CarriedForwardAccount" xml:space="preserve">
@@ -215,10 +209,7 @@ Voulez-vous enregistrer ?</value>
 	<data name="Word_BookingNumber" xml:space="preserve">
     <value>Numéro de journalisation</value>
   </data>
-	<data name="Label_ValueWithCurrency" xml:space="preserve">
-    <value>Valeur (CHF)</value>
-  </data>
-	<data name="Header_DebitCredit" xml:space="preserve">
+  <data name="Header_DebitCredit" xml:space="preserve">
     <value>Débit/Crédit</value>
   </data>
 	<data name="Word_Debit" xml:space="preserve">
@@ -367,10 +358,7 @@ Les noms de destinataires importés et les textes de transaction peuvent être m
 	<data name="Menu_Reports" xml:space="preserve">
     <value>Rapports</value>
   </data>
-	<data name="Menu_Reports_Journal" xml:space="preserve">
-    <value>Journal</value>
-  </data>
-	<data name="Menu_Reports_AccountJournal" xml:space="preserve">
+  <data name="Menu_Reports_AccountJournal" xml:space="preserve">
     <value>Feuilles des comptes</value>
   </data>
 	<data name="Menu_Reports_TotalsAndBalances" xml:space="preserve">
@@ -566,5 +554,17 @@ Sans une telle configuration pour au moins un compte, cette fonction est désact
   </data>
 	<data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
     <value>Expression régulière utilisée pour supprimer des sous-chaînes</value>
+  </data>
+  <data name="Header_ProjectOptions" xml:space="preserve">
+    <value>Modifier les options du projet</value>
+  </data>
+  <data name="Label_ValueWithCurrencyX" xml:space="preserve">
+    <value>Valeur ({0})</value>
+  </data>
+  <data name="Menu_Project_Settings_ProjectOptions" xml:space="preserve">
+    <value>Options du projet</value>
+  </data>
+  <data name="Word_Currency" xml:space="preserve">
+    <value>Monnaie</value>
   </data>
 </root>

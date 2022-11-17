@@ -55,8 +55,8 @@
                       IsCheckable="True" IsChecked="{Binding Menu.IsGermanCulture, Mode=OneWay}" />
             <MenuItem Header="English" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="en"
                       IsCheckable="True" IsChecked="{Binding Menu.IsEnglishCulture, Mode=OneWay}" />
-            <MenuItem Header="SwissFrench" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="fr-CH"
-                      IsCheckable="True" IsChecked="{Binding Menu.IsSwissFrenchCulture, Mode=OneWay}" />
+            <MenuItem Header="Français" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="fr"
+                      IsCheckable="True" IsChecked="{Binding Menu.IsFrenchCulture, Mode=OneWay}" />
             <MenuItem Header="&lt;System&gt;" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter=""
                       IsCheckable="True" IsChecked="{Binding Menu.IsSystemCulture, Mode=OneWay}" />
           </MenuItem>

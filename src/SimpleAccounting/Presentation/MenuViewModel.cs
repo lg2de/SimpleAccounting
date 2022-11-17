@@ -70,7 +70,7 @@ namespace lg2de.SimpleAccounting.Presentation
                 this.projectData.Settings.Culture = cultureName.ToString();
                 this.NotifyOfPropertyChange(nameof(this.IsGermanCulture));
                 this.NotifyOfPropertyChange(nameof(this.IsEnglishCulture));
-                this.NotifyOfPropertyChange(nameof(this.IsSwissFrenchCulture));
+                this.NotifyOfPropertyChange(nameof(this.IsFrenchCulture));
                 this.NotifyOfPropertyChange(nameof(this.IsSystemCulture));
                 this.dialogs.ShowMessageBox(
                     Resources.Information_CultureChangeRestartRequired,
@@ -80,7 +80,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public bool IsGermanCulture => this.projectData.Settings.Culture == "de";
         public bool IsEnglishCulture => this.projectData.Settings.Culture == "en";
-        public bool IsSwissFrenchCulture => this.projectData.Settings.Culture == "fr-CH";
+        public bool IsFrenchCulture => this.projectData.Settings.Culture == "fr";
         public bool IsSystemCulture => this.projectData.Settings.Culture == string.Empty;
 
         public ObservableCollection<MenuItemViewModel> RecentProjects { get; }
