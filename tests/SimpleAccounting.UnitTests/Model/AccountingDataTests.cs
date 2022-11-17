@@ -266,6 +266,46 @@ namespace lg2de.SimpleAccounting.UnitTests.Model
                 });
         }
 
+        [CulturedFact("fr")]
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        public void CloseYear_SampleDataFrench_TextCorrect()
+        {
+            var sut = Samples.SampleProject;
+            var currentYear = sut.Journal.Last();
+            currentYear.Booking.AddRange(Samples.SampleBookings);
+            var carryforwardAccount =
+                sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+
+            sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
+
+            var newYear = sut.Journal.Last();
+            newYear.Should().NotBeEquivalentTo(currentYear);
+            currentYear.Closed.Should().BeTrue();
+            newYear.Closed.Should().BeFalse();
+            newYear.Booking.Should().BeEquivalentTo(
+                new[]
+                {
+                    new
+                    {
+                        ID = 1,
+                        Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 1" } },
+                        Debit = new[] { new { Account = 100, Text = "Valeur d'ouverture 1" } }
+                    },
+                    new
+                    {
+                        ID = 2,
+                        Credit = new[] { new { Account = 5000, Text = "Valeur d'ouverture 2" } },
+                        Debit = new[] { new { Account = 990, Text = "Valeur d'ouverture 2" } }
+                    },
+                    new
+                    {
+                        ID = 3,
+                        Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 3" } },
+                        Debit = new[] { new { Account = 6000, Text = "Valeur d'ouverture 3" } }
+                    }
+                });
+        }
+
         [CulturedFact("en")]
         public void CloseYear_TextOptionAccountName_TextCorrect()
         {
