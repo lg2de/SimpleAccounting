@@ -228,7 +228,7 @@
         <GridSplitter
           Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"
           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-        <DockPanel Grid.ColumnSpan="3" Grid.Row="2">
+        <DockPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2">
           <TextBlock
             DockPanel.Dock="Left"
             Text="{x:Static properties:Resources.Word_Accounts}"
@@ -246,11 +246,18 @@
             ClipboardCopyMode="IncludeHeader"
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_Number}" Binding="{Binding Identifier}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_AccountName}" Binding="{Binding Name}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_AccountGroup}"
-                                  Binding="{Binding Group.Name}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_AccountType}" Binding="{Binding Type}" />
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_Number}"
+                Binding="{Binding Identifier}" />
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_AccountName}"
+                Binding="{Binding Name}" />
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_AccountGroup}"
+                Binding="{Binding Group.Name}" />
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_AccountType}"
+                Binding="{Binding TypeName}" />
             </DataGrid.Columns>
             <DataGrid.InputBindings>
               <MouseBinding

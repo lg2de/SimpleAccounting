@@ -133,7 +133,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
         public void SelectFirstAccount()
         {
-            // Note, all constructions of AccountingDataJournal initializes the list of bookins.
+            // Note, all constructions of AccountingDataJournal initializes the list of bookings.
             // We do not need to check for null.
             var firstBooking = this.projectData.CurrentYear.Booking
                 .OrderBy(x => x.Date)

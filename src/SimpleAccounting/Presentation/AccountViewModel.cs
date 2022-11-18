@@ -12,6 +12,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
     /// <summary>
     ///     Implements the view model for a single account.
@@ -22,13 +23,15 @@ namespace lg2de.SimpleAccounting.Presentation
 
         static AccountViewModel()
         {
-            foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)))
+            foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>())
             {
-                Types.Add((AccountDefinitionType)type!);
+                var localizedType = Resources.ResourceManager.GetString($"AccountType_{type}") ?? $"<{type}>";
+                Types[type] = localizedType;
             }
         }
 
-        public static IList<AccountDefinitionType> Types { get; } = new List<AccountDefinitionType>();
+        public static IDictionary<AccountDefinitionType, string> Types { get; } =
+            new Dictionary<AccountDefinitionType, string>();
 
         public ulong Identifier { get; set; }
 
@@ -40,6 +43,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public AccountingDataAccountGroup? Group { get; set; }
 
         public AccountDefinitionType Type { get; set; }
+
+        public string TypeName => Types[this.Type];
 
         public bool IsActivated { get; set; } = true;
 

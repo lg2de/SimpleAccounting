@@ -576,4 +576,22 @@ Without such configuration for at least one account, this function is disabled.<
   <data name="Header_ProjectOptions" xml:space="preserve">
     <value>Edit project options</value>
   </data>
+  <data name="AccountType_Asset" xml:space="preserve">
+    <value>Asset</value>
+  </data>
+  <data name="AccountType_Income" xml:space="preserve">
+    <value>Income</value>
+  </data>
+  <data name="AccountType_Expense" xml:space="preserve">
+    <value>Expense</value>
+  </data>
+  <data name="AccountType_Credit" xml:space="preserve">
+    <value>Credit</value>
+  </data>
+  <data name="AccountType_Debit" xml:space="preserve">
+    <value>Debit</value>
+  </data>
+  <data name="AccountType_Carryforward" xml:space="preserve">
+    <value>Carry forward</value>
+  </data>
 </root>

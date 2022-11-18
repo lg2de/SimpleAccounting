@@ -87,7 +87,9 @@
           <ComboBox
             Grid.Column="1" Grid.Row="3"
             ItemsSource="{Binding Types}"
-            SelectedItem="{Binding Type}" />
+            SelectedValue="{Binding Type}"
+            DisplayMemberPath="Value"
+            SelectedValuePath="Key"/>
 
           <StackPanel
             Grid.Column="1" Grid.Row="4"
