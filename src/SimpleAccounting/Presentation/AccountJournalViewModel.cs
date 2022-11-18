@@ -61,7 +61,8 @@ namespace lg2de.SimpleAccounting.Presentation
                         Identifier = booking.ID,
                         Date = booking.Date.ToDateTime(),
                         Text = debitEntry.Text,
-                        DebitValue = debitEntry.Value.ToViewModel()
+                        DebitValue = debitEntry.Value.ToViewModel(),
+                        IsFollowup = booking.Followup
                     };
 
                     debitSum += item.DebitValue;
@@ -79,7 +80,8 @@ namespace lg2de.SimpleAccounting.Presentation
                         Identifier = booking.ID,
                         Date = booking.Date.ToDateTime(),
                         Text = creditEntry.Text,
-                        CreditValue = creditEntry.Value.ToViewModel()
+                        CreditValue = creditEntry.Value.ToViewModel(),
+                        IsFollowup = booking.Followup
                     };
 
                     creditSum += item.CreditValue;
