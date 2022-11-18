@@ -19,19 +19,27 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     internal class AccountViewModel : Screen
     {
+        private static readonly Lazy<Dictionary<AccountDefinitionType, string>> types;
+
         private bool isImportActive;
 
         static AccountViewModel()
         {
-            foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>())
-            {
-                var localizedType = Resources.ResourceManager.GetString($"AccountType_{type}") ?? $"<{type}>";
-                Types[type] = localizedType;
-            }
+            types = new Lazy<Dictionary<AccountDefinitionType, string>>(
+                () =>
+                {
+                    var result = new Dictionary<AccountDefinitionType, string>();
+                    foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>())
+                    {
+                        var localizedType = Resources.ResourceManager.GetString($"AccountType_{type}") ?? $"<{type}>";
+                        result[type] = localizedType;
+                    }
+
+                    return result;
+                });
         }
 
-        public static IDictionary<AccountDefinitionType, string> Types { get; } =
-            new Dictionary<AccountDefinitionType, string>();
+        public static IDictionary<AccountDefinitionType, string> Types => types.Value;
 
         public ulong Identifier { get; set; }
 

@@ -23,7 +23,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
         [CulturedFact("de")]
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        public void TypeName()
+        public void TypeName_GermanCulture_CorrectlyInitialized()
         {
             var sut = new AccountViewModel { Type = AccountDefinitionType.Credit };
 
