@@ -19,27 +19,16 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     internal class AccountViewModel : Screen
     {
-        private static readonly Lazy<Dictionary<AccountDefinitionType, string>> types;
+        private static Lazy<Dictionary<AccountDefinitionType, string>>? types;
 
         private bool isImportActive;
 
         static AccountViewModel()
         {
-            types = new Lazy<Dictionary<AccountDefinitionType, string>>(
-                () =>
-                {
-                    var result = new Dictionary<AccountDefinitionType, string>();
-                    foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>())
-                    {
-                        var localizedType = Resources.ResourceManager.GetString($"AccountType_{type}") ?? $"<{type}>";
-                        result[type] = localizedType;
-                    }
-
-                    return result;
-                });
+            ResetTypesLazy();
         }
 
-        public static IDictionary<AccountDefinitionType, string> Types => types.Value;
+        public static IDictionary<AccountDefinitionType, string> Types => types!.Value;
 
         public ulong Identifier { get; set; }
 
@@ -126,6 +115,22 @@ namespace lg2de.SimpleAccounting.Presentation
             });
 
         internal Func<ulong, bool>? IsValidIdentifierFunc { get; set; }
+
+        internal static void ResetTypesLazy()
+        {
+            types = new Lazy<Dictionary<AccountDefinitionType, string>>(
+                () =>
+                {
+                    var result = new Dictionary<AccountDefinitionType, string>();
+                    foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>())
+                    {
+                        var localizedType = Resources.ResourceManager.GetString($"AccountType_{type}") ?? $"<{type}>";
+                        result[type] = localizedType;
+                    }
+
+                    return result;
+                });
+        }
 
         internal AccountViewModel Clone()
         {

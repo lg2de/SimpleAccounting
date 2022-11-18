@@ -17,6 +17,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [CulturedFact("en")]
         public void Types_DefaultCulture_NoFallbackValue()
         {
+            AccountViewModel.ResetTypesLazy();
             AccountViewModel.Types.Values.Should()
                 .NotContain(x => x.StartsWith("<", StringComparison.InvariantCulture));
         }
@@ -25,6 +26,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         public void TypeName_GermanCulture_CorrectlyInitialized()
         {
+            AccountViewModel.ResetTypesLazy();
             var sut = new AccountViewModel { Type = AccountDefinitionType.Credit };
 
             sut.TypeName.Should().Be("Kreditor");
