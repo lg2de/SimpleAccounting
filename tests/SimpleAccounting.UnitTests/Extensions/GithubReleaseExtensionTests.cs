@@ -77,8 +77,11 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions
         private class TestingRelease : ReleaseAsset
         {
             public TestingRelease(string name)
+                : base(
+                    url: string.Empty, id: 1, nodeId: string.Empty, name, label: string.Empty, state: string.Empty,
+                    contentType: string.Empty, size: 0, downloadCount: 0, createdAt: DateTimeOffset.MinValue,
+                    updatedAt: DateTimeOffset.MinValue, browserDownloadUrl: string.Empty, new Author())
             {
-                this.Name = name;
             }
         }
     }
