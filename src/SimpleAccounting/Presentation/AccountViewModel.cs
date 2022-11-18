@@ -19,8 +19,6 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     internal class AccountViewModel : Screen
     {
-        private static Lazy<Dictionary<AccountDefinitionType, string>>? types;
-
         private bool isImportActive;
 
         static AccountViewModel()
@@ -28,7 +26,8 @@ namespace lg2de.SimpleAccounting.Presentation
             ResetTypesLazy();
         }
 
-        public static IDictionary<AccountDefinitionType, string> Types => types!.Value;
+        public static IDictionary<AccountDefinitionType, string> Types { get; } =
+            new Dictionary<AccountDefinitionType, string>();
 
         public ulong Identifier { get; set; }
 
@@ -91,6 +90,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return false;
                 }
 
+                // check whether the identifier is valid (e.g. not duplicated)
                 if (this.IsValidIdentifierFunc?.Invoke(this.Identifier) == false)
                 {
                     return false;
@@ -98,6 +98,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 if (!this.IsImportActive)
                 {
+                    // import is not active -> done
                     return true;
                 }
 
@@ -118,18 +119,12 @@ namespace lg2de.SimpleAccounting.Presentation
 
         internal static void ResetTypesLazy()
         {
-            types = new Lazy<Dictionary<AccountDefinitionType, string>>(
-                () =>
-                {
-                    var result = new Dictionary<AccountDefinitionType, string>();
-                    foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>())
-                    {
-                        var localizedType = Resources.ResourceManager.GetString($"AccountType_{type}") ?? $"<{type}>";
-                        result[type] = localizedType;
-                    }
-
-                    return result;
-                });
+            Types.Clear();
+            foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>())
+            {
+                var localizedType = Resources.ResourceManager.GetString($"AccountType_{type}") ?? $"<{type}>";
+                Types[type] = localizedType;
+            }
         }
 
         internal AccountViewModel Clone()
