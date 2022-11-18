@@ -451,7 +451,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
             fileSystem.FileExists("the.fileName~").Returns(true);
 
             (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                    .CompleteWithinAsync(1.Seconds()))
+                    .CompleteWithinAsync(5.Seconds()))
                 .Which.Should().Be(OperationResult.Completed);
 
             using var _ = new AssertionScope();
