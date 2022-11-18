@@ -61,6 +61,10 @@ namespace lg2de.SimpleAccounting.Presentation
             this.Accounts.OnDataLoaded();
         }
 
+        [SuppressMessage(
+            "Major Code Smell",
+            "S6354:Use a testable date/time provider",
+            Justification = "Ok for testing code")]
         private void LoadJournal()
         {
             int index = 0;
@@ -68,7 +72,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 Identifier = 41,
                 Date = DateTime.Now,
-                Text = "Booking1",
+                Text = "Booking 1",
                 Value = 123.4,
                 CreditAccount = "100",
                 DebitAccount = "400"
@@ -78,7 +82,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 Identifier = 42,
                 Date = DateTime.Now,
-                Text = "Booking2",
+                Text = "Booking 2",
                 Value = 1.444,
                 CreditAccount = "101",
                 DebitAccount = "401",
@@ -89,7 +93,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 Identifier = 43,
                 Date = DateTime.Now,
-                Text = "Booking3",
+                Text = "Booking 3",
                 Value = 99,
                 CreditAccount = "101",
                 DebitAccount = "401",
@@ -99,7 +103,7 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 Identifier = 44,
                 Date = DateTime.Now,
-                Text = "Booking4",
+                Text = "Booking 4",
                 Value = -99,
                 CreditAccount = "101",
                 DebitAccount = "401",
@@ -112,16 +116,17 @@ namespace lg2de.SimpleAccounting.Presentation
             {
                 Identifier = 42,
                 Date = DateTime.Now,
-                Text = "Booking1",
+                Text = "Booking 2",
                 CreditValue = 123.4,
-                RemoteAccount = "Div."
+                RemoteAccount = "Div.",
+                IsFollowup = true
             };
             this.AccountJournal.Items.Add(accountJournalItem);
             accountJournalItem = new AccountJournalItemViewModel(index++)
             {
                 Identifier = 44,
                 Date = DateTime.Now,
-                Text = "Booking",
+                Text = "Booking 4",
                 CreditValue = 1.222,
                 RemoteAccount = "Div."
             };
