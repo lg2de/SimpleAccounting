@@ -32,7 +32,7 @@
     <!-- license is MIT -->
     <PackageReference Include="Octokit" Version="4.0.1" />
     <!-- license is MIT -->
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
