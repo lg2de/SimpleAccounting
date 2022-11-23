@@ -7,7 +7,7 @@ on:
     tags:
       - '*'
   pull_request:
-    types: [opened, reopened, synchronize]
+  pull_request_target:
 
 jobs:
   build:
