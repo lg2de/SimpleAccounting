@@ -571,7 +571,7 @@ Sans une telle configuration pour au moins un compte, cette fonction est désact
     <value>Actif</value>
   </data>
   <data name="AccountType_Carryforward" xml:space="preserve">
-    <value>Reporter</value>
+    <value>Report à nouveau</value>
   </data>
   <data name="AccountType_Credit" xml:space="preserve">
     <value>Crédit</value>
