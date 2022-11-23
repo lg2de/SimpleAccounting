@@ -561,4 +561,22 @@ Ohne eine solche Konfiguration für mindestens ein Konto ist diese Funktion deak
   <data name="Header_ProjectOptions" xml:space="preserve">
     <value>Projekteinstellungen bearbeiten</value>
   </data>
+  <data name="AccountType_Asset" xml:space="preserve">
+    <value>Bestand</value>
+  </data>
+  <data name="AccountType_Income" xml:space="preserve">
+    <value>Einnahme</value>
+  </data>
+  <data name="AccountType_Expense" xml:space="preserve">
+    <value>Ausgabe</value>
+  </data>
+  <data name="AccountType_Credit" xml:space="preserve">
+    <value>Kreditor</value>
+  </data>
+  <data name="AccountType_Debit" xml:space="preserve">
+    <value>Debitor</value>
+  </data>
+  <data name="AccountType_Carryforward" xml:space="preserve">
+    <value>Saldovortrag</value>
+  </data>
 </root>

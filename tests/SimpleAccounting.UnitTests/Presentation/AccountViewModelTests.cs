@@ -4,7 +4,9 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Presentation
 {
+    using System;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using FluentAssertions;
     using lg2de.SimpleAccounting.Model;
     using lg2de.SimpleAccounting.Presentation;
@@ -12,6 +14,24 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
 
     public class AccountViewModelTests
     {
+        [CulturedFact("en")]
+        public void Types_DefaultCulture_NoFallbackValue()
+        {
+            AccountViewModel.ResetTypesLazy();
+            AccountViewModel.Types.Values.Should()
+                .NotContain(x => x.StartsWith("<", StringComparison.InvariantCulture));
+        }
+
+        [CulturedFact("de")]
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        public void TypeName_GermanCulture_CorrectlyInitialized()
+        {
+            AccountViewModel.ResetTypesLazy();
+            var sut = new AccountViewModel { Type = AccountDefinitionType.Credit };
+
+            sut.TypeName.Should().Be("Kreditor");
+        }
+
         [Fact]
         public void SaveCommand_MissingName_CannotExecute()
         {

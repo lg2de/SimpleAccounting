@@ -12,6 +12,7 @@ namespace lg2de.SimpleAccounting.Presentation
     using Caliburn.Micro;
     using lg2de.SimpleAccounting.Infrastructure;
     using lg2de.SimpleAccounting.Model;
+    using lg2de.SimpleAccounting.Properties;
 
     /// <summary>
     ///     Implements the view model for a single account.
@@ -22,13 +23,11 @@ namespace lg2de.SimpleAccounting.Presentation
 
         static AccountViewModel()
         {
-            foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)))
-            {
-                Types.Add((AccountDefinitionType)type!);
-            }
+            ResetTypesLazy();
         }
 
-        public static IList<AccountDefinitionType> Types { get; } = new List<AccountDefinitionType>();
+        public static IDictionary<AccountDefinitionType, string> Types { get; } =
+            new Dictionary<AccountDefinitionType, string>();
 
         public ulong Identifier { get; set; }
 
@@ -40,6 +39,8 @@ namespace lg2de.SimpleAccounting.Presentation
         public AccountingDataAccountGroup? Group { get; set; }
 
         public AccountDefinitionType Type { get; set; }
+
+        public string TypeName => Types[this.Type];
 
         public bool IsActivated { get; set; } = true;
 
@@ -89,6 +90,7 @@ namespace lg2de.SimpleAccounting.Presentation
                     return false;
                 }
 
+                // check whether the identifier is valid (e.g. not duplicated)
                 if (this.IsValidIdentifierFunc?.Invoke(this.Identifier) == false)
                 {
                     return false;
@@ -96,6 +98,7 @@ namespace lg2de.SimpleAccounting.Presentation
 
                 if (!this.IsImportActive)
                 {
+                    // import is not active -> done
                     return true;
                 }
 
@@ -113,6 +116,16 @@ namespace lg2de.SimpleAccounting.Presentation
             });
 
         internal Func<ulong, bool>? IsValidIdentifierFunc { get; set; }
+
+        internal static void ResetTypesLazy()
+        {
+            Types.Clear();
+            foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>())
+            {
+                var localizedType = Resources.ResourceManager.GetString($"AccountType_{type}") ?? $"<{type}>";
+                Types[type] = localizedType;
+            }
+        }
 
         internal AccountViewModel Clone()
         {

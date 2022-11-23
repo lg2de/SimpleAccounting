@@ -124,6 +124,60 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Asset.
+        /// </summary>
+        public static string AccountType_Asset {
+            get {
+                return ResourceManager.GetString("AccountType_Asset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Carry forward.
+        /// </summary>
+        public static string AccountType_Carryforward {
+            get {
+                return ResourceManager.GetString("AccountType_Carryforward", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Credit.
+        /// </summary>
+        public static string AccountType_Credit {
+            get {
+                return ResourceManager.GetString("AccountType_Credit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Debit.
+        /// </summary>
+        public static string AccountType_Debit {
+            get {
+                return ResourceManager.GetString("AccountType_Debit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expense.
+        /// </summary>
+        public static string AccountType_Expense {
+            get {
+                return ResourceManager.GetString("AccountType_Expense", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Income.
+        /// </summary>
+        public static string AccountType_Income {
+            get {
+                return ResourceManager.GetString("AccountType_Income", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Book (CTRL-ENTER).
         /// </summary>
         public static string Action_Book {

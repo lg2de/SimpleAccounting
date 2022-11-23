@@ -567,4 +567,22 @@ Sans une telle configuration pour au moins un compte, cette fonction est désact
   <data name="Word_Currency" xml:space="preserve">
     <value>Monnaie</value>
   </data>
+  <data name="AccountType_Asset" xml:space="preserve">
+    <value>Actif</value>
+  </data>
+  <data name="AccountType_Carryforward" xml:space="preserve">
+    <value>Report à nouveau</value>
+  </data>
+  <data name="AccountType_Credit" xml:space="preserve">
+    <value>Crédit</value>
+  </data>
+  <data name="AccountType_Debit" xml:space="preserve">
+    <value>Débit</value>
+  </data>
+  <data name="AccountType_Income" xml:space="preserve">
+    <value>Revenu</value>
+  </data>
+  <data name="AccountType_Expense" xml:space="preserve">
+    <value>Dépenses</value>
+  </data>
 </root>

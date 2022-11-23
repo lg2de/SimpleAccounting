@@ -24,7 +24,7 @@ namespace lg2de.SimpleAccounting.Presentation
         {
             this.Identifier = 42;
             this.Name = "Bla";
-            this.Type = AccountDefinitionType.Asset;
+            this.Type = AccountDefinitionType.Credit;
             this.IsActivated = true;
 
             this.Groups = new List<AccountingDataAccountGroup> { new AccountingDataAccountGroup { Name = "MyGroup" } };
