@@ -79,7 +79,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
                 $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
             var updateProcess = this.process.Start(info);
 
-            var exited = updateProcess.WaitForExit(this.WaitTimeMilliseconds);
+            var exited = updateProcess?.WaitForExit(this.WaitTimeMilliseconds) == true;
             if (!exited)
             {
                 return true;

@@ -17,7 +17,10 @@ namespace lg2de.SimpleAccounting.Infrastructure
 
         private const string SecureDriveAppExe = SecureDriveApp + ".exe";
 
-        private const string SecureDriveAppKey =
+        private const string SecureDriveAppKey1 = // current with version 1.6.7
+            "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{B64AF181-543A-33B3-96C8-C95D766D9C08}";
+
+        private const string SecureDriveAppKey2 = // old with version 1.5.x
             "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Cryptomator_is1";
 
         private const string SecureDriveAppFallbackPath = "C:\\Program Files\\Cryptomator\\";
@@ -70,7 +73,7 @@ namespace lg2de.SimpleAccounting.Infrastructure
             }
         }
 
-        private Process GetSecureDriveProcess()
+        private Process? GetSecureDriveProcess()
         {
             return this.processApi.GetProcessByName(SecureDriveApp);
         }
@@ -78,8 +81,9 @@ namespace lg2de.SimpleAccounting.Infrastructure
         private async Task<bool> StartProcessAsync()
         {
             var localMachine = Registry.LocalMachine;
-            using var fileKey = localMachine.OpenSubKey(SecureDriveAppKey);
-            var directory = fileKey?.GetValue("InstallLocation").ToString() ?? SecureDriveAppFallbackPath;
+            using var fileKey1 = localMachine.OpenSubKey(SecureDriveAppKey1);
+            using var fileKey2 = localMachine.OpenSubKey(SecureDriveAppKey2);
+            var directory = fileKey1?.GetValue("InstallLocation").ToString() ?? SecureDriveAppFallbackPath;
             string filePath = Path.Combine(directory, SecureDriveAppExe);
             if (!this.fileSystem.FileExists(filePath))
             {

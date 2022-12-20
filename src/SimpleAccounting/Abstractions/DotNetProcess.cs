@@ -16,7 +16,7 @@ namespace lg2de.SimpleAccounting.Abstractions
     [ExcludeFromCodeCoverage]
     internal class DotNetProcess : IProcess
     {
-        public Process GetProcessByName(string processName)
+        public Process? GetProcessByName(string processName)
         {
             return Process.GetProcesses().FirstOrDefault(
                 x => x.ProcessName.Equals(processName, StringComparison.InvariantCultureIgnoreCase));
@@ -32,7 +32,7 @@ namespace lg2de.SimpleAccounting.Abstractions
             return Process.GetCurrentProcess().Id;
         }
 
-        public Process Start(ProcessStartInfo info)
+        public Process? Start(ProcessStartInfo info)
         {
             return Process.Start(info);
         }
@@ -44,7 +44,18 @@ namespace lg2de.SimpleAccounting.Abstractions
                 return false;
             }
 
-            return !process.MainWindowHandle.Equals(IntPtr.Zero);
+            if (!process.MainWindowHandle.Equals(IntPtr.Zero))
+            {
+                // is visible
+                return true;
+            }
+
+            // check child processes
+            var childProcesses = Process.GetProcesses().Where(
+                p =>
+                    p.ProcessName.Equals(process.ProcessName, StringComparison.OrdinalIgnoreCase)
+                     && p.Id != process.Id);
+            return childProcesses.Select(this.IsProcessWindowVisible).FirstOrDefault();
         }
 
         public void BringProcessToFront(Process process)

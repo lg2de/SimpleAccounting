@@ -11,13 +11,13 @@ namespace lg2de.SimpleAccounting.Abstractions
     /// </summary>
     internal interface IProcess
     {
-        Process GetProcessByName(string processName);
+        Process? GetProcessByName(string processName);
 
         Process GetCurrentProcess();
 
         int GetCurrentProcessId();
 
-        Process Start(ProcessStartInfo info);
+        Process? Start(ProcessStartInfo info);
 
         bool IsProcessWindowVisible(Process process);
 
