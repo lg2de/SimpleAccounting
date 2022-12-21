@@ -14,7 +14,7 @@ jobs:
     name: build
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |
         git fetch --prune --unshallow
 
@@ -23,9 +23,9 @@ jobs:
       with:
         java-version: 11
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 3.1.103
+        dotnet-version: 6.0.x
     - name: Setup SonarScanner
       run: choco install "sonarscanner-msbuild-net46" -y
     - name: Patch version info
@@ -35,7 +35,7 @@ jobs:
         GITHUB_PR_REF: ${{ github.head_ref }}
 
     - name: Restore packages
-      run: dotnet restore --configfile nuget.config
+      run: dotnet restore --configfile nuget.config --verbosity normal
     - name: Prepare SonarScanner
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -70,4 +70,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: SimpleAccounting
-        path: src\SimpleAccounting\bin\Release\netcoreapp3.1\publish
+        path: src\SimpleAccounting\bin\Release\net6.0-windows\publish
