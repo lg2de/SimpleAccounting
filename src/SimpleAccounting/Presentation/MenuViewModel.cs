@@ -90,6 +90,10 @@ namespace lg2de.SimpleAccounting.Presentation
             _ => this.projectData.ShowAddBookingDialog(this.projectData.ShowInactiveAccounts),
             _ => !this.projectData.CurrentYear.Closed);
 
+        public ICommand DuplicateBookingsCommand => new RelayCommand(
+            this.OnDuplicateBooking,
+            _ => !this.projectData.CurrentYear.Closed);
+
         public ICommand EditBookingCommand => new RelayCommand(
             this.OnEditBooking,
             _ => !this.projectData.CurrentYear.Closed);
@@ -207,6 +211,16 @@ namespace lg2de.SimpleAccounting.Presentation
             }
 
             this.projectData.ShowEditBookingDialog(journalItem, this.projectData.ShowInactiveAccounts);
+        }
+
+        private void OnDuplicateBooking(object commandParameter)
+        {
+            if (!(commandParameter is IJournalItem journalItem))
+            {
+                return;
+            }
+
+            this.projectData.ShowDuplicateBookingDialog(journalItem, this.projectData.ShowInactiveAccounts);
         }
 
         private void OnCloseYear(object _)

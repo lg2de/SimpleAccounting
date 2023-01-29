@@ -227,37 +227,13 @@ namespace lg2de.SimpleAccounting.Model
             this.YearChanged(this, EventArgs.Empty);
         }
 
-        public void ShowAddBookingDialog(bool showInactiveAccounts)
+        private EditBookingViewModel BookingFromJournal(AccountingDataJournalBooking journalEntry, bool isEdit, bool showInactiveAccounts)
         {
-            var bookingModel =
-                new EditBookingViewModel(this, DateTime.Today, editMode: false);
-            var allAccounts = this.Storage.AllAccounts;
-            bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
-            var bookingTemplates = this.Storage.Setup?.BookingTemplates;
-            if (bookingTemplates != null)
-            {
-                bookingModel.AddTemplates(bookingTemplates);
-            }
-
-            this.windowManager.ShowDialog(bookingModel);
-        }
-
-        public void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts)
-        {
-            if (item.StorageIndex < 0)
-            {
-                // summary item selected => ignore
-                return;
-            }
-
-            var journalEntry = this.CurrentYear.Booking[item.StorageIndex];
-
             var bookingModel = new EditBookingViewModel(
                 this,
                 journalEntry.Date.ToDateTime(),
-                editMode: true)
+                editMode: isEdit)
             {
-                BookingIdentifier = journalEntry.ID,
                 IsFollowup = journalEntry.Followup,
                 IsOpening = journalEntry.Opening
             };
@@ -289,6 +265,52 @@ namespace lg2de.SimpleAccounting.Model
 
             var allAccounts = this.Storage.AllAccounts;
             bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
+
+            return bookingModel;
+
+        }
+
+        public void ShowAddBookingDialog(bool showInactiveAccounts)
+        {
+            var bookingModel =
+                new EditBookingViewModel(this, DateTime.Today, editMode: false);
+            var allAccounts = this.Storage.AllAccounts;
+            bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
+            var bookingTemplates = this.Storage.Setup?.BookingTemplates;
+            if (bookingTemplates != null)
+            {
+                bookingModel.AddTemplates(bookingTemplates);
+            }
+
+            this.windowManager.ShowDialog(bookingModel);
+        }
+
+        public void ShowDuplicateBookingDialog(IJournalItem item, bool showInactiveAccounts)
+        {
+            if (item.StorageIndex < 0)
+            {
+                // summary item selected => ignore
+                return;
+            }
+            var journalEntry = this.CurrentYear.Booking[item.StorageIndex];
+
+            var bookingModel = this.BookingFromJournal(journalEntry, false, showInactiveAccounts); 
+
+            this.windowManager.ShowDialog(bookingModel);
+        }
+
+        public void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts)
+        {
+            if (item.StorageIndex < 0)
+            {
+                // summary item selected => ignore
+                return;
+            }
+
+            var journalEntry = this.CurrentYear.Booking[item.StorageIndex];
+
+            var bookingModel = this.BookingFromJournal(journalEntry, true, showInactiveAccounts);
+            bookingModel.BookingIdentifier = journalEntry.ID;  
 
             var result = this.windowManager.ShowDialog(bookingModel);
             if (result != true)

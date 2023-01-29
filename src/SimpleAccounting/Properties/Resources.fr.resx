@@ -585,4 +585,7 @@ Sans une telle configuration pour au moins un compte, cette fonction est désact
   <data name="AccountType_Expense" xml:space="preserve">
     <value>Dépenses</value>
   </data>
+  <data name="JournalContextMenu_Duplicate" xml:space="preserve">
+    <value>Dupliquer</value>
+  </data>
 </root>

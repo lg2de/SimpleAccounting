@@ -570,6 +570,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Duplicate.
+        /// </summary>
+        public static string JournalContextMenu_Duplicate {
+            get {
+                return ResourceManager.GetString("JournalContextMenu_Duplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Debit account
         ///(Remote account).
         /// </summary>

@@ -58,6 +58,8 @@ namespace lg2de.SimpleAccounting.Model
 
         void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts);
 
+        void ShowDuplicateBookingDialog(IJournalItem item, bool showInactiveAccounts);
+
         void ShowImportDialog();
 
         bool CloseYear();

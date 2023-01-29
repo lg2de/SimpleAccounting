@@ -27,6 +27,9 @@ namespace lg2de.SimpleAccounting.Presentation
         bool IsSystemCulture { get; }
 
         ICommand AddBookingsCommand { get; }
+
+        ICommand DuplicateBookingsCommand { get; }
+
         ICommand EditBookingCommand { get; }
         ICommand ImportBookingsCommand { get; }
         ICommand CloseYearCommand { get; }

@@ -594,4 +594,7 @@ Without such configuration for at least one account, this function is disabled.<
   <data name="AccountType_Carryforward" xml:space="preserve">
     <value>Carry forward</value>
   </data>
+  <data name="JournalContextMenu_Duplicate" xml:space="preserve">
+    <value>Duplicate</value>
+  </data>
 </root>
