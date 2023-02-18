@@ -7,7 +7,7 @@ on:
     tags:
       - '*'
   pull_request:
-  pull_request_target:
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   build:
@@ -18,16 +18,15 @@ jobs:
     - run: |
         git fetch --prune --unshallow
 
-    - name: Set up JDK
-      uses: actions/setup-java@v1
-      with:
-        java-version: 11
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.103
-    - name: Setup SonarScanner
-      run: choco install "sonarscanner-msbuild-net46" -y
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     - name: Patch version info
       run: .\PatchVersion.ps1
       shell: pwsh
@@ -36,23 +35,6 @@ jobs:
 
     - name: Restore packages
       run: dotnet restore --configfile nuget.config
-    - name: Prepare SonarScanner
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        $prNo=${{ github.event.number }}
-        if ($prNo -gt 0) {
-          $branch="${{ github.HEAD_REF }}"
-          Write-Host analyzing Pull Request $prNo on branch $branch
-          $branchCommand="/d:sonar.pullrequest.key=$prNo"
-        } else {
-          $branch=$env:GITHUB_REF -replace "(\w+/)*",""
-          Write-Host analyzing branch $branch
-          $branchCommand="/d:sonar.branch.name=$branch"
-        }
-        Write-Host CMDs=$branchCommand
-        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
-      shell: pwsh
     - name: Build Debug
       run: dotnet build --configuration Debug --no-restore
     - name: Test with OpenCover
@@ -63,8 +45,6 @@ jobs:
       shell: pwsh
     - name: Publish Release
       run: dotnet publish --configuration Release --no-restore
-    - name: Complete SonarScanner
-      run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
