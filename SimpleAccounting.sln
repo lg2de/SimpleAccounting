@@ -8,8 +8,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		CreateCoverReport.ps1 = CreateCoverReport.ps1
-		src\Directory.Build.props = src\Directory.Build.props
 		.sonarlint\lg2de_simpleaccountingcsharp.ruleset = .sonarlint\lg2de_simpleaccountingcsharp.ruleset
 		LICENSE = LICENSE
 		nuget.config = nuget.config
@@ -31,6 +29,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{3F74
 		samples\sample.acml = samples\sample.acml
 		samples\sample.csv = samples\sample.csv
 		samples\TotalsAndBalancesReport.png = samples\TotalsAndBalancesReport.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{88F13815-196C-4F7F-B54A-A345656DD866}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BF2618D8-BC1B-4127-8DCF-85A493C04BF8}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Directory.Build.props = tests\Directory.Build.props
 	EndProjectSection
 EndProject
 Global
@@ -57,5 +65,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62844EF8-76D5-4F6B-85A3-9E80E71E4482}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{976604F7-86B8-407E-A9B2-592E376D7006} = {88F13815-196C-4F7F-B54A-A345656DD866}
+		{507F5D29-96C7-48C2-966C-58342D08A4A7} = {BF2618D8-BC1B-4127-8DCF-85A493C04BF8}
+		{E77B3647-FBC9-4138-A0D5-C9165EF45417} = {BF2618D8-BC1B-4127-8DCF-85A493C04BF8}
 	EndGlobalSection
 EndGlobal
