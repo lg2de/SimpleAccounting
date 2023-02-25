@@ -2,9 +2,4 @@
 
   <Import Project="../Directory.Build.props" />
 
-  <PropertyGroup>
-    <!-- for analyzing coverage with coverlet some more details must be created -->
-    <PreserveCompilationContext>true</PreserveCompilationContext>
-  </PropertyGroup>
-  
 </Project>
