@@ -60,8 +60,13 @@ jobs:
     - name: Complete SonarScanner
       run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
-    - name: Upload artifacts
+    - name: Upload product artifact
       uses: actions/upload-artifact@v1
       with:
         name: SimpleAccounting
         path: src\SimpleAccounting\bin\Release\net6.0-windows\publish
+    - name: Upload test artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: CoverReport
+        path: CoverReport
