@@ -417,6 +417,27 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation
         }
 
         [Fact]
+        public void DuplicateBookingsCommand_NoSave_DialogInitialized()
+        {
+            var sut = CreateSut(out IWindowManager windowManager);
+            EditBookingViewModel vm = null;
+            windowManager.ShowDialog(
+                Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
+                Arg.Any<IDictionary<string, object>>());
+            var project = Samples.SampleProject;
+            project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+            sut.ProjectData.Load(project);
+
+            sut.Menu.DuplicateBookingsCommand.Execute(sut.FullJournal.Items.Last());
+
+            using var _ = new AssertionScope();
+            sut.ProjectData.IsModified.Should().BeFalse("the project remains unchanged");
+            vm.BookingIdentifier.Should().Be(sut.FullJournal.Items.Last().Identifier + 1);
+            vm.BookingText.Should().Be("Rent to friend");
+            vm.Accounts.Should().BeEquivalentTo(Samples.SampleProject.AllAccounts.Where(x => x.Active));
+        }
+
+        [Fact]
         public void ImportBookingsCommand_BookingNumberInitialized()
         {
             var sut = CreateSut(out IWindowManager windowManager);
