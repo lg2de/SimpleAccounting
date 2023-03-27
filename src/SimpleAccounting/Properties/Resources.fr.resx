@@ -586,6 +586,9 @@ Sans une telle configuration pour au moins un compte, cette fonction est désact
     <value>Dépenses</value>
   </data>
   <data name="JournalContextMenu_Duplicate" xml:space="preserve">
-    <value>Dupliquer</value>
+    <value>Créer une copie</value>
+  </data>
+  <data name="JournalContextMenu_Edit" xml:space="preserve">
+    <value>Modifier l'entrée</value>
   </data>
 </root>

@@ -227,49 +227,6 @@ namespace lg2de.SimpleAccounting.Model
             this.YearChanged(this, EventArgs.Empty);
         }
 
-        private EditBookingViewModel BookingFromJournal(AccountingDataJournalBooking journalEntry, bool isEdit, bool showInactiveAccounts)
-        {
-            var bookingModel = new EditBookingViewModel(
-                this,
-                journalEntry.Date.ToDateTime(),
-                editMode: isEdit)
-            {
-                IsFollowup = journalEntry.Followup,
-                IsOpening = journalEntry.Opening
-            };
-
-            if (journalEntry.Credit.Count > 1)
-            {
-                journalEntry.Credit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.CreditSplitEntries.Add);
-                var theDebit = journalEntry.Debit.First();
-                bookingModel.DebitAccount = theDebit.Account;
-                bookingModel.BookingText = theDebit.Text;
-                bookingModel.BookingValue = theDebit.Value.ToViewModel();
-            }
-            else if (journalEntry.Debit.Count > 1)
-            {
-                journalEntry.Debit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.DebitSplitEntries.Add);
-                var theCredit = journalEntry.Credit.First();
-                bookingModel.CreditAccount = theCredit.Account;
-                bookingModel.BookingText = theCredit.Text;
-                bookingModel.BookingValue = theCredit.Value.ToViewModel();
-            }
-            else
-            {
-                var theDebit = journalEntry.Debit.First();
-                bookingModel.DebitAccount = theDebit.Account;
-                bookingModel.BookingValue = theDebit.Value.ToViewModel();
-                bookingModel.CreditAccount = journalEntry.Credit.First().Account;
-                bookingModel.BookingText = theDebit.Text;
-            }
-
-            var allAccounts = this.Storage.AllAccounts;
-            bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
-
-            return bookingModel;
-
-        }
-
         public void ShowAddBookingDialog(bool showInactiveAccounts)
         {
             var bookingModel =
@@ -292,9 +249,10 @@ namespace lg2de.SimpleAccounting.Model
                 // summary item selected => ignore
                 return;
             }
+
             var journalEntry = this.CurrentYear.Booking[item.StorageIndex];
 
-            var bookingModel = this.BookingFromJournal(journalEntry, false, showInactiveAccounts); 
+            var bookingModel = this.BookingFromJournal(journalEntry, editMode: false, showInactiveAccounts);
 
             this.windowManager.ShowDialog(bookingModel);
         }
@@ -309,8 +267,8 @@ namespace lg2de.SimpleAccounting.Model
 
             var journalEntry = this.CurrentYear.Booking[item.StorageIndex];
 
-            var bookingModel = this.BookingFromJournal(journalEntry, true, showInactiveAccounts);
-            bookingModel.BookingIdentifier = journalEntry.ID;  
+            var bookingModel = this.BookingFromJournal(journalEntry, editMode: true, showInactiveAccounts);
+            bookingModel.BookingIdentifier = journalEntry.ID;
 
             var result = this.windowManager.ShowDialog(bookingModel);
             if (result != true)
@@ -376,6 +334,45 @@ namespace lg2de.SimpleAccounting.Model
         {
             this.JournalChanged(
                 this, new JournalChangedEventArgs(0, this.storage.AllAccounts.Select(x => x.ID).ToList()));
+        }
+
+        private EditBookingViewModel BookingFromJournal(
+            AccountingDataJournalBooking journalEntry, bool editMode, bool showInactiveAccounts)
+        {
+            var bookingModel = new EditBookingViewModel(this, journalEntry.Date.ToDateTime(), editMode)
+            {
+                IsFollowup = journalEntry.Followup, IsOpening = journalEntry.Opening
+            };
+
+            if (journalEntry.Credit.Count > 1)
+            {
+                journalEntry.Credit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.CreditSplitEntries.Add);
+                var theDebit = journalEntry.Debit.First();
+                bookingModel.DebitAccount = theDebit.Account;
+                bookingModel.BookingText = theDebit.Text;
+                bookingModel.BookingValue = theDebit.Value.ToViewModel();
+            }
+            else if (journalEntry.Debit.Count > 1)
+            {
+                journalEntry.Debit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.DebitSplitEntries.Add);
+                var theCredit = journalEntry.Credit.First();
+                bookingModel.CreditAccount = theCredit.Account;
+                bookingModel.BookingText = theCredit.Text;
+                bookingModel.BookingValue = theCredit.Value.ToViewModel();
+            }
+            else
+            {
+                var theDebit = journalEntry.Debit.First();
+                bookingModel.DebitAccount = theDebit.Account;
+                bookingModel.BookingValue = theDebit.Value.ToViewModel();
+                bookingModel.CreditAccount = journalEntry.Credit.First().Account;
+                bookingModel.BookingText = theDebit.Text;
+            }
+
+            var allAccounts = this.Storage.AllAccounts;
+            bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
+
+            return bookingModel;
         }
     }
 }

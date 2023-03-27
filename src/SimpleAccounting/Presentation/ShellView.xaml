@@ -176,6 +176,9 @@
             </DataGrid.InputBindings>
             <DataGrid.ContextMenu>
               <ContextMenu>
+                <MenuItem Header="{x:Static properties:Resources.JournalContextMenu_Edit}"
+                          Command="{Binding Menu.EditBookingCommand}" 
+                          CommandParameter="{Binding FullJournal.Items/}" />
                 <MenuItem Header="{x:Static properties:Resources.JournalContextMenu_Duplicate}"
                           Command="{Binding Menu.DuplicateBookingsCommand}" 
                           CommandParameter="{Binding FullJournal.Items/}" />
