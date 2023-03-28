@@ -579,4 +579,10 @@ Ohne eine solche Konfiguration für mindestens ein Konto ist diese Funktion deak
   <data name="AccountType_Carryforward" xml:space="preserve">
     <value>Saldovortrag</value>
   </data>
+  <data name="JournalContextMenu_Duplicate" xml:space="preserve">
+    <value>Kopie erstellen</value>
+  </data>
+  <data name="JournalContextMenu_Edit" xml:space="preserve">
+    <value>Eintrag bearbeiten</value>
+  </data>
 </root>
