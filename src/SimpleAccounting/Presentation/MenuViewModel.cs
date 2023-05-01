@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Presentation;
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -67,6 +68,11 @@ internal class MenuViewModel : Screen, IMenuViewModel
     public ICommand SwitchCultureCommand => new RelayCommand(
         cultureName =>
         {
+            if (cultureName == null)
+            {
+                throw new ArgumentNullException(nameof(cultureName));
+            }
+
             this.projectData.Settings.Culture = cultureName.ToString();
             this.NotifyOfPropertyChange(nameof(this.IsGermanCulture));
             this.NotifyOfPropertyChange(nameof(this.IsEnglishCulture));
@@ -142,7 +148,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
             return;
         }
 
-        foreach (var project in this.projectData.Settings.RecentProjects)
+        foreach (var project in this.projectData.Settings.RecentProjects.Cast<string>())
         {
             var command = new AsyncCommand(this.busy, () => this.OnLoadRecentProjectAsync(project));
             this.RecentProjects.Add(new MenuItemViewModel(project, command));
@@ -169,7 +175,11 @@ internal class MenuViewModel : Screen, IMenuViewModel
         // failed to load, remove from menu
         // keep in menu if aborted (e.g. SecureDrive not available)
         var item = this.RecentProjects.FirstOrDefault(x => x.Header == project);
-        this.RecentProjects.Remove(item);
+        if (item != null)
+        {
+            this.RecentProjects.Remove(item);
+        }
+
         this.projectData.Settings.RecentProjects.Remove(project);
     }
 
@@ -203,9 +213,9 @@ internal class MenuViewModel : Screen, IMenuViewModel
         }
     }
 
-    private void OnEditBooking(object commandParameter)
+    private void OnEditBooking(object? commandParameter)
     {
-        if (!(commandParameter is IJournalItem journalItem))
+        if (commandParameter is not IJournalItem journalItem)
         {
             return;
         }
@@ -223,7 +233,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
         this.projectData.ShowDuplicateBookingDialog(journalItem, this.projectData.ShowInactiveAccounts);
     }
 
-    private void OnCloseYear(object _)
+    private void OnCloseYear(object? _)
     {
         if (!this.projectData.CloseYear())
         {

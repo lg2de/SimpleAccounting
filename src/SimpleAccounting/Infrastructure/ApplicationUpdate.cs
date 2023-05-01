@@ -86,7 +86,7 @@ internal class ApplicationUpdate : IApplicationUpdate
         }
 
         var message = string.Format(
-            CultureInfo.CurrentUICulture, Resources.Update_ProcessFailed, updateProcess.ExitCode);
+            CultureInfo.CurrentUICulture, Resources.Update_ProcessFailed, updateProcess?.ExitCode);
         this.dialogs.ShowMessageBox(message, Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
         return false;
     }

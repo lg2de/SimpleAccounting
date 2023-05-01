@@ -37,7 +37,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
     {
         this.PreparePrintDocument(title, DateTime.Now);
 
-        XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table");
+        XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table")!;
 
         this.firstAccount = true;
 
@@ -60,7 +60,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             var titleFont = this.PrintDocument.CreateElement("font");
             titleFont.SetAttribute("size", TitleSize);
             titleFont.SetAttribute("bold", 1);
-            tableNode.ParentNode.InsertBefore(titleFont, tableNode);
+            tableNode.ParentNode!.InsertBefore(titleFont, tableNode);
 
             var titleNode = this.PrintDocument.CreateElement("text");
             titleNode.InnerText = account.FormatName();
@@ -73,7 +73,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             var newTable = tableNode.CloneNode(deep: true);
             tableNode.ParentNode.InsertBefore(newTable, tableNode);
 
-            var dataNode = newTable.SelectSingleNode("data");
+            var dataNode = newTable.SelectSingleNode("data")!;
 
             this.creditTotal = 0;
             this.debitTotal = 0;
@@ -119,7 +119,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             balanceLineNode.AddTableNode(string.Empty);
         }
 
-        tableNode.ParentNode.RemoveChild(tableNode);
+        tableNode.ParentNode!.RemoveChild(tableNode);
     }
 
     private void AddAccountSeparator(XmlNode tableNode)
@@ -142,7 +142,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             separatorNode.SetAttribute("relY", "5");
         }
 
-        tableNode.ParentNode.InsertBefore(separatorNode, tableNode);
+        tableNode.ParentNode!.InsertBefore(separatorNode, tableNode);
     }
 
     private void AddBookingEntries(AccountingDataJournalBooking entry, ulong accountIdentifier, XmlNode dataNode)

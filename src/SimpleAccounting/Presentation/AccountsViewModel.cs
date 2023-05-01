@@ -192,9 +192,9 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         this.projectData.IsModified = true;
     }
 
-    public void OnEditAccount(object commandParameter)
+    public void OnEditAccount(object? commandParameter)
     {
-        if (!(commandParameter is AccountViewModel account))
+        if (commandParameter is not AccountViewModel account)
         {
             return;
         }

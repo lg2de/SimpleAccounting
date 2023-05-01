@@ -33,7 +33,7 @@ internal static class XmlExtensions
     /// <param name="node">The node to receive the attribute.</param>
     /// <param name="name">The name of the attribute.</param>
     /// <param name="value">The attribute value.</param>
-    public static void SetAttribute(this XmlNode node, string name, object value)
+    public static void SetAttribute(this XmlNode node, string name, object? value)
     {
         if (node == null)
         {
@@ -46,7 +46,7 @@ internal static class XmlExtensions
         }
 
         XmlAttribute attr = node.OwnerDocument!.CreateAttribute(name);
-        attr.Value = value.ToString();
+        attr.Value = value?.ToString();
         node.Attributes!.SetNamedItem(attr);
     }
 

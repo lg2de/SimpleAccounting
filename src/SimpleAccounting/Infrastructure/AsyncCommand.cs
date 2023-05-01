@@ -32,18 +32,18 @@ public class AsyncCommand : IAsyncCommand
         this.command = command;
     }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add { CommandManager.RequerySuggested += value; }
         remove { CommandManager.RequerySuggested -= value; }
     }
 
-    public async void Execute(object parameter)
+    public async void Execute(object? parameter)
     {
         await this.ExecuteAsync(parameter);
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return true;
     }

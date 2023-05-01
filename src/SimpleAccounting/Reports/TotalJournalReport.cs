@@ -27,7 +27,7 @@ internal class TotalJournalReport : ReportBase, ITotalJournalReport
     {
         this.PreparePrintDocument(title, DateTime.Now);
 
-        XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data");
+        XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data")!;
 
         var journalEntries = this.YearData.Booking
             .OrderBy(b => b.Date)

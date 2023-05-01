@@ -234,7 +234,7 @@ internal class XmlPrinter : IXmlPrinter
     {
         this.SetupGraphics();
 
-        this.currentNode = this.Document.DocumentElement!.FirstChild;
+        this.currentNode = this.Document.DocumentElement!.FirstChild!;
         TransformNodes(this.currentNode);
         this.ProcessPageTexts();
             
@@ -268,14 +268,14 @@ internal class XmlPrinter : IXmlPrinter
                     this.ProcessNewPage();
                     break;
                 case FontNode:
-                    this.ProcessFontNode(transformingNode, () => TransformNodes(transformingNode.FirstChild));
+                    this.ProcessFontNode(transformingNode, () => TransformNodes(transformingNode.FirstChild!));
                     continue;
                 default:
                     // nothing to do
                     break;
                 }
 
-                TransformNodes(transformingNode.FirstChild);
+                TransformNodes(transformingNode.FirstChild!);
 
                 if (nextNode != null
                     && this.CursorY >= this.DocumentHeight - this.DocumentBottomMargin)
@@ -465,8 +465,8 @@ internal class XmlPrinter : IXmlPrinter
         XmlNodeList dataRows, int rowIndex, IGraphics referenceGraphics)
     {
         var dataRow = dataRows[rowIndex];
-        var rowColumn = dataRow.SelectNodes("td");
-        if (rowColumn == null)
+        var rowColumn = dataRow?.SelectNodes("td");
+        if (dataRow == null || rowColumn == null)
         {
             // no data found
             return;
@@ -476,7 +476,7 @@ internal class XmlPrinter : IXmlPrinter
         for (int columnIndex = 0; columnIndex < columnDefinitions.Count; columnIndex++)
         {
             var columnDefinition = columnDefinitions[columnIndex];
-            var columnText = columnIndex < rowColumn.Count ? rowColumn[columnIndex].InnerText : string.Empty;
+            var columnText = columnIndex < rowColumn.Count ? rowColumn[columnIndex]!.InnerText : string.Empty;
             int maxWidth = columnDefinition.GetAttribute<int>(WidthNode);
             var currentFont = this.fontStack.Peek();
             wrappedTexts[columnIndex] = columnText.Wrap(this.ToPhysical(maxWidth), currentFont, referenceGraphics);
@@ -497,8 +497,8 @@ internal class XmlPrinter : IXmlPrinter
         int xPosition = 0;
         for (int columnIndex = 0; columnIndex < rowColumn.Count; columnIndex++)
         {
-            var columnDefinition = columnDefinitions[columnIndex];
-            var columnData = rowColumn[columnIndex];
+            var columnDefinition = columnDefinitions[columnIndex]!;
+            var columnData = rowColumn[columnIndex]!;
             var wrappedText = wrappedTexts[columnIndex];
             XmlNode textNode = this.Document.CreateElement(TextNode);
             textNode.InnerText = wrappedText;
@@ -810,7 +810,7 @@ internal class XmlPrinter : IXmlPrinter
     {
         Font drawFont = this.fontStack.Peek();
 
-        XmlNode nodeBold = fontNode.Attributes!.GetNamedItem("bold");
+        XmlNode? nodeBold = fontNode.Attributes!.GetNamedItem("bold");
         var fontName = fontNode.GetAttribute("name", drawFont.Name);
         var fontSize = fontNode.GetAttribute("size", drawFont.SizeInPoints);
         FontStyle fontStyle = drawFont.Style;

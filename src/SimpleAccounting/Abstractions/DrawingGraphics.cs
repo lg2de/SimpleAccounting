@@ -33,17 +33,17 @@ internal class DrawingGraphics : IGraphics
 
     public SizeF MeasureString(string text, Font font)
     {
-        return this.printPageEventArgs.Graphics.MeasureString(text, font);
+        return this.printPageEventArgs.Graphics!.MeasureString(text, font);
     }
 
     public void DrawString(string s, Font font, Brush brush, float x, float y, StringAlignment alignment)
     {
         using var format = new StringFormat { Alignment = alignment };
-        this.printPageEventArgs.Graphics.DrawString(s, font, brush, x, y, format);
+        this.printPageEventArgs.Graphics!.DrawString(s, font, brush, x, y, format);
     }
 
     public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
     {
-        this.printPageEventArgs.Graphics.DrawLine(pen, x1, y1, x2, y2);
+        this.printPageEventArgs.Graphics!.DrawLine(pen, x1, y1, x2, y2);
     }
 }

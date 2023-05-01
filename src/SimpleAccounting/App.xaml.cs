@@ -32,7 +32,7 @@ public partial class App
         {
             // delete configuration of old version
             // ReSharper disable once AssignNullToNotNullAttribute
-            Directory.Delete(Path.GetDirectoryName(fileName), recursive: true);
+            Directory.Delete(Path.GetDirectoryName(fileName)!, recursive: true);
         }
     }
 

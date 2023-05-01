@@ -83,7 +83,7 @@ internal class SecureDriveStarter
         var localMachine = Registry.LocalMachine;
         using var fileKey1 = localMachine.OpenSubKey(SecureDriveAppKey1);
         using var fileKey2 = localMachine.OpenSubKey(SecureDriveAppKey2);
-        var directory = fileKey1?.GetValue("InstallLocation").ToString() ?? SecureDriveAppFallbackPath;
+        var directory = fileKey1?.GetValue("InstallLocation")?.ToString() ?? SecureDriveAppFallbackPath;
         string filePath = Path.Combine(directory, SecureDriveAppExe);
         if (!this.fileSystem.FileExists(filePath))
         {

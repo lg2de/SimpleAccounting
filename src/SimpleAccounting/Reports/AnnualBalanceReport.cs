@@ -38,7 +38,7 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
         // expense / Ausgaben
         this.ProcessExpenses(out var totalExpense);
 
-        var balanceNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"balance\"]");
+        var balanceNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"balance\"]")!;
         balanceNode.InnerText = (totalIncome + totalExpense).FormatCurrency();
 
         // receivables / Forderungen
@@ -51,7 +51,7 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
 
     private void ProcessIncome(out long totalIncome)
     {
-        var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='income']");
+        var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='income']")!;
         totalIncome = 0;
         var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Income);
         foreach (var account in accounts)
@@ -68,13 +68,13 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
             dataNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
         }
 
-        var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression);
+        var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression)!;
         balanceElement.InnerText = totalIncome.FormatCurrency();
     }
 
     private void ProcessExpenses(out long totalExpense)
     {
-        var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='expense']");
+        var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='expense']")!;
         totalExpense = 0;
         var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Expense);
         foreach (var account in accounts)
@@ -91,14 +91,14 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
             dataNode.AppendChild(this.CreateAccountBalanceNode(account, balance));
         }
 
-        var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression);
+        var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression)!;
         balanceElement.InnerText = totalExpense.FormatCurrency();
     }
 
     private void ProcessReceivablesAndLiabilities(out long totalReceivable, out long totalLiability)
     {
-        var receivableNode = this.PrintDocument.SelectSingleNode("//table/data[@target='receivable']");
-        var liabilityNode = this.PrintDocument.SelectSingleNode("//table/data[@target='liability']");
+        var receivableNode = this.PrintDocument.SelectSingleNode("//table/data[@target='receivable']")!;
+        var liabilityNode = this.PrintDocument.SelectSingleNode("//table/data[@target='liability']")!;
         totalReceivable = 0;
         totalLiability = 0;
         var accounts = this.allAccounts.Where(
@@ -125,15 +125,15 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
             }
         }
 
-        var balanceElement = receivableNode.SelectSingleNode(FourthColumnExpression);
+        var balanceElement = receivableNode.SelectSingleNode(FourthColumnExpression)!;
         balanceElement.InnerText = totalReceivable.FormatCurrency();
-        balanceElement = liabilityNode.SelectSingleNode(FourthColumnExpression);
+        balanceElement = liabilityNode.SelectSingleNode(FourthColumnExpression)!;
         balanceElement.InnerText = totalLiability.FormatCurrency();
     }
 
     private void ProcessAssets(long totalReceivable, long totalLiability)
     {
-        var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='asset']");
+        var dataNode = this.PrintDocument.SelectSingleNode("//table/data[@target='asset']")!;
         long totalAccount = 0;
         var accounts = this.allAccounts.Where(a => a.Type == AccountDefinitionType.Asset);
         foreach (var account in accounts)
@@ -161,7 +161,7 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
             totalAccount += totalLiability;
         }
 
-        var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression);
+        var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression)!;
         balanceElement.InnerText = totalAccount.FormatCurrency();
     }
 

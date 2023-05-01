@@ -23,7 +23,7 @@ internal interface IAccountsViewModel : INotifyPropertyChanged
 
     void ShowNewAccountDialog();
 
-    void OnEditAccount(object commandParameter);
+    void OnEditAccount(object? commandParameter);
 
     void SelectFirstAccount();
     void OnDataLoaded();

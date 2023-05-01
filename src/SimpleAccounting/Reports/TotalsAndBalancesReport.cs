@@ -54,7 +54,7 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
     {
         this.PreparePrintDocument(title, DateTime.Now);
 
-        XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data");
+        XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data")!;
 
         this.overallOpeningCredit = 0;
         this.overallOpeningDebit = 0;
@@ -126,12 +126,12 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
 
         dataNode.AppendChild(totalLineNode);
 
-        var signatures = this.PrintDocument.SelectSingleNode("//signatures");
+        var signatures = this.PrintDocument.SelectSingleNode("//signatures")!;
         foreach (var signature in this.Signatures)
         {
             var move = this.PrintDocument.CreateElement("move");
             move.SetAttribute("relY", "20");
-            signatures.ParentNode.InsertBefore(move, signatures);
+            signatures.ParentNode!.InsertBefore(move, signatures);
 
             var line = this.PrintDocument.CreateElement("line");
             line.SetAttribute("relToX", "100");
@@ -143,7 +143,7 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
             signatures.ParentNode.InsertBefore(text, signatures);
         }
 
-        signatures.ParentNode.RemoveChild(signatures);
+        signatures.ParentNode!.RemoveChild(signatures);
     }
 
     private static string FormatValue(long value)
