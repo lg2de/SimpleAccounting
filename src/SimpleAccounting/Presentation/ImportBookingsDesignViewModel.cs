@@ -3,129 +3,128 @@
 // </copyright>
 
 #pragma warning disable CA1303 // Do not pass literals as localized parameters because design view model defines useful values
-namespace lg2de.SimpleAccounting.Presentation
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using lg2de.SimpleAccounting.Model;
-    using lg2de.SimpleAccounting.Properties;
+namespace lg2de.SimpleAccounting.Presentation;
 
-    /// <summary>
-    ///     Implements the view model for the booking importer in the designer.
-    /// </summary>
-    [SuppressMessage(
-        "Major Code Smell", "S109:Magic numbers should not be used",
-        Justification = "Design view model defines useful values")]
-    [SuppressMessage(
-        "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
-        Justification = "Design view model defines useful values")]
-    internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using lg2de.SimpleAccounting.Model;
+using lg2de.SimpleAccounting.Properties;
+
+/// <summary>
+///     Implements the view model for the booking importer in the designer.
+/// </summary>
+[SuppressMessage(
+    "Major Code Smell", "S109:Magic numbers should not be used",
+    Justification = "Design view model defines useful values")]
+[SuppressMessage(
+    "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
+    Justification = "Design view model defines useful values")]
+internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
+{
+    // define some accounts
+    private static readonly List<AccountDefinition> SampleAccounts = new List<AccountDefinition>
     {
-        // define some accounts
-        private static readonly List<AccountDefinition> SampleAccounts = new List<AccountDefinition>
+        new AccountDefinition
         {
-            new AccountDefinition
+            ID = 100,
+            Name = "Cash",
+            ImportMapping = new AccountDefinitionImportMapping
             {
-                ID = 100,
-                Name = "Cash",
-                ImportMapping = new AccountDefinitionImportMapping
+                Columns = new List<AccountDefinitionImportMappingColumn>
                 {
-                    Columns = new List<AccountDefinitionImportMappingColumn>
+                    new AccountDefinitionImportMappingColumn
                     {
-                        new AccountDefinitionImportMappingColumn
-                        {
-                            Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date
-                        },
-                        new AccountDefinitionImportMappingColumn
-                        {
-                            Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value
-                        }
+                        Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date
+                    },
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value
                     }
                 }
-            },
-            new AccountDefinition { ID = 600, Name = "Shopping" },
-            new AccountDefinition { ID = 990, Name = "Carryforward" }
-        };
+            }
+        },
+        new AccountDefinition { ID = 600, Name = "Shopping" },
+        new AccountDefinition { ID = 990, Name = "Carryforward" }
+    };
 
-        // build sample project with journal entries
-        private static readonly AccountingData SampleData = new AccountingData
+    // build sample project with journal entries
+    private static readonly AccountingData SampleData = new AccountingData
+    {
+        Journal = new List<AccountingDataJournal>
         {
-            Journal = new List<AccountingDataJournal>
+            new AccountingDataJournal
             {
-                new AccountingDataJournal
+                DateStart = (uint)(DateTime.Today.Year * 10000 + 101),
+                DateEnd = (uint)(DateTime.Today.Year * 10000 + 1231),
+                Booking = new List<AccountingDataJournalBooking>
                 {
-                    DateStart = (uint)(DateTime.Today.Year * 10000 + 101),
-                    DateEnd = (uint)(DateTime.Today.Year * 10000 + 1231),
-                    Booking = new List<AccountingDataJournalBooking>
+                    new AccountingDataJournalBooking
                     {
-                        new AccountingDataJournalBooking
+                        Date = (uint)(DateTime.Today.Year * 10000 + 1231),
+                        ID = 999,
+                        Credit = new List<BookingValue>
                         {
-                            Date = (uint)(DateTime.Today.Year * 10000 + 1231),
-                            ID = 999,
-                            Credit = new List<BookingValue>
+                            new BookingValue
                             {
-                                new BookingValue
-                                {
-                                    Account = 100, Text = "End of year", Value = 1234
-                                }
-                            },
-                            Debit = new List<BookingValue>
+                                Account = 100, Text = "End of year", Value = 1234
+                            }
+                        },
+                        Debit = new List<BookingValue>
+                        {
+                            new BookingValue
                             {
-                                new BookingValue
-                                {
-                                    Account = 990, Text = "End of year", Value = 1234
-                                }
+                                Account = 990, Text = "End of year", Value = 1234
                             }
                         }
                     }
                 }
-            },
-            Accounts = new List<AccountingDataAccountGroup>
-            {
-                new AccountingDataAccountGroup { Account = SampleAccounts }
             }
-        };
-
-        public ImportBookingsDesignViewModel()
-            : base(null!, new ProjectData(new Settings(), null!, null!, null!, null!))
+        },
+        Accounts = new List<AccountingDataAccountGroup>
         {
-            this.ProjectData.Load(SampleData);
-            this.SelectedAccountNumber = 100;
-            this.StartDate = DateTime.Today;
-
-            this.LoadedData.Add(
-                new ImportEntryViewModel(SampleAccounts)
-                {
-                    Date = DateTime.Now - TimeSpan.FromDays(1),
-                    Name = "Should not be visible!",
-                    Text = "Should not be visible!",
-                    RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
-                    Value = 99.95
-                });
-            this.LoadedData.Add(
-                new ImportEntryViewModel(SampleAccounts)
-                {
-                    Date = DateTime.Now,
-                    Name = "McX",
-                    Text = "Shoes",
-                    RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
-                    Value = 99.95,
-                    IsFollowup = true
-                });
-            this.LoadedData.Add(
-                new ImportEntryViewModel(SampleAccounts)
-                {
-                    Date = DateTime.Now + TimeSpan.FromDays(1),
-                    Name = "McY",
-                    Text = "More Shoes",
-                    Value = 159.95,
-                    IsSkip = true
-                });
-
-            this.SetupExisting();
-            this.UpdateIdentifierInLoadedData();
+            new AccountingDataAccountGroup { Account = SampleAccounts }
         }
+    };
+
+    public ImportBookingsDesignViewModel()
+        : base(null!, new ProjectData(new Settings(), null!, null!, null!, null!))
+    {
+        this.ProjectData.Load(SampleData);
+        this.SelectedAccountNumber = 100;
+        this.StartDate = DateTime.Today;
+
+        this.LoadedData.Add(
+            new ImportEntryViewModel(SampleAccounts)
+            {
+                Date = DateTime.Now - TimeSpan.FromDays(1),
+                Name = "Should not be visible!",
+                Text = "Should not be visible!",
+                RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
+                Value = 99.95
+            });
+        this.LoadedData.Add(
+            new ImportEntryViewModel(SampleAccounts)
+            {
+                Date = DateTime.Now,
+                Name = "McX",
+                Text = "Shoes",
+                RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
+                Value = 99.95,
+                IsFollowup = true
+            });
+        this.LoadedData.Add(
+            new ImportEntryViewModel(SampleAccounts)
+            {
+                Date = DateTime.Now + TimeSpan.FromDays(1),
+                Name = "McY",
+                Text = "More Shoes",
+                Value = 159.95,
+                IsSkip = true
+            });
+
+        this.SetupExisting();
+        this.UpdateIdentifierInLoadedData();
     }
 }

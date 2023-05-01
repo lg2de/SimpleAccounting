@@ -2,44 +2,43 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Presentation
+namespace lg2de.SimpleAccounting.Presentation;
+
+using System;
+using System.Text.RegularExpressions;
+using lg2de.SimpleAccounting.Model;
+
+/// <summary>
+///     Implements the view model to visualize single pattern for semi-automatic booking import.
+/// </summary>
+public class ImportPatternViewModel
 {
-    using System;
-    using System.Text.RegularExpressions;
-    using lg2de.SimpleAccounting.Model;
+    private string expression = string.Empty;
 
-    /// <summary>
-    ///     Implements the view model to visualize single pattern for semi-automatic booking import.
-    /// </summary>
-    public class ImportPatternViewModel
+    public string Expression
     {
-        private string expression = string.Empty;
-
-        public string Expression
+        get => this.expression;
+        set
         {
-            get => this.expression;
-            set
+            if (string.IsNullOrWhiteSpace(value))
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    throw new ArgumentException("The expression must not be empty.");
-                }
+                throw new ArgumentException("The expression must not be empty.");
+            }
 
-                try
-                {
-                    this.expression = (new Regex(value)).ToString();
-                }
-                catch
-                {
-                    throw new ArgumentException("The expression must be a valid regular expression.");
-                }
+            try
+            {
+                this.expression = (new Regex(value)).ToString();
+            }
+            catch
+            {
+                throw new ArgumentException("The expression must be a valid regular expression.");
             }
         }
-
-        public double? Value { get; set; }
-
-        public ulong AccountId { get; set; }
-
-        public AccountDefinition? Account { get; set; }
     }
+
+    public double? Value { get; set; }
+
+    public ulong AccountId { get; set; }
+
+    public AccountDefinition? Account { get; set; }
 }

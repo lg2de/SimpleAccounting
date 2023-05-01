@@ -2,30 +2,29 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Presentation
+namespace lg2de.SimpleAccounting.Presentation;
+
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Input;
+
+/// <summary>
+///     Defines abstraction for <see cref="AccountsViewModel"/>.
+/// </summary>
+internal interface IAccountsViewModel : INotifyPropertyChanged
 {
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
-    using System.Windows.Input;
+    ObservableCollection<AccountViewModel> AccountList { get; }
 
-    /// <summary>
-    ///     Defines abstraction for <see cref="AccountsViewModel"/>.
-    /// </summary>
-    internal interface IAccountsViewModel : INotifyPropertyChanged
-    {
-        ObservableCollection<AccountViewModel> AccountList { get; }
+    AccountViewModel? SelectedAccount { get; set; }
 
-        AccountViewModel? SelectedAccount { get; set; }
+    ICommand AccountSelectionCommand { get; }
 
-        ICommand AccountSelectionCommand { get; }
+    bool ShowInactiveAccounts { get; set; }
 
-        bool ShowInactiveAccounts { get; set; }
+    void ShowNewAccountDialog();
 
-        void ShowNewAccountDialog();
+    void OnEditAccount(object commandParameter);
 
-        void OnEditAccount(object commandParameter);
-
-        void SelectFirstAccount();
-        void OnDataLoaded();
-    }
+    void SelectFirstAccount();
+    void OnDataLoaded();
 }

@@ -2,31 +2,30 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Presentation
+namespace lg2de.SimpleAccounting.Presentation;
+
+using Caliburn.Micro;
+using lg2de.SimpleAccounting.Infrastructure;
+
+/// <summary>
+///     Implements the model for the busy control.
+/// </summary>
+public class BusyControlModel : Screen, IBusy
 {
-    using Caliburn.Micro;
-    using lg2de.SimpleAccounting.Infrastructure;
+    private bool isBusy;
 
-    /// <summary>
-    ///     Implements the model for the busy control.
-    /// </summary>
-    public class BusyControlModel : Screen, IBusy
+    public bool IsBusy
     {
-        private bool isBusy;
-
-        public bool IsBusy
+        get => this.isBusy;
+        set
         {
-            get => this.isBusy;
-            set
+            if (value == this.isBusy)
             {
-                if (value == this.isBusy)
-                {
-                    return;
-                }
-
-                this.isBusy = value;
-                this.NotifyOfPropertyChange();
+                return;
             }
+
+            this.isBusy = value;
+            this.NotifyOfPropertyChange();
         }
     }
 }

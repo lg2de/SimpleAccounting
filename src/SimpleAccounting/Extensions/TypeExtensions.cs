@@ -2,21 +2,20 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Extensions
-{
-    using System;
-    using System.Reflection;
+namespace lg2de.SimpleAccounting.Extensions;
 
-    /// <summary>
-    ///     Implements extensions on <see cref="Type"/>.
-    /// </summary>
-    internal static class TypeExtensions
+using System;
+using System.Reflection;
+
+/// <summary>
+///     Implements extensions on <see cref="Type"/>.
+/// </summary>
+internal static class TypeExtensions
+{
+    public static string GetInformationalVersion(this Type type)
     {
-        public static string GetInformationalVersion(this Type type)
-        {
-            return type.Assembly
-                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-                ?? "UNKNOWN";
-        }
+        return type.Assembly
+                   .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+               ?? "UNKNOWN";
     }
 }

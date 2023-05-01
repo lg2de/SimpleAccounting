@@ -2,23 +2,22 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Infrastructure
+namespace lg2de.SimpleAccounting.Infrastructure;
+
+using System.Diagnostics.CodeAnalysis;
+
+/// <summary>
+///     Implements several constant and static texts.
+/// </summary>
+[ExcludeFromCodeCoverage]
+internal static class Defines
 {
-    using System.Diagnostics.CodeAnalysis;
+    public const string ProjectName = "SimpleAccounting";
+    public const string GithubDomain = "github.com";
+    public const string OrganizationName = "lg2de";
 
-    /// <summary>
-    ///     Implements several constant and static texts.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    internal static class Defines
-    {
-        public const string ProjectName = "SimpleAccounting";
-        public const string GithubDomain = "github.com";
-        public const string OrganizationName = "lg2de";
+    public static readonly string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
+    public static readonly string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
 
-        public static readonly string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
-        public static readonly string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
-
-        public static string GetAutoSaveFileName(string fileName) => fileName + "~";
-    }
+    public static string GetAutoSaveFileName(string fileName) => fileName + "~";
 }

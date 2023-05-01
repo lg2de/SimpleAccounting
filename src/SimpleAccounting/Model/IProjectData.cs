@@ -2,74 +2,73 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Model
+namespace lg2de.SimpleAccounting.Model;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using lg2de.SimpleAccounting.Infrastructure;
+using lg2de.SimpleAccounting.Presentation;
+using lg2de.SimpleAccounting.Properties;
+
+/// <summary>
+///     Defines the interface for the runtime information of a single project loaded.
+/// </summary>
+internal interface IProjectData
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using lg2de.SimpleAccounting.Infrastructure;
-    using lg2de.SimpleAccounting.Presentation;
-    using lg2de.SimpleAccounting.Properties;
+    Settings Settings { get; }
 
-    /// <summary>
-    ///     Defines the interface for the runtime information of a single project loaded.
-    /// </summary>
-    internal interface IProjectData
-    {
-        Settings Settings { get; }
+    string FileName { get; set; }
 
-        string FileName { get; set; }
+    string AutoSaveFileName { get; }
 
-        string AutoSaveFileName { get; }
+    AccountingData Storage { get; }
 
-        AccountingData Storage { get; }
+    AccountingDataJournal CurrentYear { get; }
 
-        AccountingDataJournal CurrentYear { get; }
+    bool ShowInactiveAccounts { get; set; }
 
-        bool ShowInactiveAccounts { get; set; }
+    bool IsModified { get; set; }
 
-        bool IsModified { get; set; }
+    ulong MaxBookIdent { get; }
 
-        ulong MaxBookIdent { get; }
+    TimeSpan AutoSaveInterval { get; set; }
 
-        TimeSpan AutoSaveInterval { get; set; }
+    event EventHandler DataLoaded;
 
-        event EventHandler DataLoaded;
+    event EventHandler YearChanged;
 
-        event EventHandler YearChanged;
+    event EventHandler<JournalChangedEventArgs> JournalChanged;
 
-        event EventHandler<JournalChangedEventArgs> JournalChanged;
+    void NewProject();
 
-        void NewProject();
+    void Load(AccountingData accountingData);
 
-        void Load(AccountingData accountingData);
+    Task<OperationResult> LoadFromFileAsync(string projectFileName);
 
-        Task<OperationResult> LoadFromFileAsync(string projectFileName);
+    void SaveProject();
 
-        void SaveProject();
+    Task AutoSaveAsync(CancellationToken cancellationToken);
 
-        Task AutoSaveAsync(CancellationToken cancellationToken);
+    void RemoveAutoSaveFile();
 
-        void RemoveAutoSaveFile();
+    void EditProjectOptions();
 
-        void EditProjectOptions();
+    void ShowAddBookingDialog(bool showInactiveAccounts);
 
-        void ShowAddBookingDialog(bool showInactiveAccounts);
+    void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts);
 
-        void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts);
+    void ShowDuplicateBookingDialog(IJournalItem item, bool showInactiveAccounts);
 
-        void ShowDuplicateBookingDialog(IJournalItem item, bool showInactiveAccounts);
+    void ShowImportDialog();
 
-        void ShowImportDialog();
+    bool CloseYear();
 
-        bool CloseYear();
+    bool CanDiscardModifiedProject();
 
-        bool CanDiscardModifiedProject();
+    void TriggerJournalChanged();
 
-        void TriggerJournalChanged();
+    void AddBooking(AccountingDataJournalBooking booking, bool updateJournal);
 
-        void AddBooking(AccountingDataJournalBooking booking, bool updateJournal);
-
-        void SelectYear(string yearName);
-    }
+    void SelectYear(string yearName);
 }

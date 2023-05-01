@@ -2,394 +2,393 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.UnitTests.Model
+namespace lg2de.SimpleAccounting.UnitTests.Model;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using FluentAssertions;
+using lg2de.SimpleAccounting.Infrastructure;
+using lg2de.SimpleAccounting.Model;
+using lg2de.SimpleAccounting.UnitTests.Presentation;
+using Xunit;
+
+public class AccountingDataTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using FluentAssertions;
-    using lg2de.SimpleAccounting.Infrastructure;
-    using lg2de.SimpleAccounting.Model;
-    using lg2de.SimpleAccounting.UnitTests.Presentation;
-    using Xunit;
-
-    public class AccountingDataTests
+    [Fact]
+    public void Migrate_DataWithEmptyProperties_EmptyPropertiesRemoved()
     {
-        [Fact]
-        public void Migrate_DataWithEmptyProperties_EmptyPropertiesRemoved()
+        var sut = new AccountingData
         {
-            var sut = new AccountingData
+            Accounts = new List<AccountingDataAccountGroup>
             {
-                Accounts = new List<AccountingDataAccountGroup>
+                new AccountingDataAccountGroup
                 {
-                    new AccountingDataAccountGroup
+                    Account = new List<AccountDefinition>
                     {
-                        Account = new List<AccountDefinition>
+                        new AccountDefinition { Name = "1" },
+                        new AccountDefinition
                         {
-                            new AccountDefinition { Name = "1" },
-                            new AccountDefinition
+                            Name = "2", ImportMapping = new AccountDefinitionImportMapping()
+                        },
+                        new AccountDefinition
+                        {
+                            Name = "3",
+                            ImportMapping = new AccountDefinitionImportMapping
                             {
-                                Name = "2", ImportMapping = new AccountDefinitionImportMapping()
-                            },
-                            new AccountDefinition
+                                Columns = new List<AccountDefinitionImportMappingColumn>(),
+                                Patterns = new List<AccountDefinitionImportMappingPattern>()
+                            }
+                        },
+                        new AccountDefinition
+                        {
+                            Name = "4",
+                            ImportMapping = new AccountDefinitionImportMapping
                             {
-                                Name = "3",
-                                ImportMapping = new AccountDefinitionImportMapping
+                                Columns = new List<AccountDefinitionImportMappingColumn>
                                 {
-                                    Columns = new List<AccountDefinitionImportMappingColumn>(),
-                                    Patterns = new List<AccountDefinitionImportMappingPattern>()
-                                }
-                            },
-                            new AccountDefinition
-                            {
-                                Name = "4",
-                                ImportMapping = new AccountDefinitionImportMapping
+                                    new AccountDefinitionImportMappingColumn
+                                    {
+                                        Source = "A"
+                                    }
+                                },
+                                Patterns = new List<AccountDefinitionImportMappingPattern>
                                 {
-                                    Columns = new List<AccountDefinitionImportMappingColumn>
+                                    new AccountDefinitionImportMappingPattern
                                     {
-                                        new AccountDefinitionImportMappingColumn
-                                        {
-                                            Source = "A"
-                                        }
-                                    },
-                                    Patterns = new List<AccountDefinitionImportMappingPattern>
-                                    {
-                                        new AccountDefinitionImportMappingPattern
-                                        {
-                                            Expression = "A"
-                                        }
+                                        Expression = "A"
                                     }
                                 }
                             }
                         }
                     }
                 }
-            };
+            }
+        };
 
-            sut.Migrate().Should().BeTrue();
+        sut.Migrate().Should().BeTrue();
 
-            var expectation = new AccountingData
+        var expectation = new AccountingData
+        {
+            Accounts = new List<AccountingDataAccountGroup>
             {
-                Accounts = new List<AccountingDataAccountGroup>
+                new AccountingDataAccountGroup
                 {
-                    new AccountingDataAccountGroup
+                    Account = new List<AccountDefinition>
                     {
-                        Account = new List<AccountDefinition>
+                        new AccountDefinition { Name = "1" },
+                        new AccountDefinition { Name = "2" },
+                        new AccountDefinition { Name = "3" },
+                        new AccountDefinition
                         {
-                            new AccountDefinition { Name = "1" },
-                            new AccountDefinition { Name = "2" },
-                            new AccountDefinition { Name = "3" },
-                            new AccountDefinition
+                            Name = "4",
+                            ImportMapping = new AccountDefinitionImportMapping
                             {
-                                Name = "4",
-                                ImportMapping = new AccountDefinitionImportMapping
+                                Columns = new List<AccountDefinitionImportMappingColumn>
                                 {
-                                    Columns = new List<AccountDefinitionImportMappingColumn>
+                                    new AccountDefinitionImportMappingColumn
                                     {
-                                        new AccountDefinitionImportMappingColumn
-                                        {
-                                            Source = "A"
-                                        }
-                                    },
-                                    Patterns = new List<AccountDefinitionImportMappingPattern>
+                                        Source = "A"
+                                    }
+                                },
+                                Patterns = new List<AccountDefinitionImportMappingPattern>
+                                {
+                                    new AccountDefinitionImportMappingPattern
                                     {
-                                        new AccountDefinitionImportMappingPattern
-                                        {
-                                            Expression = "A"
-                                        }
+                                        Expression = "A"
                                     }
                                 }
                             }
                         }
                     }
                 }
-            };
-            sut.Should().BeEquivalentTo(
-                expectation,
-                o => o.Excluding(
-                    info => info.Path.EndsWith(
-                        nameof(AccountDefinitionImportMappingPattern.Regex), StringComparison.Ordinal)));
-        }
+            }
+        };
+        sut.Should().BeEquivalentTo(
+            expectation,
+            o => o.Excluding(
+                info => info.Path.EndsWith(
+                    nameof(AccountDefinitionImportMappingPattern.Regex), StringComparison.Ordinal)));
+    }
 
-        [Fact]
-        public void Migrate_Empty_Unchanged()
+    [Fact]
+    public void Migrate_Empty_Unchanged()
+    {
+        var sut = new AccountingData();
+
+        sut.Migrate().Should().BeFalse("no (relevant) changes made");
+
+        sut.Should().BeEquivalentTo(new AccountingData());
+    }
+
+    [Fact]
+    public void Migrate_EmptyYears_YearsNodeRemoved()
+    {
+        var sut = new AccountingData { Years = new List<AccountingDataYear>() };
+
+        sut.Migrate().Should().BeFalse("just removing the empty not is not a relevant change");
+
+        sut.Should().BeEquivalentTo(new AccountingData());
+        sut.Years.Should().BeNull();
+    }
+
+    [Fact]
+    public void Migrate_ObsoleteYears_YearsMigratedToJournal()
+    {
+        var sut = new AccountingData
         {
-            var sut = new AccountingData();
-
-            sut.Migrate().Should().BeFalse("no (relevant) changes made");
-
-            sut.Should().BeEquivalentTo(new AccountingData());
-        }
-
-        [Fact]
-        public void Migrate_EmptyYears_YearsNodeRemoved()
-        {
-            var sut = new AccountingData { Years = new List<AccountingDataYear>() };
-
-            sut.Migrate().Should().BeFalse("just removing the empty not is not a relevant change");
-
-            sut.Should().BeEquivalentTo(new AccountingData());
-            sut.Years.Should().BeNull();
-        }
-
-        [Fact]
-        public void Migrate_ObsoleteYears_YearsMigratedToJournal()
-        {
-            var sut = new AccountingData
+            Years = new List<AccountingDataYear>
             {
-                Years = new List<AccountingDataYear>
+                new AccountingDataYear
                 {
-                    new AccountingDataYear
-                    {
-                        Name = 2001, DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true
-                    },
-                    new AccountingDataYear
-                    {
-                        Name = 2002, DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false
-                    }
-                }
-            };
-
-            sut.Migrate().Should().BeTrue();
-
-            var expectation = new
-            {
-                Journal = new[]
-                {
-                    new { Year = "2001", DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true },
-                    new { Year = "2002", DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false }
-                }
-            };
-            sut.Should().BeEquivalentTo(expectation);
-        }
-
-        [Fact]
-        public void SafeGetLatest_EmptyList_BookingsInitialized()
-        {
-            var sut = new List<AccountingDataJournal>();
-
-            var latest = sut.SafeGetLatest();
-
-            latest.Booking.Should().BeEmpty();
-        }
-
-        [Fact]
-        public void SafeGetLatest_MissingBookings_BookingsInitialized()
-        {
-            var sut = new List<AccountingDataJournal> { new AccountingDataJournal { Year = "Year" } };
-
-            var latest = sut.SafeGetLatest();
-
-            latest.Booking.Should().BeEmpty();
-        }
-
-        [CulturedFact("en")]
-        public void CloseYear_SampleDataEnglish_AllRelevantDataCorrect()
-        {
-            var sut = Samples.SampleProject;
-            var currentYear = sut.Journal.Last();
-            currentYear.Booking.AddRange(Samples.SampleBookings);
-            var carryforwardAccount =
-                sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
-
-            sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
-
-            var newYear = sut.Journal.Last();
-            newYear.Should().NotBeEquivalentTo(currentYear);
-            currentYear.Closed.Should().BeTrue();
-            newYear.Closed.Should().BeFalse();
-            newYear.Booking.Should().BeEquivalentTo(
-                new[]
-                {
-                    new
-                    {
-                        ID = 1,
-                        Opening = true,
-                        Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 1", Value = 65100 } },
-                        Debit = new[] { new { Account = Samples.BankAccount, Text = "Opening value 1", Value = 65100 } }
-                    },
-                    new
-                    {
-                        ID = 2,
-                        Opening = true,
-                        Credit = new[] { new { Account = Samples.BankCredit, Text = "Opening value 2", Value = 260000 } },
-                        Debit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 2", Value = 260000 } }
-                    },
-                    new
-                    {
-                        ID = 3,
-                        Opening = true,
-                        Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 3", Value = 9900 } },
-                        Debit = new[] { new { Account = Samples.FriendsDebit, Text = "Opening value 3", Value = 9900 } }
-                    }
-                });
-        }
-
-        [CulturedFact("de")]
-        [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        public void CloseYear_SampleDataGerman_TextCorrect()
-        {
-            var sut = Samples.SampleProject;
-            var currentYear = sut.Journal.Last();
-            currentYear.Booking.AddRange(Samples.SampleBookings);
-            var carryforwardAccount =
-                sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
-
-            sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
-
-            var newYear = sut.Journal.Last();
-            newYear.Should().NotBeEquivalentTo(currentYear);
-            currentYear.Closed.Should().BeTrue();
-            newYear.Closed.Should().BeFalse();
-            newYear.Booking.Should().BeEquivalentTo(
-                new[]
-                {
-                    new
-                    {
-                        ID = 1,
-                        Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 1" } },
-                        Debit = new[] { new { Account = 100, Text = "Eröffnungsbetrag 1" } }
-                    },
-                    new
-                    {
-                        ID = 2,
-                        Credit = new[] { new { Account = 5000, Text = "Eröffnungsbetrag 2" } },
-                        Debit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 2" } }
-                    },
-                    new
-                    {
-                        ID = 3,
-                        Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 3" } },
-                        Debit = new[] { new { Account = 6000, Text = "Eröffnungsbetrag 3" } }
-                    }
-                });
-        }
-
-        [CulturedFact("fr")]
-        [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        public void CloseYear_SampleDataFrench_TextCorrect()
-        {
-            var sut = Samples.SampleProject;
-            var currentYear = sut.Journal.Last();
-            currentYear.Booking.AddRange(Samples.SampleBookings);
-            var carryforwardAccount =
-                sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
-
-            sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
-
-            var newYear = sut.Journal.Last();
-            newYear.Should().NotBeEquivalentTo(currentYear);
-            currentYear.Closed.Should().BeTrue();
-            newYear.Closed.Should().BeFalse();
-            newYear.Booking.Should().BeEquivalentTo(
-                new[]
-                {
-                    new
-                    {
-                        ID = 1,
-                        Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 1" } },
-                        Debit = new[] { new { Account = 100, Text = "Valeur d'ouverture 1" } }
-                    },
-                    new
-                    {
-                        ID = 2,
-                        Credit = new[] { new { Account = 5000, Text = "Valeur d'ouverture 2" } },
-                        Debit = new[] { new { Account = 990, Text = "Valeur d'ouverture 2" } }
-                    },
-                    new
-                    {
-                        ID = 3,
-                        Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 3" } },
-                        Debit = new[] { new { Account = 6000, Text = "Valeur d'ouverture 3" } }
-                    }
-                });
-        }
-
-        [CulturedFact("en")]
-        public void CloseYear_TextOptionAccountName_TextCorrect()
-        {
-            var sut = Samples.SampleProject;
-            var currentYear = sut.Journal.Last();
-            currentYear.Booking.AddRange(Samples.SampleBookings);
-            var carryforwardAccount =
-                sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
-
-            sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.AccountName);
-
-            var newYear = sut.Journal.Last();
-            newYear.Should().NotBeEquivalentTo(currentYear);
-            currentYear.Closed.Should().BeTrue();
-            newYear.Closed.Should().BeFalse();
-            newYear.Booking.Should().BeEquivalentTo(
-                new[]
-                {
-                    new
-                    {
-                        ID = 1,
-                        Credit = new[] { new { Account = 990, Text = "Opening value Bank account" } },
-                        Debit = new[] { new { Account = 100, Text = "Opening value Bank account" } }
-                    },
-                    new
-                    {
-                        ID = 2,
-                        Credit = new[] { new { Account = 5000, Text = "Opening value Bank credit" } },
-                        Debit = new[] { new { Account = 990, Text = "Opening value Bank credit" } }
-                    },
-                    new
-                    {
-                        ID = 3,
-                        Credit = new[] { new { Account = 990, Text = "Opening value Friends debit" } },
-                        Debit = new[] { new { Account = 6000, Text = "Opening value Friends debit" } }
-                    }
-                });
-        }
-
-        [Fact]
-        public void CloseYear_JournalWithInvalidBookings_EntryIgnored()
-        {
-            var sut = new AccountingData
-            {
-                Accounts = new List<AccountingDataAccountGroup>
-                {
-                    new AccountingDataAccountGroup
-                    {
-                        Account = new List<AccountDefinition>
-                        {
-                            new AccountDefinition { ID = 100, Type = AccountDefinitionType.Asset },
-                            new AccountDefinition
-                            {
-                                ID = 999, Type = AccountDefinitionType.Carryforward
-                            }
-                        }
-                    }
+                    Name = 2001, DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true
                 },
-                Journal = new List<AccountingDataJournal>
+                new AccountingDataYear
                 {
-                    new AccountingDataJournal { Booking = null, DateStart = 2020_0101, DateEnd = 2020_1231 }
+                    Name = 2002, DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false
                 }
-            };
+            }
+        };
 
-            sut.CloseYear(sut.Journal.Last(), sut.Accounts.Last().Account.Last(), OpeningTextOption.Numbered);
+        sut.Migrate().Should().BeTrue();
 
-            sut.Journal.First().Closed.Should().BeTrue();
-            sut.Journal.Last().Closed.Should().BeFalse();
-        }
-
-        [Fact]
-        public void XsiSchemaLocation_DefaultConstructor_DefaultValue()
+        var expectation = new
         {
-            var sut = new AccountingData();
+            Journal = new[]
+            {
+                new { Year = "2001", DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true },
+                new { Year = "2002", DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false }
+            }
+        };
+        sut.Should().BeEquivalentTo(expectation);
+    }
 
-            sut.xsiSchemaLocation.Should().Be(AccountingData.DefaultXsiSchemaLocation);
-        }
+    [Fact]
+    public void SafeGetLatest_EmptyList_BookingsInitialized()
+    {
+        var sut = new List<AccountingDataJournal>();
 
-        [Fact]
-        public void XsiSchemaLocation_SetDifferentValue_DefaultValue()
+        var latest = sut.SafeGetLatest();
+
+        latest.Booking.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void SafeGetLatest_MissingBookings_BookingsInitialized()
+    {
+        var sut = new List<AccountingDataJournal> { new AccountingDataJournal { Year = "Year" } };
+
+        var latest = sut.SafeGetLatest();
+
+        latest.Booking.Should().BeEmpty();
+    }
+
+    [CulturedFact("en")]
+    public void CloseYear_SampleDataEnglish_AllRelevantDataCorrect()
+    {
+        var sut = Samples.SampleProject;
+        var currentYear = sut.Journal.Last();
+        currentYear.Booking.AddRange(Samples.SampleBookings);
+        var carryforwardAccount =
+            sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+
+        sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
+
+        var newYear = sut.Journal.Last();
+        newYear.Should().NotBeEquivalentTo(currentYear);
+        currentYear.Closed.Should().BeTrue();
+        newYear.Closed.Should().BeFalse();
+        newYear.Booking.Should().BeEquivalentTo(
+            new[]
+            {
+                new
+                {
+                    ID = 1,
+                    Opening = true,
+                    Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 1", Value = 65100 } },
+                    Debit = new[] { new { Account = Samples.BankAccount, Text = "Opening value 1", Value = 65100 } }
+                },
+                new
+                {
+                    ID = 2,
+                    Opening = true,
+                    Credit = new[] { new { Account = Samples.BankCredit, Text = "Opening value 2", Value = 260000 } },
+                    Debit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 2", Value = 260000 } }
+                },
+                new
+                {
+                    ID = 3,
+                    Opening = true,
+                    Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 3", Value = 9900 } },
+                    Debit = new[] { new { Account = Samples.FriendsDebit, Text = "Opening value 3", Value = 9900 } }
+                }
+            });
+    }
+
+    [CulturedFact("de")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    public void CloseYear_SampleDataGerman_TextCorrect()
+    {
+        var sut = Samples.SampleProject;
+        var currentYear = sut.Journal.Last();
+        currentYear.Booking.AddRange(Samples.SampleBookings);
+        var carryforwardAccount =
+            sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+
+        sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
+
+        var newYear = sut.Journal.Last();
+        newYear.Should().NotBeEquivalentTo(currentYear);
+        currentYear.Closed.Should().BeTrue();
+        newYear.Closed.Should().BeFalse();
+        newYear.Booking.Should().BeEquivalentTo(
+            new[]
+            {
+                new
+                {
+                    ID = 1,
+                    Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 1" } },
+                    Debit = new[] { new { Account = 100, Text = "Eröffnungsbetrag 1" } }
+                },
+                new
+                {
+                    ID = 2,
+                    Credit = new[] { new { Account = 5000, Text = "Eröffnungsbetrag 2" } },
+                    Debit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 2" } }
+                },
+                new
+                {
+                    ID = 3,
+                    Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 3" } },
+                    Debit = new[] { new { Account = 6000, Text = "Eröffnungsbetrag 3" } }
+                }
+            });
+    }
+
+    [CulturedFact("fr")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    public void CloseYear_SampleDataFrench_TextCorrect()
+    {
+        var sut = Samples.SampleProject;
+        var currentYear = sut.Journal.Last();
+        currentYear.Booking.AddRange(Samples.SampleBookings);
+        var carryforwardAccount =
+            sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+
+        sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
+
+        var newYear = sut.Journal.Last();
+        newYear.Should().NotBeEquivalentTo(currentYear);
+        currentYear.Closed.Should().BeTrue();
+        newYear.Closed.Should().BeFalse();
+        newYear.Booking.Should().BeEquivalentTo(
+            new[]
+            {
+                new
+                {
+                    ID = 1,
+                    Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 1" } },
+                    Debit = new[] { new { Account = 100, Text = "Valeur d'ouverture 1" } }
+                },
+                new
+                {
+                    ID = 2,
+                    Credit = new[] { new { Account = 5000, Text = "Valeur d'ouverture 2" } },
+                    Debit = new[] { new { Account = 990, Text = "Valeur d'ouverture 2" } }
+                },
+                new
+                {
+                    ID = 3,
+                    Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 3" } },
+                    Debit = new[] { new { Account = 6000, Text = "Valeur d'ouverture 3" } }
+                }
+            });
+    }
+
+    [CulturedFact("en")]
+    public void CloseYear_TextOptionAccountName_TextCorrect()
+    {
+        var sut = Samples.SampleProject;
+        var currentYear = sut.Journal.Last();
+        currentYear.Booking.AddRange(Samples.SampleBookings);
+        var carryforwardAccount =
+            sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+
+        sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.AccountName);
+
+        var newYear = sut.Journal.Last();
+        newYear.Should().NotBeEquivalentTo(currentYear);
+        currentYear.Closed.Should().BeTrue();
+        newYear.Closed.Should().BeFalse();
+        newYear.Booking.Should().BeEquivalentTo(
+            new[]
+            {
+                new
+                {
+                    ID = 1,
+                    Credit = new[] { new { Account = 990, Text = "Opening value Bank account" } },
+                    Debit = new[] { new { Account = 100, Text = "Opening value Bank account" } }
+                },
+                new
+                {
+                    ID = 2,
+                    Credit = new[] { new { Account = 5000, Text = "Opening value Bank credit" } },
+                    Debit = new[] { new { Account = 990, Text = "Opening value Bank credit" } }
+                },
+                new
+                {
+                    ID = 3,
+                    Credit = new[] { new { Account = 990, Text = "Opening value Friends debit" } },
+                    Debit = new[] { new { Account = 6000, Text = "Opening value Friends debit" } }
+                }
+            });
+    }
+
+    [Fact]
+    public void CloseYear_JournalWithInvalidBookings_EntryIgnored()
+    {
+        var sut = new AccountingData
         {
-            var sut = new AccountingData { xsiSchemaLocation = "foo" };
+            Accounts = new List<AccountingDataAccountGroup>
+            {
+                new AccountingDataAccountGroup
+                {
+                    Account = new List<AccountDefinition>
+                    {
+                        new AccountDefinition { ID = 100, Type = AccountDefinitionType.Asset },
+                        new AccountDefinition
+                        {
+                            ID = 999, Type = AccountDefinitionType.Carryforward
+                        }
+                    }
+                }
+            },
+            Journal = new List<AccountingDataJournal>
+            {
+                new AccountingDataJournal { Booking = null, DateStart = 2020_0101, DateEnd = 2020_1231 }
+            }
+        };
 
-            sut.xsiSchemaLocation.Should().Be(AccountingData.DefaultXsiSchemaLocation);
-        }
+        sut.CloseYear(sut.Journal.Last(), sut.Accounts.Last().Account.Last(), OpeningTextOption.Numbered);
+
+        sut.Journal.First().Closed.Should().BeTrue();
+        sut.Journal.Last().Closed.Should().BeFalse();
+    }
+
+    [Fact]
+    public void XsiSchemaLocation_DefaultConstructor_DefaultValue()
+    {
+        var sut = new AccountingData();
+
+        sut.xsiSchemaLocation.Should().Be(AccountingData.DefaultXsiSchemaLocation);
+    }
+
+    [Fact]
+    public void XsiSchemaLocation_SetDifferentValue_DefaultValue()
+    {
+        var sut = new AccountingData { xsiSchemaLocation = "foo" };
+
+        sut.xsiSchemaLocation.Should().Be(AccountingData.DefaultXsiSchemaLocation);
     }
 }

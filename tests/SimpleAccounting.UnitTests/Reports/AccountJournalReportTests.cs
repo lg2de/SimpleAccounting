@@ -2,41 +2,41 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.UnitTests.Reports
+namespace lg2de.SimpleAccounting.UnitTests.Reports;
+
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using FluentAssertions;
+using FluentAssertions.Execution;
+using lg2de.SimpleAccounting.Reports;
+using lg2de.SimpleAccounting.UnitTests.Presentation;
+using Xunit;
+
+[SuppressMessage("ReSharper", "UseStringInterpolation")]
+public class AccountJournalReportTests
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.Linq;
-    using System.Xml.Linq;
-    using System.Xml.XPath;
-    using FluentAssertions;
-    using FluentAssertions.Execution;
-    using lg2de.SimpleAccounting.Reports;
-    using lg2de.SimpleAccounting.UnitTests.Presentation;
-    using Xunit;
-
-    [SuppressMessage("ReSharper", "UseStringInterpolation")]
-    public class AccountJournalReportTests
+    [CulturedTheory("en")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CreateReport_SampleData_Converted(bool pageBreakBetweenAccounts)
     {
-        [CulturedTheory("en")]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void CreateReport_SampleData_Converted(bool pageBreakBetweenAccounts)
+        var projectData = Samples.SampleProjectData;
+        projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
+        var sut = new AccountJournalReport(new XmlPrinter(), projectData)
         {
-            var projectData = Samples.SampleProjectData;
-            projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
-            var sut = new AccountJournalReport(new XmlPrinter(), projectData)
-            {
-                PageBreakBetweenAccounts = pageBreakBetweenAccounts
-            };
+            PageBreakBetweenAccounts = pageBreakBetweenAccounts
+        };
 
-            sut.CreateReport("dummy");
+        sut.CreateReport("dummy");
 
-            var year = DateTime.Now.Year;
-            var expectedBankAccount = string.Format(
-                CultureInfo.InvariantCulture,
-                @"
+        var year = DateTime.Now.Year;
+        var expectedBankAccount = string.Format(
+            CultureInfo.InvariantCulture,
+            @"
 <data>
   <tr topLine=""True"">
     <td>1/1/{0}</td>
@@ -95,9 +95,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedSalary = string.Format(
-                CultureInfo.InvariantCulture,
-                @"
+        var expectedSalary = string.Format(
+            CultureInfo.InvariantCulture,
+            @"
 <data>
   <tr topLine=""True"">
     <td>1/28/{0}</td>
@@ -124,9 +124,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedShoes = string.Format(
-                CultureInfo.InvariantCulture,
-                @"
+        var expectedShoes = string.Format(
+            CultureInfo.InvariantCulture,
+            @"
 <data>
   <tr topLine=""True"">
     <td>2/1/{0}</td>
@@ -153,9 +153,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedCarryforward = string.Format(
-                CultureInfo.InvariantCulture,
-                @"
+        var expectedCarryforward = string.Format(
+            CultureInfo.InvariantCulture,
+            @"
 <data>
   <tr topLine=""True"">
     <td>1/1/{0}</td>
@@ -190,9 +190,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedBankCredit = string.Format(
-                CultureInfo.InvariantCulture,
-                @"
+        var expectedBankCredit = string.Format(
+            CultureInfo.InvariantCulture,
+            @"
 <data>
   <tr topLine=""True"">
     <td>1/1/{0}</td>
@@ -227,9 +227,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td />
   </tr>
 </data>", year);
-            var expectedFriendsDebit = string.Format(
-                CultureInfo.InvariantCulture,
-                @"
+        var expectedFriendsDebit = string.Format(
+            CultureInfo.InvariantCulture,
+            @"
 <data>
   <tr topLine=""True"">
     <td>2/5/{0}</td>
@@ -249,66 +249,65 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
   </tr>
 </data>", year);
 
-            sut.DocumentForTests!.Root!.Elements().Select(e => e.Name).Should().Equal(
-                "pageTexts",
-                "font", // header
-                "text",
-                "move",
-                "font", // firm
-                "text",
-                "move",
-                "text", // time range
-                "move",
-                "font", // default font
-                "font", // account header
-                "move",
-                "table", // account data
-                pageBreakBetweenAccounts ? "newPage" : "move",
-                "font", // account header
-                "move",
-                "table", // account data
-                pageBreakBetweenAccounts ? "newPage" : "move",
-                "font", // account header
-                "move",
-                "table", // account data
-                pageBreakBetweenAccounts ? "newPage" : "move",
-                "font", // account header
-                "move",
-                "table", // account data
-                pageBreakBetweenAccounts ? "newPage" : "move",
-                "font", // account header
-                "move",
-                "table", // account data
-                pageBreakBetweenAccounts ? "newPage" : "move",
-                "font", // account header
-                "move",
-                "table", // account data
-                "move", // footer
-                "text");
+        sut.DocumentForTests!.Root!.Elements().Select(e => e.Name).Should().Equal(
+            "pageTexts",
+            "font", // header
+            "text",
+            "move",
+            "font", // firm
+            "text",
+            "move",
+            "text", // time range
+            "move",
+            "font", // default font
+            "font", // account header
+            "move",
+            "table", // account data
+            pageBreakBetweenAccounts ? "newPage" : "move",
+            "font", // account header
+            "move",
+            "table", // account data
+            pageBreakBetweenAccounts ? "newPage" : "move",
+            "font", // account header
+            "move",
+            "table", // account data
+            pageBreakBetweenAccounts ? "newPage" : "move",
+            "font", // account header
+            "move",
+            "table", // account data
+            pageBreakBetweenAccounts ? "newPage" : "move",
+            "font", // account header
+            "move",
+            "table", // account data
+            pageBreakBetweenAccounts ? "newPage" : "move",
+            "font", // account header
+            "move",
+            "table", // account data
+            "move", // footer
+            "text");
 
-            var actual = sut.DocumentForTests.XPathSelectElements("//table/data").ToArray();
-            actual.Should().HaveCount(6);
-            using (new AssertionScope())
-            {
-                actual[0].Should().BeEquivalentTo(
-                    XDocument.Parse(expectedBankAccount).Root,
-                    "bank account table should match");
-                actual[1].Should().BeEquivalentTo(
-                    XDocument.Parse(expectedSalary).Root,
-                    "salary table should match");
-                actual[2].Should().BeEquivalentTo(
-                    XDocument.Parse(expectedShoes).Root,
-                    "shoes table should match");
-                actual[3].Should().BeEquivalentTo(
-                    XDocument.Parse(expectedCarryforward).Root,
-                    "carryforward table should match");
-                actual[4].Should().BeEquivalentTo(
-                    XDocument.Parse(expectedBankCredit).Root,
-                    "bank credit table should match");
-                actual[5].Should().BeEquivalentTo(
-                    XDocument.Parse(expectedFriendsDebit).Root,
-                    "friends debit table should match");
-            }
+        var actual = sut.DocumentForTests.XPathSelectElements("//table/data").ToArray();
+        actual.Should().HaveCount(6);
+        using (new AssertionScope())
+        {
+            actual[0].Should().BeEquivalentTo(
+                XDocument.Parse(expectedBankAccount).Root,
+                "bank account table should match");
+            actual[1].Should().BeEquivalentTo(
+                XDocument.Parse(expectedSalary).Root,
+                "salary table should match");
+            actual[2].Should().BeEquivalentTo(
+                XDocument.Parse(expectedShoes).Root,
+                "shoes table should match");
+            actual[3].Should().BeEquivalentTo(
+                XDocument.Parse(expectedCarryforward).Root,
+                "carryforward table should match");
+            actual[4].Should().BeEquivalentTo(
+                XDocument.Parse(expectedBankCredit).Root,
+                "bank credit table should match");
+            actual[5].Should().BeEquivalentTo(
+                XDocument.Parse(expectedFriendsDebit).Root,
+                "friends debit table should match");
         }
     }
 }
