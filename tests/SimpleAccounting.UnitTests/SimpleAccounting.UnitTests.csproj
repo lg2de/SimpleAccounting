@@ -8,16 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="coverlet.msbuild" Version="3.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <!-- license is apache 2.0 -->
     <PackageReference Include="FluentAssertions" Version="6.10.0" />
     <!-- license is MS.NET -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <!-- license is BSD-3-Clause -->
     <PackageReference Include="NSubstitute" Version="5.0.0" />
-    <!-- license is MIT -->
-    <PackageReference Include="OpenCover" Version="4.7.1221" />
-    <!-- license is apache 2.0 -->
-    <PackageReference Include="ReportGenerator" Version="4.6.4" />
     <!-- license is apache 2.0 -->
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.console" Version="2.4.2">

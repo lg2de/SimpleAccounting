@@ -36,6 +36,8 @@ jobs:
 
     - name: Restore packages
       run: dotnet restore --configfile nuget.config --verbosity normal
+    - name: Publish Release
+      run: dotnet publish --configuration Release --no-restore
     - name: Prepare SonarScanner
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -51,18 +53,10 @@ jobs:
           $branchCommand="/d:sonar.branch.name=$branch"
         }
         Write-Host CMDs=$branchCommand
-        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
+        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN /d:sonar.cs.opencover.reportsPaths="tests\**\coverage.opencover.xml"
       shell: pwsh
-    - name: Build Debug
-      run: dotnet build --configuration Debug --no-restore
-    - name: Test with OpenCover
-      run: |
-        .\CreateCoverReport.ps1
-        # Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-        # bash codecov.sh -f "CoverOutput/coverage.xml" -t ${{ secrets.CODECOV_TOKEN }}
-      shell: pwsh
-    - name: Publish Release
-      run: dotnet publish --configuration Release --no-restore
+    - name: Build Debug and Test
+      run: dotnet test --configuration Debug --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
     - name: Complete SonarScanner
       run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
