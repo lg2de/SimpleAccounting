@@ -16,7 +16,6 @@ using lg2de.SimpleAccounting.Properties;
 
 internal class ProjectFileLoader
 {
-    private const int MaxRecentProjects = 10;
     private readonly IFileSystem fileSystem;
 
     private readonly IDialogs dialogs;
@@ -170,11 +169,6 @@ internal class ProjectFileLoader
             this.settings.SecuredDrives.Add(info.RootPath);
         }
 
-        this.settings.RecentProjects.Remove(projectFileName);
-        this.settings.RecentProjects.Insert(0, projectFileName);
-        while (this.settings.RecentProjects.Count > MaxRecentProjects)
-        {
-            this.settings.RecentProjects.RemoveAt(MaxRecentProjects);
-        }
+        this.settings.SetRecentProject(projectFileName);
     }
 }
