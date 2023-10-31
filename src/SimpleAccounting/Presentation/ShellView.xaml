@@ -16,6 +16,7 @@
       <Setter Property="FontSize" Value="15" />
       <Setter Property="Margin" Value="5" />
     </Style>
+    <local:DateConverter x:Key="DateConverter" />
   </Window.Resources>
   <Window.InputBindings>
     <KeyBinding Key="B" Modifiers="Control" Command="{Binding Menu.AddBookingsCommand}" />
@@ -202,10 +203,10 @@
             <DataGrid.Columns>
               <DataGridTextColumn
                 Header="{x:Static properties:Resources.Word_Date}" Width="60"
-                Binding="{Binding Date, StringFormat=\{0:d\}}"
+                Binding="{Binding Date, Converter={StaticResource DateConverter}}"
                 CellStyle="{StaticResource SummaryGridStyle}" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="75"
-                                  Binding="{Binding Identifier}"
+                                  Binding="{Binding IdentifierText}"
                                   CellStyle="{StaticResource SummaryGridStyle}" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200"
                                   Binding="{Binding Text}" />

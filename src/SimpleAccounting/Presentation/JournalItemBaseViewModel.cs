@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Presentation;
 
 using System;
+using System.Globalization;
 using Caliburn.Micro;
 
 /// <summary>
@@ -19,6 +20,9 @@ public class JournalItemBaseViewModel : PropertyChangedBase, IJournalItem
     }
 
     public ulong Identifier { get; set; }
+
+    public string IdentifierText =>
+        this.Identifier > 0 ? this.Identifier.ToString(CultureInfo.InvariantCulture) : string.Empty;
 
     public DateTime Date { get; set; }
 
