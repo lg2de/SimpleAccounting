@@ -5,7 +5,7 @@
     <!-- ProjectGuid is required for SonarQube -->
     <ProjectGuid>{976604F7-86B8-407E-A9B2-592E376D7006}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>lg2de.SimpleAccounting</RootNamespace>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>

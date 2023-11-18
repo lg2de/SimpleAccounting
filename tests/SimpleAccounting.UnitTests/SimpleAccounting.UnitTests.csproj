@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <!-- ProjectGuid is required for SonarQube -->
     <ProjectGuid>{E77B3647-FBC9-4138-A0D5-C9165EF45417}</ProjectGuid>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>lg2de.SimpleAccounting.UnitTests</RootNamespace>
   </PropertyGroup>
 
@@ -30,10 +30,10 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <!-- TODO S1451 (add or update header) is disabled because of external code (cultured fact) --> 
+    <!-- TODO S1451 (add or update header) is disabled because of external code (cultured fact) -->
     <NoWarn>$(NoWarn);S1451</NoWarn>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\SimpleAccounting\SimpleAccounting.csproj" />
   </ItemGroup>

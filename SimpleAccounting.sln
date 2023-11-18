@@ -1,20 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.352
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DE9ECA6D-3497-4565-A718-EBBADDDCF2DF}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
+		global.json = global.json
 		.sonarlint\lg2de_simpleaccountingcsharp.ruleset = .sonarlint\lg2de_simpleaccountingcsharp.ruleset
 		LICENSE = LICENSE
 		nuget.config = nuget.config
 		PatchVersion.ps1 = PatchVersion.ps1
 		README.md = README.md
 		SimpleAccounting.sln.DotSettings = SimpleAccounting.sln.DotSettings
-		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAccounting", "src\SimpleAccounting\SimpleAccounting.csproj", "{976604F7-86B8-407E-A9B2-592E376D7006}"
@@ -64,12 +65,12 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {62844EF8-76D5-4F6B-85A3-9E80E71E4482}
-	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{976604F7-86B8-407E-A9B2-592E376D7006} = {88F13815-196C-4F7F-B54A-A345656DD866}
-		{507F5D29-96C7-48C2-966C-58342D08A4A7} = {BF2618D8-BC1B-4127-8DCF-85A493C04BF8}
 		{E77B3647-FBC9-4138-A0D5-C9165EF45417} = {BF2618D8-BC1B-4127-8DCF-85A493C04BF8}
+		{507F5D29-96C7-48C2-966C-58342D08A4A7} = {BF2618D8-BC1B-4127-8DCF-85A493C04BF8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {62844EF8-76D5-4F6B-85A3-9E80E71E4482}
 	EndGlobalSection
 EndGlobal

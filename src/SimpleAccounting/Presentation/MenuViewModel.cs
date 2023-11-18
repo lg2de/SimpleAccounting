@@ -223,9 +223,9 @@ internal class MenuViewModel : Screen, IMenuViewModel
         this.projectData.ShowEditBookingDialog(journalItem, this.projectData.ShowInactiveAccounts);
     }
 
-    private void OnDuplicateBooking(object commandParameter)
+    private void OnDuplicateBooking(object? commandParameter)
     {
-        if (!(commandParameter is IJournalItem journalItem))
+        if (commandParameter is not IJournalItem journalItem)
         {
             return;
         }

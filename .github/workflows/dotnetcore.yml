@@ -25,7 +25,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.0.x
     - name: Setup SonarScanner
       run: choco install "sonarscanner-msbuild-net46" -y
     - name: Patch version info
@@ -64,7 +64,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: SimpleAccounting
-        path: src\SimpleAccounting\bin\Release\net6.0-windows\publish
+        path: src\SimpleAccounting\bin\Release\net8.0-windows\publish
     - name: Upload test artifact
       uses: actions/upload-artifact@v1
       with:
