@@ -68,5 +68,5 @@ jobs:
     - name: Upload test artifact
       uses: actions/upload-artifact@v1
       with:
-        name: CoverReport
-        path: CoverReport
+        name: Coverage
+        path: **\coverage.opencover.xml
