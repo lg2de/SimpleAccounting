@@ -88,14 +88,13 @@ internal class ShellViewModel : Screen, IDisposable
 
     public IAccountsViewModel Accounts { get; }
 
-    public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryCloseAsync());
+    public ICommand CloseApplicationCommand => new AsyncCommand(() => this.TryCloseAsync());
 
     public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this.Busy, this.OnCheckForUpdateAsync);
 
-    public ICommand NewAccountCommand => new RelayCommand(_ => this.Accounts.ShowNewAccountDialogAsync());
+    public ICommand NewAccountCommand => new AsyncCommand(this.Accounts.ShowNewAccountDialogAsync);
 
-    public ICommand EditAccountCommand =>
-        new RelayCommand(commandParameter => this.Accounts.OnEditAccountAsync(commandParameter));
+    public ICommand EditAccountCommand => new AsyncCommand(x => this.Accounts.OnEditAccountAsync(x));
 
     internal IProjectData ProjectData { get; }
 

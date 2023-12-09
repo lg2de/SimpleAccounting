@@ -133,17 +133,17 @@ internal class ImportBookingsViewModel : Screen
 
     public IBusy Busy { get; } = new BusyControlModel();
 
-    public ICommand LoadDataCommand => new RelayCommand(
-        _ => this.OnLoadData(),
-        _ => this.SelectedAccount != null);
+    public ICommand LoadDataCommand => new AsyncCommand(
+        this.OnLoadData,
+        () => this.SelectedAccount != null);
 
     public IAsyncCommand BookAllCommand => new AsyncCommand(
         this.ProcessDataAsync,
         () => this.LoadedData.Exists(x => x.RemoteAccount != null || x.IsSkip || x.IsExisting));
 
-    public ICommand BookMappedCommand => new RelayCommand(
-        _ => this.ProcessDataAsync(),
-        _ => this.LoadedData.Exists(x => x.RemoteAccount != null));
+    public ICommand BookMappedCommand => new AsyncCommand(
+        this.ProcessDataAsync,
+        () => this.LoadedData.Exists(x => x.RemoteAccount != null));
 
     protected IProjectData ProjectData { get; }
 

@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
@@ -207,8 +208,8 @@ public partial class EditBookingAccountControl : INotifyPropertyChanged
     /// <remarks>
     ///     This property is used only in the control itself.
     /// </remarks>
-    public ICommand SplitCommand => new RelayCommand(
-        _ =>
+    public ICommand SplitCommand => new AsyncCommand(
+        () =>
         {
             this.SplitEntries.Add(
                 new SplitBookingViewModel
@@ -218,32 +219,34 @@ public partial class EditBookingAccountControl : INotifyPropertyChanged
                     BookingValue = this.BookingValue
                 });
         },
-        _ => this.AllowSplitting);
+        () => this.AllowSplitting);
 
-    public ICommand AddSplitEntryCommand => new RelayCommand(
+    public ICommand AddSplitEntryCommand => new AsyncCommand(
         parameter =>
         {
-            if (!(parameter is SplitBookingViewModel currentViewModel))
+            if (parameter is not SplitBookingViewModel currentViewModel)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             var index = this.SplitEntries.IndexOf(currentViewModel);
             this.SplitEntries.Insert(index + 1, new SplitBookingViewModel());
+            return Task.CompletedTask;
         },
-        _ => this.AllowSplitting);
+        () => this.AllowSplitting);
 
-    public ICommand RemoveSplitEntryCommand => new RelayCommand(
+    public ICommand RemoveSplitEntryCommand => new AsyncCommand(
         parameter =>
         {
-            if (!(parameter is SplitBookingViewModel viewModel))
+            if (parameter is not SplitBookingViewModel viewModel)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             this.SplitEntries.Remove(viewModel);
+            return Task.CompletedTask;
         },
-        _ => this.AllowSplitting);
+        () => this.AllowSplitting);
 
     /// <inheritdoc />
     public event PropertyChangedEventHandler PropertyChanged;

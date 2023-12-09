@@ -45,9 +45,9 @@ public class CloseYearViewModel : Screen
 
     public TextOptionViewModel TextOption { get; set; }
 
-    public ICommand CloseYearCommand => new RelayCommand(
-        _ => this.TryCloseAsync(true),
-        _ => this.RemoteAccount != null);
+    public ICommand CloseYearCommand => new AsyncCommand(
+        () => this.TryCloseAsync(true),
+        () => this.RemoteAccount != null);
 
     protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
     {

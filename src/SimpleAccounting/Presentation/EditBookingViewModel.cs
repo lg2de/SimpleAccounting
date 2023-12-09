@@ -179,8 +179,8 @@ internal class EditBookingViewModel : Screen
 
     public uint PageIndex { get; set; }
 
-    public ICommand AddCommand => new RelayCommand(
-        _ =>
+    public ICommand AddCommand => new AsyncCommand(
+        () =>
         {
             var newBooking = this.CreateJournalEntry();
             this.projectData.AddBooking(newBooking, updateJournal: true);
@@ -189,14 +189,14 @@ internal class EditBookingViewModel : Screen
             this.BookingIdentifier++;
             this.NotifyOfPropertyChange(nameof(this.BookingIdentifier));
         },
-        _ => this.IsDataValid());
+        this.IsDataValid);
 
-    public ICommand SaveCommand => new RelayCommand(
-        _ => this.TryCloseAsync(true),
-        _ => this.IsDataValid());
+    public ICommand SaveCommand => new AsyncCommand(
+        () => this.TryCloseAsync(true),
+        this.IsDataValid);
 
-    public ICommand DefaultCommand => new RelayCommand(
-        _ =>
+    public ICommand DefaultCommand => new AsyncCommand(
+        () =>
         {
             if (this.EditMode)
             {
@@ -206,6 +206,8 @@ internal class EditBookingViewModel : Screen
             {
                 this.AddCommand.Execute(null);
             }
+
+            return Task.CompletedTask;
         });
 
     public AccountingDataJournalBooking CreateJournalEntry()

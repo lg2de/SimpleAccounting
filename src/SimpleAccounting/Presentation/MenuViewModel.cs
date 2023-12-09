@@ -44,28 +44,29 @@ internal class MenuViewModel : Screen, IMenuViewModel
         this.reportFactory = reportFactory;
     }
 
-    public ICommand NewProjectCommand => new RelayCommand(
-        _ =>
+    public ICommand NewProjectCommand => new AsyncCommand(
+        () =>
         {
             if (!this.projectData.CanDiscardModifiedProject())
             {
-                return;
+                return Task.CompletedTask;
             }
 
             this.projectData.NewProject();
+            return Task.CompletedTask;
         });
 
-    public ICommand OpenProjectCommand => new RelayCommand(
-        _ => this.OnOpenProject());
+    public ICommand OpenProjectCommand => new AsyncCommand(
+        this.OnOpenProjectAsync);
 
-    public ICommand SaveProjectCommand => new RelayCommand(
-        _ => this.OnSaveProject(),
-        _ => this.projectData.IsModified);
+    public ICommand SaveProjectCommand => new AsyncCommand(
+        this.OnSaveProject,
+        () => this.projectData.IsModified);
 
-    public ICommand ProjectOptionsCommand => new RelayCommand(
-        _ => this.projectData.EditProjectOptionsAsync());
+    public ICommand ProjectOptionsCommand => new AsyncCommand(
+        this.projectData.EditProjectOptionsAsync);
 
-    public ICommand SwitchCultureCommand => new RelayCommand(
+    public ICommand SwitchCultureCommand => new AsyncCommand(
         cultureName =>
         {
             if (cultureName == null)
@@ -82,6 +83,8 @@ internal class MenuViewModel : Screen, IMenuViewModel
                 Resources.Information_CultureChangeRestartRequired,
                 Resources.Header_SettingsChanged,
                 icon: MessageBoxImage.Information);
+
+            return Task.CompletedTask;
         });
 
     public bool IsGermanCulture => this.projectData.Settings.Culture == "de";
@@ -91,53 +94,53 @@ internal class MenuViewModel : Screen, IMenuViewModel
 
     public ObservableCollection<MenuItemViewModel> RecentProjects { get; } = [];
 
-    public ICommand AddBookingsCommand => new RelayCommand(
-        _ => this.projectData.ShowAddBookingDialogAsync(this.projectData.ShowInactiveAccounts),
-        _ => !this.projectData.CurrentYear.Closed);
+    public ICommand AddBookingsCommand => new AsyncCommand(
+        () => this.projectData.ShowAddBookingDialogAsync(this.projectData.ShowInactiveAccounts),
+        () => !this.projectData.CurrentYear.Closed);
 
-    public ICommand DuplicateBookingsCommand => new RelayCommand(
+    public ICommand DuplicateBookingsCommand => new AsyncCommand(
         this.OnDuplicateBookingAsync,
-        _ => !this.projectData.CurrentYear.Closed);
+        () => !this.projectData.CurrentYear.Closed);
 
-    public ICommand EditBookingCommand => new RelayCommand(
-        this.OnEditBooking,
-        _ => !this.projectData.CurrentYear.Closed);
+    public ICommand EditBookingCommand => new AsyncCommand(
+        this.OnEditBookingAsync,
+        () => !this.projectData.CurrentYear.Closed);
 
-    public ICommand ImportBookingsCommand => new RelayCommand(
-        _ => this.projectData.ShowImportDialogAsync(),
-        _ => !this.projectData.CurrentYear.Closed);
+    public ICommand ImportBookingsCommand => new AsyncCommand(
+        this.projectData.ShowImportDialogAsync,
+        () => !this.projectData.CurrentYear.Closed);
 
-    public ICommand CloseYearCommand => new RelayCommand(
+    public ICommand CloseYearCommand => new AsyncCommand(
         this.OnCloseYearAsync,
-        _ => !this.projectData.CurrentYear.Closed);
+        () => !this.projectData.CurrentYear.Closed);
 
-    public ICommand TotalJournalReportCommand => new RelayCommand(
-        _ => this.OnTotalJournalReport(),
-        _ => this.projectData.CurrentYear.Booking.Count != 0);
+    public ICommand TotalJournalReportCommand => new AsyncCommand(
+        this.OnTotalJournalReport,
+        () => this.projectData.CurrentYear.Booking.Count != 0);
 
-    public ICommand AccountJournalReportCommand => new RelayCommand(
-        _ => this.OnAccountJournalReport(),
-        _ => this.projectData.CurrentYear.Booking.Count != 0);
+    public ICommand AccountJournalReportCommand => new AsyncCommand(
+        this.OnAccountJournalReport,
+        () => this.projectData.CurrentYear.Booking.Count != 0);
 
-    public ICommand TotalsAndBalancesReportCommand => new RelayCommand(
-        _ => this.OnTotalsAndBalancesReport(),
-        _ => this.projectData.CurrentYear.Booking.Count != 0);
+    public ICommand TotalsAndBalancesReportCommand => new AsyncCommand(
+        this.OnTotalsAndBalancesReport,
+        () => this.projectData.CurrentYear.Booking.Count != 0);
 
-    public ICommand AssetBalancesReportCommand => new RelayCommand(
-        _ => this.OnAssetBalancesReport(),
-        _ => this.projectData.CurrentYear.Booking.Count != 0);
+    public ICommand AssetBalancesReportCommand => new AsyncCommand(
+        this.OnAssetBalancesReport,
+        () => this.projectData.CurrentYear.Booking.Count != 0);
 
-    public ICommand AnnualBalanceReportCommand => new RelayCommand(
-        _ => this.OnAnnualBalanceReport(),
-        _ => this.projectData.CurrentYear.Booking.Count != 0);
+    public ICommand AnnualBalanceReportCommand => new AsyncCommand(
+        this.OnAnnualBalanceReport,
+        () => this.projectData.CurrentYear.Booking.Count != 0);
 
     public ObservableCollection<MenuItemViewModel> BookingYears { get; } = [];
 
-    public ICommand HelpAboutCommand => new RelayCommand(
-        _ => this.processApi.ShellExecute(Defines.ProjectUrl));
+    public ICommand HelpAboutCommand => new AsyncCommand(
+        () => this.processApi.ShellExecute(Defines.ProjectUrl));
 
-    public ICommand HelpFeedbackCommand => new RelayCommand(
-        _ => this.processApi.ShellExecute(Defines.NewIssueUrl));
+    public ICommand HelpFeedbackCommand => new AsyncCommand(
+        () => this.processApi.ShellExecute(Defines.NewIssueUrl));
 
     public void BuildRecentProjectsMenu()
     {
@@ -176,17 +179,17 @@ internal class MenuViewModel : Screen, IMenuViewModel
         this.BuildRecentProjectsMenu();
     }
 
-    private void OnOpenProject()
+    private Task OnOpenProjectAsync()
     {
         (DialogResult result, var fileName) =
             this.dialogs.ShowOpenFileDialog(filter: Resources.FileFilter_MainProject);
         if (result != DialogResult.OK)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         this.busy.IsBusy = true;
-        Task.Run(
+        return Task.Run(
             async () =>
             {
                 await this.projectData.LoadFromFileAsync(fileName);
@@ -219,14 +222,14 @@ internal class MenuViewModel : Screen, IMenuViewModel
         }
     }
 
-    private void OnEditBooking(object? commandParameter)
+    private Task OnEditBookingAsync(object? commandParameter)
     {
         if (commandParameter is not IJournalItem journalItem)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        this.projectData.ShowEditBookingDialogAsync(journalItem, this.projectData.ShowInactiveAccounts);
+        return this.projectData.ShowEditBookingDialogAsync(journalItem, this.projectData.ShowInactiveAccounts);
     }
 
     private Task OnDuplicateBookingAsync(object? commandParameter)
@@ -239,7 +242,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
         return this.projectData.ShowDuplicateBookingDialogAsync(journalItem, this.projectData.ShowInactiveAccounts);
     }
 
-    private async Task OnCloseYearAsync(object? _)
+    private async Task OnCloseYearAsync()
     {
         if (!await this.projectData.CloseYearAsync())
         {

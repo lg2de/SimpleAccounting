@@ -25,9 +25,9 @@ public class ProjectOptionsViewModel : Screen
 
     public string Currency { get; set; }
 
-    public ICommand SaveCommand => new RelayCommand(
-        _ => this.TryCloseAsync(this.OnSave()),
-        _ => !string.IsNullOrWhiteSpace(this.Currency));
+    public ICommand SaveCommand => new AsyncCommand(
+        () => this.TryCloseAsync(this.OnSave()),
+        () => !string.IsNullOrWhiteSpace(this.Currency));
 
     protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
     {

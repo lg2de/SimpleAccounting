@@ -44,13 +44,15 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         }
     }
 
-    public ICommand AccountSelectionCommand => new RelayCommand(
+    public ICommand AccountSelectionCommand => new AsyncCommand(
         o =>
         {
             if (o is AccountViewModel account)
             {
                 this.SelectedAccount = account;
             }
+
+            return Task.CompletedTask;
         });
 
     public bool ShowInactiveAccounts

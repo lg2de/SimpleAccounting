@@ -80,9 +80,9 @@ internal class AccountViewModel : Screen
 
     public ObservableCollection<ImportPatternViewModel> ImportPatterns { get; set; } = [];
 
-    public ICommand SaveCommand => new RelayCommand(
-        _ => this.TryCloseAsync(true),
-        _ =>
+    public ICommand SaveCommand => new AsyncCommand(
+        () => this.TryCloseAsync(true),
+        () =>
         {
             if (string.IsNullOrWhiteSpace(this.Name))
             {
