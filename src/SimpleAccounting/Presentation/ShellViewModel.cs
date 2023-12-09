@@ -151,12 +151,15 @@ internal class ShellViewModel : Screen, IDisposable
                             this.Busy.IsBusy = false;
                         });
                     this.autoSaveTask = this.ProjectData.AutoSaveAsync(this.cancellationTokenSource.Token);
-                });
+                },
+                cancellationToken);
         }
         else
         {
             this.Menu.BuildRecentProjectsMenu();
-            this.autoSaveTask = Task.Run(() => this.ProjectData.AutoSaveAsync(this.cancellationTokenSource.Token));
+            this.autoSaveTask = Task.Run(
+                () => this.ProjectData.AutoSaveAsync(this.cancellationTokenSource.Token),
+                cancellationToken);
         }
     }
 
