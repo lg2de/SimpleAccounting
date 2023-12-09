@@ -17,8 +17,8 @@ using Xunit;
 
 public class EditBookingViewModelTests
 {
-    private static readonly DateTime YearBegin = new(DateTime.Now.Year, 1, 1);
-    private static readonly DateTime YearEnd = new(DateTime.Now.Year, 12, 31);
+    private static readonly DateTime YearBegin = new(DateTime.Now.Year, 1, 1, 0, 0, 0, DateTimeKind.Local);
+    private static readonly DateTime YearEnd = new(DateTime.Now.Year, 12, 31, 0, 0, 0, DateTimeKind.Local);
 
     [Fact]
     public void Ctor_DateBeforeStart_DateLimited()
@@ -587,7 +587,7 @@ public class EditBookingViewModelTests
             DebitAccount = 2,
             BookingText = "default",
             BookingValue = 42,
-            Date = new DateTime(2020, 6, 20)
+            Date = new DateTime(2020, 6, 20, 0, 0, 0, DateTimeKind.Local)
         };
         sut.Accounts.Add(new AccountDefinition { ID = 1 });
         sut.Accounts.Add(new AccountDefinition { ID = 2 });
@@ -613,7 +613,7 @@ public class EditBookingViewModelTests
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
-            BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
+            BookingIdentifier = 42, Date = new DateTime(2020, 6, 20, 0, 0, 0, DateTimeKind.Local)
         };
         sut.CreditSplitEntries.Add(
             new SplitBookingViewModel { BookingText = "Credit1", BookingValue = 10, AccountNumber = 100 });
@@ -649,7 +649,7 @@ public class EditBookingViewModelTests
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
-            BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
+            BookingIdentifier = 42, Date = new DateTime(2020, 6, 20, 0, 0, 0, DateTimeKind.Local)
         };
         sut.CreditSplitEntries.Add(
             new SplitBookingViewModel { BookingText = "Credit", BookingValue = 10, AccountNumber = 100 });
@@ -679,7 +679,7 @@ public class EditBookingViewModelTests
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
-            BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
+            BookingIdentifier = 42, Date = new DateTime(2020, 6, 20, 0, 0, 0, DateTimeKind.Local)
         };
         sut.DebitSplitEntries.Add(
             new SplitBookingViewModel { BookingText = "Debit1", BookingValue = 10, AccountNumber = 100 });
@@ -715,7 +715,7 @@ public class EditBookingViewModelTests
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
-            BookingIdentifier = 42, Date = new DateTime(2020, 6, 20)
+            BookingIdentifier = 42, Date = new DateTime(2020, 6, 20, 0, 0, 0, DateTimeKind.Local)
         };
         sut.DebitSplitEntries.Add(
             new SplitBookingViewModel { BookingText = "Debit", BookingValue = 10, AccountNumber = 100 });

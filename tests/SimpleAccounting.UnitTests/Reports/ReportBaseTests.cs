@@ -67,7 +67,7 @@ public class ReportBaseTests
         projectData.SelectYear(projectData.Storage.Journal[0].Year);
         var sut = new TestReport(printer, projectData);
 
-        sut.PreparePrintDocument("TheTitle", new DateTime(2021, 5, 5));
+        sut.PreparePrintDocument("TheTitle", new DateTime(2021, 5, 5, 0, 0, 0, DateTimeKind.Local));
 
         sut.PrintDocument.OuterXml.Should().Be(
             "<root><text ID=\"title\">TheTitle</text>"
@@ -83,7 +83,7 @@ public class ReportBaseTests
     {
         var printer = Substitute.For<IXmlPrinter>();
         var sut = new TestReport(printer, Samples.SampleProjectData);
-        sut.SetPrintingDate(new DateTime(2020, 2, 29));
+        sut.SetPrintingDate(new DateTime(2020, 2, 29, 0, 0, 0, DateTimeKind.Local));
 
         sut.ShowPreview("DocumentName");
 

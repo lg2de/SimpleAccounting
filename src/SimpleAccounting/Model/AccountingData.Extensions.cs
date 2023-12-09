@@ -314,8 +314,8 @@ internal static class AccountDataJournalExtensions
                 new AccountingDataJournal
                 {
                     Year = today.Year.ToString(CultureInfo.InvariantCulture),
-                    DateStart = new DateTime(today.Year, 1, 1).ToAccountingDate(),
-                    DateEnd = new DateTime(today.Year, december, decemberLast).ToAccountingDate(),
+                    DateStart = new DateTime(today.Year, 1, 1, 0, 0, 0, DateTimeKind.Local).ToAccountingDate(),
+                    DateEnd = new DateTime(today.Year, december, decemberLast, 0, 0, 0, DateTimeKind.Local).ToAccountingDate(),
                     Booking = []
                 });
         }

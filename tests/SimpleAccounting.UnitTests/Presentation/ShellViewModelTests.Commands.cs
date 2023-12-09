@@ -460,8 +460,8 @@ public partial class ShellViewModelTests
                 new
                 {
                     FirstBookingNumber = 1,
-                    RangeMin = new DateTime(DateTime.Now.Year, 1, 1),
-                    RangeMax = new DateTime(DateTime.Now.Year, 12, 31)
+                    RangeMin = new DateTime(DateTime.Now.Year, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                    RangeMax = new DateTime(DateTime.Now.Year, 12, 31, 0, 0, 0, DateTimeKind.Local)
                 });
             vm.ImportAccounts.Should().NotBeEmpty();
         }
@@ -523,7 +523,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Opening value 1",
                     Value = 651,
                     CreditAccount = "990 (Carryforward)",
@@ -532,7 +532,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Opening value 2",
                     Value = 2600,
                     CreditAccount = "5000 (Bank credit)",
@@ -541,7 +541,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Opening value 3",
                     Value = 99,
                     CreditAccount = "990 (Carryforward)",
@@ -554,7 +554,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Opening value 1",
                     DebitValue = 651,
                     CreditValue = 0,
@@ -607,7 +607,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Opening value 1",
                     Value = 651,
                     CreditAccount = "999 (MyCarryForward)",
@@ -616,7 +616,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Opening value 2",
                     Value = 2600,
                     CreditAccount = "5000 (Bank credit)",
@@ -625,7 +625,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Opening value 3",
                     Value = 99,
                     CreditAccount = "999 (MyCarryForward)",
@@ -638,7 +638,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1),
+                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Opening value 1",
                     DebitValue = 651,
                     CreditValue = 0,

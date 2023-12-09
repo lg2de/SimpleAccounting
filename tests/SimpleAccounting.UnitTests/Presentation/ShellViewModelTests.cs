@@ -309,7 +309,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 4567,
-                    Date = new DateTime(DateTime.Now.Year, 4, 1),
+                    Date = new DateTime(DateTime.Now.Year, 4, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Init",
                     Value = 0.42,
                     CreditAccount = "990 (Carryforward)",
@@ -324,7 +324,7 @@ public partial class ShellViewModelTests
                 new
                 {
                     Identifier = 4567,
-                    Date = new DateTime(DateTime.Now.Year, 4, 1),
+                    Date = new DateTime(DateTime.Now.Year, 4, 1, 0, 0, 0, DateTimeKind.Local),
                     Text = "Init",
                     CreditValue = 0.0,
                     DebitValue = 0.42,
@@ -589,7 +589,7 @@ public partial class ShellViewModelTests
     public void SaveProject_AutoSaveExisting_AutoSaveFileDeleted()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
+        fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
         var fileName = "project.name";
         fileSystem.FileExists(fileName + "~").Returns(true);
         sut.ProjectData.Load(Samples.SampleProject);
@@ -606,7 +606,7 @@ public partial class ShellViewModelTests
     public void SaveProject_ProjectExisting_SavedAfterBackup()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
+        fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
         var fileName = "project.name";
         fileSystem.FileExists(fileName).Returns(true);
         sut.ProjectData.Load(Samples.SampleProject);

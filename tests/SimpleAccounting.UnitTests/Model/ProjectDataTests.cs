@@ -96,7 +96,7 @@ public class ProjectDataTests
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-        fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56));
+        fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56, 0, 0, DateTimeKind.Local));
         sut.Load(Samples.SampleProject);
 
         sut.SaveProject();

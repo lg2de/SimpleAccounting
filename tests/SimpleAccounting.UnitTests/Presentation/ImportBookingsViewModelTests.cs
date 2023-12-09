@@ -78,7 +78,7 @@ public class ImportBookingsViewModelTests
                 {
                     new
                     {
-                        Date = new DateTime(year, 1, 1),
+                        Date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 1,
                         Text = "Open 1",
                         Value = 1000,
@@ -86,7 +86,7 @@ public class ImportBookingsViewModelTests
                     },
                     new
                     {
-                        Date = new DateTime(year, 1, 28),
+                        Date = new DateTime(year, 1, 28, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 3,
                         Text = "Salary",
                         Value = 200,
@@ -94,7 +94,7 @@ public class ImportBookingsViewModelTests
                     },
                     new
                     {
-                        Date = new DateTime(year, 1, 29),
+                        Date = new DateTime(year, 1, 29, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 4,
                         Text = "Credit rate",
                         Value = -400,
@@ -102,7 +102,7 @@ public class ImportBookingsViewModelTests
                     },
                     new
                     {
-                        Date = new DateTime(year, 2, 1),
+                        Date = new DateTime(year, 2, 1, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 5,
                         Text = "Shoes",
                         Value = -50,
@@ -110,7 +110,7 @@ public class ImportBookingsViewModelTests
                     },
                     new
                     {
-                        Date = new DateTime(year, 2, 5),
+                        Date = new DateTime(year, 2, 5, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 6,
                         Text = "Rent to friend",
                         Value = -99,
@@ -256,13 +256,13 @@ public class ImportBookingsViewModelTests
             projectData) { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
         var remoteAccount = accounts.Single(x => x.ID == 600);
         int year = DateTime.Today.Year;
-        sut.StartDate = new DateTime(year, 1, 2);
+        sut.StartDate = new DateTime(year, 1, 2, 0, 0, 0, DateTimeKind.Local);
         sut.LoadedData.AddRange(
             new[]
             {
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 1),
+                    Date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 101,
                     Name = "Name",
                     Text = "Text",
@@ -271,7 +271,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 2),
+                    Date = new DateTime(year, 1, 2, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 102,
                     Text = "Text",
                     Value = 2,
@@ -280,7 +280,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 103,
                     Name = "Name",
                     Value = -1,
@@ -289,7 +289,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 104,
                     Name = "Name",
                     Value = -1,
@@ -297,7 +297,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 105,
                     Name = "Already booked",
                     Value = -2,
@@ -306,7 +306,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 106,
                     Name = "Ignore",
                     Value = -3,
@@ -314,7 +314,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 107,
                     Name = "Ignore too",
                     Value = -4,

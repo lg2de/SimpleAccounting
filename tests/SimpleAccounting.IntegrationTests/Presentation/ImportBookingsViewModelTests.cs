@@ -55,10 +55,10 @@ public class ImportBookingsViewModelTests
         sut.LoadedData.Should().BeEquivalentTo(
             new[]
             {
-                new { Date = new DateTime(2000, 1, 10), Name = "Name1", Text = "Text1", Value = 12.34 },
-                new { Date = new DateTime(2000, 12, 1), Name = "Name2", Text = "Text2", Value = 23.45 },
-                new { Date = new DateTime(2000, 12, 1), Name = "Name3", Text = "Text3", Value = 23.46 },
-                new { Date = new DateTime(2000, 12, 31), Name = "Name4", Text = "Text4", Value = -42.42 }
+                new { Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local), Name = "Name1", Text = "Text1", Value = 12.34 },
+                new { Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local), Name = "Name2", Text = "Text2", Value = 23.45 },
+                new { Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local), Name = "Name3", Text = "Text3", Value = 23.46 },
+                new { Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local), Name = "Name4", Text = "Text4", Value = -42.42 }
             }, o => o.WithStrictOrdering());
         sut.ImportDataFiltered.Should().BeEquivalentTo(
             new[]
@@ -66,7 +66,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name2",
                     Text = "Text2",
                     Value = 23.45
@@ -74,7 +74,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name3",
                     Text = "Text3",
                     Value = 23.46
@@ -82,7 +82,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 4,
-                    Date = new DateTime(2000, 12, 31),
+                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name4",
                     Text = "Text4",
                     Value = -42.42
@@ -90,7 +90,7 @@ public class ImportBookingsViewModelTests
             }, o => o.WithStrictOrdering());
 
         // set start date to year begin to import data skipped before
-        sut.StartDate = new DateTime(2000, 1, 1);
+        sut.StartDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
 
         // note that all identifiers will be changed
         sut.ImportDataFiltered.Should().BeEquivalentTo(
@@ -99,7 +99,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(2000, 1, 10),
+                    Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name1",
                     Text = "Text1",
                     Value = 12.34
@@ -107,14 +107,14 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 1,
-                    Date = new DateTime(2000, 1, 15),
+                    Date = new DateTime(2000, 1, 15, 0, 0, 0, DateTimeKind.Local),
                     Text = "Shopping Mall - Shoes",
                     Value = -50
                 },
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name2",
                     Text = "Text2",
                     Value = 23.45
@@ -122,7 +122,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 4,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name3",
                     Text = "Text3",
                     Value = 23.46
@@ -130,7 +130,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 5,
-                    Date = new DateTime(2000, 12, 31),
+                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name4",
                     Text = "Text4",
                     Value = -42.42
@@ -175,10 +175,10 @@ public class ImportBookingsViewModelTests
         sut.LoadedData.Should().BeEquivalentTo(
             new[]
             {
-                new { Date = new DateTime(2000, 12, 31), Name = "Name4", Text = "Text4", Value = -42.42 },
-                new { Date = new DateTime(2000, 12, 1), Name = "Name3", Text = "Text3", Value = 23.46 },
-                new { Date = new DateTime(2000, 12, 1), Name = "Name2", Text = "Text2", Value = 23.45 },
-                new { Date = new DateTime(2000, 1, 10), Name = "Name1", Text = "Text1", Value = 12.34 },
+                new { Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local), Name = "Name4", Text = "Text4", Value = -42.42 },
+                new { Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local), Name = "Name3", Text = "Text3", Value = 23.46 },
+                new { Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local), Name = "Name2", Text = "Text2", Value = 23.45 },
+                new { Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local), Name = "Name1", Text = "Text1", Value = 12.34 },
             }, o => o.WithStrictOrdering());
         sut.ImportDataFiltered.Should().BeEquivalentTo(
             new[]
@@ -186,7 +186,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name3",
                     Text = "Text3",
                     Value = 23.46
@@ -194,7 +194,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name2",
                     Text = "Text2",
                     Value = 23.45
@@ -202,7 +202,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 4,
-                    Date = new DateTime(2000, 12, 31),
+                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name4",
                     Text = "Text4",
                     Value = -42.42
@@ -210,7 +210,7 @@ public class ImportBookingsViewModelTests
             }, o => o.WithStrictOrdering());
 
         // set start date to year begin to import data skipped before
-        sut.StartDate = new DateTime(2000, 1, 1);
+        sut.StartDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
 
         // note that all identifiers will be changed
         sut.ImportDataFiltered.Should().BeEquivalentTo(
@@ -219,7 +219,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(2000, 1, 10),
+                    Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name1",
                     Text = "Text1",
                     Value = 12.34
@@ -227,14 +227,14 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 1,
-                    Date = new DateTime(2000, 1, 15),
+                    Date = new DateTime(2000, 1, 15, 0, 0, 0, DateTimeKind.Local),
                     Text = "Shopping Mall - Shoes",
                     Value = -50
                 },
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name3",
                     Text = "Text3",
                     Value = 23.46
@@ -242,7 +242,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 4,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name2",
                     Text = "Text2",
                     Value = 23.45
@@ -250,7 +250,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 5,
-                    Date = new DateTime(2000, 12, 31),
+                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name4",
                     Text = "Text4",
                     Value = -42.42
