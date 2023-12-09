@@ -8,6 +8,9 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
+/// <summary>
+///     Implements a converter for <see cref="DateTime"/> into date only supporting <langword>null</langword>.
+/// </summary>
 public class DateConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -15,7 +18,7 @@ public class DateConverter : IValueConverter
         const int firstYear = 1900;
         return value is not DateTime dateTime || dateTime.Year < firstYear
             ? null
-            : dateTime.ToString("d", CultureInfo.CurrentUICulture);
+            : dateTime.ToString("d", culture);
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

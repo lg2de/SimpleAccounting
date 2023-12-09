@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation;
 using System;
 using System.Globalization;
 using Caliburn.Micro;
+using JetBrains.Annotations;
 
 /// <summary>
 ///     Implements the base view model for items in all journals.
@@ -32,7 +33,7 @@ public class JournalItemBaseViewModel : PropertyChangedBase, IJournalItem
 
     public bool IsEvenRow
     {
-        get => this.isEvenRow;
+        [UsedImplicitly] get => this.isEvenRow;
         set
         {
             if (value == this.isEvenRow)
@@ -45,5 +46,5 @@ public class JournalItemBaseViewModel : PropertyChangedBase, IJournalItem
         }
     }
 
-    public int StorageIndex { get; protected set; } = -1;
+    public int StorageIndex { get; protected init; } = -1;
 }
