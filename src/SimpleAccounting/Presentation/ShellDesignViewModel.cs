@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.Presentation;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
@@ -23,7 +22,7 @@ using lg2de.SimpleAccounting.Properties;
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 internal class ShellDesignViewModel : ShellViewModel
 {
-    private static readonly ProjectData DesignProject = new ProjectData(new Settings(), null!, null!, null!, null!);
+    private static readonly ProjectData DesignProject = new(new Settings(), null!, null!, null!, null!);
 
     public ShellDesignViewModel()
         : base(
@@ -44,20 +43,13 @@ internal class ShellDesignViewModel : ShellViewModel
     private void LoadAccounts()
     {
         this.ProjectData.Storage.Accounts =
-            new List<AccountingDataAccountGroup>
+        [
+            new AccountingDataAccountGroup
             {
-                new AccountingDataAccountGroup
-                {
-                    Name = "Bestandskonten",
-                    Account = new List<AccountDefinition>
-                    {
-                        new AccountDefinition
-                        {
-                            ID = 100, Name = "Kasse", Type = AccountDefinitionType.Asset
-                        }
-                    }
-                }
-            };
+                Name = "Bestandskonten",
+                Account = [new AccountDefinition { ID = 100, Name = "Kasse", Type = AccountDefinitionType.Asset }]
+            }
+        ];
         this.Accounts.OnDataLoaded();
     }
 

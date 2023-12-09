@@ -27,7 +27,7 @@ public class ImportPatternViewModel
 
             try
             {
-                this.expression = (new Regex(value)).ToString();
+                this.expression = (new Regex(value, RegexOptions.None, TimeSpan.FromSeconds(1))).ToString();
             }
             catch
             {

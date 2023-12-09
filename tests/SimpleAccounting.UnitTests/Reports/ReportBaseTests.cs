@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
 using System;
-using System.Linq;
 using System.Xml;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
@@ -65,10 +64,10 @@ public class ReportBaseTests
         var projectData = Samples.SampleProjectData;
         projectData.Storage.Setup.Name = "TheName";
         projectData.Storage.Setup.Location = "TheLocation";
-        projectData.SelectYear(projectData.Storage.Journal.First().Year);
+        projectData.SelectYear(projectData.Storage.Journal[0].Year);
         var sut = new TestReport(printer, projectData);
 
-        sut.PreparePrintDocument("TheTitle", new DateTime(2021, 5, 5));
+        sut.PreparePrintDocument("TheTitle", new DateTime(2021, 5, 5, 0, 0, 0, DateTimeKind.Local));
 
         sut.PrintDocument.OuterXml.Should().Be(
             "<root><text ID=\"title\">TheTitle</text>"
@@ -84,11 +83,11 @@ public class ReportBaseTests
     {
         var printer = Substitute.For<IXmlPrinter>();
         var sut = new TestReport(printer, Samples.SampleProjectData);
-        sut.SetPrintingDate(new DateTime(2020, 2, 29));
+        sut.SetPrintingDate(new DateTime(2020, 2, 29, 0, 0, 0, DateTimeKind.Local));
 
         sut.ShowPreview("DocumentName");
 
-        var year = Samples.SampleProject.Journal.Last().Year;
+        var year = Samples.SampleProject.Journal[^1].Year;
         printer.Received(1).PrintDocument($"2020-02-29 DocumentName {year}");
     }
 }

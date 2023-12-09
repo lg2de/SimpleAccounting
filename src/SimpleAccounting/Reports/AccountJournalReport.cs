@@ -44,7 +44,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
         foreach (var account in this.accounts)
         {
             var accountEntries = this.YearData.Booking
-                .Where(x => x.Debit.Any(a => a.Account == account.ID) || x.Credit.Any(a => a.Account == account.ID))
+                .Where(x => x.Debit.Exists(a => a.Account == account.ID) || x.Credit.Exists(a => a.Account == account.ID))
                 .OrderBy(x => x.Date)
                 .ThenBy(x => x.ID)
                 .ToList();

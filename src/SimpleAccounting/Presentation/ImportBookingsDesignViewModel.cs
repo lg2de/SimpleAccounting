@@ -24,68 +24,47 @@ using lg2de.SimpleAccounting.Properties;
 internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
 {
     // define some accounts
-    private static readonly List<AccountDefinition> SampleAccounts = new List<AccountDefinition>
-    {
+    private static readonly List<AccountDefinition> SampleAccounts =
+    [
         new AccountDefinition
         {
             ID = 100,
             Name = "Cash",
             ImportMapping = new AccountDefinitionImportMapping
             {
-                Columns = new List<AccountDefinitionImportMappingColumn>
-                {
-                    new AccountDefinitionImportMappingColumn
-                    {
-                        Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date
-                    },
-                    new AccountDefinitionImportMappingColumn
-                    {
-                        Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value
-                    }
-                }
+                Columns =
+                [
+                    new AccountDefinitionImportMappingColumn { Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date },
+                    new AccountDefinitionImportMappingColumn { Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value }
+                ]
             }
         },
         new AccountDefinition { ID = 600, Name = "Shopping" },
         new AccountDefinition { ID = 990, Name = "Carryforward" }
-    };
+    ];
 
     // build sample project with journal entries
-    private static readonly AccountingData SampleData = new AccountingData
+    private static readonly AccountingData SampleData = new()
     {
-        Journal = new List<AccountingDataJournal>
-        {
+        Journal =
+        [
             new AccountingDataJournal
             {
                 DateStart = (uint)(DateTime.Today.Year * 10000 + 101),
                 DateEnd = (uint)(DateTime.Today.Year * 10000 + 1231),
-                Booking = new List<AccountingDataJournalBooking>
-                {
+                Booking =
+                [
                     new AccountingDataJournalBooking
                     {
                         Date = (uint)(DateTime.Today.Year * 10000 + 1231),
                         ID = 999,
-                        Credit = new List<BookingValue>
-                        {
-                            new BookingValue
-                            {
-                                Account = 100, Text = "End of year", Value = 1234
-                            }
-                        },
-                        Debit = new List<BookingValue>
-                        {
-                            new BookingValue
-                            {
-                                Account = 990, Text = "End of year", Value = 1234
-                            }
-                        }
+                        Credit = [new BookingValue { Account = 100, Text = "End of year", Value = 1234 }],
+                        Debit = [new BookingValue { Account = 990, Text = "End of year", Value = 1234 }]
                     }
-                }
+                ]
             }
-        },
-        Accounts = new List<AccountingDataAccountGroup>
-        {
-            new AccountingDataAccountGroup { Account = SampleAccounts }
-        }
+        ],
+        Accounts = [new AccountingDataAccountGroup { Account = SampleAccounts }]
     };
 
     public ImportBookingsDesignViewModel()

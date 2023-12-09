@@ -169,7 +169,7 @@ public class MenuViewModelTests
             Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
         projectData.Load(Samples.SampleProject);
         sut.OnDataLoaded();
-        sut.BookingYears.First().Command.Execute(null);
+        sut.BookingYears[0].Command.Execute(null);
 
         sut.CloseYearCommand.CanExecute(null).Should().BeFalse();
     }
@@ -256,7 +256,7 @@ public class MenuViewModelTests
             .Returns(assetBalancesReport);
         var project = Samples.SampleProject;
         project.Accounts.Add(
-            new AccountingDataAccountGroup { Name = "EMPTY", Account = new List<AccountDefinition>() });
+            new AccountingDataAccountGroup { Name = "EMPTY", Account = [] });
         projectData.Load(project);
 
         sut.AssetBalancesReportCommand.Execute(null);

@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.IntegrationTests.Presentation;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -56,10 +55,10 @@ public class ImportBookingsViewModelTests
         sut.LoadedData.Should().BeEquivalentTo(
             new[]
             {
-                new { Date = new DateTime(2000, 1, 10), Name = "Name1", Text = "Text1", Value = 12.34 },
-                new { Date = new DateTime(2000, 12, 1), Name = "Name2", Text = "Text2", Value = 23.45 },
-                new { Date = new DateTime(2000, 12, 1), Name = "Name3", Text = "Text3", Value = 23.46 },
-                new { Date = new DateTime(2000, 12, 31), Name = "Name4", Text = "Text4", Value = -42.42 }
+                new { Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local), Name = "Name1", Text = "Text1", Value = 12.34 },
+                new { Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local), Name = "Name2", Text = "Text2", Value = 23.45 },
+                new { Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local), Name = "Name3", Text = "Text3", Value = 23.46 },
+                new { Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local), Name = "Name4", Text = "Text4", Value = -42.42 }
             }, o => o.WithStrictOrdering());
         sut.ImportDataFiltered.Should().BeEquivalentTo(
             new[]
@@ -67,7 +66,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name2",
                     Text = "Text2",
                     Value = 23.45
@@ -75,7 +74,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name3",
                     Text = "Text3",
                     Value = 23.46
@@ -83,7 +82,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 4,
-                    Date = new DateTime(2000, 12, 31),
+                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name4",
                     Text = "Text4",
                     Value = -42.42
@@ -91,7 +90,7 @@ public class ImportBookingsViewModelTests
             }, o => o.WithStrictOrdering());
 
         // set start date to year begin to import data skipped before
-        sut.StartDate = new DateTime(2000, 1, 1);
+        sut.StartDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
 
         // note that all identifiers will be changed
         sut.ImportDataFiltered.Should().BeEquivalentTo(
@@ -100,7 +99,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(2000, 1, 10),
+                    Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name1",
                     Text = "Text1",
                     Value = 12.34
@@ -108,14 +107,14 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 1,
-                    Date = new DateTime(2000, 1, 15),
+                    Date = new DateTime(2000, 1, 15, 0, 0, 0, DateTimeKind.Local),
                     Text = "Shopping Mall - Shoes",
                     Value = -50
                 },
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name2",
                     Text = "Text2",
                     Value = 23.45
@@ -123,7 +122,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 4,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name3",
                     Text = "Text3",
                     Value = 23.46
@@ -131,7 +130,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 5,
-                    Date = new DateTime(2000, 12, 31),
+                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name4",
                     Text = "Text4",
                     Value = -42.42
@@ -176,10 +175,10 @@ public class ImportBookingsViewModelTests
         sut.LoadedData.Should().BeEquivalentTo(
             new[]
             {
-                new { Date = new DateTime(2000, 12, 31), Name = "Name4", Text = "Text4", Value = -42.42 },
-                new { Date = new DateTime(2000, 12, 1), Name = "Name3", Text = "Text3", Value = 23.46 },
-                new { Date = new DateTime(2000, 12, 1), Name = "Name2", Text = "Text2", Value = 23.45 },
-                new { Date = new DateTime(2000, 1, 10), Name = "Name1", Text = "Text1", Value = 12.34 },
+                new { Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local), Name = "Name4", Text = "Text4", Value = -42.42 },
+                new { Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local), Name = "Name3", Text = "Text3", Value = 23.46 },
+                new { Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local), Name = "Name2", Text = "Text2", Value = 23.45 },
+                new { Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local), Name = "Name1", Text = "Text1", Value = 12.34 },
             }, o => o.WithStrictOrdering());
         sut.ImportDataFiltered.Should().BeEquivalentTo(
             new[]
@@ -187,7 +186,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name3",
                     Text = "Text3",
                     Value = 23.46
@@ -195,7 +194,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name2",
                     Text = "Text2",
                     Value = 23.45
@@ -203,7 +202,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 4,
-                    Date = new DateTime(2000, 12, 31),
+                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name4",
                     Text = "Text4",
                     Value = -42.42
@@ -211,7 +210,7 @@ public class ImportBookingsViewModelTests
             }, o => o.WithStrictOrdering());
 
         // set start date to year begin to import data skipped before
-        sut.StartDate = new DateTime(2000, 1, 1);
+        sut.StartDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
 
         // note that all identifiers will be changed
         sut.ImportDataFiltered.Should().BeEquivalentTo(
@@ -220,7 +219,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 2,
-                    Date = new DateTime(2000, 1, 10),
+                    Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name1",
                     Text = "Text1",
                     Value = 12.34
@@ -228,14 +227,14 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 1,
-                    Date = new DateTime(2000, 1, 15),
+                    Date = new DateTime(2000, 1, 15, 0, 0, 0, DateTimeKind.Local),
                     Text = "Shopping Mall - Shoes",
                     Value = -50
                 },
                 new
                 {
                     Identifier = 3,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name3",
                     Text = "Text3",
                     Value = 23.46
@@ -243,7 +242,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 4,
-                    Date = new DateTime(2000, 12, 1),
+                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name2",
                     Text = "Text2",
                     Value = 23.45
@@ -251,7 +250,7 @@ public class ImportBookingsViewModelTests
                 new
                 {
                     Identifier = 5,
-                    Date = new DateTime(2000, 12, 31),
+                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
                     Name = "Name4",
                     Text = "Text4",
                     Value = -42.42
@@ -263,13 +262,13 @@ public class ImportBookingsViewModelTests
     {
         var project = new AccountingData
         {
-            Accounts = new List<AccountingDataAccountGroup>
-            {
+            Accounts =
+            [
                 new AccountingDataAccountGroup
                 {
                     Name = "Default",
-                    Account = new List<AccountDefinition>
-                    {
+                    Account =
+                    [
                         new AccountDefinition
                         {
                             ID = 100,
@@ -277,8 +276,8 @@ public class ImportBookingsViewModelTests
                             Type = AccountDefinitionType.Asset,
                             ImportMapping = new AccountDefinitionImportMapping
                             {
-                                Columns = new List<AccountDefinitionImportMappingColumn>
-                                {
+                                Columns =
+                                [
                                     new AccountDefinitionImportMappingColumn
                                     {
                                         Source = "Date",
@@ -307,37 +306,34 @@ public class ImportBookingsViewModelTests
                                             AccountDefinitionImportMappingColumnTarget
                                                 .Value
                                     }
-                                }
+                                ]
                             }
                         }
-                    }
+                    ]
                 }
-            },
-            Journal = new List<AccountingDataJournal>
-            {
+            ],
+            Journal =
+            [
                 new AccountingDataJournal
                 {
                     Year = "2000",
                     DateStart = 2000_0101,
                     DateEnd = 2000_1231,
-                    Booking = new List<AccountingDataJournalBooking>()
+                    Booking = []
                 }
-            }
+            ]
         };
-        var dataJournal = project.Journal.First();
+        var dataJournal = project.Journal[0];
         dataJournal.Booking.Add(
             new AccountingDataJournalBooking
             {
                 ID = 1,
                 Date = 2000_0115,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 100, Text = "Shopping Mall - Shoes", Value = 5000 }
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 600, Text = "Shopping Mall - Shoes", Value = 5000 },
-                }
+                Credit = [new BookingValue { Account = 100, Text = "Shopping Mall - Shoes", Value = 5000 }],
+                Debit =
+                [
+                    new BookingValue { Account = 600, Text = "Shopping Mall - Shoes", Value = 5000 }
+                ]
             });
         return project;
     }

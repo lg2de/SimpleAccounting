@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
@@ -140,10 +139,7 @@ public class AccountViewModelTests
             IsImportActive = true,
             ImportDateSource = "X1",
             ImportValueSource = "X2",
-            ImportPatterns = new ObservableCollection<ImportPatternViewModel>
-            {
-                new ImportPatternViewModel { Account = new AccountDefinition() }
-            }
+            ImportPatterns = [new ImportPatternViewModel { Account = new AccountDefinition() }]
         };
 
         sut.SaveCommand.CanExecute(null).Should().BeFalse();
@@ -158,10 +154,7 @@ public class AccountViewModelTests
             IsImportActive = true,
             ImportDateSource = "X1",
             ImportValueSource = "X2",
-            ImportPatterns = new ObservableCollection<ImportPatternViewModel>
-            {
-                new ImportPatternViewModel { Expression = "RegEx", Account = null }
-            }
+            ImportPatterns = [new ImportPatternViewModel { Expression = "RegEx", Account = null }]
         };
 
         sut.SaveCommand.CanExecute(null).Should().BeFalse();

@@ -25,6 +25,8 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <!-- REMOVE OBSOLETE is disabled because we use Obsolete attribute differently -->
+    <NoWarn>$(NoWarn);S1133</NoWarn>
     <!-- TODO S1451 (add or update header) is disabled because of external code (cultured fact) -->
     <NoWarn>$(NoWarn);S1451</NoWarn>
   </PropertyGroup>

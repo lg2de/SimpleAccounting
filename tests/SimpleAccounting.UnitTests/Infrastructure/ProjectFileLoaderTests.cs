@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Infrastructure;
 
 using System;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,7 +38,7 @@ public class ProjectFileLoaderTests
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
-        var settings = new Settings { SecuredDrives = new StringCollection { "K:\\" } };
+        var settings = new Settings { SecuredDrives = ["K:\\"] };
         var sut = new ProjectFileLoader(settings, dialogs, fileSystem, processApi);
         dialogs.ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator")),

@@ -115,12 +115,12 @@ internal class ImportBookingsViewModel : Screen
         }
     }
 
-    public List<ImportEntryViewModel> LoadedData { get; } = new List<ImportEntryViewModel>();
+    public List<ImportEntryViewModel> LoadedData { get; } = [];
 
-    public List<ImportEntryViewModel> ExistingData { get; } = new List<ImportEntryViewModel>();
+    public List<ImportEntryViewModel> ExistingData { get; } = [];
 
     public ObservableCollection<ImportEntryViewModel> ImportDataFiltered =>
-        new ObservableCollection<ImportEntryViewModel>(
+        new(
             this.LoadedData
                 .Concat(this.ExistingData)
                 .Where(x => x.Date >= this.StartDate)
@@ -138,11 +138,11 @@ internal class ImportBookingsViewModel : Screen
 
     public ICommand BookAllCommand => new RelayCommand(
         _ => this.ProcessData(),
-        _ => this.LoadedData.All(x => x.RemoteAccount != null || x.IsSkip || x.IsExisting));
+        _ => this.LoadedData.Exists(x => x.RemoteAccount != null || x.IsSkip || x.IsExisting));
 
     public ICommand BookMappedCommand => new RelayCommand(
         _ => this.ProcessData(),
-        _ => this.LoadedData.Any(x => x.RemoteAccount != null));
+        _ => this.LoadedData.Exists(x => x.RemoteAccount != null));
 
     protected IProjectData ProjectData { get; }
 
@@ -163,19 +163,19 @@ internal class ImportBookingsViewModel : Screen
         this.ExistingData.AddRange(
             this.ProjectData.CurrentYear.Booking
                 .Where(
-                    x => x.Credit.Any(c => c.Account == this.selectedAccountNumber)
-                         || x.Debit.Any(d => d.Account == this.selectedAccountNumber))
+                    x => x.Credit.Exists(c => c.Account == this.selectedAccountNumber)
+                         || x.Debit.Exists(d => d.Account == this.selectedAccountNumber))
                 .Select(ToViewModel));
         this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
 
         ImportEntryViewModel ToViewModel(AccountingDataJournalBooking entry)
         {
             var value = entry.Credit.Sum(x => x.Value).ToViewModel();
-            var me = entry.Debit.First();
+            var me = entry.Debit[0];
             var remotes = entry.Credit;
-            if (entry.Credit.Any(c => c.Account == this.selectedAccountNumber))
+            if (entry.Credit.Exists(c => c.Account == this.selectedAccountNumber))
             {
-                me = entry.Credit.First();
+                me = entry.Credit[0];
                 remotes = entry.Debit;
                 value = -value;
             }
@@ -188,7 +188,7 @@ internal class ImportBookingsViewModel : Screen
             }
 
             // remote account may be null in case of split booking
-            var remoteAccount = this.accounts.FirstOrDefault(x => x.ID == remoteIdentifier);
+            var remoteAccount = this.accounts.Find(x => x.ID == remoteIdentifier);
 
             return new ImportEntryViewModel(this.accounts)
             {
@@ -237,7 +237,7 @@ internal class ImportBookingsViewModel : Screen
                     continue;
                 }
 
-                if (this.ExistingData.Any(
+                if (this.ExistingData.Exists(
                         x =>
                             x.Date == item.Date
                             && Math.Abs(x.Value - item.Value) < double.Epsilon
@@ -338,8 +338,8 @@ internal class ImportBookingsViewModel : Screen
                 debitValue.Account = importing.RemoteAccount.ID;
             }
 
-            newBooking.Credit = new List<BookingValue> { creditValue };
-            newBooking.Debit = new List<BookingValue> { debitValue };
+            newBooking.Credit = [creditValue];
+            newBooking.Debit = [debitValue];
             this.ProjectData.AddBooking(newBooking, updateJournal: false);
         }
 

@@ -24,7 +24,7 @@ public class TotalsAndBalancesReportTests
 
         sut.CreateReport("dummy");
 
-        var year = Samples.SampleProject.Journal.Last().Year;
+        var year = Samples.SampleProject.Journal[^1].Year;
         var expected = $@"
 <data>
   <tr topLine=""True"">

@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
-using System.Collections.Generic;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
@@ -42,8 +41,8 @@ public class FullJournalViewModelTests
         {
             Date = date,
             ID = identifier,
-            Credit = new List<BookingValue> { new BookingValue { Text = "dummy", Account = 100 } },
-            Debit = new List<BookingValue>()
+            Credit = [new BookingValue { Text = "dummy", Account = 100 }],
+            Debit = []
         };
     }
 }

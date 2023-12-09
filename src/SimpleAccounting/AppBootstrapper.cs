@@ -23,7 +23,7 @@ using lg2de.SimpleAccounting.Reports;
     Justification = "The bootstrapper is responsible to configure all classes.")]
 public class AppBootstrapper : BootstrapperBase
 {
-    private readonly SimpleContainer container = new SimpleContainer();
+    private readonly SimpleContainer container = new();
 
     public AppBootstrapper()
     {

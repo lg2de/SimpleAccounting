@@ -29,8 +29,8 @@ public partial class AccountingData
 
     public AccountingData()
     {
-        this.Accounts = new List<AccountingDataAccountGroup>();
-        this.Journal = new List<AccountingDataJournal>();
+        this.Accounts = [];
+        this.Journal = [];
         this.Setup = new AccountingDataSetup();
     }
 
@@ -64,26 +64,23 @@ public partial class AccountingData
         var year = (ushort)DateTime.Now.Year;
         var defaultAccounts = new List<AccountDefinition>
         {
-            new AccountDefinition { ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset },
-            new AccountDefinition { ID = 400, Name = "Salary", Type = AccountDefinitionType.Income },
-            new AccountDefinition { ID = 600, Name = "Food", Type = AccountDefinitionType.Expense },
-            new AccountDefinition { ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward }
+            new() { ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset },
+            new() { ID = 400, Name = "Salary", Type = AccountDefinitionType.Income },
+            new() { ID = 600, Name = "Food", Type = AccountDefinitionType.Expense },
+            new() { ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward }
         };
         var accountJournal = new AccountingDataJournal
         {
             Year = year.ToString(CultureInfo.InvariantCulture),
             DateStart = (uint)year * 10000 + 101,
             DateEnd = (uint)year * 10000 + 1231,
-            Booking = new List<AccountingDataJournalBooking>()
+            Booking = []
         };
         return new AccountingData
         {
             Setup = new AccountingDataSetup { Currency = "€" },
-            Accounts = new List<AccountingDataAccountGroup>
-            {
-                new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }
-            },
-            Journal = new List<AccountingDataJournal> { accountJournal }
+            Accounts = [new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }],
+            Journal = [accountJournal]
         };
     }
 
@@ -112,7 +109,7 @@ public partial class AccountingData
         {
             DateStart = currentModelJournal.DateStart + 10000,
             DateEnd = currentModelJournal.DateEnd + 10000,
-            Booking = new List<AccountingDataJournalBooking>()
+            Booking = []
         };
         newYearJournal.Year = newYearJournal.DateStart.ToDateTime().Year.ToString(CultureInfo.InvariantCulture);
         this.Journal.Add(newYearJournal);
@@ -149,8 +146,8 @@ public partial class AccountingData
             {
                 Date = newYearJournal.DateStart,
                 ID = bookingId,
-                Debit = new List<BookingValue>(),
-                Credit = new List<BookingValue>(),
+                Debit = [],
+                Credit = [],
                 Opening = true
             };
             newYearJournal.Booking.Add(newBooking);
@@ -196,7 +193,7 @@ public partial class AccountingData
         var result = false;
         foreach (var year in this.Years)
         {
-            this.Journal ??= new List<AccountingDataJournal>();
+            this.Journal ??= [];
 
             string oldYearName = year.Name.ToString(CultureInfo.InvariantCulture);
             var journal = this.Journal.SingleOrDefault(x => x.Year == oldYearName);
@@ -204,7 +201,7 @@ public partial class AccountingData
             {
                 journal = new AccountingDataJournal
                 {
-                    Year = oldYearName, Booking = new List<AccountingDataJournalBooking>()
+                    Year = oldYearName, Booking = []
                 };
                 this.Journal.Add(journal);
             }
@@ -296,8 +293,8 @@ public partial class AccountDefinitionImportMapping
     public bool IsValid()
     {
         return
-            this.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
-            && this.Columns.Any(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
+            this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
+            && this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
     }
 }
 
@@ -317,14 +314,14 @@ internal static class AccountDataJournalExtensions
                 new AccountingDataJournal
                 {
                     Year = today.Year.ToString(CultureInfo.InvariantCulture),
-                    DateStart = new DateTime(today.Year, 1, 1).ToAccountingDate(),
-                    DateEnd = new DateTime(today.Year, december, decemberLast).ToAccountingDate(),
-                    Booking = new List<AccountingDataJournalBooking>()
+                    DateStart = new DateTime(today.Year, 1, 1, 0, 0, 0, DateTimeKind.Local).ToAccountingDate(),
+                    DateEnd = new DateTime(today.Year, december, decemberLast, 0, 0, 0, DateTimeKind.Local).ToAccountingDate(),
+                    Booking = []
                 });
         }
 
-        var latest = journals.Last();
-        latest.Booking ??= new List<AccountingDataJournalBooking>();
+        var latest = journals[^1];
+        latest.Booking ??= [];
 
         return latest;
     }
@@ -356,7 +353,7 @@ public partial class AccountDefinition
 public partial class AccountDefinitionImportMappingPattern
 {
     private Regex? regex;
-    internal Regex Regex => this.regex ??= new Regex(this.Expression, RegexOptions.Compiled);
+    internal Regex Regex => this.regex ??= new Regex(this.Expression, RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 }
 
 public partial class BookingValue

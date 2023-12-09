@@ -27,7 +27,7 @@ internal class AccountDesignViewModel : AccountViewModel
         this.Type = AccountDefinitionType.Credit;
         this.IsActivated = true;
 
-        this.Groups = new List<AccountingDataAccountGroup> { new AccountingDataAccountGroup { Name = "MyGroup" } };
+        this.Groups = new List<AccountingDataAccountGroup> { new() { Name = "MyGroup" } };
         this.Group = this.Groups.First();
 
         this.IsImportActive = true;
@@ -40,11 +40,11 @@ internal class AccountDesignViewModel : AccountViewModel
         this.ImportValueSource = "Value column";
         this.ImportValueIgnorePattern = "ignore value";
 
-        this.ImportRemoteAccounts = new List<AccountDefinition> { new AccountDefinition { ID = 100, Name = "Bank" } };
+        this.ImportRemoteAccounts = new List<AccountDefinition> { new() { ID = 100, Name = "Bank" } };
         this.ImportPatterns.Add(
             new ImportPatternViewModel
             {
-                Expression = "RegEx", Value = 29.95, Account = this.ImportRemoteAccounts.First()
+                Expression = "RegEx", Value = 29.95, Account = this.ImportRemoteAccounts[0]
             });
     }
 }

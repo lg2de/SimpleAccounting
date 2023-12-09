@@ -21,62 +21,48 @@ public class AccountingDataTests
     {
         var sut = new AccountingData
         {
-            Accounts = new List<AccountingDataAccountGroup>
-            {
+            Accounts =
+            [
                 new AccountingDataAccountGroup
                 {
-                    Account = new List<AccountDefinition>
-                    {
+                    Account =
+                    [
                         new AccountDefinition { Name = "1" },
-                        new AccountDefinition
-                        {
-                            Name = "2", ImportMapping = new AccountDefinitionImportMapping()
-                        },
+                        new AccountDefinition { Name = "2", ImportMapping = new AccountDefinitionImportMapping() },
                         new AccountDefinition
                         {
                             Name = "3",
-                            ImportMapping = new AccountDefinitionImportMapping
-                            {
-                                Columns = new List<AccountDefinitionImportMappingColumn>(),
-                                Patterns = new List<AccountDefinitionImportMappingPattern>()
-                            }
+                            ImportMapping =
+                                new AccountDefinitionImportMapping
+                                {
+                                    Columns = [],
+                                    Patterns = []
+                                }
                         },
                         new AccountDefinition
                         {
                             Name = "4",
                             ImportMapping = new AccountDefinitionImportMapping
                             {
-                                Columns = new List<AccountDefinitionImportMappingColumn>
-                                {
-                                    new AccountDefinitionImportMappingColumn
-                                    {
-                                        Source = "A"
-                                    }
-                                },
-                                Patterns = new List<AccountDefinitionImportMappingPattern>
-                                {
-                                    new AccountDefinitionImportMappingPattern
-                                    {
-                                        Expression = "A"
-                                    }
-                                }
+                                Columns = [new AccountDefinitionImportMappingColumn { Source = "A" }],
+                                Patterns = [new AccountDefinitionImportMappingPattern { Expression = "A" }]
                             }
                         }
-                    }
+                    ]
                 }
-            }
+            ]
         };
 
         sut.Migrate().Should().BeTrue();
 
         var expectation = new AccountingData
         {
-            Accounts = new List<AccountingDataAccountGroup>
-            {
+            Accounts =
+            [
                 new AccountingDataAccountGroup
                 {
-                    Account = new List<AccountDefinition>
-                    {
+                    Account =
+                    [
                         new AccountDefinition { Name = "1" },
                         new AccountDefinition { Name = "2" },
                         new AccountDefinition { Name = "3" },
@@ -85,25 +71,13 @@ public class AccountingDataTests
                             Name = "4",
                             ImportMapping = new AccountDefinitionImportMapping
                             {
-                                Columns = new List<AccountDefinitionImportMappingColumn>
-                                {
-                                    new AccountDefinitionImportMappingColumn
-                                    {
-                                        Source = "A"
-                                    }
-                                },
-                                Patterns = new List<AccountDefinitionImportMappingPattern>
-                                {
-                                    new AccountDefinitionImportMappingPattern
-                                    {
-                                        Expression = "A"
-                                    }
-                                }
+                                Columns = [new AccountDefinitionImportMappingColumn { Source = "A" }],
+                                Patterns = [new AccountDefinitionImportMappingPattern { Expression = "A" }]
                             }
                         }
-                    }
+                    ]
                 }
-            }
+            ]
         };
         sut.Should().BeEquivalentTo(
             expectation,
@@ -125,7 +99,7 @@ public class AccountingDataTests
     [Fact]
     public void Migrate_EmptyYears_YearsNodeRemoved()
     {
-        var sut = new AccountingData { Years = new List<AccountingDataYear>() };
+        var sut = new AccountingData { Years = [] };
 
         sut.Migrate().Should().BeFalse("just removing the empty not is not a relevant change");
 
@@ -138,17 +112,12 @@ public class AccountingDataTests
     {
         var sut = new AccountingData
         {
-            Years = new List<AccountingDataYear>
-            {
-                new AccountingDataYear
-                {
-                    Name = 2001, DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true
-                },
-                new AccountingDataYear
-                {
-                    Name = 2002, DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false
-                }
-            }
+            Years =
+            [
+                new AccountingDataYear { Name = 2001, DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true },
+
+                new AccountingDataYear { Name = 2002, DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false }
+            ]
         };
 
         sut.Migrate().Should().BeTrue();
@@ -177,7 +146,7 @@ public class AccountingDataTests
     [Fact]
     public void SafeGetLatest_MissingBookings_BookingsInitialized()
     {
-        var sut = new List<AccountingDataJournal> { new AccountingDataJournal { Year = "Year" } };
+        var sut = new List<AccountingDataJournal> { new() { Year = "Year" } };
 
         var latest = sut.SafeGetLatest();
 
@@ -188,14 +157,14 @@ public class AccountingDataTests
     public void CloseYear_SampleDataEnglish_AllRelevantDataCorrect()
     {
         var sut = Samples.SampleProject;
-        var currentYear = sut.Journal.Last();
+        var currentYear = sut.Journal[^1];
         currentYear.Booking.AddRange(Samples.SampleBookings);
         var carryforwardAccount =
             sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
 
         sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
 
-        var newYear = sut.Journal.Last();
+        var newYear = sut.Journal[^1];
         newYear.Should().NotBeEquivalentTo(currentYear);
         currentYear.Closed.Should().BeTrue();
         newYear.Closed.Should().BeFalse();
@@ -231,14 +200,14 @@ public class AccountingDataTests
     public void CloseYear_SampleDataGerman_TextCorrect()
     {
         var sut = Samples.SampleProject;
-        var currentYear = sut.Journal.Last();
+        var currentYear = sut.Journal[^1];
         currentYear.Booking.AddRange(Samples.SampleBookings);
         var carryforwardAccount =
             sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
 
         sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
 
-        var newYear = sut.Journal.Last();
+        var newYear = sut.Journal[^1];
         newYear.Should().NotBeEquivalentTo(currentYear);
         currentYear.Closed.Should().BeTrue();
         newYear.Closed.Should().BeFalse();
@@ -271,14 +240,14 @@ public class AccountingDataTests
     public void CloseYear_SampleDataFrench_TextCorrect()
     {
         var sut = Samples.SampleProject;
-        var currentYear = sut.Journal.Last();
+        var currentYear = sut.Journal[^1];
         currentYear.Booking.AddRange(Samples.SampleBookings);
         var carryforwardAccount =
             sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
 
         sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
 
-        var newYear = sut.Journal.Last();
+        var newYear = sut.Journal[^1];
         newYear.Should().NotBeEquivalentTo(currentYear);
         currentYear.Closed.Should().BeTrue();
         newYear.Closed.Should().BeFalse();
@@ -310,14 +279,14 @@ public class AccountingDataTests
     public void CloseYear_TextOptionAccountName_TextCorrect()
     {
         var sut = Samples.SampleProject;
-        var currentYear = sut.Journal.Last();
+        var currentYear = sut.Journal[^1];
         currentYear.Booking.AddRange(Samples.SampleBookings);
         var carryforwardAccount =
             sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
 
         sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.AccountName);
 
-        var newYear = sut.Journal.Last();
+        var newYear = sut.Journal[^1];
         newYear.Should().NotBeEquivalentTo(currentYear);
         currentYear.Closed.Should().BeTrue();
         newYear.Closed.Should().BeFalse();
@@ -350,30 +319,24 @@ public class AccountingDataTests
     {
         var sut = new AccountingData
         {
-            Accounts = new List<AccountingDataAccountGroup>
-            {
+            Accounts =
+            [
                 new AccountingDataAccountGroup
                 {
-                    Account = new List<AccountDefinition>
-                    {
+                    Account =
+                    [
                         new AccountDefinition { ID = 100, Type = AccountDefinitionType.Asset },
-                        new AccountDefinition
-                        {
-                            ID = 999, Type = AccountDefinitionType.Carryforward
-                        }
-                    }
+                        new AccountDefinition { ID = 999, Type = AccountDefinitionType.Carryforward }
+                    ]
                 }
-            },
-            Journal = new List<AccountingDataJournal>
-            {
-                new AccountingDataJournal { Booking = null, DateStart = 2020_0101, DateEnd = 2020_1231 }
-            }
+            ],
+            Journal = [new AccountingDataJournal { Booking = null, DateStart = 2020_0101, DateEnd = 2020_1231 }]
         };
 
-        sut.CloseYear(sut.Journal.Last(), sut.Accounts.Last().Account.Last(), OpeningTextOption.Numbered);
+        sut.CloseYear(sut.Journal[^1], sut.Accounts[^1].Account[^1], OpeningTextOption.Numbered);
 
-        sut.Journal.First().Closed.Should().BeTrue();
-        sut.Journal.Last().Closed.Should().BeFalse();
+        sut.Journal[0].Closed.Should().BeTrue();
+        sut.Journal[^1].Closed.Should().BeFalse();
     }
 
     [Fact]

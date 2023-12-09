@@ -65,15 +65,15 @@ internal class EditBookingViewModel : Screen
 
     public bool EditMode { get; }
 
-    public List<AccountDefinition> Accounts { get; } = new List<AccountDefinition>();
+    public List<AccountDefinition> Accounts { get; } = [];
 
-    public List<AccountDefinition> IncomeAccounts { get; private set; } = new List<AccountDefinition>();
+    public List<AccountDefinition> IncomeAccounts { get; private set; } = [];
 
-    public List<AccountDefinition> IncomeRemoteAccounts { get; private set; } = new List<AccountDefinition>();
+    public List<AccountDefinition> IncomeRemoteAccounts { get; private set; } = [];
 
-    public List<AccountDefinition> ExpenseAccounts { get; private set; } = new List<AccountDefinition>();
+    public List<AccountDefinition> ExpenseAccounts { get; private set; } = [];
 
-    public List<AccountDefinition> ExpenseRemoteAccounts { get; private set; } = new List<AccountDefinition>();
+    public List<AccountDefinition> ExpenseRemoteAccounts { get; private set; } = [];
 
     public string ValueLabel { get; }
 
@@ -85,8 +85,7 @@ internal class EditBookingViewModel : Screen
 
     public ulong BookingIdentifier { get; set; }
 
-    public ObservableCollection<BookingTemplate> BindingTemplates { get; }
-        = new ObservableCollection<BookingTemplate>();
+    public ObservableCollection<BookingTemplate> BindingTemplates { get; } = [];
 
     public BookingTemplate? SelectedTemplate
     {
@@ -156,13 +155,11 @@ internal class EditBookingViewModel : Screen
         }
     }
 
-    public ObservableCollection<SplitBookingViewModel> CreditSplitEntries { get; } =
-        new ObservableCollection<SplitBookingViewModel>();
+    public ObservableCollection<SplitBookingViewModel> CreditSplitEntries { get; } = [];
 
     public bool CreditSplitAllowed => this.DebitSplitEntries.Count == 0;
 
-    public ObservableCollection<SplitBookingViewModel> DebitSplitEntries { get; } =
-        new ObservableCollection<SplitBookingViewModel>();
+    public ObservableCollection<SplitBookingViewModel> DebitSplitEntries { get; } = [];
 
     public bool DebitSplitAllowed => this.CreditSplitEntries.Count == 0;
 
@@ -224,7 +221,7 @@ internal class EditBookingViewModel : Screen
         {
             // complete base value for debit...
             baseValue.Account = this.DebitAccount;
-            newBooking.Debit = new List<BookingValue> { baseValue };
+            newBooking.Debit = [baseValue];
 
             // ...and build credit values
             newBooking.Credit = this.CreditSplitEntries.Select(x => x.ToBooking()).ToList();
@@ -242,7 +239,7 @@ internal class EditBookingViewModel : Screen
         {
             // complete base value for credit...
             baseValue.Account = this.CreditAccount;
-            newBooking.Credit = new List<BookingValue> { baseValue };
+            newBooking.Credit = [baseValue];
 
             // ...and build debit values
             newBooking.Debit = this.DebitSplitEntries.Select(x => x.ToBooking()).ToList();
@@ -260,8 +257,8 @@ internal class EditBookingViewModel : Screen
         var debitValue = baseValue.Clone();
         baseValue.Account = this.CreditAccount;
         debitValue.Account = this.DebitAccount;
-        newBooking.Credit = new List<BookingValue> { baseValue };
-        newBooking.Debit = new List<BookingValue> { debitValue };
+        newBooking.Credit = [baseValue];
+        newBooking.Debit = [debitValue];
         return newBooking;
     }
 

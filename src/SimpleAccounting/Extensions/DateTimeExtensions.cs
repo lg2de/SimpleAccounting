@@ -7,7 +7,7 @@ namespace lg2de.SimpleAccounting.Extensions;
 using System;
 
 /// <summary>
-///     Implements extensions on <see cref="DateTime"/>.
+///     Implements extensions on <see cref="DateTime" />.
 /// </summary>
 internal static class DateTimeExtensions
 {
@@ -20,7 +20,9 @@ internal static class DateTimeExtensions
         return new DateTime(
             (int)date / YearFactor,
             (int)(date / MonthFactor) % MonthFactor,
-            (int)date % MonthFactor);
+            (int)date % MonthFactor,
+            0, 0, 0,
+            DateTimeKind.Local);
     }
 
     public static uint ToAccountingDate(this DateTime date)

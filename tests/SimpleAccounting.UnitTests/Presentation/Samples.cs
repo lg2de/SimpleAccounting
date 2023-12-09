@@ -34,13 +34,13 @@ internal static class Samples
             var year = (uint)DateTime.Now.Year;
             var accountingData = new AccountingData
             {
-                Accounts = new List<AccountingDataAccountGroup>
-                {
+                Accounts =
+                [
                     new AccountingDataAccountGroup
                     {
                         Name = "Default",
-                        Account = new List<AccountDefinition>
-                        {
+                        Account =
+                        [
                             new AccountDefinition
                             {
                                 ID = BankAccount,
@@ -48,8 +48,8 @@ internal static class Samples
                                 Type = AccountDefinitionType.Asset,
                                 ImportMapping = new AccountDefinitionImportMapping
                                 {
-                                    Columns = new List<AccountDefinitionImportMappingColumn>
-                                    {
+                                    Columns =
+                                    [
                                         new AccountDefinitionImportMappingColumn
                                         {
                                             Source = "Date",
@@ -78,66 +78,50 @@ internal static class Samples
                                                 AccountDefinitionImportMappingColumnTarget
                                                     .Value
                                         }
-                                    }
+                                    ]
                                 }
                             },
+                            new AccountDefinition { ID = Salary, Name = "Salary", Type = AccountDefinitionType.Income },
+                            new AccountDefinition { ID = Shoes, Name = "Shoes", Type = AccountDefinitionType.Expense },
                             new AccountDefinition
                             {
-                                ID = Salary, Name = "Salary", Type = AccountDefinitionType.Income
-                            },
-                            new AccountDefinition
-                            {
-                                ID = Shoes, Name = "Shoes", Type = AccountDefinitionType.Expense
-                            },
-                            new AccountDefinition
-                            {
-                                ID = Carryforward,
-                                Name = "Carryforward",
-                                Type = AccountDefinitionType.Carryforward
+                                ID = Carryforward, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
                             }
-                        }
+                        ]
                     },
                     new AccountingDataAccountGroup
                     {
                         Name = "Second",
-                        Account = new List<AccountDefinition>
-                        {
-                            new AccountDefinition
-                            {
-                                ID = BankCredit,
-                                Name = "Bank credit",
-                                Type = AccountDefinitionType.Credit
-                            },
-                            new AccountDefinition
-                            {
-                                ID = FriendsDebit,
-                                Name = "Friends debit",
-                                Type = AccountDefinitionType.Debit
-                            },
+                        Account =
+                        [
+                            new AccountDefinition { ID = BankCredit, Name = "Bank credit", Type = AccountDefinitionType.Credit },
+
+                            new AccountDefinition { ID = FriendsDebit, Name = "Friends debit", Type = AccountDefinitionType.Debit },
+
                             new AccountDefinition { ID = Inactive, Name = "Inactive", Active = false }
-                        }
+                        ]
                     }
-                },
-                Journal = new List<AccountingDataJournal>
-                {
+                ],
+                Journal =
+                [
                     new AccountingDataJournal
                     {
                         Year = "2000",
                         DateStart = 2000_0101,
                         DateEnd = 2000_1231,
                         Closed = true,
-                        Booking = new List<AccountingDataJournalBooking>()
+                        Booking = []
                     },
                     new AccountingDataJournal
                     {
                         Year = year.ToString(CultureInfo.InvariantCulture),
                         DateStart = year * 10000 + 101,
                         DateEnd = year * 10000 + 1231,
-                        Booking = new List<AccountingDataJournalBooking>()
+                        Booking = []
                     }
-                }
+                ]
             };
-            accountingData.Accounts.Last().Account.AddRange(
+            accountingData.Accounts[^1].Account.AddRange(
                 Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>().Select(
                     type => new AccountDefinition
                     {
@@ -167,19 +151,12 @@ internal static class Samples
         {
             return new AccountDefinitionImportMapping
             {
-                Columns = new List<AccountDefinitionImportMappingColumn>
-                {
-                    new AccountDefinitionImportMappingColumn
-                    {
-                        Target = AccountDefinitionImportMappingColumnTarget.Date,
-                        Source = "Date"
-                    },
-                    new AccountDefinitionImportMappingColumn
-                    {
-                        Target = AccountDefinitionImportMappingColumnTarget.Value,
-                        Source = "Value"
-                    }
-                }
+                Columns =
+                [
+                    new AccountDefinitionImportMappingColumn { Target = AccountDefinitionImportMappingColumnTarget.Date, Source = "Date" },
+
+                    new AccountDefinitionImportMappingColumn { Target = AccountDefinitionImportMappingColumnTarget.Value, Source = "Value" }
+                ]
             };
         }
     }
@@ -193,14 +170,8 @@ internal static class Samples
                 // attention, explicitly starting with unsorted ID to test sorting by date and ID
                 ID = 2,
                 Date = BaseDate + 101,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = BankCredit, Text = "Open 2", Value = 300000 }
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = Carryforward, Text = "Open 2", Value = 300000 }
-                },
+                Credit = [new BookingValue { Account = BankCredit, Text = "Open 2", Value = 300000 }],
+                Debit = [new BookingValue { Account = Carryforward, Text = "Open 2", Value = 300000 }],
                 Opening = true
             };
 
@@ -208,14 +179,8 @@ internal static class Samples
             {
                 ID = 1,
                 Date = BaseDate + 101,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = Carryforward, Text = "Open 1", Value = 100000 }
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = BankAccount, Text = "Open 1", Value = 100000 }
-                },
+                Credit = [new BookingValue { Account = Carryforward, Text = "Open 1", Value = 100000 }],
+                Debit = [new BookingValue { Account = BankAccount, Text = "Open 1", Value = 100000 }],
                 Opening = true
             };
 
@@ -223,58 +188,43 @@ internal static class Samples
             {
                 ID = 3,
                 Date = BaseDate + 128,
-                Credit = new List<BookingValue>
-                {
+                Credit =
+                [
                     new BookingValue { Account = Salary, Text = "Salary1", Value = 12000 },
                     new BookingValue { Account = Salary, Text = "Salary2", Value = 8000 }
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = BankAccount, Text = "Salary", Value = 20000 }
-                }
+                ],
+                Debit = [new BookingValue { Account = BankAccount, Text = "Salary", Value = 20000 }]
             };
                 
             yield return new AccountingDataJournalBooking
             {
                 ID = 4,
                 Date = BaseDate + 129,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = BankAccount, Text = "Credit rate", Value = 40000 },
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = BankCredit, Text = "Credit rate", Value = 40000 }
-                }
+                Credit =
+                [
+                    new BookingValue { Account = BankAccount, Text = "Credit rate", Value = 40000 }
+                ],
+                Debit = [new BookingValue { Account = BankCredit, Text = "Credit rate", Value = 40000 }]
             };
 
             yield return new AccountingDataJournalBooking
             {
                 ID = 5,
                 Date = BaseDate + 201,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = BankAccount, Text = "Shoes", Value = BankCredit }
-                },
-                Debit = new List<BookingValue>
-                {
+                Credit = [new BookingValue { Account = BankAccount, Text = "Shoes", Value = BankCredit }],
+                Debit =
+                [
                     new BookingValue { Account = Shoes, Text = "Shoes1", Value = 2000 },
                     new BookingValue { Account = Shoes, Text = "Shoes2", Value = 3000 }
-                }
+                ]
             };
 
             yield return new AccountingDataJournalBooking
             {
                 ID = 6,
                 Date = BaseDate + 205,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = BankAccount, Text = "Rent to friend", Value = 9900 }
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = FriendsDebit, Text = "Rent to friend", Value = 9900 }
-                }
+                Credit = [new BookingValue { Account = BankAccount, Text = "Rent to friend", Value = 9900 }],
+                Debit = [new BookingValue { Account = FriendsDebit, Text = "Rent to friend", Value = 9900 }]
             };
         }
     }

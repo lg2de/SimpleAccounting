@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using FluentAssertions;
@@ -24,7 +23,7 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var sut = new ImportBookingsViewModel(null!, projectData);
 
         sut.ImportAccounts.Should().BeEquivalentTo(new[] { new { Name = "Bank account" } });
@@ -34,13 +33,10 @@ public class ImportBookingsViewModelTests
     public void ImportStatus_NoImportAccount()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
-        {
-            new AccountingDataAccountGroup
-            {
-                Account = new List<AccountDefinition> { new AccountDefinition { ID = 100, Name = "Bank" } }
-            }
-        };
+        projectData.Storage.Accounts =
+        [
+            new AccountingDataAccountGroup { Account = [new AccountDefinition { ID = 100, Name = "Bank" }] }
+        ];
         var sut = new ImportBookingsViewModel(null!, projectData);
 
         sut.IsImportPossible.Should().BeFalse();
@@ -51,19 +47,13 @@ public class ImportBookingsViewModelTests
     public void ImportStatus_AnyImportAccount()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
-        {
+        projectData.Storage.Accounts =
+        [
             new AccountingDataAccountGroup
             {
-                Account = new List<AccountDefinition>
-                {
-                    new AccountDefinition
-                    {
-                        ID = 100, Name = "Bank", ImportMapping = Samples.SimpleImportConfiguration
-                    }
-                }
+                Account = [new AccountDefinition { ID = 100, Name = "Bank", ImportMapping = Samples.SimpleImportConfiguration }]
             }
-        };
+        ];
         var sut = new ImportBookingsViewModel(null!, projectData);
 
         sut.IsImportPossible.Should().BeTrue();
@@ -76,11 +66,11 @@ public class ImportBookingsViewModelTests
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
         var sut = new ImportBookingsViewModel(null!, projectData);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
 
         sut.SelectedAccountNumber = 100;
 
-        var year = Convert.ToInt32(Samples.SampleProject.Journal.Last().Year);
+        var year = Convert.ToInt32(Samples.SampleProject.Journal[^1].Year);
         sut.ImportDataFiltered.Should().BeEmpty("start date should be set after last booking");
         sut.ExistingData.Should()
             .BeEquivalentTo(
@@ -88,7 +78,7 @@ public class ImportBookingsViewModelTests
                 {
                     new
                     {
-                        Date = new DateTime(year, 1, 1),
+                        Date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 1,
                         Text = "Open 1",
                         Value = 1000,
@@ -96,7 +86,7 @@ public class ImportBookingsViewModelTests
                     },
                     new
                     {
-                        Date = new DateTime(year, 1, 28),
+                        Date = new DateTime(year, 1, 28, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 3,
                         Text = "Salary",
                         Value = 200,
@@ -104,7 +94,7 @@ public class ImportBookingsViewModelTests
                     },
                     new
                     {
-                        Date = new DateTime(year, 1, 29),
+                        Date = new DateTime(year, 1, 29, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 4,
                         Text = "Credit rate",
                         Value = -400,
@@ -112,7 +102,7 @@ public class ImportBookingsViewModelTests
                     },
                     new
                     {
-                        Date = new DateTime(year, 2, 1),
+                        Date = new DateTime(year, 2, 1, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 5,
                         Text = "Shoes",
                         Value = -50,
@@ -120,7 +110,7 @@ public class ImportBookingsViewModelTests
                     },
                     new
                     {
-                        Date = new DateTime(year, 2, 5),
+                        Date = new DateTime(year, 2, 5, 0, 0, 0, DateTimeKind.Local),
                         Identifier = 6,
                         Text = "Rent to friend",
                         Value = -99,
@@ -195,7 +185,7 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, projectData);
         sut.LoadedData.Add(
@@ -209,13 +199,13 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, projectData);
         sut.LoadedData.Add(
             new ImportEntryViewModel(accounts)
             {
-                RemoteAccount = accounts.First(), IsSkip = false, IsExisting = false
+                RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
             });
 
         sut.BookAllCommand.CanExecute(null).Should().BeTrue();
@@ -226,7 +216,7 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, projectData);
         sut.LoadedData.Add(
@@ -240,7 +230,7 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, projectData);
         sut.LoadedData.Add(
@@ -266,13 +256,13 @@ public class ImportBookingsViewModelTests
             projectData) { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
         var remoteAccount = accounts.Single(x => x.ID == 600);
         int year = DateTime.Today.Year;
-        sut.StartDate = new DateTime(year, 1, 2);
+        sut.StartDate = new DateTime(year, 1, 2, 0, 0, 0, DateTimeKind.Local);
         sut.LoadedData.AddRange(
             new[]
             {
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 1),
+                    Date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 101,
                     Name = "Name",
                     Text = "Text",
@@ -281,7 +271,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 2),
+                    Date = new DateTime(year, 1, 2, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 102,
                     Text = "Text",
                     Value = 2,
@@ -290,7 +280,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 103,
                     Name = "Name",
                     Value = -1,
@@ -299,7 +289,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 104,
                     Name = "Name",
                     Value = -1,
@@ -307,7 +297,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 105,
                     Name = "Already booked",
                     Value = -2,
@@ -316,7 +306,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 106,
                     Name = "Ignore",
                     Value = -3,
@@ -324,7 +314,7 @@ public class ImportBookingsViewModelTests
                 },
                 new ImportEntryViewModel(accounts)
                 {
-                    Date = new DateTime(year, 1, 3),
+                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
                     Identifier = 107,
                     Name = "Ignore too",
                     Value = -4,

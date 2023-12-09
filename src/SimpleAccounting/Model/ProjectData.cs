@@ -349,7 +349,7 @@ internal class ProjectData : IProjectData
         if (journalEntry.Credit.Count > 1)
         {
             journalEntry.Credit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.CreditSplitEntries.Add);
-            var theDebit = journalEntry.Debit.First();
+            var theDebit = journalEntry.Debit[0];
             bookingModel.DebitAccount = theDebit.Account;
             bookingModel.BookingText = theDebit.Text;
             bookingModel.BookingValue = theDebit.Value.ToViewModel();
@@ -357,17 +357,17 @@ internal class ProjectData : IProjectData
         else if (journalEntry.Debit.Count > 1)
         {
             journalEntry.Debit.Select(x => x.ToSplitModel()).ToList().ForEach(bookingModel.DebitSplitEntries.Add);
-            var theCredit = journalEntry.Credit.First();
+            var theCredit = journalEntry.Credit[0];
             bookingModel.CreditAccount = theCredit.Account;
             bookingModel.BookingText = theCredit.Text;
             bookingModel.BookingValue = theCredit.Value.ToViewModel();
         }
         else
         {
-            var theDebit = journalEntry.Debit.First();
+            var theDebit = journalEntry.Debit[0];
             bookingModel.DebitAccount = theDebit.Account;
             bookingModel.BookingValue = theDebit.Value.ToViewModel();
-            bookingModel.CreditAccount = journalEntry.Credit.First().Account;
+            bookingModel.CreditAccount = journalEntry.Credit[0].Account;
             bookingModel.BookingText = theDebit.Text;
         }
 

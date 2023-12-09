@@ -17,13 +17,13 @@ using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
 
-internal sealed class ImportFileLoader : IDisposable
+internal sealed partial class ImportFileLoader : IDisposable
 {
     private readonly List<AccountDefinition> accounts;
     private readonly CultureInfo cultureInfo;
     private readonly string fileName;
     private readonly AccountDefinitionImportMapping importMapping;
-    private readonly Regex duplicateSpaceExpression = new Regex(@"\s+", RegexOptions.Compiled);
+    private readonly Regex duplicateSpaceExpression = DuplicateSpaceRegex();
 
     private StreamReader? streamReader;
 
@@ -60,18 +60,18 @@ internal sealed class ImportFileLoader : IDisposable
     {
         var dateField =
             this.importMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source
             ?? "date";
         var nameField =
             this.importMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source
             ?? "name";
         var textField =
             this.importMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
         var valueField =
             this.importMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
             ?? "value";
 
         using var csv = new CsvReader(reader, configuration);
@@ -108,7 +108,8 @@ internal sealed class ImportFileLoader : IDisposable
             text ??= string.Empty;
             if (!string.IsNullOrEmpty(textField.IgnorePattern))
             {
-                text = Regex.Replace(text, textField.IgnorePattern, string.Empty);
+                text = Regex.Replace(
+                    text, textField.IgnorePattern, string.Empty, RegexOptions.None, TimeSpan.FromSeconds(1));
             }
 
             text = this.duplicateSpaceExpression.Replace(text, " ");
@@ -141,4 +142,7 @@ internal sealed class ImportFileLoader : IDisposable
             return true;
         }
     }
+
+    [GeneratedRegex(@"\s+", RegexOptions.Compiled)]
+    private static partial Regex DuplicateSpaceRegex();
 }

@@ -48,7 +48,7 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
         this.accountGroups = accountGroups.ToList();
     }
 
-    public List<string> Signatures { get; } = new List<string>();
+    public List<string> Signatures { get; } = [];
 
     public void CreateReport(string title)
     {
@@ -158,16 +158,16 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
 
     private void ProcessAccount(XmlNode dataNode, AccountDefinition account)
     {
-        if (this.YearData.Booking.All(
+        if (this.YearData.Booking.TrueForAll(
                 b =>
-                    b.Debit.All(x => x.Account != account.ID) && b.Credit.All(x => x.Account != account.ID)))
+                    b.Debit.TrueForAll(x => x.Account != account.ID) && b.Credit.TrueForAll(x => x.Account != account.ID)))
         {
             return;
         }
 
         this.accountsPerGroup++;
         var lastBookingDate = this.YearData.Booking
-            .Where(x => x.Debit.Any(a => a.Account == account.ID) || x.Credit.Any(a => a.Account == account.ID))
+            .Where(x => x.Debit.Exists(a => a.Account == account.ID) || x.Credit.Exists(a => a.Account == account.ID))
             .Select(x => x.Date).DefaultIfEmpty().Max();
         long balanceCredit = this.YearData.Booking
             .SelectMany(x => x.Credit.Where(y => y.Account == account.ID))

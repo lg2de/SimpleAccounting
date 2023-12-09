@@ -14,7 +14,7 @@ using Xunit;
 
 public sealed class StringExtensionsTests : IDisposable
 {
-    private readonly Font testFont = new Font("Arial", 10);
+    private readonly Font testFont = new("Arial", 10);
 
     [Fact]
     public void Wrap_EmptyString_InputReturnedUnchanged()
