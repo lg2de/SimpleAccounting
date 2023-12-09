@@ -654,15 +654,8 @@ internal class XmlPrinter : IXmlPrinter
 
     private void CreateFrame(XmlNode referenceNode, XmlNode positionNode, int x1, int y1, int x2, int y2)
     {
-        if (referenceNode == null)
-        {
-            throw new ArgumentNullException(nameof(referenceNode));
-        }
-
-        if (positionNode == null)
-        {
-            throw new ArgumentNullException(nameof(positionNode));
-        }
+        ArgumentNullException.ThrowIfNull(referenceNode);
+        ArgumentNullException.ThrowIfNull(positionNode);
 
         var leftLine = referenceNode.GetAttribute<bool>("leftLine");
         if (leftLine)

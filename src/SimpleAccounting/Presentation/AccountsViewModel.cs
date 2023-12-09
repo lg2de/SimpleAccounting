@@ -51,8 +51,6 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             {
                 this.SelectedAccount = account;
             }
-
-            return Task.CompletedTask;
         });
 
     public bool ShowInactiveAccounts

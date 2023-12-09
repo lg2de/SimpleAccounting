@@ -26,7 +26,6 @@ public class CloseYearViewModel : Screen
     public CloseYearViewModel(AccountingDataJournal currentYear)
     {
         this.currentYear = currentYear ?? throw new ArgumentNullException(nameof(currentYear));
-
         this.TextOptions = new List<TextOptionViewModel>
         {
             new(OpeningTextOption.Numbered, Resources.CloseYear_TextOptionNumbered),

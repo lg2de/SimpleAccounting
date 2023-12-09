@@ -43,6 +43,15 @@ public class AsyncCommand : IAsyncCommand
         };
     }
 
+    public AsyncCommand(Action<object?> command)
+    {
+        this.asyncCommand2 = x =>
+        {
+            command(x);
+            return Task.CompletedTask;
+        };
+    }
+
     public AsyncCommand(Action command, Func<bool> canExecute)
     {
         this.asyncCommand1 = () =>

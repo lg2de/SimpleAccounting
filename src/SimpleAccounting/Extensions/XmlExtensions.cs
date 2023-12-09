@@ -35,15 +35,8 @@ internal static class XmlExtensions
     /// <param name="value">The attribute value.</param>
     public static void SetAttribute(this XmlNode node, string name, object? value)
     {
-        if (node == null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
-
-        if (name == null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
+        ArgumentNullException.ThrowIfNull(node);
+        ArgumentNullException.ThrowIfNull(name);
 
         XmlAttribute attr = node.OwnerDocument!.CreateAttribute(name);
         attr.Value = value?.ToString();
@@ -67,10 +60,7 @@ internal static class XmlExtensions
     /// <exception cref="ArgumentException">Thrown if the generic type is not supported.</exception>
     public static T GetAttribute<T>(this XmlNode node, string name, T defaultValue = default)
     {
-        if (node == null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
+        ArgumentNullException.ThrowIfNull(node);
 
         var attribute = node.Attributes?.GetNamedItem(name);
         if (attribute == null)

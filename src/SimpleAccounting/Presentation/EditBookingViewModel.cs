@@ -206,8 +206,6 @@ internal class EditBookingViewModel : Screen
             {
                 this.AddCommand.Execute(null);
             }
-
-            return Task.CompletedTask;
         });
 
     public AccountingDataJournalBooking CreateJournalEntry()

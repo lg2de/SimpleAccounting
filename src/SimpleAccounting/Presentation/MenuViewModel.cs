@@ -69,10 +69,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     public ICommand SwitchCultureCommand => new AsyncCommand(
         cultureName =>
         {
-            if (cultureName == null)
-            {
-                throw new ArgumentNullException(nameof(cultureName));
-            }
+            ArgumentNullException.ThrowIfNull(cultureName);
 
             this.projectData.Settings.Culture = cultureName.ToString();
             this.NotifyOfPropertyChange(nameof(this.IsGermanCulture));
@@ -83,8 +80,6 @@ internal class MenuViewModel : Screen, IMenuViewModel
                 Resources.Information_CultureChangeRestartRequired,
                 Resources.Header_SettingsChanged,
                 icon: MessageBoxImage.Information);
-
-            return Task.CompletedTask;
         });
 
     public bool IsGermanCulture => this.projectData.Settings.Culture == "de";
