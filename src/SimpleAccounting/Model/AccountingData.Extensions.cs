@@ -353,7 +353,7 @@ public partial class AccountDefinition
 public partial class AccountDefinitionImportMappingPattern
 {
     private Regex? regex;
-    internal Regex Regex => this.regex ??= new Regex(this.Expression, RegexOptions.Compiled);
+    internal Regex Regex => this.regex ??= new Regex(this.Expression, RegexOptions.Compiled, TimeSpan.FromSeconds(1));
 }
 
 public partial class BookingValue

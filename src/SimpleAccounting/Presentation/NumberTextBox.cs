@@ -16,7 +16,7 @@ using System.Windows.Input;
 ///     Implements a <see cref="TextBox"/> only accepting unsigned integer numbers.
 /// </summary>
 [ExcludeFromCodeCoverage]
-internal class NumberTextBox : TextBox
+internal partial class NumberTextBox : TextBox
 {
     public static readonly DependencyProperty ScaleProperty =
         DependencyProperty.Register(
@@ -72,13 +72,15 @@ internal class NumberTextBox : TextBox
     {
         if (this.Scale == 0)
         {
-            this.numberExpression = new Regex("^[0-9]*$", RegexOptions.Compiled);
+            this.numberExpression = NumberRegex();
             return;
         }
 
         var decimalSeparator = CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator;
         this.numberExpression = new Regex(
-            $"^[0-9]*({decimalSeparator}[0-9]{{0,{this.Scale}}})?$", RegexOptions.Compiled);
+            $"^[0-9]*({decimalSeparator}[0-9]{{0,{this.Scale}}})?$",
+            RegexOptions.Compiled,
+            TimeSpan.FromSeconds(1));
     }
 
     private void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -107,4 +109,7 @@ internal class NumberTextBox : TextBox
             e.CancelCommand();
         }
     }
+
+    [GeneratedRegex("^[0-9]*$", RegexOptions.Compiled)]
+    private static partial Regex NumberRegex();
 }
