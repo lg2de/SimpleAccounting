@@ -24,8 +24,7 @@ internal class AccountJournalViewModel : Screen, IAccountJournalViewModel
         this.projectData = projectData;
     }
 
-    public ObservableCollection<AccountJournalItemViewModel> Items { get; }
-        = new ObservableCollection<AccountJournalItemViewModel>();
+    public ObservableCollection<AccountJournalItemViewModel> Items { get; } = [];
 
     public AccountJournalItemViewModel? SelectedItem
     {
@@ -43,9 +42,9 @@ internal class AccountJournalViewModel : Screen, IAccountJournalViewModel
 
         var relevantBookings =
             this.projectData.CurrentYear.Booking
-                .Where(b => b.Credit.Any(x => x.Account == accountNumber))
+                .Where(b => b.Credit.Exists(x => x.Account == accountNumber))
                 .Concat(
-                    this.projectData.CurrentYear.Booking.Where(b => b.Debit.Any(x => x.Account == accountNumber)))
+                    this.projectData.CurrentYear.Booking.Where(b => b.Debit.Exists(x => x.Account == accountNumber)))
                 .OrderBy(x => x.Date)
                 .ThenBy(x => x.ID);
         double creditSum = 0;

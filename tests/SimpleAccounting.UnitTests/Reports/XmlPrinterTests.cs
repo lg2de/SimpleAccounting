@@ -19,7 +19,7 @@ using Xunit;
 public class XmlPrinterTests
 {
     private static readonly List<PaperSize> PaperSizes =
-        new List<PaperSize> { new PaperSize("A4", (int)(210 / 0.254), (int)(297 / 0.254)) };
+        [new PaperSize("A4", (int)(210 / 0.254), (int)(297 / 0.254))];
 
     [Fact]
     public void LoadDocument_AccountJournalReport_Loaded()

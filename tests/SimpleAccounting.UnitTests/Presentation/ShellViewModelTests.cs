@@ -5,8 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -66,16 +64,10 @@ public partial class ShellViewModelTests
         sut.ProjectData.Settings.RecentProject = "recent.project";
         var sample = new AccountingData
         {
-            Accounts = new List<AccountingDataAccountGroup>
-            {
-                new AccountingDataAccountGroup
-                {
-                    Account = new List<AccountDefinition>
-                    {
-                        new AccountDefinition { ID = 1, Name = "TheAccount" }
-                    }
-                }
-            }
+            Accounts =
+            [
+                new AccountingDataAccountGroup { Account = [new AccountDefinition { ID = 1, Name = "TheAccount" }] }
+            ]
         };
         fileSystem.FileExists("recent.project").Returns(true);
         fileSystem.ReadAllTextFromFile("recent.project").Returns(sample.Serialize());
@@ -106,16 +98,10 @@ public partial class ShellViewModelTests
         sut.ProjectData.Settings.RecentProject = "recent.project";
         var sample = new AccountingData
         {
-            Accounts = new List<AccountingDataAccountGroup>
-            {
-                new AccountingDataAccountGroup
-                {
-                    Account = new List<AccountDefinition>
-                    {
-                        new AccountDefinition { ID = 1, Name = "TheAccount" }
-                    }
-                }
-            }
+            Accounts =
+            [
+                new AccountingDataAccountGroup { Account = [new AccountDefinition { ID = 1, Name = "TheAccount" }] }
+            ]
         };
         fileSystem.FileExists("recent.project").Returns(true);
         fileSystem.ReadAllTextFromFile("recent.project").Returns(sample.Serialize());
@@ -146,8 +132,8 @@ public partial class ShellViewModelTests
         var settings = new Settings
         {
             RecentProject = "k:\\file2",
-            RecentProjects = new StringCollection { "c:\\file1", "k:\\file2" },
-            SecuredDrives = new StringCollection { "K:\\" }
+            RecentProjects = ["c:\\file1", "k:\\file2"],
+            SecuredDrives = ["K:\\"]
         };
         var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
@@ -185,7 +171,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut();
         var project = Samples.SampleProject;
-        project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         sut.ProjectData.Load(project);
 
         ((IActivate)sut).Activate();
@@ -231,7 +217,7 @@ public partial class ShellViewModelTests
     public void OnActivate_TwoRecentProjectsOneExisting_AllProjectListed()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        sut.ProjectData.Settings.RecentProjects = new StringCollection { "file1", "file2" };
+        sut.ProjectData.Settings.RecentProjects = ["file1", "file2"];
         fileSystem.FileExists(Arg.Is("file1")).Returns(true);
         fileSystem.FileExists(Arg.Is("file2")).Returns(false);
 
@@ -245,7 +231,7 @@ public partial class ShellViewModelTests
     public async Task RecentFileCommand_NonExisting_ProjectRemovedFromList()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        sut.ProjectData.Settings.RecentProjects = new StringCollection { "file1", "file2" };
+        sut.ProjectData.Settings.RecentProjects = ["file1", "file2"];
         fileSystem.FileExists(Arg.Is("file1")).Returns(true);
         fileSystem.FileExists(Arg.Is("file2")).Returns(false);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
@@ -265,8 +251,8 @@ public partial class ShellViewModelTests
     public async Task RecentFileCommand_FileOnSecureDriveNotStarted_ProjectKept()
     {
         var sut = CreateSut(out IDialogs dialogs, out IFileSystem fileSystem);
-        sut.ProjectData.Settings.RecentProjects = new StringCollection { "K:\\file1", "file2" };
-        sut.ProjectData.Settings.SecuredDrives = new StringCollection { "K:\\" };
+        sut.ProjectData.Settings.RecentProjects = ["K:\\file1", "file2"];
+        sut.ProjectData.Settings.SecuredDrives = ["K:\\"];
         fileSystem.FileExists(Arg.Is("K:\\file1")).Returns(false);
         fileSystem.FileExists(Arg.Is("file2")).Returns(true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
@@ -308,8 +294,8 @@ public partial class ShellViewModelTests
         {
             Date = Samples.BaseDate + 401,
             ID = 4567,
-            Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
-            Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
+            Credit = [new BookingValue { Account = 990, Text = "Init", Value = 42 }],
+            Debit = [new BookingValue { Account = 100, Text = "Init", Value = 42 }]
         };
 
         using var fullJournalMonitor = sut.FullJournal.Monitor();
@@ -360,10 +346,10 @@ public partial class ShellViewModelTests
         {
             Date = Samples.BaseDate + 401,
             ID = 4567,
-            Credit = new List<BookingValue> { new BookingValue { Account = 990, Text = "Init", Value = 42 } },
-            Debit = new List<BookingValue> { new BookingValue { Account = 100, Text = "Init", Value = 42 } }
+            Credit = [new BookingValue { Account = 990, Text = "Init", Value = 42 }],
+            Debit = [new BookingValue { Account = 100, Text = "Init", Value = 42 }]
         };
-        sut.Accounts.SelectedAccount = sut.Accounts.AccountList.Last();
+        sut.Accounts.SelectedAccount = sut.Accounts.AccountList[^1];
 
         using var monitor1 = sut.AccountJournal.Monitor();
         using var monitor2 = sut.AccountJournal.Items.Monitor();
@@ -532,8 +518,8 @@ public partial class ShellViewModelTests
     public async Task LoadProjectFromFileAsync_FullRecentList_NewFileOnTop()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        sut.ProjectData.Settings.RecentProjects = new StringCollection
-        {
+        sut.ProjectData.Settings.RecentProjects =
+        [
             "A",
             "B",
             "C",
@@ -544,7 +530,7 @@ public partial class ShellViewModelTests
             "H",
             "I",
             "J"
-        };
+        ];
         fileSystem.FileExists("the.fileName").Returns(true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
@@ -562,7 +548,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut(out IFileSystem fileSystem);
         var accountingData = new AccountingData
         {
-            Years = new List<AccountingDataYear> { new AccountingDataYear { Name = 2020 } }
+            Years = [new AccountingDataYear { Name = 2020 }]
         };
         fileSystem.FileExists("the.fileName").Returns(true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
@@ -638,7 +624,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut();
         var project = Samples.SampleProject;
-        project.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         sut.ProjectData.Load(project);
 
         sut.Accounts.ShowInactiveAccounts = true;

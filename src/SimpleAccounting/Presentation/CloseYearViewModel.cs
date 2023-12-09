@@ -27,10 +27,10 @@ public class CloseYearViewModel : Screen
 
         this.TextOptions = new List<TextOptionViewModel>
         {
-            new TextOptionViewModel(OpeningTextOption.Numbered, Resources.CloseYear_TextOptionNumbered),
-            new TextOptionViewModel(OpeningTextOption.AccountName, Resources.CloseYear_TextOptionAccountName)
+            new(OpeningTextOption.Numbered, Resources.CloseYear_TextOptionNumbered),
+            new(OpeningTextOption.AccountName, Resources.CloseYear_TextOptionAccountName)
         };
-        this.TextOption = this.TextOptions.First();
+        this.TextOption = this.TextOptions[0];
     }
 
     public string InstructionText { get; private set; } = string.Empty;

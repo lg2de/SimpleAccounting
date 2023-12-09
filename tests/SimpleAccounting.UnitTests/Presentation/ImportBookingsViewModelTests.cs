@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using FluentAssertions;
@@ -24,7 +23,7 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var sut = new ImportBookingsViewModel(null!, projectData);
 
         sut.ImportAccounts.Should().BeEquivalentTo(new[] { new { Name = "Bank account" } });
@@ -34,13 +33,10 @@ public class ImportBookingsViewModelTests
     public void ImportStatus_NoImportAccount()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
-        {
-            new AccountingDataAccountGroup
-            {
-                Account = new List<AccountDefinition> { new AccountDefinition { ID = 100, Name = "Bank" } }
-            }
-        };
+        projectData.Storage.Accounts =
+        [
+            new AccountingDataAccountGroup { Account = [new AccountDefinition { ID = 100, Name = "Bank" }] }
+        ];
         var sut = new ImportBookingsViewModel(null!, projectData);
 
         sut.IsImportPossible.Should().BeFalse();
@@ -51,19 +47,13 @@ public class ImportBookingsViewModelTests
     public void ImportStatus_AnyImportAccount()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
-        {
+        projectData.Storage.Accounts =
+        [
             new AccountingDataAccountGroup
             {
-                Account = new List<AccountDefinition>
-                {
-                    new AccountDefinition
-                    {
-                        ID = 100, Name = "Bank", ImportMapping = Samples.SimpleImportConfiguration
-                    }
-                }
+                Account = [new AccountDefinition { ID = 100, Name = "Bank", ImportMapping = Samples.SimpleImportConfiguration }]
             }
-        };
+        ];
         var sut = new ImportBookingsViewModel(null!, projectData);
 
         sut.IsImportPossible.Should().BeTrue();
@@ -76,11 +66,11 @@ public class ImportBookingsViewModelTests
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
         var sut = new ImportBookingsViewModel(null!, projectData);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
 
         sut.SelectedAccountNumber = 100;
 
-        var year = Convert.ToInt32(Samples.SampleProject.Journal.Last().Year);
+        var year = Convert.ToInt32(Samples.SampleProject.Journal[^1].Year);
         sut.ImportDataFiltered.Should().BeEmpty("start date should be set after last booking");
         sut.ExistingData.Should()
             .BeEquivalentTo(
@@ -195,7 +185,7 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, projectData);
         sut.LoadedData.Add(
@@ -209,13 +199,13 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, projectData);
         sut.LoadedData.Add(
             new ImportEntryViewModel(accounts)
             {
-                RemoteAccount = accounts.First(), IsSkip = false, IsExisting = false
+                RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
             });
 
         sut.BookAllCommand.CanExecute(null).Should().BeTrue();
@@ -226,7 +216,7 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, projectData);
         sut.LoadedData.Add(
@@ -240,7 +230,7 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        projectData.Storage.Journal.Last().Booking.AddRange(Samples.SampleBookings);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, projectData);
         sut.LoadedData.Add(

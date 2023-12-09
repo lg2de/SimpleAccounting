@@ -9,7 +9,7 @@ using System;
 using Xunit.Sdk;
 
 [XunitTestCaseDiscoverer("Xunit." + nameof(CulturedTheoryAttributeDiscoverer), "SimpleAccounting.UnitTests")]
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Method)]
 internal sealed class CulturedTheoryAttribute : TheoryAttribute
 {
     public CulturedTheoryAttribute(params string[] cultures) { }

@@ -41,7 +41,7 @@ internal class TotalJournalReport : ReportBase, ITotalJournalReport
 
             if (entry.Debit.Count == 1
                 && entry.Credit.Count == 1
-                && entry.Debit.First().Text == entry.Credit.First().Text)
+                && entry.Debit[0].Text == entry.Credit[0].Text)
             {
                 var credit = entry.Credit.Single();
                 var debit = entry.Debit.Single();

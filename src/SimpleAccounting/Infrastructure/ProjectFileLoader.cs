@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.Infrastructure;
 
 using System;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,11 +28,11 @@ internal class ProjectFileLoader
         this.fileSystem = fileSystem;
         this.processApi = processApi;
 
-        this.settings.RecentProjects ??= new StringCollection();
-        this.settings.SecuredDrives ??= new StringCollection();
+        this.settings.RecentProjects ??= [];
+        this.settings.SecuredDrives ??= [];
     }
 
-    public AccountingData ProjectData { get; private set; } = new AccountingData();
+    public AccountingData ProjectData { get; private set; } = new();
 
     /// <summary>
     ///     Gets a value indicating whether project has been migrated.

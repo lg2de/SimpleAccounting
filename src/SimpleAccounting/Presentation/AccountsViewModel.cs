@@ -31,8 +31,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         this.projectData = projectData;
     }
 
-    public ObservableCollection<AccountViewModel> AccountList { get; }
-        = new ObservableCollection<AccountViewModel>();
+    public ObservableCollection<AccountViewModel> AccountList { get; } = [];
 
     public AccountViewModel? SelectedAccount
     {
@@ -96,19 +95,19 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             }
 
             accountModel.IsImportActive = true;
-            var dateColumn = account.ImportMapping.Columns?.FirstOrDefault(
+            var dateColumn = account.ImportMapping.Columns?.Find(
                 x => x.Target == AccountDefinitionImportMappingColumnTarget.Date);
             accountModel.ImportDateSource = dateColumn?.Source;
             accountModel.ImportDateIgnorePattern = dateColumn?.IgnorePattern;
-            var nameColumn = account.ImportMapping.Columns?.FirstOrDefault(
+            var nameColumn = account.ImportMapping.Columns?.Find(
                 x => x.Target == AccountDefinitionImportMappingColumnTarget.Name);
             accountModel.ImportNameSource = nameColumn?.Source;
             accountModel.ImportNameIgnorePattern = nameColumn?.IgnorePattern;
-            var textColumn = account.ImportMapping.Columns?.FirstOrDefault(
+            var textColumn = account.ImportMapping.Columns?.Find(
                 x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
             accountModel.ImportTextSource = textColumn?.Source;
             accountModel.ImportTextIgnorePattern = textColumn?.IgnorePattern;
-            var valueColumn = account.ImportMapping.Columns?.FirstOrDefault(
+            var valueColumn = account.ImportMapping.Columns?.Find(
                 x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
             accountModel.ImportValueSource = valueColumn?.Source;
             accountModel.ImportValueIgnorePattern = valueColumn?.IgnorePattern;
@@ -124,7 +123,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
                     {
                         Expression = x.Expression,
                         AccountId = x.AccountID,
-                        Value = x.ValueSpecified ? x.Value.ToViewModel() : (double?)null
+                        Value = x.ValueSpecified ? x.Value.ToViewModel() : null
                     }));
 
             return accountModel;
@@ -156,7 +155,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
     public void ShowNewAccountDialog()
     {
         // setup new view model for the new account
-        var accountGroup = this.projectData.Storage.Accounts.First();
+        var accountGroup = this.projectData.Storage.Accounts[0];
         var accountVm = new AccountViewModel
         {
             DisplayName = Resources.Header_CreateAccount,
@@ -293,8 +292,8 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         // save required items
         accountDefinition.ImportMapping = new AccountDefinitionImportMapping
         {
-            Columns = new List<AccountDefinitionImportMappingColumn>
-            {
+            Columns =
+            [
                 new AccountDefinitionImportMappingColumn
                 {
                     Target = AccountDefinitionImportMappingColumnTarget.Date,
@@ -307,7 +306,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
                     Source = viewModel.ImportValueSource,
                     IgnorePattern = viewModel.ImportValueIgnorePattern
                 }
-            }
+            ]
         };
 
         // save optional items

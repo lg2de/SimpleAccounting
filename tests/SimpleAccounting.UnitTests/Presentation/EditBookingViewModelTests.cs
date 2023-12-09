@@ -5,8 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Caliburn.Micro;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -19,8 +17,8 @@ using Xunit;
 
 public class EditBookingViewModelTests
 {
-    private static readonly DateTime YearBegin = new DateTime(DateTime.Now.Year, 1, 1);
-    private static readonly DateTime YearEnd = new DateTime(DateTime.Now.Year, 12, 31);
+    private static readonly DateTime YearBegin = new(DateTime.Now.Year, 1, 1);
+    private static readonly DateTime YearEnd = new(DateTime.Now.Year, 12, 31);
 
     [Fact]
     public void Ctor_DateBeforeStart_DateLimited()
@@ -540,7 +538,7 @@ public class EditBookingViewModelTests
         sut.Accounts.Add(new AccountDefinition { ID = 3 });
         sut.BindingTemplates.Add(new BookingTemplate { Credit = 3 });
 
-        sut.SelectedTemplate = sut.BindingTemplates.Last();
+        sut.SelectedTemplate = sut.BindingTemplates[^1];
 
         using var _ = new AssertionScope();
         sut.DebitAccount.Should().Be(2);
@@ -566,7 +564,7 @@ public class EditBookingViewModelTests
         sut.Accounts.Add(new AccountDefinition { ID = 3 });
         sut.BindingTemplates.Add(new BookingTemplate { Debit = 3 });
 
-        sut.SelectedTemplate = sut.BindingTemplates.Last();
+        sut.SelectedTemplate = sut.BindingTemplates[^1];
 
         using var _ = new AssertionScope();
         sut.DebitAccount.Should().Be(3);
@@ -596,7 +594,7 @@ public class EditBookingViewModelTests
         sut.Accounts.Add(new AccountDefinition { ID = 3 });
         sut.BindingTemplates.Add(new BookingTemplate { Value = 123 });
 
-        sut.SelectedTemplate = sut.BindingTemplates.Last();
+        sut.SelectedTemplate = sut.BindingTemplates[^1];
 
         using var _ = new AssertionScope();
         sut.DebitAccount.Should().Be(2);
@@ -632,15 +630,12 @@ public class EditBookingViewModelTests
             {
                 Date = 2020_0620,
                 ID = 42,
-                Credit = new List<BookingValue>
-                {
+                Credit =
+                [
                     new BookingValue { Account = 100, Text = "Credit1", Value = 1000 },
                     new BookingValue { Account = 200, Text = "Credit2", Value = 2000 }
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 300, Text = "Debit", Value = 3000 }
-                }
+                ],
+                Debit = [new BookingValue { Account = 300, Text = "Debit", Value = 3000 }]
             });
     }
 
@@ -669,14 +664,8 @@ public class EditBookingViewModelTests
             {
                 Date = 2020_0620,
                 ID = 42,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 100, Text = "Overall", Value = 1000 }
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 300, Text = "Overall", Value = 1000 }
-                }
+                Credit = [new BookingValue { Account = 100, Text = "Overall", Value = 1000 }],
+                Debit = [new BookingValue { Account = 300, Text = "Overall", Value = 1000 }]
             });
     }
 
@@ -707,15 +696,12 @@ public class EditBookingViewModelTests
             {
                 Date = 2020_0620,
                 ID = 42,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 300, Text = "Credit", Value = 3000 }
-                },
-                Debit = new List<BookingValue>
-                {
+                Credit = [new BookingValue { Account = 300, Text = "Credit", Value = 3000 }],
+                Debit =
+                [
                     new BookingValue { Account = 100, Text = "Debit1", Value = 1000 },
                     new BookingValue { Account = 200, Text = "Debit2", Value = 2000 }
-                }
+                ]
             });
     }
 
@@ -744,14 +730,8 @@ public class EditBookingViewModelTests
             {
                 Date = 2020_0620,
                 ID = 42,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 300, Text = "Overall", Value = 1000 }
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 100, Text = "Overall", Value = 1000 }
-                }
+                Credit = [new BookingValue { Account = 300, Text = "Overall", Value = 1000 }],
+                Debit = [new BookingValue { Account = 100, Text = "Overall", Value = 1000 }]
             });
     }
 

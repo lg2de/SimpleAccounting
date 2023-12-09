@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.IntegrationTests.Presentation;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -263,13 +262,13 @@ public class ImportBookingsViewModelTests
     {
         var project = new AccountingData
         {
-            Accounts = new List<AccountingDataAccountGroup>
-            {
+            Accounts =
+            [
                 new AccountingDataAccountGroup
                 {
                     Name = "Default",
-                    Account = new List<AccountDefinition>
-                    {
+                    Account =
+                    [
                         new AccountDefinition
                         {
                             ID = 100,
@@ -277,8 +276,8 @@ public class ImportBookingsViewModelTests
                             Type = AccountDefinitionType.Asset,
                             ImportMapping = new AccountDefinitionImportMapping
                             {
-                                Columns = new List<AccountDefinitionImportMappingColumn>
-                                {
+                                Columns =
+                                [
                                     new AccountDefinitionImportMappingColumn
                                     {
                                         Source = "Date",
@@ -307,37 +306,34 @@ public class ImportBookingsViewModelTests
                                             AccountDefinitionImportMappingColumnTarget
                                                 .Value
                                     }
-                                }
+                                ]
                             }
                         }
-                    }
+                    ]
                 }
-            },
-            Journal = new List<AccountingDataJournal>
-            {
+            ],
+            Journal =
+            [
                 new AccountingDataJournal
                 {
                     Year = "2000",
                     DateStart = 2000_0101,
                     DateEnd = 2000_1231,
-                    Booking = new List<AccountingDataJournalBooking>()
+                    Booking = []
                 }
-            }
+            ]
         };
-        var dataJournal = project.Journal.First();
+        var dataJournal = project.Journal[0];
         dataJournal.Booking.Add(
             new AccountingDataJournalBooking
             {
                 ID = 1,
                 Date = 2000_0115,
-                Credit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 100, Text = "Shopping Mall - Shoes", Value = 5000 }
-                },
-                Debit = new List<BookingValue>
-                {
-                    new BookingValue { Account = 600, Text = "Shopping Mall - Shoes", Value = 5000 },
-                }
+                Credit = [new BookingValue { Account = 100, Text = "Shopping Mall - Shoes", Value = 5000 }],
+                Debit =
+                [
+                    new BookingValue { Account = 600, Text = "Shopping Mall - Shoes", Value = 5000 }
+                ]
             });
         return project;
     }

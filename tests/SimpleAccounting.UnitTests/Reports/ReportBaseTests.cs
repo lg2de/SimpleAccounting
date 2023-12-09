@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
 using System;
-using System.Linq;
 using System.Xml;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
@@ -65,7 +64,7 @@ public class ReportBaseTests
         var projectData = Samples.SampleProjectData;
         projectData.Storage.Setup.Name = "TheName";
         projectData.Storage.Setup.Location = "TheLocation";
-        projectData.SelectYear(projectData.Storage.Journal.First().Year);
+        projectData.SelectYear(projectData.Storage.Journal[0].Year);
         var sut = new TestReport(printer, projectData);
 
         sut.PreparePrintDocument("TheTitle", new DateTime(2021, 5, 5));
@@ -88,7 +87,7 @@ public class ReportBaseTests
 
         sut.ShowPreview("DocumentName");
 
-        var year = Samples.SampleProject.Journal.Last().Year;
+        var year = Samples.SampleProject.Journal[^1].Year;
         printer.Received(1).PrintDocument($"2020-02-29 DocumentName {year}");
     }
 }

@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
-using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
@@ -23,7 +22,7 @@ public class TotalJournalReportTests
 
         sut.CreateReport("dummy");
 
-        var year = Samples.SampleProject.Journal.Last().Year;
+        var year = Samples.SampleProject.Journal[^1].Year;
         var expected = $@"
 <data>
   <tr topLine=""True"">

@@ -25,15 +25,15 @@ public class ImportFileLoaderTests
         var project = Samples.SampleProject;
         var accounts = project.AllAccounts.ToList();
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
-        bankAccount.ImportMapping.Patterns = new List<AccountDefinitionImportMappingPattern>
-        {
+        bankAccount.ImportMapping.Patterns =
+        [
             new AccountDefinitionImportMappingPattern
             {
                 // correct expression, but wrong value 
                 Expression = "Text1", AccountID = Samples.Carryforward, ValueSpecified = true, Value = 999
             },
             new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = Samples.Shoes }
-        };
+        ];
         bankAccount.ImportMapping.Columns.Single(x => x.Source == "Text").IgnorePattern = "ignore.*this";
         var sut = new ImportFileLoader("dummy", new CultureInfo("en-us"), accounts, bankAccount.ImportMapping);
 

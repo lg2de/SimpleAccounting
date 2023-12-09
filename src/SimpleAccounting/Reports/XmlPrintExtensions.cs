@@ -13,7 +13,7 @@ using lg2de.SimpleAccounting.Properties;
 /// </summary>
 internal static class XmlPrintExtensions
 {
-    private static readonly Regex ReferenceTextExpression = new Regex("@(?<ReferenceText>[a-zA-Z0-9_]+)@", RegexOptions.Compiled);
+    private static readonly Regex ReferenceTextExpression = new("@(?<ReferenceText>[a-zA-Z0-9_]+)@", RegexOptions.Compiled);
 
     public static string Translate(this string input)
     {

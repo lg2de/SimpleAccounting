@@ -78,8 +78,7 @@ internal class AccountViewModel : Screen
 
     public IList<AccountDefinition> ImportRemoteAccounts { get; set; } = new List<AccountDefinition>();
 
-    public ObservableCollection<ImportPatternViewModel> ImportPatterns { get; set; } =
-        new ObservableCollection<ImportPatternViewModel>();
+    public ObservableCollection<ImportPatternViewModel> ImportPatterns { get; set; } = [];
 
     public ICommand SaveCommand => new RelayCommand(
         _ => this.TryClose(true),

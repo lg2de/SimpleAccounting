@@ -89,8 +89,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     public bool IsFrenchCulture => this.projectData.Settings.Culture == "fr";
     public bool IsSystemCulture => this.projectData.Settings.Culture == string.Empty;
 
-    public ObservableCollection<MenuItemViewModel> RecentProjects { get; }
-        = new ObservableCollection<MenuItemViewModel>();
+    public ObservableCollection<MenuItemViewModel> RecentProjects { get; } = [];
 
     public ICommand AddBookingsCommand => new RelayCommand(
         _ => this.projectData.ShowAddBookingDialog(this.projectData.ShowInactiveAccounts),
@@ -132,8 +131,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
         _ => this.OnAnnualBalanceReport(),
         _ => this.projectData.CurrentYear.Booking.Any());
 
-    public ObservableCollection<MenuItemViewModel> BookingYears { get; }
-        = new ObservableCollection<MenuItemViewModel>();
+    public ObservableCollection<MenuItemViewModel> BookingYears { get; } = [];
 
     public ICommand HelpAboutCommand => new RelayCommand(
         _ => this.processApi.ShellExecute(Defines.ProjectUrl));
@@ -247,7 +245,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
 
         // refresh menu and select the new year
         this.UpdateBookingYears();
-        this.BookingYears.Last().Command.Execute(null);
+        this.BookingYears[^1].Command.Execute(null);
     }
 
     private void OnTotalJournalReport()

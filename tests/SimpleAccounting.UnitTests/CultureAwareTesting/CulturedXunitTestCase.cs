@@ -6,8 +6,8 @@
 namespace Xunit;
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,8 +19,8 @@ internal class CulturedXunitTestCase : XunitTestCase
     string culture = "<unset>";
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(
-        "Called by the de-serializer; should only be called by deriving classes for de-serialization purposes")]
+    [Obsolete("Called by the de-serializer; should only be called by deriving classes for de-serialization purposes")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public CulturedXunitTestCase() { }
 
     public CulturedXunitTestCase(
@@ -41,7 +41,7 @@ internal class CulturedXunitTestCase : XunitTestCase
     {
         this.culture = culture;
 
-        this.Traits.Add("Culture", new List<string> { culture });
+        this.Traits.Add("Culture", [culture]);
 
         this.DisplayName += $"[{culture}]";
     }

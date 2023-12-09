@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using FluentAssertions;
@@ -97,7 +96,7 @@ public class EditBookingAccountControlTests
         var sut = new EditBookingAccountControl(false)
         {
             AllowSplitting = true,
-            SplitEntries = new ObservableCollection<SplitBookingViewModel>()
+            SplitEntries = []
         };
         using var monitor = sut.Monitor();
 
@@ -124,7 +123,7 @@ public class EditBookingAccountControlTests
         var sut = new EditBookingAccountControl(false)
         {
             AllowSplitting = true,
-            SplitEntries = new ObservableCollection<SplitBookingViewModel> { new SplitBookingViewModel() }
+            SplitEntries = [new SplitBookingViewModel()]
         };
 
         sut.AddSplitEntryCommand.Execute(sut.SplitEntries.Single());
@@ -146,7 +145,7 @@ public class EditBookingAccountControlTests
         var sut = new EditBookingAccountControl(false)
         {
             AllowSplitting = true,
-            SplitEntries = new ObservableCollection<SplitBookingViewModel> { new SplitBookingViewModel() }
+            SplitEntries = [new SplitBookingViewModel()]
         };
         using var monitor = sut.Monitor();
 

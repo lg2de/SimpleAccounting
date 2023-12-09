@@ -23,7 +23,7 @@ internal sealed class ImportFileLoader : IDisposable
     private readonly CultureInfo cultureInfo;
     private readonly string fileName;
     private readonly AccountDefinitionImportMapping importMapping;
-    private readonly Regex duplicateSpaceExpression = new Regex(@"\s+", RegexOptions.Compiled);
+    private readonly Regex duplicateSpaceExpression = new(@"\s+", RegexOptions.Compiled);
 
     private StreamReader? streamReader;
 
@@ -60,18 +60,18 @@ internal sealed class ImportFileLoader : IDisposable
     {
         var dateField =
             this.importMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source
             ?? "date";
         var nameField =
             this.importMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source
             ?? "name";
         var textField =
             this.importMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
         var valueField =
             this.importMapping.Columns
-                .FirstOrDefault(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
             ?? "value";
 
         using var csv = new CsvReader(reader, configuration);

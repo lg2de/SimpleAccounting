@@ -23,8 +23,7 @@ internal class FullJournalViewModel : Screen, IFullJournalViewModel
         this.projectData = projectData;
     }
 
-    public ObservableCollection<FullJournalItemViewModel> Items { get; }
-        = new ObservableCollection<FullJournalItemViewModel>();
+    public ObservableCollection<FullJournalItemViewModel> Items { get; } = [];
 
     public FullJournalItemViewModel? SelectedItem
     {

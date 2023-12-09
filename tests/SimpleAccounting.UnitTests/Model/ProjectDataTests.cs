@@ -6,9 +6,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Model;
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
@@ -32,7 +30,7 @@ public class ProjectDataTests
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
-        var settings = new Settings { SecuredDrives = new StringCollection { "K:\\" } };
+        var settings = new Settings { SecuredDrives = ["K:\\"] };
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
         dialogs.ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
@@ -169,7 +167,7 @@ public class ProjectDataTests
         var settings = new Settings();
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
         sut.Load(Samples.SampleProject);
-        sut.Storage.Accounts.Last().Account.Add(
+        sut.Storage.Accounts[^1].Account.Add(
             new AccountDefinition { ID = 99999, Name = "C2", Type = AccountDefinitionType.Carryforward });
         sut.Storage.Setup.Behavior.LastCarryForward = 99999;
         sut.Storage.Setup.Behavior.LastCarryForwardSpecified = true;
