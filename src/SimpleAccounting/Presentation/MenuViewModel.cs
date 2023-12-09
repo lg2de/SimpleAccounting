@@ -59,7 +59,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
         _ => this.OnOpenProject());
 
     public ICommand SaveProjectCommand => new RelayCommand(
-        _ => this.projectData.SaveProject(),
+        _ => this.OnSaveProject(),
         _ => this.projectData.IsModified);
 
     public ICommand ProjectOptionsCommand => new RelayCommand(
@@ -148,6 +148,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
             return;
         }
 
+        this.RecentProjects.Clear();
         foreach (var project in this.projectData.Settings.RecentProjects.Cast<string>())
         {
             var command = new AsyncCommand(this.busy, () => this.OnLoadRecentProjectAsync(project));
@@ -167,20 +168,14 @@ internal class MenuViewModel : Screen, IMenuViewModel
     private async Task OnLoadRecentProjectAsync(string project)
     {
         var loadResult = await this.projectData.LoadFromFileAsync(project);
-        if (loadResult != OperationResult.Failed)
+        if (loadResult == OperationResult.Failed)
         {
-            return;
+            // failed to load, remove from menu
+            // keep in menu if aborted (e.g. SecureDrive not available)
+            this.projectData.Settings.RecentProjects.Remove(project);
         }
 
-        // failed to load, remove from menu
-        // keep in menu if aborted (e.g. SecureDrive not available)
-        var item = this.RecentProjects.FirstOrDefault(x => x.Header == project);
-        if (item != null)
-        {
-            this.RecentProjects.Remove(item);
-        }
-
-        this.projectData.Settings.RecentProjects.Remove(project);
+        this.BuildRecentProjectsMenu();
     }
 
     private void OnOpenProject()
@@ -197,10 +192,20 @@ internal class MenuViewModel : Screen, IMenuViewModel
             async () =>
             {
                 await this.projectData.LoadFromFileAsync(fileName);
-                await Execute.OnUIThreadAsync(() => this.busy.IsBusy = false);
+                await Execute.OnUIThreadAsync(() =>
+                {
+                    this.busy.IsBusy = false;
+                    this.BuildRecentProjectsMenu();
+                });
             });
     }
 
+    private void OnSaveProject()
+    {
+        this.projectData.SaveProject();
+        this.BuildRecentProjectsMenu();
+    }
+    
     private void UpdateBookingYears()
     {
         this.BookingYears.Clear();

@@ -82,6 +82,18 @@ public class MenuViewModelTests
     }
 
     [Fact]
+    public void RecentProjects_SaveNewFile_AddedToList()
+    {
+        var sut = CreateSut(out ProjectData projectData);
+        sut.NewProjectCommand.Execute(null);
+        projectData.FileName = "this-is-the-file-name";
+
+        sut.SaveProjectCommand.Execute(null);
+
+        sut.RecentProjects.Should().BeEquivalentTo(new[] { new { Header = "this-is-the-file-name" } });
+    }
+
+    [Fact]
     public void NewProjectCommand_ModifiedProjectNoDiscard_ProjectRemains()
     {
         MenuViewModel sut = CreateSut(out ProjectData projectData);
@@ -376,7 +388,8 @@ public class MenuViewModelTests
         return sut;
     }
 
-    private static MenuViewModel CreateSut(out ProjectData projectData, out IDialogs dialogs, out IReportFactory reportFactory)
+    private static MenuViewModel CreateSut(
+        out ProjectData projectData, out IDialogs dialogs, out IReportFactory reportFactory)
     {
         var windowManager = Substitute.For<IWindowManager>();
         var fileSystem = Substitute.For<IFileSystem>();

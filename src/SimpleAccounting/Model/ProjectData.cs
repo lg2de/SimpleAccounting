@@ -167,6 +167,8 @@ internal class ProjectData : IProjectData
         {
             this.fileSystem.FileDelete(this.AutoSaveFileName);
         }
+
+        this.Settings.SetRecentProject(this.FileName);
     }
 
     public async Task AutoSaveAsync(CancellationToken cancellationToken)

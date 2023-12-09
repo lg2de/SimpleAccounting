@@ -279,7 +279,7 @@ public partial class ShellViewModelTests
         ((IActivate)sut).Activate();
         sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("K:\\file1", "file2");
 
-        foreach (var viewModel in sut.Menu.RecentProjects)
+        foreach (var viewModel in sut.Menu.RecentProjects.ToList())
         {
             await viewModel.Command.ExecuteAsync(null);
         }
