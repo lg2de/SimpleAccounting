@@ -2,22 +2,21 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Presentation
-{
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
+namespace lg2de.SimpleAccounting.Presentation;
 
-    /// <summary>
-    ///     Defines abstraction for <see cref="FullJournalViewModel"/>.
-    /// </summary>
-    internal interface IFullJournalViewModel : INotifyPropertyChanged
-    {
-        ObservableCollection<FullJournalItemViewModel> Items { get; }
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+
+/// <summary>
+///     Defines abstraction for <see cref="FullJournalViewModel"/>.
+/// </summary>
+internal interface IFullJournalViewModel : INotifyPropertyChanged
+{
+    ObservableCollection<FullJournalItemViewModel> Items { get; }
         
-        FullJournalItemViewModel? SelectedItem { get; set; }
+    FullJournalItemViewModel? SelectedItem { get; set; }
         
-        void Rebuild();
+    void Rebuild();
         
-        void Select(ulong bookingId);
-    }
+    void Select(ulong bookingId);
 }

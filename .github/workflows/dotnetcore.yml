@@ -7,25 +7,26 @@ on:
     tags:
       - '*'
   pull_request:
-  pull_request_target:
 
 jobs:
   build:
     name: build
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |
         git fetch --prune --unshallow
 
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 11
+        java-version: 17
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 3.1.103
+        dotnet-version: 8.0.x
+    - name: Setup dotnet-cover
+      run: dotnet tool install --global dotnet-coverage
     - name: Setup SonarScanner
       run: choco install "sonarscanner-msbuild-net46" -y
     - name: Patch version info
@@ -35,7 +36,10 @@ jobs:
         GITHUB_PR_REF: ${{ github.head_ref }}
 
     - name: Restore packages
-      run: dotnet restore --configfile nuget.config
+      run: dotnet restore --configfile nuget.config --verbosity normal
+    - name: Publish Release
+      run: dotnet publish --configuration Release -r win-x64 --self-contained
+      working-directory: src\SimpleAccounting
     - name: Prepare SonarScanner
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -51,23 +55,15 @@ jobs:
           $branchCommand="/d:sonar.branch.name=$branch"
         }
         Write-Host CMDs=$branchCommand
-        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN /d:sonar.cs.opencover.reportsPaths=CoverOutput\coverage.xml
+        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
       shell: pwsh
-    - name: Build Debug
-      run: dotnet build --configuration Debug --no-restore
-    - name: Test with OpenCover
-      run: |
-        .\CreateCoverReport.ps1
-        # Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-        # bash codecov.sh -f "CoverOutput/coverage.xml" -t ${{ secrets.CODECOV_TOKEN }}
-      shell: pwsh
-    - name: Publish Release
-      run: dotnet publish --configuration Release --no-restore
+    - name: Build Debug and Test
+      run: dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
     - name: Complete SonarScanner
       run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
-    - name: Upload artifacts
+    - name: Upload product artifact
       uses: actions/upload-artifact@v1
       with:
         name: SimpleAccounting
-        path: src\SimpleAccounting\bin\Release\netcoreapp3.1\publish
+        path: src\SimpleAccounting\bin\Release\net8.0-windows\win-x64\publish

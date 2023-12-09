@@ -2,29 +2,28 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.Abstractions
+namespace lg2de.SimpleAccounting.Abstractions;
+
+using System.Diagnostics;
+
+/// <summary>
+///     Abstracts the API to handled .NET processes.
+/// </summary>
+internal interface IProcess
 {
-    using System.Diagnostics;
+    Process? GetProcessByName(string processName);
 
-    /// <summary>
-    ///     Abstracts the API to handled .NET processes.
-    /// </summary>
-    internal interface IProcess
-    {
-        Process? GetProcessByName(string processName);
+    Process GetCurrentProcess();
 
-        Process GetCurrentProcess();
+    int GetCurrentProcessId();
 
-        int GetCurrentProcessId();
+    Process? Start(ProcessStartInfo info);
 
-        Process? Start(ProcessStartInfo info);
+    bool IsProcessWindowVisible(Process process);
 
-        bool IsProcessWindowVisible(Process process);
+    void BringProcessToFront(Process process);
 
-        void BringProcessToFront(Process process);
+    void MinimizeProcess(Process process);
 
-        void MinimizeProcess(Process process);
-
-        void ShellExecute(string fileName);
-    }
+    void ShellExecute(string fileName);
 }

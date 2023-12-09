@@ -3,70 +3,69 @@
 
 #nullable enable
 // ReSharper disable once CheckNamespace
-namespace Xunit
+namespace Xunit;
+
+using System;
+using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit.Abstractions;
+using Xunit.Sdk;
+
+internal class CulturedXunitTheoryTestCaseRunner : XunitTheoryTestCaseRunner
 {
-    using System;
-    using System.Globalization;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Xunit.Abstractions;
-    using Xunit.Sdk;
+    readonly string culture;
+    CultureInfo? originalCulture;
+    CultureInfo? originalUICulture;
 
-    internal class CulturedXunitTheoryTestCaseRunner : XunitTheoryTestCaseRunner
+    public CulturedXunitTheoryTestCaseRunner(
+        CulturedXunitTheoryTestCase culturedXunitTheoryTestCase,
+        string displayName,
+        string? skipReason,
+        object?[] constructorArguments,
+        IMessageSink diagnosticMessageSink,
+        IMessageBus messageBus,
+        ExceptionAggregator aggregator,
+        CancellationTokenSource cancellationTokenSource)
+        : base(
+            culturedXunitTheoryTestCase, displayName, skipReason, constructorArguments, diagnosticMessageSink,
+            messageBus, aggregator, cancellationTokenSource)
     {
-        readonly string culture;
-        CultureInfo? originalCulture;
-        CultureInfo? originalUICulture;
+        this.culture = culturedXunitTheoryTestCase.Culture;
+    }
 
-        public CulturedXunitTheoryTestCaseRunner(
-            CulturedXunitTheoryTestCase culturedXunitTheoryTestCase,
-            string displayName,
-            string? skipReason,
-            object?[] constructorArguments,
-            IMessageSink diagnosticMessageSink,
-            IMessageBus messageBus,
-            ExceptionAggregator aggregator,
-            CancellationTokenSource cancellationTokenSource)
-            : base(
-                culturedXunitTheoryTestCase, displayName, skipReason, constructorArguments, diagnosticMessageSink,
-                messageBus, aggregator, cancellationTokenSource)
+    protected override Task AfterTestCaseStartingAsync()
+    {
+        try
         {
-            this.culture = culturedXunitTheoryTestCase.Culture;
+            this.originalCulture = CultureInfo.CurrentCulture;
+            this.originalUICulture = CultureInfo.CurrentUICulture;
+
+            var cultureInfo = new CultureInfo(this.culture);
+            CultureInfo.CurrentCulture = cultureInfo;
+            CultureInfo.CurrentUICulture = cultureInfo;
+        }
+        catch (Exception ex)
+        {
+            this.Aggregator.Add(ex);
+            return Task.FromResult(0);
         }
 
-        protected override Task AfterTestCaseStartingAsync()
+        return base.AfterTestCaseStartingAsync();
+    }
+
+    protected override Task BeforeTestCaseFinishedAsync()
+    {
+        if (this.originalUICulture != null)
         {
-            try
-            {
-                this.originalCulture = CultureInfo.CurrentCulture;
-                this.originalUICulture = CultureInfo.CurrentUICulture;
-
-                var cultureInfo = new CultureInfo(this.culture);
-                CultureInfo.CurrentCulture = cultureInfo;
-                CultureInfo.CurrentUICulture = cultureInfo;
-            }
-            catch (Exception ex)
-            {
-                this.Aggregator.Add(ex);
-                return Task.FromResult(0);
-            }
-
-            return base.AfterTestCaseStartingAsync();
+            CultureInfo.CurrentUICulture = this.originalUICulture;
         }
 
-        protected override Task BeforeTestCaseFinishedAsync()
+        if (this.originalCulture != null)
         {
-            if (this.originalUICulture != null)
-            {
-                CultureInfo.CurrentUICulture = this.originalUICulture;
-            }
-
-            if (this.originalCulture != null)
-            {
-                CultureInfo.CurrentCulture = this.originalCulture;
-            }
-
-            return base.BeforeTestCaseFinishedAsync();
+            CultureInfo.CurrentCulture = this.originalCulture;
         }
+
+        return base.BeforeTestCaseFinishedAsync();
     }
 }

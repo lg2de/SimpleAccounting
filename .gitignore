@@ -340,5 +340,4 @@ ASALocalRun/
 healthchecksdb
 
 # code coverage files
-/CoverReport
-/CoverOutput
+coverage.xml

@@ -1,16 +1,16 @@
 ﻿
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- ProjectGuid is required for SonarQube -->
     <ProjectGuid>{976604F7-86B8-407E-A9B2-592E376D7006}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>lg2de.SimpleAccounting</RootNamespace>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Authors>Lukas Grützmacher</Authors>
-    <Copyright>Copyright © 2007-2021</Copyright>
+    <Copyright>Copyright © 2007-2023</Copyright>
     <InformationalVersion>DEVEL</InformationalVersion>
     <ApplicationIcon>App.ico</ApplicationIcon>
   </PropertyGroup>

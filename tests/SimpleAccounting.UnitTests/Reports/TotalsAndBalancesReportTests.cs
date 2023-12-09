@@ -2,30 +2,30 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.UnitTests.Reports
+namespace lg2de.SimpleAccounting.UnitTests.Reports;
+
+using System.Linq;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using FluentAssertions;
+using lg2de.SimpleAccounting.Reports;
+using lg2de.SimpleAccounting.UnitTests.Presentation;
+using Xunit;
+
+public class TotalsAndBalancesReportTests
 {
-    using System.Linq;
-    using System.Xml.Linq;
-    using System.Xml.XPath;
-    using FluentAssertions;
-    using lg2de.SimpleAccounting.Reports;
-    using lg2de.SimpleAccounting.UnitTests.Presentation;
-    using Xunit;
-
-    public class TotalsAndBalancesReportTests
+    [CulturedFact("en")]
+    public void CreateReport_SampleData_Converted()
     {
-        [CulturedFact("en")]
-        public void CreateReport_SampleData_Converted()
-        {
-            var projectData = Samples.SampleProjectData;
-            projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
-            var sut = new TotalsAndBalancesReport(
-                new XmlPrinter(), projectData, projectData.Storage.Accounts);
+        var projectData = Samples.SampleProjectData;
+        projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
+        var sut = new TotalsAndBalancesReport(
+            new XmlPrinter(), projectData, projectData.Storage.Accounts);
 
-            sut.CreateReport("dummy");
+        sut.CreateReport("dummy");
 
-            var year = Samples.SampleProject.Journal.Last().Year;
-            var expected = $@"
+        var year = Samples.SampleProject.Journal.Last().Year;
+        var expected = $@"
 <data>
   <tr topLine=""True"">
     <td>100</td>
@@ -127,22 +127,21 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports
     <td>2800.00</td>
   </tr>
 </data>";
-            sut.DocumentForTests.XPathSelectElement("//table/data")
-                .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
-        }
+        sut.DocumentForTests.XPathSelectElement("//table/data")
+            .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
+    }
 
-        [Fact]
-        public void CreateReport_SampleWithSignature_SignatureLinesCreated()
-        {
-            var projectData = Samples.SampleProjectData;
-            var sut = new TotalsAndBalancesReport(
-                new XmlPrinter(), projectData, projectData.Storage.Accounts);
-            sut.Signatures.Add("The Name");
+    [Fact]
+    public void CreateReport_SampleWithSignature_SignatureLinesCreated()
+    {
+        var projectData = Samples.SampleProjectData;
+        var sut = new TotalsAndBalancesReport(
+            new XmlPrinter(), projectData, projectData.Storage.Accounts);
+        sut.Signatures.Add("The Name");
 
-            sut.CreateReport("dummy");
+        sut.CreateReport("dummy");
 
-            sut.DocumentForTests.XPathSelectElements("//text[@tag='signature']")
-                .Select(x => x.Value).Should().Equal("The Name");
-        }
+        sut.DocumentForTests.XPathSelectElements("//text[@tag='signature']")
+            .Select(x => x.Value).Should().Equal("The Name");
     }
 }

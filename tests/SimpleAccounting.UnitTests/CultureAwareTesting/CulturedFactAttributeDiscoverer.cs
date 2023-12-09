@@ -3,44 +3,43 @@
 
 // ReSharper disable once CheckNamespace
 
-namespace Xunit
+namespace Xunit;
+
+using System.Collections.Generic;
+using System.Linq;
+using Xunit.Abstractions;
+using Xunit.Sdk;
+
+internal class CulturedFactAttributeDiscoverer : IXunitTestCaseDiscoverer
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using Xunit.Abstractions;
-    using Xunit.Sdk;
+    readonly IMessageSink diagnosticMessageSink;
 
-    internal class CulturedFactAttributeDiscoverer : IXunitTestCaseDiscoverer
+    public CulturedFactAttributeDiscoverer(IMessageSink diagnosticMessageSink)
     {
-        readonly IMessageSink diagnosticMessageSink;
+        this.diagnosticMessageSink = diagnosticMessageSink;
+    }
 
-        public CulturedFactAttributeDiscoverer(IMessageSink diagnosticMessageSink)
+    public IEnumerable<IXunitTestCase> Discover(
+        ITestFrameworkDiscoveryOptions discoveryOptions,
+        ITestMethod testMethod,
+        IAttributeInfo factAttribute)
+    {
+        var ctorArgs = factAttribute.GetConstructorArguments().ToArray();
+        var cultures = Reflector.ConvertArguments(ctorArgs, new[] { typeof(string[]) }).Cast<string[]>().Single();
+
+        if (cultures == null || cultures.Length == 0)
         {
-            this.diagnosticMessageSink = diagnosticMessageSink;
+            cultures = new[] { "en-US", "fr-FR" };
         }
 
-        public IEnumerable<IXunitTestCase> Discover(
-            ITestFrameworkDiscoveryOptions discoveryOptions,
-            ITestMethod testMethod,
-            IAttributeInfo factAttribute)
-        {
-            var ctorArgs = factAttribute.GetConstructorArguments().ToArray();
-            var cultures = Reflector.ConvertArguments(ctorArgs, new[] { typeof(string[]) }).Cast<string[]>().Single();
+        var methodDisplay = discoveryOptions.MethodDisplayOrDefault();
+        var methodDisplayOptions = discoveryOptions.MethodDisplayOptionsOrDefault();
 
-            if (cultures == null || cultures.Length == 0)
-            {
-                cultures = new[] { "en-US", "fr-FR" };
-            }
-
-            var methodDisplay = discoveryOptions.MethodDisplayOrDefault();
-            var methodDisplayOptions = discoveryOptions.MethodDisplayOptionsOrDefault();
-
-            return
-                cultures
-                    .Select(
-                        culture => new CulturedXunitTestCase(
-                            diagnosticMessageSink, methodDisplay, methodDisplayOptions, testMethod, culture))
-                    .ToList();
-        }
+        return
+            cultures
+                .Select(
+                    culture => new CulturedXunitTestCase(
+                        diagnosticMessageSink, methodDisplay, methodDisplayOptions, testMethod, culture))
+                .ToList();
     }
 }

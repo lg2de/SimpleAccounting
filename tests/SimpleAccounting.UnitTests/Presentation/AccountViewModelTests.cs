@@ -2,169 +2,168 @@
 //     Copyright (c) Lukas Grützmacher. All rights reserved.
 // </copyright>
 
-namespace lg2de.SimpleAccounting.UnitTests.Presentation
+namespace lg2de.SimpleAccounting.UnitTests.Presentation;
+
+using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using FluentAssertions;
+using lg2de.SimpleAccounting.Model;
+using lg2de.SimpleAccounting.Presentation;
+using Xunit;
+
+public class AccountViewModelTests
 {
-    using System;
-    using System.Collections.ObjectModel;
-    using System.Diagnostics.CodeAnalysis;
-    using FluentAssertions;
-    using lg2de.SimpleAccounting.Model;
-    using lg2de.SimpleAccounting.Presentation;
-    using Xunit;
-
-    public class AccountViewModelTests
+    [CulturedFact("en")]
+    public void Types_DefaultCulture_NoFallbackValue()
     {
-        [CulturedFact("en")]
-        public void Types_DefaultCulture_NoFallbackValue()
+        AccountViewModel.ResetTypesLazy();
+        AccountViewModel.Types.Values.Should()
+            .NotContain(x => x.StartsWith("<", StringComparison.InvariantCulture));
+    }
+
+    [CulturedFact("de")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    public void TypeName_GermanCulture_CorrectlyInitialized()
+    {
+        AccountViewModel.ResetTypesLazy();
+        var sut = new AccountViewModel { Type = AccountDefinitionType.Credit };
+
+        sut.TypeName.Should().Be("Kreditor");
+    }
+
+    [Fact]
+    public void SaveCommand_MissingName_CannotExecute()
+    {
+        var sut = new AccountViewModel { Name = string.Empty };
+
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void SaveCommand_NoIdentifierCheck_CanExecute()
+    {
+        var sut = new AccountViewModel
         {
-            AccountViewModel.ResetTypesLazy();
-            AccountViewModel.Types.Values.Should()
-                .NotContain(x => x.StartsWith("<", StringComparison.InvariantCulture));
-        }
+            Name = "AccountName", IsValidIdentifierFunc = null, IsImportActive = false
+        };
 
-        [CulturedFact("de")]
-        [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        public void TypeName_GermanCulture_CorrectlyInitialized()
+        sut.SaveCommand.CanExecute(null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void SaveCommand_IdentifierCheckSucceed_CanExecute()
+    {
+        var sut = new AccountViewModel { Name = "AccountName", IsValidIdentifierFunc = id => true };
+
+        sut.SaveCommand.CanExecute(null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void SaveCommand_IdentifierCheckFailed_CannotExecute()
+    {
+        var sut = new AccountViewModel { Name = "AccountName", IsValidIdentifierFunc = id => false };
+
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void SaveCommand_ImportMappingWithoutDate_CannotExecute()
+    {
+        var sut = new AccountViewModel
         {
-            AccountViewModel.ResetTypesLazy();
-            var sut = new AccountViewModel { Type = AccountDefinitionType.Credit };
+            Name = "AccountName",
+            IsImportActive = true,
+            ImportDateSource = string.Empty,
+            ImportValueSource = "X2",
+            ImportNameSource = "X3",
+            ImportTextSource = "X4"
+        };
 
-            sut.TypeName.Should().Be("Kreditor");
-        }
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
 
-        [Fact]
-        public void SaveCommand_MissingName_CannotExecute()
+    [Fact]
+    public void SaveCommand_ImportMappingWithoutValue_CannotExecute()
+    {
+        var sut = new AccountViewModel
         {
-            var sut = new AccountViewModel { Name = string.Empty };
+            Name = "AccountName",
+            IsImportActive = true,
+            ImportDateSource = "X1",
+            ImportValueSource = string.Empty,
+            ImportNameSource = "X3",
+            ImportTextSource = "X4"
+        };
 
-            sut.SaveCommand.CanExecute(null).Should().BeFalse();
-        }
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
 
-        [Fact]
-        public void SaveCommand_NoIdentifierCheck_CanExecute()
+    [Fact]
+    public void SaveCommand_ImportMappingWithoutName_CanExecute()
+    {
+        var sut = new AccountViewModel
         {
-            var sut = new AccountViewModel
+            Name = "AccountName",
+            IsImportActive = true,
+            ImportDateSource = "X1",
+            ImportValueSource = "X2",
+            ImportNameSource = string.Empty,
+            ImportTextSource = "X4"
+        };
+
+        sut.SaveCommand.CanExecute(null).Should().BeTrue("it is optional");
+    }
+
+    [Fact]
+    public void SaveCommand_ImportMappingWithoutText_CanExecute()
+    {
+        var sut = new AccountViewModel
+        {
+            Name = "AccountName",
+            IsImportActive = true,
+            ImportDateSource = "X1",
+            ImportValueSource = "X2",
+            ImportNameSource = "X3",
+            ImportTextSource = string.Empty
+        };
+
+        sut.SaveCommand.CanExecute(null).Should().BeTrue("it is optional");
+    }
+
+    [Fact]
+    public void SaveCommand_ImportPatternMissingExpression_CanExecute()
+    {
+        var sut = new AccountViewModel
+        {
+            Name = "AccountName",
+            IsImportActive = true,
+            ImportDateSource = "X1",
+            ImportValueSource = "X2",
+            ImportPatterns = new ObservableCollection<ImportPatternViewModel>
             {
-                Name = "AccountName", IsValidIdentifierFunc = null, IsImportActive = false
-            };
+                new ImportPatternViewModel { Account = new AccountDefinition() }
+            }
+        };
 
-            sut.SaveCommand.CanExecute(null).Should().BeTrue();
-        }
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
 
-        [Fact]
-        public void SaveCommand_IdentifierCheckSucceed_CanExecute()
+    [Fact]
+    public void SaveCommand_ImportPatternMissingAccount_CanExecute()
+    {
+        var sut = new AccountViewModel
         {
-            var sut = new AccountViewModel { Name = "AccountName", IsValidIdentifierFunc = id => true };
-
-            sut.SaveCommand.CanExecute(null).Should().BeTrue();
-        }
-
-        [Fact]
-        public void SaveCommand_IdentifierCheckFailed_CannotExecute()
-        {
-            var sut = new AccountViewModel { Name = "AccountName", IsValidIdentifierFunc = id => false };
-
-            sut.SaveCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void SaveCommand_ImportMappingWithoutDate_CannotExecute()
-        {
-            var sut = new AccountViewModel
+            Name = "AccountName",
+            IsImportActive = true,
+            ImportDateSource = "X1",
+            ImportValueSource = "X2",
+            ImportPatterns = new ObservableCollection<ImportPatternViewModel>
             {
-                Name = "AccountName",
-                IsImportActive = true,
-                ImportDateSource = string.Empty,
-                ImportValueSource = "X2",
-                ImportNameSource = "X3",
-                ImportTextSource = "X4"
-            };
+                new ImportPatternViewModel { Expression = "RegEx", Account = null }
+            }
+        };
 
-            sut.SaveCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void SaveCommand_ImportMappingWithoutValue_CannotExecute()
-        {
-            var sut = new AccountViewModel
-            {
-                Name = "AccountName",
-                IsImportActive = true,
-                ImportDateSource = "X1",
-                ImportValueSource = string.Empty,
-                ImportNameSource = "X3",
-                ImportTextSource = "X4"
-            };
-
-            sut.SaveCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void SaveCommand_ImportMappingWithoutName_CanExecute()
-        {
-            var sut = new AccountViewModel
-            {
-                Name = "AccountName",
-                IsImportActive = true,
-                ImportDateSource = "X1",
-                ImportValueSource = "X2",
-                ImportNameSource = string.Empty,
-                ImportTextSource = "X4"
-            };
-
-            sut.SaveCommand.CanExecute(null).Should().BeTrue("it is optional");
-        }
-
-        [Fact]
-        public void SaveCommand_ImportMappingWithoutText_CanExecute()
-        {
-            var sut = new AccountViewModel
-            {
-                Name = "AccountName",
-                IsImportActive = true,
-                ImportDateSource = "X1",
-                ImportValueSource = "X2",
-                ImportNameSource = "X3",
-                ImportTextSource = string.Empty
-            };
-
-            sut.SaveCommand.CanExecute(null).Should().BeTrue("it is optional");
-        }
-
-        [Fact]
-        public void SaveCommand_ImportPatternMissingExpression_CanExecute()
-        {
-            var sut = new AccountViewModel
-            {
-                Name = "AccountName",
-                IsImportActive = true,
-                ImportDateSource = "X1",
-                ImportValueSource = "X2",
-                ImportPatterns = new ObservableCollection<ImportPatternViewModel>
-                {
-                    new ImportPatternViewModel { Account = new AccountDefinition() }
-                }
-            };
-
-            sut.SaveCommand.CanExecute(null).Should().BeFalse();
-        }
-
-        [Fact]
-        public void SaveCommand_ImportPatternMissingAccount_CanExecute()
-        {
-            var sut = new AccountViewModel
-            {
-                Name = "AccountName",
-                IsImportActive = true,
-                ImportDateSource = "X1",
-                ImportValueSource = "X2",
-                ImportPatterns = new ObservableCollection<ImportPatternViewModel>
-                {
-                    new ImportPatternViewModel { Expression = "RegEx", Account = null }
-                }
-            };
-
-            sut.SaveCommand.CanExecute(null).Should().BeFalse();
-        }
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
     }
 }
