@@ -8,11 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- license is MS.NET -->
-    <PackageReference Include="coverlet.collector" Version="6.0.1-preview.23.gc309dab13c">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <!-- license is apache 2.0 -->
     <PackageReference Include="FluentAssertions" Version="6.10.0" />
     <!-- license is MS.NET -->

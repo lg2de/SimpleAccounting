@@ -67,8 +67,3 @@ jobs:
       with:
         name: SimpleAccounting
         path: src\SimpleAccounting\bin\Release\net8.0-windows\publish
-    - name: Upload test artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: Coverage
-        path: '**\*.coverage'
