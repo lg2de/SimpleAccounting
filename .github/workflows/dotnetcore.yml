@@ -26,6 +26,8 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
+    - name: Setup dotnet-cover
+      run: dotnet tool install --global dotnet-coverage
     - name: Setup SonarScanner
       run: choco install "sonarscanner-msbuild-net46" -y
     - name: Patch version info
@@ -53,10 +55,10 @@ jobs:
           $branchCommand="/d:sonar.branch.name=$branch"
         }
         Write-Host CMDs=$branchCommand
-        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN
+        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
       shell: pwsh
     - name: Build Debug and Test
-      run: dotnet test --configuration Debug --no-restore --collect:"Code Coverage"
+      run: dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
     - name: Complete SonarScanner
       run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
