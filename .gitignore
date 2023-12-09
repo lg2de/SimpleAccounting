@@ -340,4 +340,4 @@ ASALocalRun/
 healthchecksdb
 
 # code coverage files
-coverage.opencover.xml
+coverage.xml
