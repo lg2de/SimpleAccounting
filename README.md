@@ -47,6 +47,9 @@ Some screenshots for first impression:
 The application is based on [.NET Core 3](https://dotnet.microsoft.com/download/dotnet-core/3.1).
 Please download and install the Runtime in version [3.1](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.16-windows-x64-installer) or above.
 
+Please note, the "development version" (current main branch) is already on .NET 8.
+New official release is pending.
+
 Download the `SimpleAccounting` package from the [release page](https://github.com/lg2de/SimpleAccounting/releases).
 Extract the ZIP archive into your preferred destination directory.
 
@@ -61,9 +64,9 @@ Medium and large changes should be discussed first. Please open a new issue or p
 
 ## TODOs
 
-I am German and have no experience with English names for the financial world.
-So I'm pretty sure that some of the words I use are confusing for native speakers.
-Maybe you want to help with the better naming?
+I am German and have no experience with English terms in the financial world.
+Therefore, I am pretty sure that some of the words I used are confusing for native speakers.
+Perhaps you would like to help with better naming?
 
 ## Roadmap
 
