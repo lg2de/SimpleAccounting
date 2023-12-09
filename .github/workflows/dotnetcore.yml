@@ -53,10 +53,10 @@ jobs:
           $branchCommand="/d:sonar.branch.name=$branch"
         }
         Write-Host CMDs=$branchCommand
-        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN /d:sonar.cs.opencover.reportsPaths="tests\**\coverage.cobertura.xml"
+        SonarScanner.MSBuild.exe begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.login=$env:SONAR_TOKEN
       shell: pwsh
     - name: Build Debug and Test
-      run: dotnet test --configuration Debug --no-restore --collect:"XPlat Code Coverage"
+      run: dotnet test --configuration Debug --no-restore --collect:"Code Coverage"
     - name: Complete SonarScanner
       run: SonarScanner.MSBuild.exe end /d:sonar.login=${{ secrets.SONAR_TOKEN }}
 
@@ -69,4 +69,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: Coverage
-        path: '**\coverage.cobertura.xml'
+        path: '**\*.coverage'
