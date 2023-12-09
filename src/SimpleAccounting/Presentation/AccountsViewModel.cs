@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Caliburn.Micro;
 using lg2de.SimpleAccounting.Extensions;
@@ -152,7 +153,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         }
     }
 
-    public void ShowNewAccountDialog()
+    public async Task ShowNewAccountDialogAsync()
     {
         // setup new view model for the new account
         var accountGroup = this.projectData.Storage.Accounts[0];
@@ -166,7 +167,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         this.UpdateImportCandidateAccounts(accountVm);
 
         // get user input
-        var result = this.windowManager.ShowDialog(accountVm);
+        var result = await this.windowManager.ShowDialogAsync(accountVm);
         if (result != true)
         {
             return;
@@ -175,10 +176,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         // update database
         var newAccount = new AccountDefinition
         {
-            ID = accountVm.Identifier,
-            Name = accountVm.Name,
-            Type = accountVm.Type,
-            Active = accountVm.IsActivated
+            ID = accountVm.Identifier, Name = accountVm.Name, Type = accountVm.Type, Active = accountVm.IsActivated
         };
         accountGroup.Account.Add(newAccount);
         accountGroup.Account = accountVm.Group.Account.OrderBy(x => x.ID).ToList();
@@ -191,17 +189,17 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         this.projectData.IsModified = true;
     }
 
-    public void OnEditAccount(object? commandParameter)
+    public Task OnEditAccountAsync(object? commandParameter)
     {
         if (commandParameter is not AccountViewModel account)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        this.ShowEditAccountDialog(account);
+        return this.ShowEditAccountDialogAsync(account);
     }
 
-    private void ShowEditAccountDialog(AccountViewModel selectedAccountViewModel)
+    private async Task ShowEditAccountDialogAsync(AccountViewModel selectedAccountViewModel)
     {
         // clone view model for easy rollback
         var clonedViewModel = selectedAccountViewModel.Clone();
@@ -212,7 +210,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         this.UpdateImportCandidateAccounts(clonedViewModel);
 
         // get user input
-        var result = this.windowManager.ShowDialog(clonedViewModel);
+        var result = await this.windowManager.ShowDialogAsync(clonedViewModel);
         if (result != true)
         {
             return;

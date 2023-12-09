@@ -44,12 +44,12 @@ internal class ShellViewModel : Screen, IDisposable
         this.version = this.GetType().GetInformationalVersion();
 
         // TODO SVM is too much responsible
-        this.ProjectData.DataLoaded += (sender, args) =>
+        this.ProjectData.DataLoaded += (_, _) =>
         {
             this.Accounts.OnDataLoaded();
             this.Menu.OnDataLoaded();
         };
-        this.ProjectData.YearChanged += (_, __) =>
+        this.ProjectData.YearChanged += (_, _) =>
         {
             this.UpdateDisplayName();
             this.FullJournal.Rebuild();
@@ -88,13 +88,14 @@ internal class ShellViewModel : Screen, IDisposable
 
     public IAccountsViewModel Accounts { get; }
 
-    public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryClose());
+    public ICommand CloseApplicationCommand => new RelayCommand(_ => this.TryCloseAsync());
 
     public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this.Busy, this.OnCheckForUpdateAsync);
 
-    public ICommand NewAccountCommand => new RelayCommand(_ => this.Accounts.ShowNewAccountDialog());
+    public ICommand NewAccountCommand => new RelayCommand(_ => this.Accounts.ShowNewAccountDialogAsync());
 
-    public ICommand EditAccountCommand => new RelayCommand(this.Accounts.OnEditAccount);
+    public ICommand EditAccountCommand =>
+        new RelayCommand(commandParameter => this.Accounts.OnEditAccountAsync(commandParameter));
 
     internal IProjectData ProjectData { get; }
 
@@ -106,34 +107,30 @@ internal class ShellViewModel : Screen, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public override void CanClose(Action<bool> callback)
+    public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = new())
     {
-        if (callback == null)
-        {
-            throw new ArgumentNullException(nameof(callback));
-        }
+        await base.CanCloseAsync(cancellationToken);
 
         if (!this.ProjectData.CanDiscardModifiedProject())
         {
-            callback(false);
-            return;
+            return false;
         }
 
         this.ProjectData.RemoveAutoSaveFile();
 
-        base.CanClose(callback);
+        return true;
     }
 
-    protected override void OnInitialize()
+    protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
     {
-        base.OnInitialize();
+        await base.OnInitializeAsync(cancellationToken);
 
         this.UpdateDisplayName();
     }
 
-    protected override void OnActivate()
+    protected override async Task OnActivateAsync(CancellationToken cancellationToken)
     {
-        base.OnActivate();
+        await base.OnActivateAsync(cancellationToken);
 
         var dispatcher = Dispatcher.CurrentDispatcher;
         this.cancellationTokenSource = new CancellationTokenSource();
@@ -170,17 +167,17 @@ internal class ShellViewModel : Screen, IDisposable
     [SuppressMessage(
         "Critical Bug", "S2952:Classes should \"Dispose\" of members from the classes' own \"Dispose\" methods",
         Justification = "FP")]
-    protected override void OnDeactivate(bool close)
+    protected override async Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
     {
-        this.LoadingTask.Wait();
-        this.cancellationTokenSource!.Cancel();
-        this.autoSaveTask.Wait();
+        await this.LoadingTask;
+        await this.cancellationTokenSource!.CancelAsync();
+        await this.autoSaveTask;
         this.cancellationTokenSource.Dispose();
         this.cancellationTokenSource = null;
 
         this.ProjectData.Settings.Save();
 
-        base.OnDeactivate(close);
+        await base.OnDeactivateAsync(close, cancellationToken);
     }
 
     protected virtual void Dispose(bool disposing)
@@ -215,7 +212,7 @@ internal class ShellViewModel : Screen, IDisposable
         // We do not want to ask again, and he doesn't want to save.
         this.ProjectData.IsModified = false;
 
-        this.TryClose();
+        await this.TryCloseAsync();
     }
 
     private void UpdateDisplayName()

@@ -5,6 +5,8 @@
 namespace lg2de.SimpleAccounting.Presentation;
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Caliburn.Micro;
 using lg2de.SimpleAccounting.Infrastructure;
@@ -24,11 +26,13 @@ public class ProjectOptionsViewModel : Screen
     public string Currency { get; set; }
 
     public ICommand SaveCommand => new RelayCommand(
-        _ => this.TryClose(this.OnSave()),
+        _ => this.TryCloseAsync(this.OnSave()),
         _ => !string.IsNullOrWhiteSpace(this.Currency));
 
-    protected override void OnInitialize()
+    protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
     {
+        await base.OnInitializeAsync(cancellationToken);
+
         this.DisplayName = Resources.Header_ProjectOptions;
     }
 

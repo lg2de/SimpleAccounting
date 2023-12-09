@@ -13,8 +13,9 @@ using System.Windows.Input;
 /// </summary>
 public class AsyncCommand : IAsyncCommand
 {
-    private readonly IBusy busy;
+    private readonly IBusy? busy;
     private readonly Func<Task> command;
+    private readonly Func<bool>? canExecute;
 
     public AsyncCommand(IBusy busy, Action command)
     {
@@ -24,6 +25,12 @@ public class AsyncCommand : IAsyncCommand
             command();
             return Task.CompletedTask;
         };
+    }
+
+    public AsyncCommand(Func<Task> command, Func<bool> canExecute)
+    {
+        this.command = command;
+        this.canExecute = canExecute;
     }
 
     public AsyncCommand(IBusy busy, Func<Task> command)
@@ -45,15 +52,23 @@ public class AsyncCommand : IAsyncCommand
 
     public bool CanExecute(object? parameter)
     {
-        return true;
+        return this.canExecute?.Invoke() ?? true;
     }
 
     public async Task ExecuteAsync(object? parameter)
     {
-        this.busy.IsBusy = true;
+        if (this.busy != null)
+        {
+            this.busy.IsBusy = true;
+        }
+
         RaiseCanExecuteChanged();
         await this.command();
-        this.busy.IsBusy = false;
+        if (this.busy != null)
+        {
+            this.busy.IsBusy = false;
+        }
+
         RaiseCanExecuteChanged();
     }
 

@@ -122,7 +122,7 @@ public partial class ShellViewModelTests
 
         var sut = CreateSut(out IWindowManager windowManager);
         windowManager
-            .ShowDialog(Arg.Do<object>(UpdateAction), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
+            .ShowDialogAsync(Arg.Do<object>(UpdateAction), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
             .Returns(true);
         sut.ProjectData.Load(Samples.SampleProject);
 
@@ -143,7 +143,7 @@ public partial class ShellViewModelTests
         sut.EditAccountCommand.Execute(sut.Accounts.AccountList[0]);
 
         sut.ProjectData.IsModified.Should().BeFalse();
-        windowManager.Received(1).ShowDialog(
+        windowManager.Received(1).ShowDialogAsync(
             Arg.Any<object>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>());
     }
 
@@ -152,7 +152,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut(out IWindowManager windowManager);
         windowManager
-            .ShowDialog(
+            .ShowDialogAsync(
                 Arg.Do<object>(
                     model =>
                     {
@@ -213,7 +213,7 @@ public partial class ShellViewModelTests
         sut.EditAccountCommand.Execute(null);
 
         sut.ProjectData.IsModified.Should().BeFalse();
-        windowManager.DidNotReceive().ShowDialog(
+        windowManager.DidNotReceive().ShowDialogAsync(
             Arg.Any<object>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>());
     }
 
@@ -242,7 +242,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut(out IWindowManager windowManager);
         EditBookingViewModel vm = null;
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         sut.ProjectData.Load(Samples.SampleProject);
@@ -260,7 +260,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut(out IWindowManager windowManager);
         EditBookingViewModel vm = null;
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         sut.ProjectData.Load(Samples.SampleProject);
@@ -278,7 +278,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut(out IWindowManager windowManager);
         EditBookingViewModel vm = null;
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         sut.ProjectData.Load(Samples.SampleProject);
@@ -316,7 +316,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut(out IWindowManager windowManager);
         EditBookingViewModel vm = null;
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         var project = Samples.SampleProject;
@@ -337,7 +337,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut(out IWindowManager windowManager);
         EditBookingViewModel vm = null;
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         var project = Samples.SampleProject;
@@ -360,7 +360,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut(out IWindowManager windowManager);
         EditBookingViewModel vm = null;
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         var project = Samples.SampleProject;
@@ -391,7 +391,7 @@ public partial class ShellViewModelTests
 
         var sut = CreateSut(out IWindowManager windowManager);
         windowManager
-            .ShowDialog(Arg.Do<object>(UpdateAction), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
+            .ShowDialogAsync(Arg.Do<object>(UpdateAction), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
             .Returns(true);
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
@@ -417,7 +417,7 @@ public partial class ShellViewModelTests
 
         using var _ = new AssertionScope();
         sut.ProjectData.IsModified.Should().BeFalse("the project remains unchanged");
-        windowManager.DidNotReceive().ShowDialog(
+        windowManager.DidNotReceive().ShowDialogAsync(
             Arg.Any<object>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>());
     }
 
@@ -426,7 +426,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut(out IWindowManager windowManager);
         EditBookingViewModel vm = null;
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         var project = Samples.SampleProject;
@@ -447,7 +447,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut(out IWindowManager windowManager);
         ImportBookingsViewModel vm = null;
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as ImportBookingsViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         sut.ProjectData.Load(Samples.SampleProject);
@@ -491,7 +491,7 @@ public partial class ShellViewModelTests
     public void CloseYearCommand_HappyPath_YearClosedAndNewAdded()
     {
         var sut = CreateSut(out IWindowManager windowManager);
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Any<CloseYearViewModel>(),
             Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>()).Returns(
@@ -507,7 +507,7 @@ public partial class ShellViewModelTests
 
         sut.Menu.CloseYearCommand.Execute(null);
 
-        windowManager.Received(1).ShowDialog(
+        windowManager.Received(1).ShowDialogAsync(
             Arg.Any<CloseYearViewModel>(),
             Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
@@ -570,7 +570,7 @@ public partial class ShellViewModelTests
     {
         const ulong myCarryForwardNumber = 999;
         var sut = CreateSut(out IWindowManager windowManager);
-        windowManager.ShowDialog(
+        windowManager.ShowDialogAsync(
             Arg.Any<CloseYearViewModel>(),
             Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>()).Returns(
@@ -591,7 +591,7 @@ public partial class ShellViewModelTests
 
         sut.Menu.CloseYearCommand.Execute(null);
 
-        windowManager.Received(1).ShowDialog(
+        windowManager.Received(1).ShowDialogAsync(
             Arg.Any<CloseYearViewModel>(),
             Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());

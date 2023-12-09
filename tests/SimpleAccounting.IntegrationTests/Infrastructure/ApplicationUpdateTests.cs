@@ -25,7 +25,7 @@ public class ApplicationUpdateTests
         var sut = new ApplicationUpdate(dialogs, fileSystem, processApi);
 
         var task = sut.GetAllReleasesAsync();
-        (await this.Awaiting(x => task).Should().CompleteWithinAsync(10.Seconds()))
+        (await this.Awaiting(_ => task).Should().CompleteWithinAsync(10.Seconds()))
             .Which.Should().Contain(
                 r => r.TagName == "2.0.0"
                      && r.Assets.Any(

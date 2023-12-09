@@ -52,17 +52,17 @@ internal interface IProjectData
 
     void RemoveAutoSaveFile();
 
-    void EditProjectOptions();
+    Task EditProjectOptionsAsync();
 
-    void ShowAddBookingDialog(bool showInactiveAccounts);
+    Task ShowAddBookingDialogAsync(bool showInactiveAccounts);
 
-    void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts);
+    Task ShowEditBookingDialogAsync(IJournalItem item, bool showInactiveAccounts);
 
-    void ShowDuplicateBookingDialog(IJournalItem item, bool showInactiveAccounts);
+    Task ShowDuplicateBookingDialogAsync(IJournalItem item, bool showInactiveAccounts);
 
-    void ShowImportDialog();
+    Task ShowImportDialogAsync();
 
-    bool CloseYear();
+    Task<bool> CloseYearAsync();
 
     bool CanDiscardModifiedProject();
 

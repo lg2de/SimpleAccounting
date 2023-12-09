@@ -61,7 +61,7 @@ public class AppBootstrapper : BootstrapperBase
         this.container.BuildUp(instance);
     }
 
-    protected override void OnStartup(object sender, StartupEventArgs e)
+    protected override async void OnStartup(object sender, StartupEventArgs e)
     {
         // configure default behavior of root window
         // works of ShellView is Window or UserControl
@@ -69,6 +69,7 @@ public class AppBootstrapper : BootstrapperBase
         {
             { "SizeToContent", SizeToContent.Manual }, { "WindowState", WindowState.Maximized }
         };
-        this.DisplayRootViewFor<ShellViewModel>(settings);
+
+        await this.DisplayRootViewForAsync<ShellViewModel>(settings);
     }
 }

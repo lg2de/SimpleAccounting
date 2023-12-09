@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Caliburn.Micro;
 using lg2de.SimpleAccounting.Infrastructure;
@@ -44,12 +46,12 @@ public class CloseYearViewModel : Screen
     public TextOptionViewModel TextOption { get; set; }
 
     public ICommand CloseYearCommand => new RelayCommand(
-        _ => this.TryClose(true),
+        _ => this.TryCloseAsync(true),
         _ => this.RemoteAccount != null);
 
-    protected override void OnInitialize()
+    protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
     {
-        base.OnInitialize();
+        await base.OnInitializeAsync(cancellationToken);
 
         this.DisplayName = Resources.Header_CloseYear;
         this.InstructionText = string.Format(

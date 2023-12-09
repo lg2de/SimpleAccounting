@@ -73,11 +73,11 @@ internal class ProjectData : IProjectData
 
     public ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
 
-    public event EventHandler DataLoaded = (_, __) => { };
+    public event EventHandler DataLoaded = (_, _) => { };
 
-    public event EventHandler YearChanged = (_, __) => { };
+    public event EventHandler YearChanged = (_, _) => { };
 
-    public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, __) => { };
+    public event EventHandler<JournalChangedEventArgs> JournalChanged = (_, _) => { };
 
     public void NewProject()
     {
@@ -200,10 +200,10 @@ internal class ProjectData : IProjectData
         }
     }
 
-    public void EditProjectOptions()
+    public async Task EditProjectOptionsAsync()
     {
         var vm = new ProjectOptionsViewModel(this.Storage);
-        if (this.windowManager.ShowDialog(vm) != true)
+        if (await this.windowManager.ShowDialogAsync(vm) != true)
         {
             return;
         }
@@ -229,7 +229,7 @@ internal class ProjectData : IProjectData
         this.YearChanged(this, EventArgs.Empty);
     }
 
-    public void ShowAddBookingDialog(bool showInactiveAccounts)
+    public async Task ShowAddBookingDialogAsync(bool showInactiveAccounts)
     {
         var bookingModel =
             new EditBookingViewModel(this, DateTime.Today, editMode: false);
@@ -241,10 +241,10 @@ internal class ProjectData : IProjectData
             bookingModel.AddTemplates(bookingTemplates);
         }
 
-        this.windowManager.ShowDialog(bookingModel);
+        await this.windowManager.ShowDialogAsync(bookingModel);
     }
 
-    public void ShowDuplicateBookingDialog(IJournalItem item, bool showInactiveAccounts)
+    public async Task ShowDuplicateBookingDialogAsync(IJournalItem item, bool showInactiveAccounts)
     {
         if (item.StorageIndex < 0)
         {
@@ -256,10 +256,10 @@ internal class ProjectData : IProjectData
 
         var bookingModel = this.BookingFromJournal(journalEntry, editMode: false, showInactiveAccounts);
 
-        this.windowManager.ShowDialog(bookingModel);
+        await this.windowManager.ShowDialogAsync(bookingModel);
     }
 
-    public void ShowEditBookingDialog(IJournalItem item, bool showInactiveAccounts)
+    public async Task ShowEditBookingDialogAsync(IJournalItem item, bool showInactiveAccounts)
     {
         if (item.StorageIndex < 0)
         {
@@ -272,7 +272,7 @@ internal class ProjectData : IProjectData
         var bookingModel = this.BookingFromJournal(journalEntry, editMode: true, showInactiveAccounts);
         bookingModel.BookingIdentifier = journalEntry.ID;
 
-        var result = this.windowManager.ShowDialog(bookingModel);
+        var result = await this.windowManager.ShowDialogAsync(bookingModel);
         if (result != true)
         {
             return;
@@ -287,15 +287,15 @@ internal class ProjectData : IProjectData
         this.JournalChanged(this, new JournalChangedEventArgs(journalEntry.ID, journalEntry.GetAccounts()));
     }
 
-    public void ShowImportDialog()
+    public Task ShowImportDialogAsync()
     {
         var importModel = new ImportBookingsViewModel(this.dialogs, this);
-        this.windowManager.ShowDialog(
+        return this.windowManager.ShowDialogAsync(
             importModel,
             settings: WindowsDialogs.SizeToContentManualSettings);
     }
 
-    public bool CloseYear()
+    public async Task<bool> CloseYearAsync()
     {
         var viewModel = new CloseYearViewModel(this.CurrentYear);
         this.Storage.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward)
@@ -313,7 +313,7 @@ internal class ProjectData : IProjectData
         }
 
         // show dialog
-        var result = this.windowManager.ShowDialog(viewModel);
+        var result = await this.windowManager.ShowDialogAsync(viewModel);
         if (result != true || viewModel.RemoteAccount == null)
         {
             // abort

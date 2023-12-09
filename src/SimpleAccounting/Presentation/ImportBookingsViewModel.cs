@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using lg2de.SimpleAccounting.Abstractions;
@@ -128,7 +129,7 @@ internal class ImportBookingsViewModel : Screen
 
     public bool IsForceEnglish { get; set; }
 
-    public  bool IsReverseOrder { get; set; }
+    public bool IsReverseOrder { get; set; }
 
     public IBusy Busy { get; } = new BusyControlModel();
 
@@ -136,12 +137,12 @@ internal class ImportBookingsViewModel : Screen
         _ => this.OnLoadData(),
         _ => this.SelectedAccount != null);
 
-    public ICommand BookAllCommand => new RelayCommand(
-        _ => this.ProcessData(),
-        _ => this.LoadedData.Exists(x => x.RemoteAccount != null || x.IsSkip || x.IsExisting));
+    public IAsyncCommand BookAllCommand => new AsyncCommand(
+        this.ProcessDataAsync,
+        () => this.LoadedData.Exists(x => x.RemoteAccount != null || x.IsSkip || x.IsExisting));
 
     public ICommand BookMappedCommand => new RelayCommand(
-        _ => this.ProcessData(),
+        _ => this.ProcessDataAsync(),
         _ => this.LoadedData.Exists(x => x.RemoteAccount != null));
 
     protected IProjectData ProjectData { get; }
@@ -295,7 +296,7 @@ internal class ImportBookingsViewModel : Screen
         }
     }
 
-    private void ProcessData()
+    private async Task ProcessDataAsync()
     {
         foreach (var importing in this.ImportDataFiltered)
         {
@@ -308,15 +309,13 @@ internal class ImportBookingsViewModel : Screen
             if (importing.RemoteAccount == null)
             {
                 // mapping missing - abort
-                AfterImport();
+                await AfterImport();
                 return;
             }
 
             var newBooking = new AccountingDataJournalBooking
             {
-                Date = importing.Date.ToAccountingDate(),
-                ID = importing.Identifier,
-                Followup = importing.IsFollowup
+                Date = importing.Date.ToAccountingDate(), ID = importing.Identifier, Followup = importing.IsFollowup
             };
             var creditValue = new BookingValue
             {
@@ -343,11 +342,12 @@ internal class ImportBookingsViewModel : Screen
             this.ProjectData.AddBooking(newBooking, updateJournal: false);
         }
 
-        AfterImport();
+        await AfterImport();
+        return;
 
-        void AfterImport()
+        async Task AfterImport()
         {
-            this.TryClose();
+            await this.TryCloseAsync();
             this.ProjectData.TriggerJournalChanged();
         }
     }

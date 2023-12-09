@@ -44,7 +44,7 @@ public class MenuViewModelTests
         // Because awaiting "ExecuteUIThread" does not really await the action
         // we need to wait for two property changed events.
         var values = new List<bool>();
-        busy.PropertyChanged += (sender, args) =>
+        busy.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName != "IsBusy")
             {
@@ -138,7 +138,7 @@ public class MenuViewModelTests
 
         sut.ProjectOptionsCommand.Execute(null);
 
-        projectData.Received(1).EditProjectOptions();
+        projectData.Received(1).EditProjectOptionsAsync();
     }
 
     [Fact]

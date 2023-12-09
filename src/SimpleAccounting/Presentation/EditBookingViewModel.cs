@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Caliburn.Micro;
 using lg2de.SimpleAccounting.Extensions;
@@ -48,13 +50,13 @@ internal class EditBookingViewModel : Screen
         }
 
         this.CreditSplitEntries.CollectionChanged +=
-            (sender, args) =>
+            (_, _) =>
             {
                 this.NotifyOfPropertyChange(nameof(this.DebitSplitAllowed));
                 this.NotifyOfPropertyChange(nameof(this.IsEasyBookingEnabled));
             };
         this.DebitSplitEntries.CollectionChanged +=
-            (sender, args) =>
+            (_, _) =>
             {
                 this.NotifyOfPropertyChange(nameof(this.CreditSplitAllowed));
                 this.NotifyOfPropertyChange(nameof(this.IsEasyBookingEnabled));
@@ -190,7 +192,7 @@ internal class EditBookingViewModel : Screen
         _ => this.IsDataValid());
 
     public ICommand SaveCommand => new RelayCommand(
-        _ => this.TryClose(true),
+        _ => this.TryCloseAsync(true),
         _ => this.IsDataValid());
 
     public ICommand DefaultCommand => new RelayCommand(
@@ -273,9 +275,9 @@ internal class EditBookingViewModel : Screen
             .ToList().ForEach(this.BindingTemplates.Add);
     }
 
-    protected override void OnInitialize()
+    protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
     {
-        base.OnInitialize();
+        await base.OnInitializeAsync(cancellationToken);
 
         this.DisplayName = this.EditMode ? Resources.Header_EditBooking : Resources.Header_NewBooking;
 

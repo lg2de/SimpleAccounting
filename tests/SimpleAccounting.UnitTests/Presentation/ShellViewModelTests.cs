@@ -25,11 +25,11 @@ using Xunit;
 public partial class ShellViewModelTests
 {
     [Fact]
-    public void OnInitialize_NoProject_Initialized()
+    public async Task OnInitialize_NoProject_Initialized()
     {
         var sut = CreateSut();
 
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
 
         sut.DisplayName.Should().NotBeNullOrWhiteSpace();
     }
@@ -43,9 +43,9 @@ public partial class ShellViewModelTests
         var fileSaved = new TaskCompletionSource<bool>();
         fileSystem
             .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
-            .Do(x => fileSaved.SetResult(true));
+            .Do(_ => fileSaved.SetResult(true));
 
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
         sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
         sut.ProjectData.Load(new AccountingData());
         sut.ProjectData.IsModified = true;
@@ -74,8 +74,8 @@ public partial class ShellViewModelTests
         var fileSaved = new TaskCompletionSource<bool>();
         fileSystem
             .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
-            .Do(x => fileSaved.SetResult(true));
-        ((IActivate)sut).Activate();
+            .Do(_ => fileSaved.SetResult(true));
+        await ((IActivate)sut).ActivateAsync();
         await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
         sut.ProjectData.IsModified = true;
 
@@ -108,8 +108,8 @@ public partial class ShellViewModelTests
         var fileSaved = new TaskCompletionSource<bool>();
         fileSystem
             .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
-            .Do(x => fileSaved.SetResult(true));
-        ((IActivate)sut).Activate();
+            .Do(_ => fileSaved.SetResult(true));
+        await ((IActivate)sut).ActivateAsync();
         await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
         sut.ProjectData.IsModified = false;
 
@@ -131,9 +131,7 @@ public partial class ShellViewModelTests
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings
         {
-            RecentProject = "k:\\file2",
-            RecentProjects = ["c:\\file1", "k:\\file2"],
-            SecuredDrives = ["K:\\"]
+            RecentProject = "k:\\file2", RecentProjects = ["c:\\file1", "k:\\file2"], SecuredDrives = ["K:\\"]
         };
         var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
@@ -150,12 +148,12 @@ public partial class ShellViewModelTests
             .Returns(MessageBoxResult.Yes);
         fileSystem.FileExists(Arg.Is("c:\\file1")).Returns(true);
         bool securedFileAvailable = false;
-        fileSystem.FileExists(Arg.Is("k:\\file2")).Returns(info => securedFileAvailable);
+        fileSystem.FileExists(Arg.Is("k:\\file2")).Returns(_ => securedFileAvailable);
         var cryptomator = new Process();
         processApi.GetProcessByName(Arg.Any<string>()).Returns(cryptomator);
-        processApi.When(x => x.BringProcessToFront(cryptomator)).Do(info => securedFileAvailable = true);
+        processApi.When(x => x.BringProcessToFront(cryptomator)).Do(_ => securedFileAvailable = true);
 
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
         await sut.LoadingTask;
 
         sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("c:\\file1", "k:\\file2");
@@ -167,14 +165,14 @@ public partial class ShellViewModelTests
     }
 
     [CulturedFact("en")]
-    public void OnActivate_SampleProject_JournalsUpdates()
+    public async Task OnActivate_SampleProject_JournalsUpdates()
     {
         var sut = CreateSut();
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         sut.ProjectData.Load(project);
 
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
 
         using var _ = new AssertionScope();
         sut.Accounts.AccountList.Select(x => x.Name).Should().Equal(
@@ -190,7 +188,12 @@ public partial class ShellViewModelTests
                 new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
                 new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
                 new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
-                new { Text = "Credit rate", CreditAccount = "100 (Bank account)", DebitAccount = "5000 (Bank credit)" },
+                new
+                {
+                    Text = "Credit rate",
+                    CreditAccount = "100 (Bank account)",
+                    DebitAccount = "5000 (Bank credit)"
+                },
                 new { Text = "Shoes1", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
                 new { Text = "Shoes2", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
                 new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = string.Empty },
@@ -214,14 +217,14 @@ public partial class ShellViewModelTests
     }
 
     [Fact]
-    public void OnActivate_TwoRecentProjectsOneExisting_AllProjectListed()
+    public async Task OnActivate_TwoRecentProjectsOneExisting_AllProjectListed()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
         sut.ProjectData.Settings.RecentProjects = ["file1", "file2"];
         fileSystem.FileExists(Arg.Is("file1")).Returns(true);
         fileSystem.FileExists(Arg.Is("file2")).Returns(false);
 
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
 
         // even the file is not available currently it should not be removed immediately from menu
         sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("file1", "file2");
@@ -235,7 +238,7 @@ public partial class ShellViewModelTests
         fileSystem.FileExists(Arg.Is("file1")).Returns(true);
         fileSystem.FileExists(Arg.Is("file2")).Returns(false);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
         sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("file1", "file2");
 
         foreach (var viewModel in sut.Menu.RecentProjects.ToList())
@@ -262,7 +265,7 @@ public partial class ShellViewModelTests
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.No);
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
         sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("K:\\file1", "file2");
 
         foreach (var viewModel in sut.Menu.RecentProjects.ToList())
@@ -278,9 +281,9 @@ public partial class ShellViewModelTests
     public async Task OnDeactivate_HappyPath_Completes()
     {
         var sut = CreateSut();
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
 
-        var task = Task.Run(() => ((IDeactivate)sut).Deactivate(close: true));
+        var task = Task.Run(() => ((IDeactivate)sut).DeactivateAsync(close: true));
 
         await task.Awaiting(x => x).Should().CompleteWithinAsync(1.Seconds());
     }
@@ -494,7 +497,7 @@ public partial class ShellViewModelTests
         fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
         fileSystem.GetDrives().Returns(
-            x =>
+            _ =>
             {
                 var func1 = new Func<string>(() => "Normal");
                 var func2 = new Func<string>(() => "Cryptomator File System");
@@ -546,10 +549,7 @@ public partial class ShellViewModelTests
     public async Task LoadProjectFromFileAsync_MigrationRequired_ProjectModified()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        var accountingData = new AccountingData
-        {
-            Years = [new AccountingDataYear { Name = 2020 }]
-        };
+        var accountingData = new AccountingData { Years = [new AccountingDataYear { Name = 2020 }] };
         fileSystem.FileExists("the.fileName").Returns(true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 
@@ -589,7 +589,8 @@ public partial class ShellViewModelTests
     public void SaveProject_AutoSaveExisting_AutoSaveFileDeleted()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
+        fileSystem.GetLastWriteTime(Arg.Any<string>())
+            .Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
         var fileName = "project.name";
         fileSystem.FileExists(fileName + "~").Returns(true);
         sut.ProjectData.Load(Samples.SampleProject);
@@ -606,7 +607,8 @@ public partial class ShellViewModelTests
     public void SaveProject_ProjectExisting_SavedAfterBackup()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
+        fileSystem.GetLastWriteTime(Arg.Any<string>())
+            .Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
         var fileName = "project.name";
         fileSystem.FileExists(fileName).Returns(true);
         sut.ProjectData.Load(Samples.SampleProject);
@@ -639,41 +641,35 @@ public partial class ShellViewModelTests
     }
 
     [Fact]
-    public void CanClose_UnmodifiedProject_CloseConfirmed()
+    public async Task CanClose_UnmodifiedProject_CloseConfirmed()
     {
         var sut = CreateSut();
-        bool? invokedWith = null;
-        void Callback(bool value) => invokedWith = value;
 
-        sut.CanClose(Callback);
+        var result = await sut.CanCloseAsync();
 
-        invokedWith.Should().BeTrue();
+        result.Should().BeTrue();
     }
 
     [Fact]
-    public void CanClose_ModifiedProjectAbort_CloseRejected()
+    public async Task CanClose_ModifiedProjectAbort_CloseRejected()
     {
         var sut = CreateSut();
         sut.ProjectData.IsModified = true;
-        bool? invokedWith = null;
-        void Callback(bool value) => invokedWith = value;
 
-        sut.CanClose(Callback);
+        var result = await sut.CanCloseAsync();
 
-        invokedWith.Should().BeFalse();
+        result.Should().BeFalse();
     }
 
     [Fact]
-    public void CanClose_AutoSaveFileExists_FileRemoved()
+    public async Task CanClose_AutoSaveFileExists_FileRemoved()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
         fileSystem.FileExists(sut.ProjectData.AutoSaveFileName).Returns(true);
-        bool? invokedWith = null;
-        void Callback(bool value) => invokedWith = value;
 
-        sut.CanClose(Callback);
+        var result = await sut.CanCloseAsync();
 
-        invokedWith.Should().BeTrue();
+        result.Should().BeTrue();
         fileSystem.Received(1).FileDelete(sut.ProjectData.AutoSaveFileName);
     }
 
@@ -684,6 +680,7 @@ public partial class ShellViewModelTests
 
         sut.Invoking(x => x.Dispose()).Should().NotThrow();
     }
+
     private static ShellViewModel CreateSut()
     {
         var busy = Substitute.For<IBusy>();

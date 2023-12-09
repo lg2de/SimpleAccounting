@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Infrastructure;
 
 using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 /// <summary>
@@ -13,16 +14,28 @@ using System.Windows.Input;
 public class RelayCommand : ICommand
 {
     private readonly Predicate<object?>? canExecute;
-    private readonly Action<object?> execute;
+    private readonly Action<object?>? execute;
+    private readonly Func<object?, Task>? asyncExecute;
 
     public RelayCommand(Action<object?> execute)
     {
         this.execute = execute;
     }
 
+    public RelayCommand(Func<object?, Task> execute)
+    {
+        this.asyncExecute = execute;
+    }
+
     public RelayCommand(Action<object?> execute, Predicate<object?> canExecute)
     {
         this.execute = execute;
+        this.canExecute = canExecute;
+    }
+
+    public RelayCommand(Func<object?, Task> execute, Predicate<object?> canExecute)
+    {
+        this.asyncExecute = execute;
         this.canExecute = canExecute;
     }
 
@@ -39,6 +52,7 @@ public class RelayCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        this.execute(parameter);
+        this.execute?.Invoke(parameter);
+        this.asyncExecute?.Invoke(parameter);
     }
 }
