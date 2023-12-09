@@ -2,6 +2,7 @@
 
 ![Build status](https://github.com/lg2de/SimpleAccounting/workflows/continous%20integration/badge.svg?branch=main)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=coverage)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=lg2de_SimpleAccounting)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=alert_status)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
