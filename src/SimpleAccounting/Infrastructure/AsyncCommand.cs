@@ -84,22 +84,26 @@ public class AsyncCommand : IAsyncCommand
         this.canExecute = canExecute;
     }
 
+    /// <inheritdoc />
     public event EventHandler? CanExecuteChanged
     {
         add { CommandManager.RequerySuggested += value; }
         remove { CommandManager.RequerySuggested -= value; }
     }
 
+    /// <inheritdoc />
     public async void Execute(object? parameter)
     {
         await this.ExecuteAsync(parameter);
     }
 
+    /// <inheritdoc />
     public bool CanExecute(object? parameter)
     {
         return this.canExecute?.Invoke() ?? true;
     }
 
+    /// <inheritdoc />
     public async Task ExecuteAsync(object? parameter)
     {
         if (this.busy != null)
