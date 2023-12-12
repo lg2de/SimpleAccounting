@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
@@ -28,7 +29,10 @@ public class AccountsViewModelTests
                 Account =
                 [
                     new AccountDefinition { ID = 1, Name = "No import mapping", ImportMapping = null },
-                    new AccountDefinition { ID = 2, Name = "Simple import mapping", ImportMapping = Samples.SimpleImportConfiguration },
+                    new AccountDefinition
+                    {
+                        ID = 2, Name = "Simple import mapping", ImportMapping = Samples.SimpleImportConfiguration
+                    },
 
                     new AccountDefinition
                     {
@@ -37,16 +41,25 @@ public class AccountsViewModelTests
                         ImportMapping = new AccountDefinitionImportMapping()
                     },
 
-                    new AccountDefinition { ID = 4, Name = "Full import mapping", ImportMapping = Samples.SimpleImportConfiguration }
+                    new AccountDefinition
+                    {
+                        ID = 4, Name = "Full import mapping", ImportMapping = Samples.SimpleImportConfiguration
+                    }
                 ]
             }
         ];
         projectData.Storage.Accounts[^1].Account[^1].ImportMapping.Patterns =
         [
             new AccountDefinitionImportMappingPattern { Expression = "OnlyAccount", AccountID = 1 },
-            new AccountDefinitionImportMappingPattern { Expression = "ValueSpecified", ValueSpecified = true, AccountID = 2 },
+            new AccountDefinitionImportMappingPattern
+            {
+                Expression = "ValueSpecified", ValueSpecified = true, AccountID = 2
+            },
 
-            new AccountDefinitionImportMappingPattern { Expression = "ValueSet", Value = 5, ValueSpecified = true, AccountID = 3 }
+            new AccountDefinitionImportMappingPattern
+            {
+                Expression = "ValueSet", Value = 5, ValueSpecified = true, AccountID = 3
+            }
         ];
 
         sut.OnDataLoaded();
@@ -96,11 +109,11 @@ public class AccountsViewModelTests
     }
 
     [Fact]
-    public void OnEditAccount_ImportPatternsConfigured_ImportPatternsBuilt()
+    public async Task OnEditAccount_ImportPatternsConfigured_ImportPatternsBuilt()
     {
         var windowManager = Substitute.For<IWindowManager>();
         AccountViewModel updatedViewModel = null;
-        windowManager.ShowDialog(Arg.Do<object>(o => updatedViewModel = o as AccountViewModel));
+        await windowManager.ShowDialogAsync(Arg.Do<object>(o => updatedViewModel = o as AccountViewModel));
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
@@ -124,7 +137,7 @@ public class AccountsViewModelTests
 
         var accountViewModel = sut.AccountList[0];
         accountViewModel.ImportRemoteAccounts.Should().BeEmpty();
-        sut.OnEditAccount(accountViewModel);
+        await sut.OnEditAccountAsync(accountViewModel);
 
         updatedViewModel?.ImportRemoteAccounts.Should().BeEquivalentTo(new[] { new { ID = 2 } });
     }

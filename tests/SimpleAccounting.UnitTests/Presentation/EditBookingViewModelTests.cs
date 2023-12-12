@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -457,7 +458,7 @@ public class EditBookingViewModelTests
     }
 
     [Fact]
-    public void OnInitialize_Initialized()
+    public async Task OnInitialize_Initialized()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
@@ -466,7 +467,7 @@ public class EditBookingViewModelTests
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin);
 
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
 
         sut.DisplayName.Should().NotBeNullOrWhiteSpace();
         sut.SelectedTemplate.Should().BeNull("not template should be selected by default");
@@ -486,7 +487,7 @@ public class EditBookingViewModelTests
             sut.Accounts.Add(new AccountDefinition { Name = type.ToString(), Type = type });
         }
 
-        ((IActivate)sut).Activate();
+        ((IActivate)sut).ActivateAsync();
 
         sut.Accounts.Should().NotBeEmpty();
         sut.IncomeAccounts.Should().NotBeEmpty();

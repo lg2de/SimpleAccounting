@@ -16,6 +16,6 @@ public partial class ImportBookingsView
     {
         this.InitializeComponent();
 
-        this.Loaded += (s, a) => this.ResetDataGridColumnSizes();
+        this.Loaded += (_, _) => this.ResetDataGridColumnSizes();
     }
 }

@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Abstractions;
@@ -51,7 +52,13 @@ public class ImportBookingsViewModelTests
         [
             new AccountingDataAccountGroup
             {
-                Account = [new AccountDefinition { ID = 100, Name = "Bank", ImportMapping = Samples.SimpleImportConfiguration }]
+                Account =
+                [
+                    new AccountDefinition
+                    {
+                        ID = 100, Name = "Bank", ImportMapping = Samples.SimpleImportConfiguration
+                    }
+                ]
             }
         ];
         var sut = new ImportBookingsViewModel(null!, projectData);
@@ -203,10 +210,7 @@ public class ImportBookingsViewModelTests
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, projectData);
         sut.LoadedData.Add(
-            new ImportEntryViewModel(accounts)
-            {
-                RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
-            });
+            new ImportEntryViewModel(accounts) { RemoteAccount = accounts[0], IsSkip = false, IsExisting = false });
 
         sut.BookAllCommand.CanExecute(null).Should().BeTrue();
     }
@@ -240,7 +244,7 @@ public class ImportBookingsViewModelTests
     }
 
     [Fact]
-    public void BookAllCommand_SampleData_DataConvertedIntoJournal()
+    public async Task BookAllCommand_SampleData_DataConvertedIntoJournal()
     {
         var projectData = Samples.SampleProjectData;
         var accountsViewModel = new AccountsViewModel(null!, projectData);
@@ -323,7 +327,7 @@ public class ImportBookingsViewModelTests
             });
         var projectDataMonitor = projectData.Monitor();
 
-        sut.BookAllCommand.Execute(null);
+        await sut.BookAllCommand.ExecuteAsync(null);
 
         // 101 should be skipped because of selected start date
         // 103 should be skipped because it is configured to be skipped

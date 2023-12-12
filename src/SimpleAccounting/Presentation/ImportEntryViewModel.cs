@@ -57,9 +57,9 @@ public class ImportEntryViewModel : JournalItemBaseViewModel
 
     public bool IsCandidate => !this.IsExisting;
 
-    public ICommand ResetRemoteAccountCommand => new RelayCommand(
-        _ => this.RemoteAccount = null,
-        _ => this.RemoteAccount != null);
+    public ICommand ResetRemoteAccountCommand => new AsyncCommand(
+        () => this.RemoteAccount = null,
+        () => this.RemoteAccount != null);
 
     internal string BuildText()
     {

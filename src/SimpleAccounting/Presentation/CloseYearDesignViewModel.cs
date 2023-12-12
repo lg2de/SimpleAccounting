@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Presentation;
 
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using lg2de.SimpleAccounting.Model;
 
 /// <summary>
@@ -16,12 +17,15 @@ using lg2de.SimpleAccounting.Model;
 [SuppressMessage(
     "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
     Justification = "Design view model defines useful values")]
+[SuppressMessage(
+    "Blocker Code Smell", "S4462:Calls to \"async\" methods should not be blocking",
+    Justification = "In the designer we need to complete immediately.")]
 internal sealed class CloseYearDesignViewModel : CloseYearViewModel
 {
     public CloseYearDesignViewModel()
         : base(new AccountingDataJournal { Year = "2020" })
     {
         this.Accounts.Add(new AccountDefinition { ID = 990, Name = "My CarryForward" });
-        this.OnInitialize();
+        this.OnInitializeAsync(CancellationToken.None).Wait();
     }
 }

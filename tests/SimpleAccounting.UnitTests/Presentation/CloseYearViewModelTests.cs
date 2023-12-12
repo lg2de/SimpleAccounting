@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System.Linq;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
@@ -31,22 +32,22 @@ public class CloseYearViewModelTests
     }
 
     [Fact]
-    public void OnInitialize_AccountsAvailable_AccountSelected()
+    public async Task OnInitialize_AccountsAvailable_AccountSelected()
     {
         var sut = new CloseYearViewModel(new AccountingDataJournal());
         sut.Accounts.Add(new AccountDefinition { ID = 1, Name = "CF", Type = AccountDefinitionType.Carryforward });
 
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
 
         sut.RemoteAccount.Should().Be(sut.Accounts.Single());
     }
 
     [Fact]
-    public void OnInitialize_NoAccountAvailable_NoAccountSelected()
+    public async Task OnInitialize_NoAccountAvailable_NoAccountSelected()
     {
         var sut = new CloseYearViewModel(new AccountingDataJournal());
 
-        ((IActivate)sut).Activate();
+        await ((IActivate)sut).ActivateAsync();
 
         sut.RemoteAccount.Should().BeNull();
     }

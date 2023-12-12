@@ -17,7 +17,7 @@ public partial class ShellView
     {
         this.InitializeComponent();
 
-        this.Loaded += (s, a) => this.ResetDataGridColumnSizes();
+        this.Loaded += (_, _) => this.ResetDataGridColumnSizes();
     }
 
     [ExcludeFromCodeCoverage]

@@ -21,10 +21,7 @@ public static class JournalBaseViewModelExtensions
     /// <exception cref="ArgumentNullException"></exception>
     public static void UpdateRowHighlighting([NotNull] this IEnumerable<JournalItemBaseViewModel> journal)
     {
-        if (journal == null)
-        {
-            throw new ArgumentNullException(nameof(journal));
-        }
+        ArgumentNullException.ThrowIfNull(journal);
 
         bool isEven = true;
         ulong lastIdentifier = 0;

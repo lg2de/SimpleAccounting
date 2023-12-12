@@ -12,5 +12,10 @@ using System.Windows.Input;
 /// </summary>
 public interface IAsyncCommand : ICommand
 {
+    /// <summary>
+    ///     Executes the command asynchronously with the specified parameter.
+    /// </summary>
+    /// <param name="parameter">The command parameter.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     Task ExecuteAsync(object? parameter);
 }

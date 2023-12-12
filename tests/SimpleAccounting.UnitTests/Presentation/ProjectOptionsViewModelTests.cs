@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
@@ -13,12 +14,12 @@ using Xunit;
 public class ProjectOptionsViewModelTests
 {
     [Fact]
-    public void Activate_TitleSet()
+    public async Task Activate_TitleSet()
     {
         var data = new AccountingData();
         var sut = new ProjectOptionsViewModel(data);
 
-        sut.As<IActivate>().Activate();
+        await sut.As<IActivate>().ActivateAsync();
 
         sut.DisplayName.Should().NotBe(sut.GetType().FullName);
     }

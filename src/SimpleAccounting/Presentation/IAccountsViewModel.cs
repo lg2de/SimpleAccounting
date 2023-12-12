@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation;
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 /// <summary>
@@ -21,9 +22,9 @@ internal interface IAccountsViewModel : INotifyPropertyChanged
 
     bool ShowInactiveAccounts { get; set; }
 
-    void ShowNewAccountDialog();
+    Task ShowNewAccountDialogAsync();
 
-    void OnEditAccount(object? commandParameter);
+    Task OnEditAccountAsync(object? commandParameter);
 
     void SelectFirstAccount();
     void OnDataLoaded();

@@ -72,13 +72,17 @@ public class AccountJournalViewModelTests
         bool isCreditFocused = creditCount == 1 && debitCount == 2 || debitCount > creditCount;
         var accountNumber = isCreditFocused ? TestAccountNumber : OtherAccountNumber;
         var creditList = Enumerable.Range(start: 1, count: creditCount)
-            .Select(selector: x => new BookingValue { Text = "dummy", Account = accountNumber }).ToList();
+            .Select(selector: _ => new BookingValue { Text = "dummy", Account = accountNumber }).ToList();
         accountNumber = isCreditFocused ? OtherAccountNumber : TestAccountNumber;
         var debitList = Enumerable.Range(start: 1, count: debitCount)
-            .Select(selector: x => new BookingValue { Text = "dummy", Account = accountNumber }).ToList();
+            .Select(selector: _ => new BookingValue { Text = "dummy", Account = accountNumber }).ToList();
         return new AccountingDataJournalBooking
         {
-            Date = date, ID = identifier, Credit = creditList, Debit = debitList, Followup = followup
+            Date = date,
+            ID = identifier,
+            Credit = creditList,
+            Debit = debitList,
+            Followup = followup
         };
     }
 }

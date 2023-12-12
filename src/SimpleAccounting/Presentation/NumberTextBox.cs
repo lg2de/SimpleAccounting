@@ -28,8 +28,8 @@ internal partial class NumberTextBox : TextBox
 
     public NumberTextBox()
     {
-        this.GotFocus += (s, e) => this.SelectAll();
-        this.GotMouseCapture += (s, e) => this.SelectAll();
+        this.GotFocus += (_, _) => this.SelectAll();
+        this.GotMouseCapture += (_, _) => this.SelectAll();
         this.PreviewKeyDown += OnPreviewKeyDown;
         this.PreviewTextInput += this.OnPreviewTextInput;
         this.UpdateExpression();

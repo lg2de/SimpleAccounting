@@ -39,20 +39,20 @@ public class ProjectDataTests
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.Yes);
         bool securedFileAvailable = false;
-        fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(info => securedFileAvailable);
+        fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(_ => securedFileAvailable);
         fileSystem.FileExists(
                 Arg.Is<string>(s => s.Contains("cryptomator.exe", StringComparison.InvariantCultureIgnoreCase)))
             .Returns(true);
         Process cryptomator = null;
         processApi.Start(Arg.Any<ProcessStartInfo>()).Returns(
-            info =>
+            _ =>
             {
                 cryptomator = new Process();
                 return cryptomator;
             });
         processApi.IsProcessWindowVisible(Arg.Any<Process>()).Returns(true);
         processApi.GetProcessByName(Arg.Any<string>()).Returns(cryptomator);
-        processApi.When(x => x.BringProcessToFront(Arg.Any<Process>())).Do(info => securedFileAvailable = true);
+        processApi.When(x => x.BringProcessToFront(Arg.Any<Process>())).Do(_ => securedFileAvailable = true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
         (await sut.Awaiting(x => x.LoadFromFileAsync("K:\\the.fileName")).Should()
@@ -96,7 +96,8 @@ public class ProjectDataTests
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-        fileSystem.GetLastWriteTime(Arg.Any<string>()).Returns(new DateTime(2020, 2, 29, 18, 45, 56, 0, 0, DateTimeKind.Local));
+        fileSystem.GetLastWriteTime(Arg.Any<string>())
+            .Returns(new DateTime(2020, 2, 29, 18, 45, 56, 0, 0, DateTimeKind.Local));
         sut.Load(Samples.SampleProject);
 
         sut.SaveProject();
@@ -124,7 +125,7 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public void EditProjectOptions_Changed_ProjectModified()
+    public async Task EditProjectOptions_Changed_ProjectModified()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
@@ -133,15 +134,15 @@ public class ProjectDataTests
         var settings = new Settings();
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
         sut.NewProject();
-        windowManager.ShowDialog(Arg.Any<ProjectOptionsViewModel>()).Returns(true);
+        windowManager.ShowDialogAsync(Arg.Any<ProjectOptionsViewModel>()).Returns(true);
 
-        sut.EditProjectOptions();
+        await sut.EditProjectOptionsAsync();
 
         sut.IsModified.Should().BeTrue();
     }
 
     [Fact]
-    public void EditProjectOptions_Unchanged_ProjectNotModified()
+    public async Task EditProjectOptions_Unchanged_ProjectNotModified()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
@@ -150,15 +151,15 @@ public class ProjectDataTests
         var settings = new Settings();
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
         sut.NewProject();
-        windowManager.ShowDialog(Arg.Any<ProjectOptionsViewModel>()).Returns(false);
+        windowManager.ShowDialogAsync(Arg.Any<ProjectOptionsViewModel>()).Returns(false);
 
-        sut.EditProjectOptions();
+        await sut.EditProjectOptionsAsync();
 
         sut.IsModified.Should().BeFalse();
     }
 
     [Fact]
-    public void CloseYear_NonDefaultConfiguration_SettingsRestored()
+    public async Task CloseYear_NonDefaultConfiguration_SettingsRestored()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
@@ -174,7 +175,7 @@ public class ProjectDataTests
         sut.Storage.Setup.Behavior.OpeningTextPattern = OpeningTextOption.AccountName.ToString();
         CloseYearViewModel invokedViewModel = null;
         windowManager
-            .ShowDialog(Arg.Any<CloseYearViewModel>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
+            .ShowDialogAsync(Arg.Any<CloseYearViewModel>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
             .Returns(
                 info =>
                 {
@@ -182,12 +183,10 @@ public class ProjectDataTests
                     return false;
                 });
 
-        sut.CloseYear().Should().BeFalse();
+        var result = await sut.Awaiting(x => x.CloseYearAsync()).Should().CompleteWithinAsync(1.Seconds());
+        result.Subject.Should().BeFalse();
 
         invokedViewModel.Should().BeEquivalentTo(
-            new
-            {
-                TextOption = new { Option = OpeningTextOption.AccountName }, RemoteAccount = new { ID = 99999 }
-            });
+            new { TextOption = new { Option = OpeningTextOption.AccountName }, RemoteAccount = new { ID = 99999 } });
     }
 }

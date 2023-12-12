@@ -42,10 +42,7 @@ public class AccountViewModelTests
     [Fact]
     public void SaveCommand_NoIdentifierCheck_CanExecute()
     {
-        var sut = new AccountViewModel
-        {
-            Name = "AccountName", IsValidIdentifierFunc = null, IsImportActive = false
-        };
+        var sut = new AccountViewModel { Name = "AccountName", IsValidIdentifierFunc = null, IsImportActive = false };
 
         sut.SaveCommand.CanExecute(null).Should().BeTrue();
     }
@@ -53,7 +50,7 @@ public class AccountViewModelTests
     [Fact]
     public void SaveCommand_IdentifierCheckSucceed_CanExecute()
     {
-        var sut = new AccountViewModel { Name = "AccountName", IsValidIdentifierFunc = id => true };
+        var sut = new AccountViewModel { Name = "AccountName", IsValidIdentifierFunc = _ => true };
 
         sut.SaveCommand.CanExecute(null).Should().BeTrue();
     }
@@ -61,7 +58,7 @@ public class AccountViewModelTests
     [Fact]
     public void SaveCommand_IdentifierCheckFailed_CannotExecute()
     {
-        var sut = new AccountViewModel { Name = "AccountName", IsValidIdentifierFunc = id => false };
+        var sut = new AccountViewModel { Name = "AccountName", IsValidIdentifierFunc = _ => false };
 
         sut.SaveCommand.CanExecute(null).Should().BeFalse();
     }

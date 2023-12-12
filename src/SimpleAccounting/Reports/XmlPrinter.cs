@@ -133,13 +133,14 @@ internal class XmlPrinter : IXmlPrinter
     {
         bool firstPageSetupRequired = true;
         bool transformationRequired = true;
-            
+
         // The setup and cleanup procedures must be executed by event handlers
         // because they are required for transformation, for preview and real printing.
-        printDocument.BeginPrint += (_, printArgs) => firstPageSetupRequired = true;
-        printDocument.EndPrint += (_, printArgs) => this.CleanupGraphics();
-            
+        printDocument.BeginPrint += (_, _) => firstPageSetupRequired = true;
+        printDocument.EndPrint += (_, _) => this.CleanupGraphics();
+
         printDocument.PrintPage += (_, printArgs) => OnPrintPage(printArgs);
+
         void OnPrintPage(PrintPageEventArgs printPageEventArgs)
         {
             var graphics = new DrawingGraphics(printPageEventArgs);
@@ -237,7 +238,7 @@ internal class XmlPrinter : IXmlPrinter
         this.currentNode = this.Document.DocumentElement!.FirstChild!;
         TransformNodes(this.currentNode);
         this.ProcessPageTexts();
-            
+
         this.CleanupGraphics();
 
         void TransformNodes(XmlNode firstNode)
@@ -310,13 +311,14 @@ internal class XmlPrinter : IXmlPrinter
                 this.PrintLineNode(graphics);
                 break;
             case FontNode:
-                this.ProcessFontNode(this.currentNode, () =>
-                {
-                    var stackNode = this.currentNode;
-                    this.currentNode = this.currentNode.FirstChild;
-                    this.PrintNodes(graphics);
-                    this.currentNode = stackNode;
-                });
+                this.ProcessFontNode(
+                    this.currentNode, () =>
+                    {
+                        var stackNode = this.currentNode;
+                        this.currentNode = this.currentNode.FirstChild;
+                        this.PrintNodes(graphics);
+                        this.currentNode = stackNode;
+                    });
                 break;
             case NewPageNode:
                 graphics.HasMorePages = true;
@@ -652,15 +654,8 @@ internal class XmlPrinter : IXmlPrinter
 
     private void CreateFrame(XmlNode referenceNode, XmlNode positionNode, int x1, int y1, int x2, int y2)
     {
-        if (referenceNode == null)
-        {
-            throw new ArgumentNullException(nameof(referenceNode));
-        }
-
-        if (positionNode == null)
-        {
-            throw new ArgumentNullException(nameof(positionNode));
-        }
+        ArgumentNullException.ThrowIfNull(referenceNode);
+        ArgumentNullException.ThrowIfNull(positionNode);
 
         var leftLine = referenceNode.GetAttribute<bool>("leftLine");
         if (leftLine)
