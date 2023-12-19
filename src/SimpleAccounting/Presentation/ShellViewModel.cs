@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -164,9 +165,6 @@ internal class ShellViewModel : Screen, IDisposable
     }
 
     [SuppressMessage(
-        "Blocker Code Smell", "S4462:Calls to \"async\" methods should not be blocking",
-        Justification = "Work-around for missing async Screen")]
-    [SuppressMessage(
         "Critical Bug", "S2952:Classes should \"Dispose\" of members from the classes' own \"Dispose\" methods",
         Justification = "FP")]
     protected override async Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
@@ -192,7 +190,8 @@ internal class ShellViewModel : Screen, IDisposable
 
     private async Task OnCheckForUpdateAsync()
     {
-        if (!await this.applicationUpdate.IsUpdateAvailableAsync(this.version))
+        string packageName = await this.applicationUpdate.GetUpdatePackageAsync(this.version, CultureInfo.CurrentUICulture);
+        if (string.IsNullOrWhiteSpace(packageName))
         {
             return;
         }
@@ -204,7 +203,7 @@ internal class ShellViewModel : Screen, IDisposable
 
         // starts separate process to update application in-place
         // Now we need to close this application.
-        if (!this.applicationUpdate.StartUpdateProcess())
+        if (!this.applicationUpdate.StartUpdateProcess(packageName))
         {
             return;
         }

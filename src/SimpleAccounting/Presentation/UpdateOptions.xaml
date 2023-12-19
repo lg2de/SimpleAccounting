@@ -1,0 +1,24 @@
+﻿<UserControl
+  x:Class="lg2de.SimpleAccounting.Presentation.UpdateOptions"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
+  mc:Ignorable="d"
+  d:Background="Azure"
+  d:DataContext="{d:DesignInstance Type=local:UpdateOptionsDesignViewModel, IsDesignTimeCreatable=True}">
+  <StackPanel Orientation="Vertical">
+    <TextBlock
+      Text="{Binding Text}"
+      Padding="10"
+      TextAlignment="Center"/>
+    <ListBox ItemsSource="{Binding Options}" HorizontalContentAlignment="Center">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Button Content="{Binding Text}" Command="{Binding Command}" />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </StackPanel>
+</UserControl>

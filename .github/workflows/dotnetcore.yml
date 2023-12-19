@@ -37,7 +37,10 @@ jobs:
 
     - name: Restore packages
       run: dotnet restore --configfile nuget.config --verbosity normal
-    - name: Publish Release
+    - name: Publish Small Release
+      run: dotnet publish --configuration Release
+      working-directory: src\SimpleAccounting
+    - name: Publish Large Release
       run: dotnet publish --configuration Release -r win-x64 --self-contained
       working-directory: src\SimpleAccounting
     - name: Prepare SonarScanner
@@ -62,8 +65,13 @@ jobs:
     - name: Complete SonarScanner
       run: dotnet sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
 
-    - name: Upload product artifact
+    - name: Upload small artifact
       uses: actions/upload-artifact@v1
       with:
         name: SimpleAccounting
+        path: src\SimpleAccounting\bin\Release\net8.0-windows\publish
+    - name: Upload large artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: SimpleAccounting-self-contained
         path: src\SimpleAccounting\bin\Release\net8.0-windows\win-x64\publish

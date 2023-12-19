@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.Infrastructure;
 
+using System.Globalization;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 /// </summary>
 internal interface IApplicationUpdate
 {
-    Task<bool> IsUpdateAvailableAsync(string currentVersion);
+    Task<string> GetUpdatePackageAsync(string currentVersion, CultureInfo cultureInfo);
 
-    bool StartUpdateProcess();
+    bool StartUpdateProcess(string packageName);
 }

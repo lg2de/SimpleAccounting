@@ -8,12 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="..\..\docs\ReleaseData.xml" Link="Model\ReleaseData.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- license is apache 2.0 -->
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <!-- license is MS.NET -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <!-- license is BSD-3-Clause -->
-    <PackageReference Include="NSubstitute" Version="5.1.0"/>
+    <PackageReference Include="NSubstitute" Version="5.1.0" />
     <!-- license is apache 2.0 -->
     <PackageReference Include="xunit" Version="2.6.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.5">
