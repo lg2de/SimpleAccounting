@@ -61,4 +61,12 @@ public class DesignViewModelTests
         Action action = () => new ShellDesignViewModel();
         action.Should().NotThrow();
     }
+
+    [Fact]
+    public void UpdateOptionsDesignViewModel_ConstructorSucceed()
+    {
+        Action action = () => new UpdateOptionsDesignViewModel();
+        action.Should().NotThrow();
+    }
+
 }

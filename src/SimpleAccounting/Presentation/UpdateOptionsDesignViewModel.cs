@@ -4,18 +4,17 @@
 
 namespace lg2de.SimpleAccounting.Presentation;
 
-using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using lg2de.SimpleAccounting.Infrastructure;
 
+/// <summary>
+///     Implements the designer view model for <see cref="UpdateOptionsViewModel"/>.
+/// </summary>
 internal class UpdateOptionsDesignViewModel : UpdateOptionsViewModel
 {
-    [SuppressMessage(
-        "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
-        Justification = "This is text for the designer only.")]
-    public UpdateOptionsDesignViewModel()
+    public UpdateOptionsDesignViewModel() : base("Asking for update options...")
     {
-        this.Text = "Asking for update options...";
-
-        this.Options.Add(new OptionItem { Text = "Option 1" });
-        this.Options.Add(new OptionItem { Text = "Option 2" });
+        this.Options.Add(new OptionItem("Option 1", new AsyncCommand(() => Task.CompletedTask)));
+        this.Options.Add(new OptionItem("Option 2", new AsyncCommand(() => Task.CompletedTask)));
     }
 }

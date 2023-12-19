@@ -8,16 +8,19 @@ using System.Collections.Generic;
 using Caliburn.Micro;
 using lg2de.SimpleAccounting.Infrastructure;
 
-public class UpdateOptionsViewModel : Screen
+/// <summary>
+///     Implements the view model to allow selection of update options.
+/// </summary>
+public class UpdateOptionsViewModel(string text) : Screen
 {
-    public string Text { get; set; }
+    public string Text { get; } = text;
 
     public IList<OptionItem> Options { get; } = [];
 
-    public class OptionItem
+    public class OptionItem(string text, IAsyncCommand command)
     {
-        public string Text { get; set; }
+        public string Text { get; } = text;
 
-        public IAsyncCommand Command { get; set; }
+        public IAsyncCommand Command { get; } = command;
     }
 }

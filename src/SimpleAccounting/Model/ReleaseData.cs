@@ -42,10 +42,10 @@ public class ReleaseData
     public class ReleaseItem
     {
         [XmlAttribute]
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
 
-        public string EnglishDescription { get; set; }
+        public string? EnglishDescription { get; set; }
 
-        public string GermanDescription { get; set; }
+        public string? GermanDescription { get; set; }
     }
 }

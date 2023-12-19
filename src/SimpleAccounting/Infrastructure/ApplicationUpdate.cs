@@ -21,6 +21,9 @@ using lg2de.SimpleAccounting.Presentation;
 using lg2de.SimpleAccounting.Properties;
 using Octokit;
 
+/// <summary>
+///     Implements the application update.
+/// </summary>
 internal class ApplicationUpdate : IApplicationUpdate
 {
     private readonly IDialogs dialogs;
@@ -139,26 +142,22 @@ internal class ApplicationUpdate : IApplicationUpdate
         var releaseDataXml =
             await this.httpClient.GetStringAsync(new Uri("https://lg2de.github.io/SimpleAccounting/ReleaseData.xml"));
         var releaseData = ReleaseData.Deserialize(releaseDataXml);
-        var releaseMap = releaseData.Releases.ToDictionary(
-            x => x.FileName.ToUpperInvariant(),
+        var releaseMap = releaseData.Releases?.ToDictionary(
+            x => x.FileName?.ToUpperInvariant() ?? "<unknown>",
             x => cultureInfo.Parent.TwoLetterISOLanguageName == "de" ? x.GermanDescription : x.EnglishDescription);
-        var vm = new UpdateOptionsViewModel
-        {
-            Text = string.Format(cultureInfo, Resources.Question_UpdateToVersionX, this.newRelease.TagName)
-        };
+        var vm = new UpdateOptionsViewModel(
+            string.Format(cultureInfo, Resources.Question_UpdateToVersionX, this.newRelease.TagName));
         string selectedPackage = string.Empty;
         foreach (string assetName in this.newRelease.Assets.Select(x => x.Name))
         {
-            var option = new UpdateOptionsViewModel.OptionItem
-            {
-                Text = releaseMap.GetValueOrDefault(assetName.ToUpperInvariant(), assetName),
-                Command = new AsyncCommand(
+            var option = new UpdateOptionsViewModel.OptionItem(
+                releaseMap?.GetValueOrDefault(assetName.ToUpperInvariant(), assetName) ?? "<unknown>",
+                new AsyncCommand(
                     () =>
                     {
                         selectedPackage = assetName;
                         return vm.TryCloseAsync(dialogResult: true);
-                    })
-            };
+                    }));
             vm.Options.Add(option);
         }
 
