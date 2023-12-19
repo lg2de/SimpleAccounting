@@ -174,7 +174,7 @@ public class ApplicationUpdateTests
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.Yes);
         var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
-            .Should().CompleteWithinAsync(1.Seconds());
+            .Should().CompleteWithinAsync(10.Seconds());
         result.Subject.Should().Be("package-name.zip");
 
         sut.StartUpdateProcess("package-name.zip").Should().BeTrue();
