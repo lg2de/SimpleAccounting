@@ -35,8 +35,8 @@ public class ReleaseDataTests
                     new ReleaseData.ReleaseItem
                     {
                         FileName = "SimpleAccounting-self-contained.zip",
-                        EnglishDescription = "Yes, the Large Package - Current .NET 8 runtime is included",
-                        GermanDescription = "Ja, das große Paket - Aktuelle .NET 8 Laufzeitumgebung ist enthalten"
+                        EnglishDescription = "Yes, the Large Package - Current .NET 8 runtime is included (recommended)",
+                        GermanDescription = "Ja, das große Paket - Aktuelle .NET 8 Laufzeitumgebung ist enthalten (empfohlen)"
                     }
                 ]
             });
