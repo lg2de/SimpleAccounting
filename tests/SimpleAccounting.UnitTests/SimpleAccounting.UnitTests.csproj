@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\docs\ReleaseData.xml" Link="Model\ReleaseData.xml" />
+    <EmbeddedResource Include="..\..\docs\ReleaseData.xml" Link="Model\ReleaseData.xml" />
   </ItemGroup>
 
   <ItemGroup>

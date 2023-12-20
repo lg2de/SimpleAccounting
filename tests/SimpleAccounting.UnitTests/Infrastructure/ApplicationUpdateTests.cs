@@ -51,7 +51,7 @@ public class ApplicationUpdateTests
     [Theory]
     [InlineData(0, "foo", "abc.zip")]
     [InlineData(1, "bar", "def.zip")]
-    public async Task AskForUpdate_NewVersionOptionSelection_StartUpdate(
+    public async Task AskForUpdateAsync_NewVersionOptionSelection_StartUpdate(
         int selectedIndex, string expectedDescription, string expectedFileName)
     {
         var dialogs = Substitute.For<IDialogs>();
@@ -91,7 +91,7 @@ public class ApplicationUpdateTests
     }
 
     [Fact]
-    public async Task AskForUpdate_NoNewVersion_AppIsUpToDate()
+    public async Task AskForUpdateAsync_NoNewVersion_AppIsUpToDate()
     {
         var dialogs = Substitute.For<IDialogs>();
         var windowsManager = Substitute.For<IWindowManager>();
@@ -117,7 +117,7 @@ public class ApplicationUpdateTests
     }
 
     [Fact]
-    public async Task AskForUpdate_NewVersionNo_NoUpdate()
+    public async Task AskForUpdateAsync_NewVersionNo_NoUpdate()
     {
         var dialogs = Substitute.For<IDialogs>();
         var windowsManager = Substitute.For<IWindowManager>();
