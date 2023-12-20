@@ -1,8 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Label="Globals">
-    <!-- ProjectGuid is required for SonarQube -->
-    <ProjectGuid>{507F5D29-96C7-48C2-966C-58342D08A4A7}</ProjectGuid>
     <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>lg2de.SimpleAccounting.IntegrationTests</RootNamespace>
   </PropertyGroup>
@@ -32,5 +30,5 @@
     <None Remove="Ressources\import.csv" />
     <EmbeddedResource Include="Ressources\import.csv" />
   </ItemGroup>
-  
+
 </Project>

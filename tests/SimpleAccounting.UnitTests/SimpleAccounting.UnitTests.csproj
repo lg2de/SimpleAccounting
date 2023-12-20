@@ -1,8 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Label="Globals">
-    <!-- ProjectGuid is required for SonarQube -->
-    <ProjectGuid>{E77B3647-FBC9-4138-A0D5-C9165EF45417}</ProjectGuid>
     <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>lg2de.SimpleAccounting.UnitTests</RootNamespace>
   </PropertyGroup>
