@@ -15,9 +15,6 @@ using lg2de.SimpleAccounting.Model;
     "Major Code Smell", "S109:Magic numbers should not be used",
     Justification = "Design view model defines useful values")]
 [SuppressMessage(
-    "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
-    Justification = "Design view model defines useful values")]
-[SuppressMessage(
     "Blocker Code Smell", "S4462:Calls to \"async\" methods should not be blocking",
     Justification = "In the designer we need to complete immediately.")]
 internal sealed class CloseYearDesignViewModel : CloseYearViewModel

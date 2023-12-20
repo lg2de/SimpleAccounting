@@ -585,4 +585,7 @@ Ohne eine solche Konfiguration für mindestens ein Konto ist diese Funktion deak
   <data name="JournalContextMenu_Edit" xml:space="preserve">
     <value>Eintrag bearbeiten</value>
   </data>
+  <data name="Update_SkipVersion" xml:space="preserve">
+    <value>Nein, diese Version überspringen!</value>
+  </data>
 </root>

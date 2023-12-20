@@ -44,6 +44,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BF2618D8
 		tests\Directory.Build.props = tests\Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3355B5D5-5674-4583-91F7-0FB77A701227}"
+	ProjectSection(SolutionItems) = preProject
+		docs\AccountingData.xsd = docs\AccountingData.xsd
+		docs\ReleaseData.xml = docs\ReleaseData.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

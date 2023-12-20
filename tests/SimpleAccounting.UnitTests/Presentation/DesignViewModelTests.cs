@@ -11,6 +11,7 @@ using lg2de.SimpleAccounting.Presentation;
 using Xunit;
 
 [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+[SuppressMessage("Performance", "CA1806:Do not ignore method results", Justification = "We are testing the constructor only.")]
 public class DesignViewModelTests
 {
     [Fact]
@@ -59,6 +60,13 @@ public class DesignViewModelTests
     public void ShellDesignViewModel_ConstructorSucceed()
     {
         Action action = () => new ShellDesignViewModel();
+        action.Should().NotThrow();
+    }
+
+    [Fact]
+    public void UpdateOptionsDesignViewModel_ConstructorSucceed()
+    {
+        Action action = () => new UpdateOptionsDesignViewModel();
         action.Should().NotThrow();
     }
 }

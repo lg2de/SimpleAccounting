@@ -1,0 +1,34 @@
+﻿<UserControl
+  x:Class="lg2de.SimpleAccounting.Presentation.UpdateOptionsView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
+  xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
+  mc:Ignorable="d"
+  d:Background="Azure"
+  d:DataContext="{d:DesignInstance Type=local:UpdateOptionsDesignViewModel, IsDesignTimeCreatable=True}">
+  <StackPanel Orientation="Vertical">
+    <StackPanel.Resources>
+      <Style TargetType="Button">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="Padding" Value="10" />
+      </Style>
+    </StackPanel.Resources>
+    <TextBlock
+      Text="{Binding Text}"
+      Padding="10"
+      TextAlignment="Center"/>
+    <ItemsControl
+      ItemsSource="{Binding Options}"
+      HorizontalContentAlignment="Center">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Button Content="{Binding Text}" Command="{Binding Command}" />
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <Button Content="{x:Static properties:Resources.Update_SkipVersion}" IsCancel="True" />
+  </StackPanel>
+</UserControl>

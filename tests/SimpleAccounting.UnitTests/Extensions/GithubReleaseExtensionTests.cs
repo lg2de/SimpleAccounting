@@ -46,14 +46,14 @@ public class GithubReleaseExtensionTests
     [Fact]
     public void GetNewRelease_AssetNotAvailable_VersionIgnored()
     {
-        var releases = CreateRelease("2.1.0", addAsset: false);
+        var releases = CreateRelease("2.1.0", assetName1: null);
         var result = releases.GetNewRelease("2.0.0");
 
         result.Should().BeNull();
     }
 
     [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-    internal static IReadOnlyList<Release> CreateRelease(string tag, bool addAsset = true)
+    internal static IReadOnlyList<Release> CreateRelease(string tag, string assetName1 = "x.zip", string assetName2 = null)
     {
         Type releaseType = typeof(Release);
         var tagProperty = releaseType.GetProperty(nameof(Release.TagName));
@@ -66,9 +66,14 @@ public class GithubReleaseExtensionTests
             preReleaseProperty.SetValue(release, true);
         }
 
-        if (addAsset)
+        if (assetName1 != null)
         {
-            assetsProperty.SetValue(release, new List<ReleaseAsset> { new TestingRelease("x.zip") });
+            var assets = new List<ReleaseAsset> { new TestingRelease(assetName1) };
+            assetsProperty.SetValue(release, assets);
+            if (assetName2 != null)
+            {
+                assets.Add(new TestingRelease(assetName2));
+            }
         }
 
         return new List<Release> { release };

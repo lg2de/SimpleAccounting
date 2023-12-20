@@ -659,8 +659,8 @@ public partial class ShellViewModelTests
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.No);
         sut.ProjectData.IsModified = true;
-        applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
-        applicationUpdate.StartUpdateProcess().Returns(false);
+        applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("true");
+        applicationUpdate.StartUpdateProcess("foo.zip").Returns(false);
         var monitor = sut.Monitor();
 
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
@@ -680,8 +680,8 @@ public partial class ShellViewModelTests
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.No);
         sut.ProjectData.IsModified = true;
-        applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
-        applicationUpdate.StartUpdateProcess().Returns(true);
+        applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("package-name.zip");
+        applicationUpdate.StartUpdateProcess("package-name.zip").Returns(true);
         var monitor = sut.Monitor();
 
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
@@ -695,24 +695,24 @@ public partial class ShellViewModelTests
     public async Task HelpCheckForUpdateCommand_NoUpdateAvailable_UpdateProcessNotStarted()
     {
         var sut = CreateSut(out IApplicationUpdate applicationUpdate, out _);
-        applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(false);
+        applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("false");
 
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
             .CompleteWithinAsync(1.Seconds());
 
-        applicationUpdate.DidNotReceive().StartUpdateProcess();
+        applicationUpdate.DidNotReceive().StartUpdateProcess("foo.zip");
     }
 
     [Fact]
     public async Task HelpCheckForUpdateCommand_UserDoesNotWantToSave_UpdateProcessNotStarted()
     {
         var sut = CreateSut(out IApplicationUpdate applicationUpdate, out _);
-        applicationUpdate.IsUpdateAvailableAsync(Arg.Any<string>()).Returns(true);
+        applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("true");
         sut.ProjectData.IsModified = true;
 
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
             .CompleteWithinAsync(1.Seconds());
 
-        applicationUpdate.DidNotReceive().StartUpdateProcess();
+        applicationUpdate.DidNotReceive().StartUpdateProcess("foo.zip");
     }
 }
