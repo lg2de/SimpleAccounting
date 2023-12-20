@@ -7,12 +7,12 @@ namespace lg2de.SimpleAccounting.Presentation
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    ///     Interaction logic for UpdateOptions.xaml
+    ///     Interaction logic for UpdateOptionsView.xaml
     /// </summary>
-    public partial class UpdateOptions
+    public partial class UpdateOptionsView
     {
         [ExcludeFromCodeCoverage]
-        public UpdateOptions()
+        public UpdateOptionsView()
         {
             this.InitializeComponent();
         }

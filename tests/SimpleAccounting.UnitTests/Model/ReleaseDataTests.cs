@@ -29,14 +29,14 @@ public class ReleaseDataTests
                     new ReleaseData.ReleaseItem
                     {
                         FileName = "SimpleAccounting.zip",
-                        EnglishDescription = "Small Package - .NET 8 runtime needs to be installed",
-                        GermanDescription = "Kleines Paket - .NET 8 Laufzeitumgebung muss installiert sein"
+                        EnglishDescription = "Yes, the Small Package - .NET 8 runtime needs to be installed",
+                        GermanDescription = "Ja, das kleine Paket - .NET 8 Laufzeitumgebung muss installiert sein"
                     },
                     new ReleaseData.ReleaseItem
                     {
                         FileName = "SimpleAccounting-self-contained.zip",
-                        EnglishDescription = "Larges Package - Current .NET 8 runtime is included",
-                        GermanDescription = "Großes Paket - Aktuelle .NET 8 Laufzeitumgebung ist enthalten"
+                        EnglishDescription = "Yes, the Large Package - Current .NET 8 runtime is included",
+                        GermanDescription = "Ja, das große Paket - Aktuelle .NET 8 Laufzeitumgebung ist enthalten"
                     }
                 ]
             });

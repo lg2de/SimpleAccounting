@@ -600,4 +600,7 @@ Without such configuration for at least one account, this function is disabled.<
   <data name="JournalContextMenu_Edit" xml:space="preserve">
     <value>Edit entry</value>
   </data>
+  <data name="Update_SkipVersion" xml:space="preserve">
+    <value>No, skip this version!</value>
+  </data>
 </root>

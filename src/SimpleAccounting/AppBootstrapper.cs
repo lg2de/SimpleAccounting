@@ -43,6 +43,7 @@ public class AppBootstrapper : BootstrapperBase
         this.container.Singleton<IDialogs, WindowsDialogs>()
             .Singleton<IFileSystem, FileSystem>()
             .Singleton<IProcess, DotNetProcess>();
+        this.container.PerRequest<IHttpClient, DotNetHttpClient>();
         this.container.PerRequest<ShellViewModel>();
     }
 

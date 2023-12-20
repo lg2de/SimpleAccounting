@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ReleaseData>
   <Release FileName="SimpleAccounting.zip">
-    <EnglishDescription>Small Package - .NET 8 runtime needs to be installed</EnglishDescription>
-    <GermanDescription>Kleines Paket - .NET 8 Laufzeitumgebung muss installiert sein</GermanDescription>
+    <EnglishDescription>Yes, the Small Package - .NET 8 runtime needs to be installed</EnglishDescription>
+    <GermanDescription>Ja, das kleine Paket - .NET 8 Laufzeitumgebung muss installiert sein</GermanDescription>
   </Release>
   <Release FileName="SimpleAccounting-self-contained.zip">
-    <EnglishDescription>Larges Package - Current .NET 8 runtime is included</EnglishDescription>
-    <GermanDescription>Großes Paket - Aktuelle .NET 8 Laufzeitumgebung ist enthalten</GermanDescription>
+    <EnglishDescription>Yes, the Large Package - Current .NET 8 runtime is included</EnglishDescription>
+    <GermanDescription>Ja, das große Paket - Aktuelle .NET 8 Laufzeitumgebung ist enthalten</GermanDescription>
   </Release>
 </ReleaseData>

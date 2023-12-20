@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
@@ -139,8 +140,18 @@ internal class ApplicationUpdate : IApplicationUpdate
             return string.Empty;
         }
 
-        var releaseDataXml =
-            await this.httpClient.GetStringAsync(new Uri("https://lg2de.github.io/SimpleAccounting/ReleaseData.xml"));
+        string releaseDataXml;
+        try
+        {
+            releaseDataXml = await this.httpClient.GetStringAsync(
+                new Uri("https://lg2de.github.io/SimpleAccounting/ReleaseData.xml"));
+        }
+        catch (HttpRequestException exception)
+        {
+            this.dialogs.ShowMessageBox(exception.Message, caption, icon: MessageBoxImage.Error);
+            return string.Empty;
+        }
+
         var releaseData = ReleaseData.Deserialize(releaseDataXml);
         var releaseMap = releaseData.Releases?.ToDictionary(
             x => x.FileName?.ToUpperInvariant() ?? "<unknown>",
