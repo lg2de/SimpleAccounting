@@ -17,6 +17,11 @@ public class UpdateOptionsViewModel(string text) : Screen
 
     public IList<OptionItem> Options { get; } = [];
 
+    public void AddOption(string option, IAsyncCommand command)
+    {
+        this.Options.Add(new OptionItem(option, command));
+    }
+
     public class OptionItem(string text, IAsyncCommand command)
     {
         public string Text { get; } = text;

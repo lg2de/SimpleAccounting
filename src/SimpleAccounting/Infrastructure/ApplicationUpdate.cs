@@ -161,7 +161,7 @@ internal class ApplicationUpdate : IApplicationUpdate
         string selectedPackage = string.Empty;
         foreach (string assetName in this.newRelease.Assets.Select(x => x.Name))
         {
-            var option = new UpdateOptionsViewModel.OptionItem(
+            vm.AddOption(
                 releaseMap?.GetValueOrDefault(assetName.ToUpperInvariant(), assetName) ?? "<unknown>",
                 new AsyncCommand(
                     () =>
@@ -169,7 +169,6 @@ internal class ApplicationUpdate : IApplicationUpdate
                         selectedPackage = assetName;
                         return vm.TryCloseAsync(dialogResult: true);
                     }));
-            vm.Options.Add(option);
         }
 
         var result = await this.windowManager.ShowDialogAsync(vm);
