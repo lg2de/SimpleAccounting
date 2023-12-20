@@ -8,14 +8,20 @@ using System;
 using System.Reflection;
 
 /// <summary>
-///     Implements extensions on <see cref="Type"/>.
+///     Implements extensions on <see cref="Type" />.
 /// </summary>
 internal static class TypeExtensions
 {
     public static string GetInformationalVersion(this Type type)
     {
-        return type.Assembly
-                   .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-               ?? "UNKNOWN";
+        string version = type.Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+                         ?? "UNKNOWN";
+        var position = version.IndexOf("+", StringComparison.InvariantCultureIgnoreCase);
+        if (position > 0)
+        {
+            version = version[..position];
+        }
+
+        return version;
     }
 }
