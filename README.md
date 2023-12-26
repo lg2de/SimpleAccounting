@@ -16,13 +16,15 @@ Bookings can be imported from text files (CSV), e.g. provided by your bank accou
 I started `SimpleAccounting` around 2005, only for my personal use to manage accounts and balances of a small club.
 In 2019, I met a colleague from another small club who was looking for a simple solution to get an overview of the balances of several logical and real accounts.
 
-So I decided to rework my solution to make it usable for others and open source.
+So, I decided to rework my solution to make it usable for others and open source.
 
 ## Naming
 
 The name says it all. The software is as simple as possible. 
 
-It probably does not follow all rules and laws of double-entry accounting, e.g. the software does not protect accounting entries from changes. Instead it is explicitly possible to change existing entries.
+It probably does not follow all rules and laws of double-entry accounting, e.g. the software does not protect accounting
+entries from changes.
+Instead it is explicitly possible to change existing entries.
 The data is stored in readable XML format and can be changed manually.
 An XSD document is available online and linked from the XML document which supports editing with code completion support.
 
@@ -31,7 +33,8 @@ The software focuses on journal and balance sheet reporting.
 ## Features
 
 * Data management for double-entry accounting, stored as XML (see [example](./samples/sample.acml)) and defined using [XSD](./docs/AccountingData.xsd)
-* User interface (English and German) for the management of accounts, the creation and modification of entries, the listing of account journals
+* User interface (English, German, and French) for the management of accounts, the creation and modification of entries,
+  the listing of account journals
 * Support for split booking entries, either on credit or debit side
 * Import of booking entries from your bank account using CSV files incl. semi-automatic assignment of offsetting accounts
 * Printable reports for full journal, account journal, accounts and balances, and annual financial statements
@@ -39,19 +42,25 @@ The software focuses on journal and balance sheet reporting.
 
 Some screenshots for first impression:
 
-|Main view|Split booking|Totals and balances report|
-|-|-|-|
-|<img src="./samples/MainView.png" alt="Main view" width="250" />|<img src="./samples/SplitBooking.png" alt="Split booking" width="250" />|<img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report" width="250" />|
+| Main view                                                        | Split booking                                                            | Totals and balances report                                                                       |
+|------------------------------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| <img src="./samples/MainView.png" alt="Main view" width="250" /> | <img src="./samples/SplitBooking.png" alt="Split booking" width="250" /> | <img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report" width="250" /> |
 
 ## Getting started
 
-The application is based on [.NET Core 3](https://dotnet.microsoft.com/download/dotnet-core/3.1).
-Please download and install the Runtime in version [3.1](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.16-windows-x64-installer) or above.
+The application is based on [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
+There is
+a [self-contained package](https://github.com/lg2de/SimpleAccounting/releases/download/2.3.0/SimpleAccounting-self-contained.zip)
+available. Using this package you do not need to install the .NET 8 runtime. I'll update this package with security
+fixes if needed.
+There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.3.0/SimpleAccounting.zip)
+available which requires .NET runtime to be installed.
+Please download and install the Runtime in
+version [8.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.0-windows-x64-installer)
+or above.
 
-Please note, the "development version" (current main branch) is already on .NET 8.
-New official release is pending.
-
-Download the `SimpleAccounting` package from the [release page](https://github.com/lg2de/SimpleAccounting/releases).
+Download one of the `SimpleAccounting` packages from
+the [release page](https://github.com/lg2de/SimpleAccounting/releases).
 Extract the ZIP archive into your preferred destination directory.
 
 Start `SimpleAccounting.exe`.
@@ -60,12 +69,14 @@ Start `SimpleAccounting.exe`.
 
 Contributions are welcome!
 
-Small changes can be made immediately via Pull Request. I will try to check and integrate it as soon as possible.
-Medium and large changes should be discussed first. Please open a new issue or participate in existing discussions.
+Small changes can be made immediately via Pull Request.
+I will try to check and integrate it as soon as possible.
+Medium and large changes should be discussed first.
+Please open a new issue or participate in existing discussions.
 
 ## TODOs
 
-I am German and have no experience with English terms in the financial world.
+I am German and have no experience with English or French terms in the financial world.
 Therefore, I am pretty sure that some of the words I used are confusing for native speakers.
 Perhaps you would like to help with better naming?
 
@@ -81,7 +92,10 @@ The roadmap is defined by issues and milestones.
 I do not like closed source reuse of my software.
 This is why I decided to license the software under GPLV3.
 
-The application uses several external packages licened unter [MIT](https://opensource.org/licenses/MIT).
+The application uses several external packages licensed under [MIT](https://opensource.org/licenses/MIT).
 Additionally the package [CsvHelper](https://github.com/JoshClose/CsvHelper) is licensed from Josh Close under [MS-PL](https://opensource.org/licenses/MS-PL).
 
-For the unit tests additional packages are used licensed under [Apache 2.0](https://licenses.nuget.org/Apache-2.0), [MS-PL](https://opensource.org/licenses/MS-PL), and [BSD-3-Clause](https://licenses.nuget.org/BSD-3-Clause).
+For the unit tests additional packages are used licensed under
+[Apache 2.0](https://licenses.nuget.org/Apache-2.0),
+[MS-PL](https://opensource.org/licenses/MS-PL),
+and [BSD-3-Clause](https://licenses.nuget.org/BSD-3-Clause).
