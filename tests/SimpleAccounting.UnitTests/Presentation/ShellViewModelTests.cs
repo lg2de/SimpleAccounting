@@ -490,8 +490,10 @@ public partial class ShellViewModelTests
         fileSystem.Received(1).FileDelete("the.fileName~");
     }
 
-    [Fact]
-    public async Task LoadProjectFromFileAsync_NewFileOnSecureDrive_StoreOpenedAndFileLoaded()
+    [Theory]
+    [InlineData("Cryptomator File System")]
+    [InlineData("cryptoFs")]
+    public async Task LoadProjectFromFileAsync_NewFileOnSecureDrive_StoreOpenedAndFileLoaded(string cryptoDriveIdentifier)
     {
         var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
         fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(true);
@@ -500,8 +502,11 @@ public partial class ShellViewModelTests
             _ =>
             {
                 var func1 = new Func<string>(() => "Normal");
-                var func2 = new Func<string>(() => "Cryptomator File System");
-                return new[] { (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2) };
+                var func2 = new Func<string>(() => cryptoDriveIdentifier);
+                return new[]
+                {
+                    (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2)
+                };
             });
 
         (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("K:\\the.fileName")).Should()

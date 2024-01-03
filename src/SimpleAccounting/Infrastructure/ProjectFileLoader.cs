@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Infrastructure;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,9 +16,8 @@ using lg2de.SimpleAccounting.Properties;
 
 internal class ProjectFileLoader
 {
-    private readonly IFileSystem fileSystem;
-
     private readonly IDialogs dialogs;
+    private readonly IFileSystem fileSystem;
     private readonly IProcess processApi;
     private readonly Settings settings;
 
@@ -155,6 +155,10 @@ internal class ProjectFileLoader
         return true;
     }
 
+    [SuppressMessage(
+        "Minor Code Smell",
+        "S6605:Collection-specific \"Exists\" method should be used instead of the \"Any\" extension",
+        Justification = "FP")]
     private void UpdateSettings(string projectFileName)
     {
         this.settings.RecentProject = projectFileName;
@@ -162,7 +166,8 @@ internal class ProjectFileLoader
         var info = this.fileSystem.GetDrives().SingleOrDefault(
             x => projectFileName.StartsWith(x.RootPath, StringComparison.InvariantCultureIgnoreCase));
         string format = info.GetFormat?.Invoke() ?? string.Empty;
-        if (format.Contains("cryptomator", StringComparison.InvariantCultureIgnoreCase)
+        var identifiers = new[] { "cryptomator", "cryptoFs" };
+        if (identifiers.Any(x => format.Contains(x, StringComparison.InvariantCultureIgnoreCase))
             && !this.settings.SecuredDrives.Contains(info.RootPath))
         {
             this.settings.SecuredDrives.Add(info.RootPath);
