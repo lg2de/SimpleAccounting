@@ -46,44 +46,23 @@ internal class ReportBase
 
     protected void PreparePrintDocument(string title, DateTime printDate)
     {
-        var textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"title\"]");
-        if (textNode != null)
-        {
-            textNode.InnerText = title;
-        }
+        this.UpdatePlaceholder("Organization", this.setup.Name);
+        this.UpdatePlaceholder("YearName", this.YearData.Year);
+        string startDate = this.YearData.DateStart.ToDateTime().ToString("d", CultureInfo.CurrentCulture);
+        string endDate = this.YearData.DateEnd.ToDateTime().ToString("d", CultureInfo.CurrentCulture);
+        this.UpdatePlaceholder("TimeRange", $"{startDate} - {endDate}");
+        this.UpdatePlaceholder(
+            "CurrentDate", this.setup.Location + ", " + printDate.ToString("D", CultureInfo.CurrentCulture));
+    }
 
-        textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"pageTitle\"]");
-        if (textNode != null)
-        {
-            textNode.InnerText = $"- {title} -";
-        }
-
-        textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"firm\"]");
-        if (textNode != null)
-        {
-            textNode.InnerText = this.setup.Name;
-        }
-
-        var elements = this.PrintDocument.SelectNodes("//*[contains(text(),'yearName')]")!;
+    private void UpdatePlaceholder(string name, string value)
+    {
+        string placeholder = $"#{name}#";
+        var elements = this.PrintDocument.SelectNodes($"//*[contains(text(),'{placeholder}')]")!;
         foreach (var element in elements.OfType<XmlElement>())
         {
             element.InnerText = element.InnerText.Replace(
-                "{yearName}", this.YearData.Year, StringComparison.InvariantCultureIgnoreCase);
-        }
-
-        textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"range\"]");
-        if (textNode != null)
-        {
-            string startDate = this.YearData.DateStart.ToDateTime().ToString("d", CultureInfo.CurrentCulture);
-            string endDate = this.YearData.DateEnd.ToDateTime().ToString("d", CultureInfo.CurrentCulture);
-            textNode.InnerText = $"{startDate} - {endDate}";
-        }
-
-        textNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"date\"]");
-        if (textNode != null)
-        {
-            textNode.InnerText =
-                this.setup.Location + ", " + printDate.ToString("D", CultureInfo.CurrentCulture);
+                placeholder, value, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
