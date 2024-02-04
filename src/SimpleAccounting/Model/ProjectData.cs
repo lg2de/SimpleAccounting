@@ -289,7 +289,7 @@ internal class ProjectData : IProjectData
 
     public Task ShowImportDialogAsync()
     {
-        var importModel = new ImportBookingsViewModel(this.dialogs, this);
+        var importModel = new ImportBookingsViewModel(this.dialogs, this.fileSystem, this);
         return this.windowManager.ShowDialogAsync(
             importModel,
             settings: WindowsDialogs.SizeToContentManualSettings);

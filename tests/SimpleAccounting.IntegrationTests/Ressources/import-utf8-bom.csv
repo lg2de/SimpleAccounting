@@ -1,6 +1,6 @@
-Date,Name,Text,Value
+﻿Date,Name,Text,Value
 1999-12-31,NameIgnore,TextIgnore,12.34
-2000-01-10,Name1,Text1,12.34
+2000-01-10,Name1,Text1 with German Ü and Copyright ©,12.34
 2000-01-15,Shopping Mall,Shoes,-50.00
 2000-12-01,Name2,Text2,23.45
 2000-12-01,Name3,Text3,23.46

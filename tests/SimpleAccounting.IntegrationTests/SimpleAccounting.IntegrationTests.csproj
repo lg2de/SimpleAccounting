@@ -27,8 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Ressources\import.csv" />
-    <EmbeddedResource Include="Ressources\import.csv" />
+    <EmbeddedResource Include="Ressources\import-*.csv"/>
   </ItemGroup>
 
 </Project>

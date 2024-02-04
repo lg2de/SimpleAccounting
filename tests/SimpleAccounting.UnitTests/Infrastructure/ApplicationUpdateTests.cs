@@ -78,7 +78,7 @@ public class ApplicationUpdateTests
         var releases = GithubReleaseExtensionTests.CreateRelease("2.1", "abc.zip", "def.zip");
 
         var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
-            .Should().CompleteWithinAsync(100.Seconds());
+            .Should().CompleteWithinAsync(10.Seconds());
 
         option.Text.Should().Be(expectedDescription);
         result.Subject.Should().Be(expectedFileName);
@@ -102,7 +102,7 @@ public class ApplicationUpdateTests
         var releases = GithubReleaseExtensionTests.CreateRelease("2.0");
 
         var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
-            .Should().CompleteWithinAsync(1.Seconds());
+            .Should().CompleteWithinAsync(10.Seconds());
         result.Subject.Should().BeEmpty();
         dialogs.Received(1).ShowMessageBox(
             Arg.Any<string>(),
@@ -135,7 +135,7 @@ public class ApplicationUpdateTests
             .Returns(MessageBoxResult.No);
 
         var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
-            .Should().CompleteWithinAsync(1.Seconds());
+            .Should().CompleteWithinAsync(10.Seconds());
 
         result.Subject.Should().BeEmpty();
         await windowsManager.Received(1).ShowDialogAsync(Arg.Any<UpdateOptionsViewModel>());

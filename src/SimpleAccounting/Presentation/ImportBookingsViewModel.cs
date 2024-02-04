@@ -28,14 +28,17 @@ internal class ImportBookingsViewModel : Screen
 {
     private readonly List<AccountDefinition> accounts;
     private readonly IDialogs dialogs;
+    private readonly IFileSystem fileSystem;
     private ulong selectedAccountNumber;
     private DateTime startDate;
 
     public ImportBookingsViewModel(
         IDialogs dialogs,
+        IFileSystem fileSystem,
         IProjectData projectData)
     {
         this.dialogs = dialogs;
+        this.fileSystem = fileSystem;
         this.ProjectData = projectData;
         this.accounts = projectData.Storage.AllAccounts.ToList();
         this.FirstBookingNumber = projectData.MaxBookIdent + 1;
@@ -207,7 +210,7 @@ internal class ImportBookingsViewModel : Screen
     [SuppressMessage(
         "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
         Justification = "Exception while processing external file must not cause crash at all")]
-    internal void LoadFromFile(string fileName)
+    internal void LoadFromBytes(byte[] bytes, string informationalFileName)
     {
         try
         {
@@ -222,7 +225,7 @@ internal class ImportBookingsViewModel : Screen
             var filteredAccounts = this.accounts.Where(
                 x => x.ID != this.selectedAccountNumber && x.Type != AccountDefinitionType.Carryforward).ToList();
             using var loader = new ImportFileLoader(
-                fileName, cultureInfo, filteredAccounts, this.SelectedAccount!.ImportMapping);
+                bytes, cultureInfo, filteredAccounts, this.SelectedAccount!.ImportMapping);
 
             var loadedEntries = loader.Load();
             if (this.IsReverseOrder)
@@ -255,7 +258,8 @@ internal class ImportBookingsViewModel : Screen
             {
                 this.dialogs.ShowMessageBox(
                     string.Format(
-                        CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFoundInX, fileName),
+                        CultureInfo.CurrentUICulture, Resources.ImportData_NoRelevantDataFoundInX,
+                        informationalFileName),
                     Resources.ImportData_MessageTitle);
             }
 
@@ -265,7 +269,7 @@ internal class ImportBookingsViewModel : Screen
         catch (Exception e)
         {
             string message =
-                string.Format(CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, fileName)
+                string.Format(CultureInfo.CurrentUICulture, Resources.Information_FailedToLoadX, informationalFileName)
                 + Environment.NewLine + e.Message;
             this.dialogs.ShowMessageBox(message, Resources.ImportData_MessageTitle);
         }
@@ -285,7 +289,8 @@ internal class ImportBookingsViewModel : Screen
                 return;
             }
 
-            this.LoadFromFile(fileName);
+            var bytes = this.fileSystem.ReadAllBytesFromFile(fileName);
+            this.LoadFromBytes(bytes, fileName);
 
             // save the folder for next import session
             this.ProjectData.Storage.Setup.Behavior.LastBookingImportFolder = Path.GetDirectoryName(fileName);

@@ -24,13 +24,13 @@
     <!-- licecnse is MIT -->
     <PackageReference Include="Caliburn.Micro" Version="4.0.212"/>
     <!-- license is MS-PL -->
-    <PackageReference Include="CsvHelper" Version="15.0.5" />
+    <PackageReference Include="CsvHelper" Version="30.1.0"/>
     <!-- licecnse is MIT -->
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
     <!-- license is MIT -->
-    <PackageReference Include="Octokit" Version="9.0.0" />
+    <PackageReference Include="MagicFileEncoding" Version="2.0.1"/>
     <!-- license is MIT -->
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+    <PackageReference Include="Octokit" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>

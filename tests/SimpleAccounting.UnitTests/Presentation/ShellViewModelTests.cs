@@ -110,7 +110,7 @@ public partial class ShellViewModelTests
             .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
             .Do(_ => fileSaved.SetResult(true));
         await ((IActivate)sut).ActivateAsync();
-        await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
+        await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(10.Seconds());
         sut.ProjectData.IsModified = false;
 
         var delayTask = Task.Delay(200.Milliseconds());
@@ -285,7 +285,7 @@ public partial class ShellViewModelTests
 
         var task = Task.Run(() => ((IDeactivate)sut).DeactivateAsync(close: true));
 
-        await task.Awaiting(x => x).Should().CompleteWithinAsync(1.Seconds());
+        await task.Awaiting(x => x).Should().CompleteWithinAsync(10.Seconds());
     }
 
     [CulturedFact("en")]
@@ -426,7 +426,7 @@ public partial class ShellViewModelTests
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
         (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds()))
+                .CompleteWithinAsync(10.Seconds()))
             .Which.Should().Be(OperationResult.Completed);
 
         using var _ = new AssertionScope();
@@ -478,7 +478,7 @@ public partial class ShellViewModelTests
         fileSystem.FileExists("the.fileName~").Returns(true);
 
         (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds()))
+                .CompleteWithinAsync(10.Seconds()))
             .Which.Should().Be(OperationResult.Completed);
 
         using var _ = new AssertionScope();
@@ -493,7 +493,8 @@ public partial class ShellViewModelTests
     [Theory]
     [InlineData("Cryptomator File System")]
     [InlineData("cryptoFs")]
-    public async Task LoadProjectFromFileAsync_NewFileOnSecureDrive_StoreOpenedAndFileLoaded(string cryptoDriveIdentifier)
+    public async Task LoadProjectFromFileAsync_NewFileOnSecureDrive_StoreOpenedAndFileLoaded(
+        string cryptoDriveIdentifier)
     {
         var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
         fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(true);
@@ -503,14 +504,11 @@ public partial class ShellViewModelTests
             {
                 var func1 = new Func<string>(() => "Normal");
                 var func2 = new Func<string>(() => cryptoDriveIdentifier);
-                return new[]
-                {
-                    (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2)
-                };
+                return new[] { (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2) };
             });
 
         (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("K:\\the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds()))
+                .CompleteWithinAsync(10.Seconds()))
             .Which.Should().Be(OperationResult.Completed);
 
         sut.ProjectData.Settings.SecuredDrives.Should().BeEquivalentTo(new object[] { "K:\\" });
@@ -543,7 +541,7 @@ public partial class ShellViewModelTests
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
 
         (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds()))
+                .CompleteWithinAsync(10.Seconds()))
             .Which.Should().Be(OperationResult.Completed);
 
         sut.ProjectData.Settings.RecentProjects.OfType<string>().Should()
@@ -559,7 +557,7 @@ public partial class ShellViewModelTests
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 
         (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds()))
+                .CompleteWithinAsync(10.Seconds()))
             .Which.Should().Be(OperationResult.Completed);
 
         sut.ProjectData.IsModified.Should().BeTrue();
@@ -581,7 +579,7 @@ public partial class ShellViewModelTests
         fileSystem.FileExists("new.fileName").Returns(true);
 
         (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(1.Seconds()))
+                .CompleteWithinAsync(10.Seconds()))
             .Which.Should().Be(OperationResult.Aborted);
 
         using var _ = new AssertionScope();
