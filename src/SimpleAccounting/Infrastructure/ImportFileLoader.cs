@@ -80,7 +80,7 @@ internal sealed partial class ImportFileLoader : IDisposable
         }
 
         csv.ReadHeader();
-        if (csv.Context.HeaderRecord.Length <= 1)
+        if (csv.HeaderRecord.Length <= 1)
         {
             throw new InvalidOperationException("Missing or incomplete file header.");
         }
