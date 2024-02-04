@@ -58,6 +58,13 @@ internal interface IFileSystem
     string ReadAllTextFromFile(string path);
 
     /// <summary>
+    ///     Opens a binary file, reads the contents of the file into a byte array, and then closes the file.
+    /// </summary>
+    /// <param name="path">The file to open for reading.</param>
+    /// <returns>A byte array containing the contents of the file.</returns>
+    byte[] ReadAllBytesFromFile(string path);
+
+    /// <summary>
     ///     Retrieves the drive names of all logical drives on a computer.
     /// </summary>
     /// <returns>An enumeration of type <see cref="System.IO.DriveInfo"/> that represents the logical drives on a computer.</returns>

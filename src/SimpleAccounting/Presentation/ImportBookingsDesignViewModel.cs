@@ -34,8 +34,14 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
             {
                 Columns =
                 [
-                    new AccountDefinitionImportMappingColumn { Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date },
-                    new AccountDefinitionImportMappingColumn { Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value }
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date
+                    },
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value
+                    }
                 ]
             }
         },
@@ -68,7 +74,7 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     };
 
     public ImportBookingsDesignViewModel()
-        : base(null!, new ProjectData(new Settings(), null!, null!, null!, null!))
+        : base(null!, null!, new ProjectData(new Settings(), null!, null!, null!, null!))
     {
         this.ProjectData.Load(SampleData);
         this.SelectedAccountNumber = 100;

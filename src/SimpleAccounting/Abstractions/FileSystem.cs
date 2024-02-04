@@ -50,6 +50,11 @@ internal class FileSystem : IFileSystem
         return File.ReadAllText(path);
     }
 
+    public byte[] ReadAllBytesFromFile(string path)
+    {
+        return File.ReadAllBytes(path);
+    }
+
     public IEnumerable<(string RootPath, Func<string> GetFormat)> GetDrives()
     {
         foreach (var driveInfo in DriveInfo.GetDrives())

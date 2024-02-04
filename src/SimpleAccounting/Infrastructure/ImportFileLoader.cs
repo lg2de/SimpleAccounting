@@ -9,31 +9,31 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using CsvHelper;
 using CsvHelper.Configuration;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
+using MagicFileEncoding;
 
 internal sealed partial class ImportFileLoader : IDisposable
 {
     private readonly List<AccountDefinition> accounts;
     private readonly CultureInfo cultureInfo;
-    private readonly string fileName;
+    private readonly byte[] bytes;
     private readonly AccountDefinitionImportMapping importMapping;
     private readonly Regex duplicateSpaceExpression = DuplicateSpaceRegex();
 
     private StreamReader? streamReader;
 
     public ImportFileLoader(
-        string fileName,
+        byte[] bytes,
         CultureInfo cultureInfo,
         List<AccountDefinition> accounts,
         AccountDefinitionImportMapping importMapping)
     {
-        this.fileName = fileName;
+        this.bytes = bytes;
         this.cultureInfo = cultureInfo;
         this.accounts = accounts;
         this.importMapping = importMapping;
@@ -46,17 +46,16 @@ internal sealed partial class ImportFileLoader : IDisposable
 
     public IEnumerable<ImportEntryViewModel> Load()
     {
+        var encoding = FileEncoding.GetAcceptableEncoding(this.bytes);
+
         // note, the stream is disposed by the reader
-        var stream = new FileStream(
-            this.fileName, FileMode.Open, FileAccess.Read,
-            FileShare.ReadWrite);
-        var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-        this.streamReader = new StreamReader(stream, enc1252!);
+        var stream = new MemoryStream(this.bytes);
+        this.streamReader = new StreamReader(stream, encoding);
         var configuration = new CsvConfiguration(this.cultureInfo);
         return this.ImportBookings(this.streamReader, configuration);
     }
 
-    internal IEnumerable<ImportEntryViewModel> ImportBookings(TextReader reader, CsvConfiguration configuration)
+    private IEnumerable<ImportEntryViewModel> ImportBookings(TextReader reader, IReaderConfiguration configuration)
     {
         var dateField =
             this.importMapping.Columns
@@ -75,8 +74,13 @@ internal sealed partial class ImportFileLoader : IDisposable
             ?? "value";
 
         using var csv = new CsvReader(reader, configuration);
-        csv.Read();
-        if (!csv.ReadHeader() || csv.Context.HeaderRecord.Length <= 1)
+        if (!csv.Read())
+        {
+            throw new InvalidOperationException("Failed to read initial record.");
+        }
+
+        csv.ReadHeader();
+        if (csv.Context.HeaderRecord.Length <= 1)
         {
             throw new InvalidOperationException("Missing or incomplete file header.");
         }

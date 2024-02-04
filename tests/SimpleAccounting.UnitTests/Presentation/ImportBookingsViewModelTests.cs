@@ -25,7 +25,7 @@ public class ImportBookingsViewModelTests
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        var sut = new ImportBookingsViewModel(null!, projectData);
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
 
         sut.ImportAccounts.Should().BeEquivalentTo(new[] { new { Name = "Bank account" } });
     }
@@ -38,7 +38,7 @@ public class ImportBookingsViewModelTests
         [
             new AccountingDataAccountGroup { Account = [new AccountDefinition { ID = 100, Name = "Bank" }] }
         ];
-        var sut = new ImportBookingsViewModel(null!, projectData);
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
 
         sut.IsImportPossible.Should().BeFalse();
         sut.IsImportBroken.Should().BeTrue();
@@ -54,14 +54,11 @@ public class ImportBookingsViewModelTests
             {
                 Account =
                 [
-                    new AccountDefinition
-                    {
-                        ID = 100, Name = "Bank", ImportMapping = Samples.SimpleImportConfiguration
-                    }
+                    new AccountDefinition { ID = 100, Name = "Bank", ImportMapping = Samples.SimpleImportConfiguration }
                 ]
             }
         ];
-        var sut = new ImportBookingsViewModel(null!, projectData);
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
 
         sut.IsImportPossible.Should().BeTrue();
         sut.IsImportBroken.Should().BeFalse();
@@ -72,7 +69,7 @@ public class ImportBookingsViewModelTests
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
         projectData.Load(Samples.SampleProject);
-        var sut = new ImportBookingsViewModel(null!, projectData);
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
 
         sut.SelectedAccountNumber = 100;
@@ -132,7 +129,7 @@ public class ImportBookingsViewModelTests
     {
         var dialogs = Substitute.For<IDialogs>();
         var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!);
-        var sut = new ImportBookingsViewModel(dialogs, projectData);
+        var sut = new ImportBookingsViewModel(dialogs, null!, projectData);
 
         sut.LoadDataCommand.CanExecute(null).Should().BeFalse();
     }
@@ -142,7 +139,8 @@ public class ImportBookingsViewModelTests
     {
         var dialogs = Substitute.For<IDialogs>();
         var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!);
-        var sut = new ImportBookingsViewModel(dialogs, projectData) { SelectedAccountNumber = 100 };
+        var fileSystem = Substitute.For<IFileSystem>();
+        var sut = new ImportBookingsViewModel(dialogs, fileSystem, projectData) { SelectedAccountNumber = 100 };
         dialogs
             .ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
             .Returns((DialogResult.OK, "D:\\MySelectedFolder\\import.csv"));
@@ -158,7 +156,7 @@ public class ImportBookingsViewModelTests
     {
         var dialogs = Substitute.For<IDialogs>();
         var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!);
-        var sut = new ImportBookingsViewModel(dialogs, projectData) { SelectedAccountNumber = 100 };
+        var sut = new ImportBookingsViewModel(dialogs, null!, projectData) { SelectedAccountNumber = 100 };
         dialogs
             .ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
             .Returns((DialogResult.Cancel, string.Empty));
@@ -176,7 +174,8 @@ public class ImportBookingsViewModelTests
         var dialogs = Substitute.For<IDialogs>();
         var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!);
         projectData.Storage.Setup.Behavior.LastBookingImportFolder = "E:\\MySelectedFolder";
-        var sut = new ImportBookingsViewModel(dialogs, projectData) { SelectedAccountNumber = 100 };
+        var fileSystem = Substitute.For<IFileSystem>();
+        var sut = new ImportBookingsViewModel(dialogs, fileSystem, projectData) { SelectedAccountNumber = 100 };
         dialogs
             .ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
             .Returns((DialogResult.OK, "F:\\MySelectedFolder\\import.csv"));
@@ -194,7 +193,7 @@ public class ImportBookingsViewModelTests
         projectData.Load(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
-        var sut = new ImportBookingsViewModel(null!, projectData);
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
         sut.LoadedData.Add(
             new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = false, IsExisting = false });
 
@@ -208,7 +207,7 @@ public class ImportBookingsViewModelTests
         projectData.Load(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
-        var sut = new ImportBookingsViewModel(null!, projectData);
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
         sut.LoadedData.Add(
             new ImportEntryViewModel(accounts) { RemoteAccount = accounts[0], IsSkip = false, IsExisting = false });
 
@@ -222,7 +221,7 @@ public class ImportBookingsViewModelTests
         projectData.Load(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
-        var sut = new ImportBookingsViewModel(null!, projectData);
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
         sut.LoadedData.Add(
             new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = true, IsExisting = false });
 
@@ -236,7 +235,7 @@ public class ImportBookingsViewModelTests
         projectData.Load(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
-        var sut = new ImportBookingsViewModel(null!, projectData);
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
         sut.LoadedData.Add(
             new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = false, IsExisting = true });
 
@@ -256,6 +255,7 @@ public class ImportBookingsViewModelTests
         var accounts = projectData.Storage.AllAccounts.ToList();
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
         var sut = new ImportBookingsViewModel(
+            null!,
             null!,
             projectData) { SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID };
         var remoteAccount = accounts.Single(x => x.ID == 600);
