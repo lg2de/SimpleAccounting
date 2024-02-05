@@ -488,33 +488,35 @@ public class XmlPrinterTests
     {
         var sut = new XmlPrinter { DocumentHeight = 10 };
         sut.LoadXml(
-            "<root>"
-            + "<pageTexts><font><text>page {pageNumber}</text></font></pageTexts>"
-            + "<table><columns>"
-            + "<column width=\"10\">C1</column>"
-            + "</columns><data>"
-            + "<tr><td>1</td></tr>"
-            + "<tr><td>2</td></tr>"
-            + "</data></table>"
-            + "</root>");
+            """
+            <root>
+              <pageTexts><font><text>page #PageNumber#</text></font></pageTexts>
+              <table>
+                <columns><column width="10">C1</column></columns>
+                <data><tr><td>1</td></tr><tr><td>2</td></tr></data>
+              </table>
+            </root>
+            """);
 
         var graphics = Substitute.For<IGraphics>();
         sut.TransformDocument(graphics);
 
         XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
             XDocument.Parse(
-                "<root>"
-                + "<font><text>page 1</text></font>"
-                + "<text relX=\"0\">C1</text>"
-                + "<move relY=\"4\" />"
-                + "<text relX=\"0\">1</text>"
-                + "<newPage />"
-                + "<font><text>page 2</text></font>"
-                + "<text relX=\"0\">C1</text>"
-                + "<move relY=\"4\" />"
-                + "<text relX=\"0\">2</text>"
-                + "<move relY=\"4\" />"
-                + "</root>"));
+                """
+                <root>
+                  <font><text>page 1</text></font>
+                  <text relX="0">C1</text>
+                  <move relY="4" />
+                  <text relX="0">1</text>
+                  <newPage />
+                  <font><text>page 2</text></font>
+                  <text relX="0">C1</text>
+                  <move relY="4" />
+                  <text relX="0">2</text>
+                  <move relY="4" />
+                </root>
+                """));
     }
 
     [Fact]

@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
 using System;
 using System.Xml;
+using System.Xml.Linq;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Reports;
@@ -35,31 +36,20 @@ public class ReportBaseTests
         }
     }
 
-    [Fact]
-    public void PreparePrintDocument_EmptyXml_Completed()
-    {
-        var printer = Substitute.For<IXmlPrinter>();
-        printer.Document.Returns(new XmlDocument());
-        var sut = new TestReport(printer, Samples.SampleProjectData);
-
-        sut.Invoking(x => x.PreparePrintDocument("TheTitle", DateTime.Now)).Should().NotThrow();
-    }
-
     [CulturedFact("en")]
     public void PreparePrintDocument_SampleXml_PlaceholdersUpdates()
     {
         var printer = Substitute.For<IXmlPrinter>();
         var xmlDocument = new XmlDocument();
         xmlDocument.LoadXml(
-            @"
-<root>
-  <text ID=""title"">XXX</text>
-  <text ID=""pageTitle"">XXX</text>
-  <text ID=""firm"">XXX</text>
-  <text>- {yearName} -</text>
-  <text ID=""range"">XXX</text>
-  <text ID=""date"">XXX</text>
-</root>");
+            """
+            <root>
+              <text>#Organization#</text>
+              <text>- #YearName# -</text>
+              <text>#TimeRange#</text>
+              <text>#CurrentDate#</text>
+            </root>
+            """);
         printer.Document.Returns(xmlDocument);
         var projectData = Samples.SampleProjectData;
         projectData.Storage.Setup.Name = "TheName";
@@ -69,13 +59,26 @@ public class ReportBaseTests
 
         sut.PreparePrintDocument("TheTitle", new DateTime(2021, 5, 5, 0, 0, 0, DateTimeKind.Local));
 
-        sut.PrintDocument.OuterXml.Should().Be(
-            "<root><text ID=\"title\">TheTitle</text>"
-            + "<text ID=\"pageTitle\">- TheTitle -</text>"
-            + "<text ID=\"firm\">TheName</text>"
-            + "<text>- 2000 -</text>"
-            + "<text ID=\"range\">1/1/2000 - 12/31/2000</text>"
-            + "<text ID=\"date\">TheLocation, Wednesday, May 5, 2021</text></root>");
+        XDocument.Parse(sut.PrintDocument.OuterXml).Should().BeEquivalentTo(
+            XDocument.Parse(
+                """
+                <root>
+                  <text>TheName</text>
+                  <text>- 2000 -</text>
+                  <text>1/1/2000 - 12/31/2000</text>
+                  <text>TheLocation, Wednesday, May 5, 2021</text>
+                </root>
+                """));
+    }
+
+    [Fact]
+    public void PreparePrintDocument_EmptyXml_Completed()
+    {
+        var printer = Substitute.For<IXmlPrinter>();
+        printer.Document.Returns(new XmlDocument());
+        var sut = new TestReport(printer, Samples.SampleProjectData);
+
+        sut.Invoking(x => x.PreparePrintDocument("TheTitle", DateTime.Now)).Should().NotThrow();
     }
 
     [Fact]
