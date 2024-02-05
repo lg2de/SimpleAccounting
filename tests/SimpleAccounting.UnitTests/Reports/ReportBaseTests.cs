@@ -8,6 +8,7 @@ using System;
 using System.Xml;
 using System.Xml.Linq;
 using FluentAssertions;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
@@ -18,21 +19,16 @@ public class ReportBaseTests
 {
     private class TestReport : ReportBase
     {
-        public TestReport(IXmlPrinter printer, ProjectData projectData)
-            : base(printer, string.Empty, projectData)
+        public TestReport(IXmlPrinter printer, IProjectData projectData, IClock clock)
+            : base(string.Empty, printer, projectData, clock)
         {
         }
 
         public new XmlDocument PrintDocument => base.PrintDocument;
 
-        public void SetPrintingDate(DateTime dateTime)
+        public new void PreparePrintDocument()
         {
-            this.PrintingDate = dateTime;
-        }
-
-        public new void PreparePrintDocument(DateTime printDate)
-        {
-            base.PreparePrintDocument(printDate);
+            base.PreparePrintDocument();
         }
     }
 
@@ -40,6 +36,8 @@ public class ReportBaseTests
     public void PreparePrintDocument_SampleXml_PlaceholdersUpdates()
     {
         var printer = Substitute.For<IXmlPrinter>();
+        var clock = Substitute.For<IClock>();
+        clock.Now().Returns(new DateTime(2021, 5, 5, 0, 0, 0, DateTimeKind.Local));
         var xmlDocument = new XmlDocument();
         xmlDocument.LoadXml(
             """
@@ -55,9 +53,9 @@ public class ReportBaseTests
         projectData.Storage.Setup.Name = "TheName";
         projectData.Storage.Setup.Location = "TheLocation";
         projectData.SelectYear(projectData.Storage.Journal[0].Year);
-        var sut = new TestReport(printer, projectData);
+        var sut = new TestReport(printer, projectData, clock);
 
-        sut.PreparePrintDocument(new DateTime(2021, 5, 5, 0, 0, 0, DateTimeKind.Local));
+        sut.PreparePrintDocument();
 
         XDocument.Parse(sut.PrintDocument.OuterXml).Should().BeEquivalentTo(
             XDocument.Parse(
@@ -75,18 +73,20 @@ public class ReportBaseTests
     public void PreparePrintDocument_EmptyXml_Completed()
     {
         var printer = Substitute.For<IXmlPrinter>();
+        var clock = Substitute.For<IClock>();
         printer.Document.Returns(new XmlDocument());
-        var sut = new TestReport(printer, Samples.SampleProjectData);
+        var sut = new TestReport(printer, Samples.SampleProjectData, clock);
 
-        sut.Invoking(x => x.PreparePrintDocument(DateTime.Now)).Should().NotThrow();
+        sut.Invoking(x => x.PreparePrintDocument()).Should().NotThrow();
     }
 
     [Fact]
     public void ShowPreview_DocumentName_PrintingNameCorrect()
     {
         var printer = Substitute.For<IXmlPrinter>();
-        var sut = new TestReport(printer, Samples.SampleProjectData);
-        sut.SetPrintingDate(new DateTime(2020, 2, 29, 0, 0, 0, DateTimeKind.Local));
+        var clock = Substitute.For<IClock>();
+        clock.Now().Returns(new DateTime(2020, 2, 29, 0, 0, 0, DateTimeKind.Local));
+        var sut = new TestReport(printer, Samples.SampleProjectData, clock);
 
         sut.ShowPreview("DocumentName");
 

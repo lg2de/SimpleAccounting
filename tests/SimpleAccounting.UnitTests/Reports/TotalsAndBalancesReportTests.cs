@@ -8,8 +8,10 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
+using NSubstitute;
 using Xunit;
 
 public class TotalsAndBalancesReportTests
@@ -19,8 +21,9 @@ public class TotalsAndBalancesReportTests
     {
         var projectData = Samples.SampleProjectData;
         projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
+        var clock = Substitute.For<IClock>();
         var sut = new TotalsAndBalancesReport(
-            new XmlPrinter(), projectData, projectData.Storage.Accounts);
+            new XmlPrinter(), projectData, clock, projectData.Storage.Accounts);
 
         sut.CreateReport();
 
@@ -147,8 +150,9 @@ public class TotalsAndBalancesReportTests
     public void CreateReport_SampleWithSignature_SignatureLinesCreated()
     {
         var projectData = Samples.SampleProjectData;
+        var clock = Substitute.For<IClock>();
         var sut = new TotalsAndBalancesReport(
-            new XmlPrinter(), projectData, projectData.Storage.Accounts);
+            new XmlPrinter(), projectData, clock, projectData.Storage.Accounts);
         sut.Signatures.Add("The Name");
 
         sut.CreateReport();

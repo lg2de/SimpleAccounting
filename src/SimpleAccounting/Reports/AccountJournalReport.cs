@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
@@ -22,8 +23,8 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
     private double debitTotal;
     private bool firstAccount;
 
-    public AccountJournalReport(IXmlPrinter printer, IProjectData projectData)
-        : base(printer, ResourceName, projectData)
+    public AccountJournalReport(IXmlPrinter printer, IProjectData projectData, IClock clock)
+        : base(ResourceName, printer, projectData, clock)
     {
         this.accounts = projectData.Storage.AllAccounts.OrderBy(a => a.ID);
     }
@@ -35,7 +36,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
 
     public void CreateReport()
     {
-        this.PreparePrintDocument(DateTime.Now);
+        this.PreparePrintDocument();
 
         XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table")!;
 

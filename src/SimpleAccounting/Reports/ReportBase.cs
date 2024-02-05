@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 
@@ -21,19 +22,19 @@ internal class ReportBase
 
     private readonly IXmlPrinter printer;
     private readonly AccountingDataSetup setup;
+    private readonly DateTime printingDate;
 
-    protected ReportBase(IXmlPrinter printer, string resourceName, IProjectData projectData)
+    protected ReportBase(string resourceName, IXmlPrinter printer, IProjectData projectData, IClock clock)
     {
         this.printer = printer;
         this.setup = projectData.Storage.Setup;
         this.YearData = projectData.CurrentYear;
+        this.printingDate = clock.Now();
 
         this.printer.LoadDocument(resourceName);
     }
 
     protected AccountingDataJournal YearData { get; }
-
-    protected DateTime PrintingDate { get; set; } = DateTime.Now;
 
     protected XmlDocument PrintDocument => this.printer.Document;
 
@@ -41,10 +42,10 @@ internal class ReportBase
 
     public void ShowPreview(string documentName)
     {
-        this.printer.PrintDocument($"{this.PrintingDate:yyyy-MM-dd} {documentName} {this.YearData.Year}");
+        this.printer.PrintDocument($"{this.printingDate:yyyy-MM-dd} {documentName} {this.YearData.Year}");
     }
 
-    protected void PreparePrintDocument(DateTime printDate)
+    protected void PreparePrintDocument()
     {
         this.UpdatePlaceholder("Organization", this.setup.Name);
         this.UpdatePlaceholder("YearName", this.YearData.Year);
@@ -52,7 +53,7 @@ internal class ReportBase
         string endDate = this.YearData.DateEnd.ToDateTime().ToString("d", CultureInfo.CurrentCulture);
         this.UpdatePlaceholder("TimeRange", $"{startDate} - {endDate}");
         this.UpdatePlaceholder(
-            "CurrentDate", this.setup.Location + ", " + printDate.ToString("D", CultureInfo.CurrentCulture));
+            "CurrentDate", this.setup.Location + ", " + this.printingDate.ToString("D", CultureInfo.CurrentCulture));
     }
 
     private void UpdatePlaceholder(string name, string value)

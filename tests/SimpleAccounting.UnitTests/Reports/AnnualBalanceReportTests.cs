@@ -8,8 +8,10 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
+using NSubstitute;
 using Xunit;
 
 public class AnnualBalanceReportTests
@@ -19,7 +21,8 @@ public class AnnualBalanceReportTests
     {
         var projectData = Samples.SampleProjectData;
         projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
-        var sut = new AnnualBalanceReport(new XmlPrinter(), projectData);
+        var clock = Substitute.For<IClock>();
+        var sut = new AnnualBalanceReport(new XmlPrinter(), projectData, clock);
 
         sut.CreateReport();
 

@@ -12,8 +12,10 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
+using NSubstitute;
 using Xunit;
 
 [SuppressMessage("ReSharper", "UseStringInterpolation")]
@@ -26,7 +28,8 @@ public class AccountJournalReportTests
     {
         var projectData = Samples.SampleProjectData;
         projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
-        var sut = new AccountJournalReport(new XmlPrinter(), projectData)
+        var clock = Substitute.For<IClock>();
+        var sut = new AccountJournalReport(new XmlPrinter(), projectData, clock)
         {
             PageBreakBetweenAccounts = pageBreakBetweenAccounts
         };
