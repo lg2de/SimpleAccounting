@@ -9,7 +9,7 @@ namespace lg2de.SimpleAccounting.Reports;
 /// </summary>
 internal interface IAnnualBalanceReport
 {
-    void CreateReport(string title);
+    void CreateReport();
 
     void ShowPreview(string documentName);
 }

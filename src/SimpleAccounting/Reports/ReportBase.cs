@@ -44,7 +44,7 @@ internal class ReportBase
         this.printer.PrintDocument($"{this.PrintingDate:yyyy-MM-dd} {documentName} {this.YearData.Year}");
     }
 
-    protected void PreparePrintDocument(string title, DateTime printDate)
+    protected void PreparePrintDocument(DateTime printDate)
     {
         this.UpdatePlaceholder("Organization", this.setup.Name);
         this.UpdatePlaceholder("YearName", this.YearData.Year);

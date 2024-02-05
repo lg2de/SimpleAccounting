@@ -252,7 +252,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     private void OnTotalJournalReport()
     {
         var report = this.reportFactory.CreateTotalJournal(this.projectData);
-        report.CreateReport(Resources.Header_Journal);
+        report.CreateReport();
         report.ShowPreview(Resources.Header_Journal);
     }
 
@@ -261,7 +261,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
         var report = this.reportFactory.CreateAccountJournal(this.projectData);
         report.PageBreakBetweenAccounts =
             this.projectData.Storage.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
-        report.CreateReport(Resources.Header_AccountSheets);
+        report.CreateReport();
         report.ShowPreview(Resources.Header_AccountSheets);
     }
 
@@ -269,7 +269,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     {
         var report = this.reportFactory.CreateTotalsAndBalances(
             this.projectData, this.projectData.Storage.Accounts);
-        report.CreateReport(Resources.Header_TotalsAndBalances);
+        report.CreateReport();
         report.ShowPreview(Resources.Header_TotalsAndBalances);
     }
 
@@ -291,7 +291,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
 
         var report = this.reportFactory.CreateTotalsAndBalances(this.projectData, accountGroups);
         this.projectData.Storage.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
-        report.CreateReport(Resources.Header_AssetBalances);
+        report.CreateReport();
         report.ShowPreview(Resources.Header_AssetBalances);
     }
 
@@ -299,7 +299,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     {
         var report = this.reportFactory.CreateAnnualBalance(this.projectData);
         string title = Resources.Header_AnnualBalance;
-        report.CreateReport(title);
+        report.CreateReport();
         report.ShowPreview(title);
     }
 }

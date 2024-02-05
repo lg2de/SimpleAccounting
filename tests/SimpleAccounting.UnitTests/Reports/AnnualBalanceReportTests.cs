@@ -21,7 +21,7 @@ public class AnnualBalanceReportTests
         projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
         var sut = new AnnualBalanceReport(new XmlPrinter(), projectData);
 
-        sut.CreateReport("dummy");
+        sut.CreateReport();
 
         using var _ = new AssertionScope();
 

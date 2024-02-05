@@ -30,9 +30,9 @@ public class ReportBaseTests
             this.PrintingDate = dateTime;
         }
 
-        public new void PreparePrintDocument(string title, DateTime printDate)
+        public new void PreparePrintDocument(DateTime printDate)
         {
-            base.PreparePrintDocument(title, printDate);
+            base.PreparePrintDocument(printDate);
         }
     }
 
@@ -57,7 +57,7 @@ public class ReportBaseTests
         projectData.SelectYear(projectData.Storage.Journal[0].Year);
         var sut = new TestReport(printer, projectData);
 
-        sut.PreparePrintDocument("TheTitle", new DateTime(2021, 5, 5, 0, 0, 0, DateTimeKind.Local));
+        sut.PreparePrintDocument(new DateTime(2021, 5, 5, 0, 0, 0, DateTimeKind.Local));
 
         XDocument.Parse(sut.PrintDocument.OuterXml).Should().BeEquivalentTo(
             XDocument.Parse(
@@ -78,7 +78,7 @@ public class ReportBaseTests
         printer.Document.Returns(new XmlDocument());
         var sut = new TestReport(printer, Samples.SampleProjectData);
 
-        sut.Invoking(x => x.PreparePrintDocument("TheTitle", DateTime.Now)).Should().NotThrow();
+        sut.Invoking(x => x.PreparePrintDocument(DateTime.Now)).Should().NotThrow();
     }
 
     [Fact]

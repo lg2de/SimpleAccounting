@@ -20,13 +20,15 @@ public class TotalJournalReportTests
         projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
         var sut = new TotalJournalReport(new XmlPrinter(), projectData);
 
-        sut.CreateReport("dummy");
+        sut.CreateReport();
 
         var year = Samples.SampleProject.Journal[^1].Year;
         var expected = $@"
 <data>
   <tr topLine=""True"">
-    <td>1/1/{year}</td>
+    <td>1/1/{
+        year
+    }</td>
     <td>1</td>
     <td>Open 1</td>
     <td>100</td>
@@ -35,7 +37,9 @@ public class TotalJournalReportTests
     <td>1000.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>1/1/{year}</td>
+    <td>1/1/{
+        year
+    }</td>
     <td>2</td>
     <td>Open 2</td>
     <td>990</td>
@@ -44,7 +48,9 @@ public class TotalJournalReportTests
     <td>3000.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>1/28/{year}</td>
+    <td>1/28/{
+        year
+    }</td>
     <td>3</td>
     <td>Salary</td>
     <td>100</td>
@@ -71,7 +77,9 @@ public class TotalJournalReportTests
     <td>80.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>1/29/{year}</td>
+    <td>1/29/{
+        year
+    }</td>
     <td>4</td>
     <td>Credit rate</td>
     <td>5000</td>
@@ -80,7 +88,9 @@ public class TotalJournalReportTests
     <td>400.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>2/1/{year}</td>
+    <td>2/1/{
+        year
+    }</td>
     <td>5</td>
     <td>Shoes1</td>
     <td>600</td>
@@ -107,7 +117,9 @@ public class TotalJournalReportTests
     <td>50.00</td>
   </tr>
   <tr topLine=""True"">
-    <td>2/5/{year}</td>
+    <td>2/5/{
+        year
+    }</td>
     <td>6</td>
     <td>Rent to friend</td>
     <td>6000</td>

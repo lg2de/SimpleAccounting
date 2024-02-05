@@ -50,9 +50,9 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
 
     public List<string> Signatures { get; } = [];
 
-    public void CreateReport(string title)
+    public void CreateReport()
     {
-        this.PreparePrintDocument(title, DateTime.Now);
+        this.PreparePrintDocument(DateTime.Now);
 
         XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data")!;
 
@@ -160,7 +160,8 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
     {
         if (this.YearData.Booking.TrueForAll(
                 b =>
-                    b.Debit.TrueForAll(x => x.Account != account.ID) && b.Credit.TrueForAll(x => x.Account != account.ID)))
+                    b.Debit.TrueForAll(x => x.Account != account.ID) &&
+                    b.Credit.TrueForAll(x => x.Account != account.ID)))
         {
             return;
         }

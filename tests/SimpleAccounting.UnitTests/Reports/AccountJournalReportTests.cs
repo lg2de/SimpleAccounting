@@ -31,7 +31,7 @@ public class AccountJournalReportTests
             PageBreakBetweenAccounts = pageBreakBetweenAccounts
         };
 
-        sut.CreateReport("dummy");
+        sut.CreateReport();
 
         var year = DateTime.Now.Year;
         var expectedBankAccount = string.Format(

@@ -23,9 +23,9 @@ internal class TotalJournalReport : ReportBase, ITotalJournalReport
     {
     }
 
-    public void CreateReport(string title)
+    public void CreateReport()
     {
-        this.PreparePrintDocument(title, DateTime.Now);
+        this.PreparePrintDocument(DateTime.Now);
 
         XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data")!;
 

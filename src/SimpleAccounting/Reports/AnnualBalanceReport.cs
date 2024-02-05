@@ -28,9 +28,9 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
         this.allAccounts = projectData.Storage.AllAccounts.ToList();
     }
 
-    public void CreateReport(string title)
+    public void CreateReport()
     {
-        this.PreparePrintDocument(title, DateTime.Now);
+        this.PreparePrintDocument(DateTime.Now);
 
         // income / Einnahmen
         this.ProcessIncome(out var totalIncome);

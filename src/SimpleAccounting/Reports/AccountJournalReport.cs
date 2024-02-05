@@ -33,9 +33,9 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
     /// </summary>
     public bool PageBreakBetweenAccounts { get; set; }
 
-    public void CreateReport(string title)
+    public void CreateReport()
     {
-        this.PreparePrintDocument(title, DateTime.Now);
+        this.PreparePrintDocument(DateTime.Now);
 
         XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table")!;
 
@@ -44,7 +44,8 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
         foreach (var account in this.accounts)
         {
             var accountEntries = this.YearData.Booking
-                .Where(x => x.Debit.Exists(a => a.Account == account.ID) || x.Credit.Exists(a => a.Account == account.ID))
+                .Where(
+                    x => x.Debit.Exists(a => a.Account == account.ID) || x.Credit.Exists(a => a.Account == account.ID))
                 .OrderBy(x => x.Date)
                 .ThenBy(x => x.ID)
                 .ToList();
