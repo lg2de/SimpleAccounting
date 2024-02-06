@@ -229,10 +229,10 @@ internal class ProjectData : IProjectData
         this.YearChanged(this, EventArgs.Empty);
     }
 
-    public async Task ShowAddBookingDialogAsync(bool showInactiveAccounts)
+    public async Task ShowAddBookingDialogAsync(DateTime today, bool showInactiveAccounts)
     {
         var bookingModel =
-            new EditBookingViewModel(this, DateTime.Today, editMode: false);
+            new EditBookingViewModel(this, today, editMode: false);
         var allAccounts = this.Storage.AllAccounts;
         bookingModel.Accounts.AddRange(showInactiveAccounts ? allAccounts : allAccounts.Where(x => x.Active));
         var bookingTemplates = this.Storage.Setup?.BookingTemplates;

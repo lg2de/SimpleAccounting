@@ -124,6 +124,7 @@ public partial class ShellViewModelTests
     public async Task OnActivate_TwoRecentProjectsOneOnSecuredDrive_AllProjectListed()
     {
         var busy = Substitute.For<IBusy>();
+        var clock = Substitute.For<IClock>();
         var windowManager = Substitute.For<IWindowManager>();
         var applicationUpdate = Substitute.For<IApplicationUpdate>();
         var dialogs = Substitute.For<IDialogs>();
@@ -138,7 +139,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, null!, null!, null!), new FullJournalViewModel(projectData),
+                new MenuViewModel(projectData, busy, null!, clock, null!, null!), new FullJournalViewModel(projectData),
                 new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate);
         dialogs.ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
@@ -689,6 +690,7 @@ public partial class ShellViewModelTests
         var busy = Substitute.For<IBusy>();
         var windowManager = Substitute.For<IWindowManager>();
         var reportFactory = Substitute.For<IReportFactory>();
+        var clock = Substitute.For<IClock>();
         var applicationUpdate = Substitute.For<IApplicationUpdate>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
@@ -700,7 +702,7 @@ public partial class ShellViewModelTests
             new ShellViewModel(
                 projectData,
                 busy,
-                new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData),
                 new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate);
         return sut;
@@ -711,6 +713,7 @@ public partial class ShellViewModelTests
         var busy = Substitute.For<IBusy>();
         windowManager = Substitute.For<IWindowManager>();
         var reportFactory = Substitute.For<IReportFactory>();
+        var clock = Substitute.For<IClock>();
         var applicationUpdate = Substitute.For<IApplicationUpdate>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
@@ -721,7 +724,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate);
         return sut;
@@ -732,6 +735,7 @@ public partial class ShellViewModelTests
         var busy = Substitute.For<IBusy>();
         var windowManager = Substitute.For<IWindowManager>();
         var reportFactory = Substitute.For<IReportFactory>();
+        var clock = Substitute.For<IClock>();
         applicationUpdate = Substitute.For<IApplicationUpdate>();
         dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
@@ -742,7 +746,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate);
         return sut;
@@ -753,6 +757,7 @@ public partial class ShellViewModelTests
         var busy = Substitute.For<IBusy>();
         var windowManager = Substitute.For<IWindowManager>();
         var reportFactory = Substitute.For<IReportFactory>();
+        var clock = Substitute.For<IClock>();
         var applicationUpdate = Substitute.For<IApplicationUpdate>();
         dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
@@ -763,7 +768,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate);
         return sut;
@@ -774,6 +779,7 @@ public partial class ShellViewModelTests
         var busy = Substitute.For<IBusy>();
         var windowManager = Substitute.For<IWindowManager>();
         var reportFactory = Substitute.For<IReportFactory>();
+        var clock = Substitute.For<IClock>();
         var applicationUpdate = Substitute.For<IApplicationUpdate>();
         var dialogs = Substitute.For<IDialogs>();
         fileSystem = Substitute.For<IFileSystem>();
@@ -784,7 +790,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate);
         return sut;
@@ -795,6 +801,7 @@ public partial class ShellViewModelTests
         var busy = Substitute.For<IBusy>();
         var windowManager = Substitute.For<IWindowManager>();
         var reportFactory = Substitute.For<IReportFactory>();
+        var clock = Substitute.For<IClock>();
         var applicationUpdate = Substitute.For<IApplicationUpdate>();
         dialogs = Substitute.For<IDialogs>();
         fileSystem = Substitute.For<IFileSystem>();
@@ -805,7 +812,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate);
         return sut;

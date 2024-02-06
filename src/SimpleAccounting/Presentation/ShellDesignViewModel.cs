@@ -28,7 +28,7 @@ internal class ShellDesignViewModel : ShellViewModel
         : base(
             DesignProject,
             new BusyControlModel(),
-            new MenuViewModel(DesignProject, null!, null!, null!, null!),
+            new MenuViewModel(DesignProject, null!, null!, null!, null!, null!),
             new FullJournalViewModel(DesignProject),
             new AccountJournalViewModel(DesignProject), new AccountsViewModel(null!, DesignProject), null!)
     {
