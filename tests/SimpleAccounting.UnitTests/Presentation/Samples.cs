@@ -94,9 +94,15 @@ internal static class Samples
                         Name = "Second",
                         Account =
                         [
-                            new AccountDefinition { ID = BankCredit, Name = "Bank credit", Type = AccountDefinitionType.Credit },
+                            new AccountDefinition
+                            {
+                                ID = BankCredit, Name = "Bank credit", Type = AccountDefinitionType.Credit
+                            },
 
-                            new AccountDefinition { ID = FriendsDebit, Name = "Friends debit", Type = AccountDefinitionType.Debit },
+                            new AccountDefinition
+                            {
+                                ID = FriendsDebit, Name = "Friends debit", Type = AccountDefinitionType.Debit
+                            },
 
                             new AccountDefinition { ID = Inactive, Name = "Inactive", Active = false }
                         ]
@@ -140,7 +146,7 @@ internal static class Samples
             var fileSystem = Substitute.For<IFileSystem>();
             var processApi = Substitute.For<IProcess>();
             var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
-            projectData.Load(SampleProject);
+            projectData.LoadData(SampleProject);
             return projectData;
         }
     }
@@ -153,9 +159,15 @@ internal static class Samples
             {
                 Columns =
                 [
-                    new AccountDefinitionImportMappingColumn { Target = AccountDefinitionImportMappingColumnTarget.Date, Source = "Date" },
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Target = AccountDefinitionImportMappingColumnTarget.Date, Source = "Date"
+                    },
 
-                    new AccountDefinitionImportMappingColumn { Target = AccountDefinitionImportMappingColumnTarget.Value, Source = "Value" }
+                    new AccountDefinitionImportMappingColumn
+                    {
+                        Target = AccountDefinitionImportMappingColumnTarget.Value, Source = "Value"
+                    }
                 ]
             };
         }
@@ -195,7 +207,7 @@ internal static class Samples
                 ],
                 Debit = [new BookingValue { Account = BankAccount, Text = "Salary", Value = 20000 }]
             };
-                
+
             yield return new AccountingDataJournalBooking
             {
                 ID = 4,

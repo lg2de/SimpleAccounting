@@ -841,10 +841,25 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There exists an automatically created backup file for project
+        ///   Looks up a localized string similar to The project
+        ///{1}
+        ///seems to be opened already by a different user.
+        ///User name: {1}
+        ///Machine name: {2}
+        ///Opened since: {3}
+        ///Do you want to open the project anyway? Concurrent modification may cause data loss..
+        /// </summary>
+        public static string Question_ExistingFileReservationX4 {
+            get {
+                return ResourceManager.GetString("Question_ExistingFileReservationX4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is an automatically generated backup file for project 
         ///{0}.
-        ///Do you want to load this backup file?
-        ///When answering &apos;No&apos; the backup file will be deleted..
+        ///Would you like to load this backup file?
+        ///Choosing &apos;No&apos; will result in the deletion of the backup file..
         /// </summary>
         public static string Question_LoadAutoSaveProjectFileX {
             get {

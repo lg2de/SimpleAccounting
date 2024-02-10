@@ -114,6 +114,28 @@ public class ProjectDataTests
         fileSystem.Received(1).FileDelete("the.fileName~");
     }
 
+    [Fact]
+    public async Task LoadFromFileAsync_OtherProjectLoaded_ReservationFileRemoved()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var processApi = Substitute.For<IProcess>();
+        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi)
+        {
+            FileName = "fileName1"
+        };
+        fileSystem.FileExists("fileName1#").Returns(true);
+        fileSystem.FileExists("fileName2").Returns(true);
+        fileSystem.ReadAllTextFromFile("fileName2").Returns(Samples.SampleProject.Serialize());
+
+        (await sut.Awaiting(x => x.LoadFromFileAsync("fileName2")).Should()
+                .CompleteWithinAsync(10.Seconds()))
+            .Which.Should().Be(OperationResult.Completed);
+
+        fileSystem.Received(1).FileDelete("fileName1#");
+    }
+
     [Theory]
     [InlineData("Cryptomator File System")]
     [InlineData("cryptoFs")]
@@ -307,10 +329,10 @@ public class ProjectDataTests
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.Cancel);
-        sut.Load(Samples.SampleProject);
+        sut.LoadData(Samples.SampleProject);
         sut.IsModified = true;
 
-        sut.CanDiscardModifiedProject().Should().BeFalse();
+        sut.TryDiscardModifiedProject().Should().BeFalse();
 
         dialogs.Received(1).ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),
@@ -378,7 +400,7 @@ public class ProjectDataTests
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
         fileSystem.GetLastWriteTime(Arg.Any<string>())
             .Returns(new DateTime(2020, 2, 29, 18, 45, 56, 0, 0, DateTimeKind.Local));
-        sut.Load(Samples.SampleProject);
+        sut.LoadData(Samples.SampleProject);
 
         sut.SaveProject();
 
@@ -493,7 +515,7 @@ public class ProjectDataTests
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-        sut.Load(Samples.SampleProject);
+        sut.LoadData(Samples.SampleProject);
         sut.Storage.Accounts[^1].Account.Add(
             new AccountDefinition { ID = 99999, Name = "C2", Type = AccountDefinitionType.Carryforward });
         sut.Storage.Setup.Behavior.LastCarryForward = 99999;

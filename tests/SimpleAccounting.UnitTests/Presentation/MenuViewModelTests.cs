@@ -121,7 +121,7 @@ public class MenuViewModelTests
     public void SaveProjectCommand_DocumentModified_CanExecute()
     {
         var sut = CreateSut(out ProjectData projectData);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
         projectData.IsModified = true;
 
         sut.SaveProjectCommand.CanExecute(null).Should().BeTrue();
@@ -153,7 +153,7 @@ public class MenuViewModelTests
             MessageBoxButton.YesNo,
             MessageBoxImage.Question,
             MessageBoxResult.No).Returns(MessageBoxResult.No);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
         sut.OnDataLoaded();
 
         sut.CloseYearCommand.Execute(null);
@@ -169,7 +169,7 @@ public class MenuViewModelTests
         dialogs.ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
             Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
         sut.OnDataLoaded();
         sut.BookingYears[0].Command.Execute(null);
 
@@ -180,7 +180,7 @@ public class MenuViewModelTests
     public void CloseYearCommand_DefaultProject_CanExecute()
     {
         var sut = CreateSut(out ProjectData projectData);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
 
         sut.CloseYearCommand.CanExecute(null).Should().BeTrue();
     }
@@ -191,7 +191,7 @@ public class MenuViewModelTests
         var sut = CreateSut(out ProjectData projectData, out IReportFactory reportFactory);
         var accountJournalReport = Substitute.For<IAccountJournalReport>();
         reportFactory.CreateAccountJournal(projectData).Returns(accountJournalReport);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
 
         sut.AccountJournalReportCommand.Execute(null);
 
@@ -222,7 +222,7 @@ public class MenuViewModelTests
         var sut = CreateSut(out ProjectData projectData, out IReportFactory reportFactory);
         var annualBalanceReport = Substitute.For<IAnnualBalanceReport>();
         reportFactory.CreateAnnualBalance(projectData).Returns(annualBalanceReport);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
 
         sut.AnnualBalanceReportCommand.Execute(null);
 
@@ -259,7 +259,7 @@ public class MenuViewModelTests
         var project = Samples.SampleProject;
         project.Accounts.Add(
             new AccountingDataAccountGroup { Name = "EMPTY", Account = [] });
-        projectData.Load(project);
+        projectData.LoadData(project);
 
         sut.AssetBalancesReportCommand.Execute(null);
 
@@ -294,7 +294,7 @@ public class MenuViewModelTests
         var sut = CreateSut(out ProjectData projectData, out IReportFactory reportFactory);
         var totalJournalReport = Substitute.For<ITotalJournalReport>();
         reportFactory.CreateTotalJournal(projectData).Returns(totalJournalReport);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
 
         sut.TotalJournalReportCommand.Execute(null);
 
@@ -328,7 +328,7 @@ public class MenuViewModelTests
                 projectData,
                 Arg.Any<IEnumerable<AccountingDataAccountGroup>>())
             .Returns(totalsAndBalancesReport);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
 
         sut.TotalsAndBalancesReportCommand.Execute(null);
 

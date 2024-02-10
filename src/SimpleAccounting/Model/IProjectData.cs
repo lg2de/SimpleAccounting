@@ -22,6 +22,8 @@ internal interface IProjectData
 
     string AutoSaveFileName { get; }
 
+    string ReservationFileName { get; }
+
     AccountingData Storage { get; }
 
     AccountingDataJournal CurrentYear { get; }
@@ -42,7 +44,7 @@ internal interface IProjectData
 
     void NewProject();
 
-    void Load(AccountingData accountingData);
+    void LoadData(AccountingData accountingData);
 
     Task<OperationResult> LoadFromFileAsync(string projectFileName);
 
@@ -50,7 +52,7 @@ internal interface IProjectData
 
     Task AutoSaveAsync(CancellationToken cancellationToken);
 
-    void RemoveAutoSaveFile();
+    void Close();
 
     Task EditProjectOptionsAsync();
 
@@ -64,7 +66,7 @@ internal interface IProjectData
 
     Task<bool> CloseYearAsync();
 
-    bool CanDiscardModifiedProject();
+    bool TryDiscardModifiedProject();
 
     void TriggerJournalChanged();
 

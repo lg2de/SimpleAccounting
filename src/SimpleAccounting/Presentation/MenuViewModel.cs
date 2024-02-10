@@ -50,7 +50,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     public ICommand NewProjectCommand => new AsyncCommand(
         () =>
         {
-            if (!this.projectData.CanDiscardModifiedProject())
+            if (!this.projectData.TryDiscardModifiedProject())
             {
                 return Task.CompletedTask;
             }

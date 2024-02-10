@@ -589,4 +589,13 @@ Ohne eine solche Konfiguration für mindestens ein Konto ist diese Funktion deak
   <data name="Update_SkipVersion" xml:space="preserve">
     <value>Nein, diese Version überspringen!</value>
   </data>
+    <data name="Question_ExistingFileReservationX4" xml:space="preserve">
+    <value>Das Projekt
+{1}
+scheint bereits von einem anderen Benutzer geöffnet worden zu sein.
+Benutzername: {1}
+Computer-Name: {2}
+Geöffnet seit: {3}
+Möchten Sie das Projekt trotzdem öffnen? Gleichzeitiges Ändern kann zu Datenverlust führen.</value>
+  </data>
 </root>

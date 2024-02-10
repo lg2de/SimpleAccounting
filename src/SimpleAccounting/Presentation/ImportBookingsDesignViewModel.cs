@@ -80,7 +80,7 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     public ImportBookingsDesignViewModel()
         : base(null!, null!, new ProjectData(new Settings(), null!, null!, null!, null!))
     {
-        this.ProjectData.Load(SampleData);
+        this.ProjectData.LoadData(SampleData);
         this.SelectedAccountNumber = 100;
         this.StartDate = DateTime.Today;
 

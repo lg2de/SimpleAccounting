@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Model;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,9 @@ using lg2de.SimpleAccounting.Properties;
 ///     It contains the persistent data according to <see cref="AccountingData" />
 ///     as well as the current state of the project.
 /// </remarks>
+[SuppressMessage(
+    "Major Code Smell", "S1200:Classes should not be coupled to too many other classes",
+    Justification = "This is the wrapper for the model which is generated code. So, this is ok here.")]
 internal class ProjectData : IProjectData
 {
     private readonly IDialogs dialogs;
@@ -71,6 +75,8 @@ internal class ProjectData : IProjectData
 
     public string AutoSaveFileName => Defines.GetAutoSaveFileName(this.FileName);
 
+    public string ReservationFileName => Defines.GetReservationFileName(this.FileName);
+
     public ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
 
     public event EventHandler DataLoaded = (_, _) => { };
@@ -81,23 +87,24 @@ internal class ProjectData : IProjectData
 
     public void NewProject()
     {
+        this.IsModified = false;
         this.FileName = "<new>";
-        this.Load(AccountingData.GetTemplateProject());
+        this.LoadData(AccountingData.GetTemplateProject());
     }
 
-    public void Load(AccountingData accountingData)
+    public void LoadData(AccountingData accountingData)
     {
         this.Storage = accountingData;
     }
 
     public async Task<OperationResult> LoadFromFileAsync(string projectFileName)
     {
-        if (!this.CanDiscardModifiedProject())
+        if (!this.TryDiscardModifiedProject())
         {
             return OperationResult.Aborted;
         }
 
-        this.IsModified = false;
+        this.Close();
 
         var loader = new ProjectFileLoader(this.Settings, this.dialogs, this.fileSystem, this.processApi);
         var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName));
@@ -113,7 +120,7 @@ internal class ProjectData : IProjectData
         return OperationResult.Completed;
     }
 
-    public bool CanDiscardModifiedProject()
+    public bool TryDiscardModifiedProject()
     {
         if (!this.IsModified)
         {
@@ -192,12 +199,19 @@ internal class ProjectData : IProjectData
         }
     }
 
-    public void RemoveAutoSaveFile()
+    public void Close()
     {
         if (this.fileSystem.FileExists(this.AutoSaveFileName))
         {
             this.fileSystem.FileDelete(this.AutoSaveFileName);
         }
+
+        if (this.fileSystem.FileExists(this.ReservationFileName))
+        {
+            this.fileSystem.FileDelete(this.ReservationFileName);
+        }
+
+        this.NewProject();
     }
 
     public async Task EditProjectOptionsAsync()

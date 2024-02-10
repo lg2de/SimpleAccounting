@@ -124,12 +124,12 @@ internal class ShellViewModel : Screen, IDisposable
     {
         await base.CanCloseAsync(cancellationToken);
 
-        if (!this.ProjectData.CanDiscardModifiedProject())
+        if (!this.ProjectData.TryDiscardModifiedProject())
         {
             return false;
         }
 
-        this.ProjectData.RemoveAutoSaveFile();
+        this.ProjectData.Close();
 
         return true;
     }
@@ -210,7 +210,7 @@ internal class ShellViewModel : Screen, IDisposable
             return;
         }
 
-        if (!this.ProjectData.CanDiscardModifiedProject())
+        if (!this.ProjectData.TryDiscardModifiedProject())
         {
             return;
         }
@@ -233,7 +233,7 @@ internal class ShellViewModel : Screen, IDisposable
     [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
     private async Task SimulateUpdateAsync()
     {
-        if (!this.ProjectData.CanDiscardModifiedProject())
+        if (!this.ProjectData.TryDiscardModifiedProject())
         {
             return;
         }

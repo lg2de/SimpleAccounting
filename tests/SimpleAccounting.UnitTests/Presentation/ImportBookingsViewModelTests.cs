@@ -23,7 +23,7 @@ public class ImportBookingsViewModelTests
     public void Ctor_SampleData_AccountsFiltered()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
 
@@ -68,7 +68,7 @@ public class ImportBookingsViewModelTests
     public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
 
@@ -190,7 +190,7 @@ public class ImportBookingsViewModelTests
     public void BookAllCommand_EntryNotMapped_CannotExecute()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
@@ -204,7 +204,7 @@ public class ImportBookingsViewModelTests
     public void BookAllCommand_EntryMapped_CanExecute()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
@@ -218,7 +218,7 @@ public class ImportBookingsViewModelTests
     public void BookAllCommand_EntrySkipped_CanExecute()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
@@ -232,7 +232,7 @@ public class ImportBookingsViewModelTests
     public void BookAllCommand_EntryExisting_CannotExecute()
     {
         var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Load(Samples.SampleProject);
+        projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, null!, projectData);

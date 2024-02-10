@@ -47,7 +47,7 @@ public partial class ShellViewModelTests
 
         await ((IActivate)sut).ActivateAsync();
         sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
-        sut.ProjectData.Load(new AccountingData());
+        sut.ProjectData.LoadData(new AccountingData());
         sut.ProjectData.IsModified = true;
         await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
 
@@ -71,15 +71,15 @@ public partial class ShellViewModelTests
         };
         fileSystem.FileExists("recent.project").Returns(true);
         fileSystem.ReadAllTextFromFile("recent.project").Returns(sample.Serialize());
-        var fileSaved = new TaskCompletionSource<bool>();
+        var autoFileSaved = new TaskCompletionSource<bool>();
         fileSystem
-            .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
-            .Do(_ => fileSaved.SetResult(true));
+            .When(x => x.WriteAllTextIntoFile("recent.project~", Arg.Any<string>()))
+            .Do(_ => autoFileSaved.SetResult(true));
         await ((IActivate)sut).ActivateAsync();
         await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
         sut.ProjectData.IsModified = true;
 
-        await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(
+        await autoFileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(
             1.Seconds(), "file should be saved by auto-save task");
 
         using var _ = new AssertionScope();
@@ -87,6 +87,7 @@ public partial class ShellViewModelTests
             .BeTrue("the project is ONLY auto-saved and not saved to real project file");
         sut.Accounts.AccountList.Should().BeEquivalentTo(new[] { new { Name = "TheAccount" } });
         fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project", Arg.Any<string>());
+        fileSystem.Received(1).WriteAllTextIntoFile("recent.project#", Arg.Any<string>());
         fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
     }
 
@@ -105,18 +106,17 @@ public partial class ShellViewModelTests
         };
         fileSystem.FileExists("recent.project").Returns(true);
         fileSystem.ReadAllTextFromFile("recent.project").Returns(sample.Serialize());
-        var fileSaved = new TaskCompletionSource<bool>();
+        var autoFileSaved = new TaskCompletionSource<bool>();
         fileSystem
-            .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
-            .Do(_ => fileSaved.SetResult(true));
+            .When(x => x.WriteAllTextIntoFile("recent.project~", Arg.Any<string>()))
+            .Do(_ => autoFileSaved.SetResult(true));
         await ((IActivate)sut).ActivateAsync();
         await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(10.Seconds());
         sut.ProjectData.IsModified = false;
 
-        var delayTask = Task.Delay(200.Milliseconds());
-        var completedTask = await Task.WhenAny(fileSaved.Task, delayTask);
-        completedTask.Should().Be(delayTask, "file should not be saved");
+        await autoFileSaved.Should().NotCompleteWithinAsync(300.Milliseconds());
 
+        fileSystem.Received(1).WriteAllTextIntoFile("recent.project#", Arg.Any<string>());
         fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
     }
 
@@ -171,7 +171,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut();
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         await ((IActivate)sut).ActivateAsync();
 
@@ -293,7 +293,7 @@ public partial class ShellViewModelTests
     public void AddBooking_FirstBooking_JournalsUpdated()
     {
         var sut = CreateSut();
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         var booking = new AccountingDataJournalBooking
         {
             Date = Samples.BaseDate + 401,
@@ -345,7 +345,7 @@ public partial class ShellViewModelTests
     public void AddBooking_BookingWithoutCurrentAccount_AccountJournalUnchanged()
     {
         var sut = CreateSut();
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         var booking = new AccountingDataJournalBooking
         {
             Date = Samples.BaseDate + 401,
@@ -370,7 +370,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut();
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Accounts.ShowInactiveAccounts = true;
 
@@ -405,15 +405,19 @@ public partial class ShellViewModelTests
     }
 
     [Fact]
-    public async Task CanClose_AutoSaveFileExists_FileRemoved()
+    public async Task CanClose_ActiveProject_BackgroundFilesCleared()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        fileSystem.FileExists(sut.ProjectData.AutoSaveFileName).Returns(true);
+        string autoSaveFileName = sut.ProjectData.AutoSaveFileName;
+        var reservationFile = sut.ProjectData.ReservationFileName;
+        fileSystem.FileExists(autoSaveFileName).Returns(true);
+        fileSystem.FileExists(reservationFile).Returns(true);
 
         var result = await sut.CanCloseAsync();
 
         result.Should().BeTrue();
-        fileSystem.Received(1).FileDelete(sut.ProjectData.AutoSaveFileName);
+        fileSystem.Received(1).FileDelete(autoSaveFileName);
+        fileSystem.Received(1).FileDelete(reservationFile);
     }
 
     [Fact]

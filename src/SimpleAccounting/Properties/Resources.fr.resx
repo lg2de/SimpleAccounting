@@ -595,4 +595,13 @@ Sans une telle configuration pour au moins un compte, cette fonction est désact
   <data name="Update_SkipVersion" xml:space="preserve">
     <value>Non, passez cette version!</value>
   </data>
+    <data name="Question_ExistingFileReservationX4" xml:space="preserve">
+		<value>Le projet
+{1}
+semble avoir été ouvert par un autre utilisateur.
+Nom d'utilisateur: {1}
+Nom de l'ordinateur : {2}
+Ouvert depuis : {3}
+Voulez-vous quand même ouvrir le projet ? Une modification simultanée peut entraîner une perte de données.</value>
+	</data>
 </root>
