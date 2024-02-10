@@ -9,7 +9,7 @@
     <!-- license is apache 2.0 -->
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <!-- license is MIT -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <!-- license is BSD-3-Clause -->
     <PackageReference Include="NSubstitute" Version="5.1.0"/>
     <!-- license is apache 2.0 -->
