@@ -36,7 +36,8 @@ public class MenuViewModelTests
         var projectData = new ProjectData(settings, null!, null!, fileSystem, null!);
         var dialogs = Substitute.For<IDialogs>();
         var busy = new BusyControlModel();
-        var sut = new MenuViewModel(projectData, busy, null!, null!, dialogs);
+        var clock = Substitute.For<IClock>();
+        var sut = new MenuViewModel(projectData, busy, null!, clock, null!, dialogs);
         long counter = 0;
         var tcs = new TaskCompletionSource<bool>();
         dialogs.ShowOpenFileDialog(Arg.Any<string>()).Returns((DialogResult.OK, "dummy"));
@@ -132,9 +133,10 @@ public class MenuViewModelTests
         var projectData = Substitute.For<IProjectData>();
         var busy = Substitute.For<IBusy>();
         var reportFactory = Substitute.For<IReportFactory>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var dialogs = Substitute.For<IDialogs>();
-        var sut = new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs);
+        var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs);
 
         sut.ProjectOptionsCommand.Execute(null);
 
@@ -261,6 +263,7 @@ public class MenuViewModelTests
 
         sut.AssetBalancesReportCommand.Execute(null);
 
+        assetBalancesReport.Received(1).CreateReport(Resources.Header_AssetBalances);
         assetBalancesReport.Received(1)
             .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
         reportFactory.Received(1).CreateTotalsAndBalances(
@@ -329,6 +332,7 @@ public class MenuViewModelTests
 
         sut.TotalsAndBalancesReportCommand.Execute(null);
 
+        totalsAndBalancesReport.Received(1).CreateReport(Resources.Header_TotalsAndBalances);
         totalsAndBalancesReport.Received(1)
             .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
     }
@@ -397,9 +401,10 @@ public class MenuViewModelTests
         dialogs = Substitute.For<IDialogs>();
         var busy = Substitute.For<IBusy>();
         reportFactory = Substitute.For<IReportFactory>();
+        var clock = Substitute.For<IClock>();
         var settings = new Settings();
         projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-        var sut = new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs);
+        var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs);
         return sut;
     }
 
@@ -411,9 +416,10 @@ public class MenuViewModelTests
         var dialogs = Substitute.For<IDialogs>();
         var busy = Substitute.For<IBusy>();
         var reportFactory = Substitute.For<IReportFactory>();
+        var clock = Substitute.For<IClock>();
         var settings = new Settings();
         var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-        var sut = new MenuViewModel(projectData, busy, reportFactory, processApi, dialogs);
+        var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs);
         return sut;
     }
 }

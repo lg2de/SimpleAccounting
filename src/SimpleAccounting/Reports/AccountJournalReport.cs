@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
@@ -22,8 +23,8 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
     private double debitTotal;
     private bool firstAccount;
 
-    public AccountJournalReport(IXmlPrinter printer, IProjectData projectData)
-        : base(printer, ResourceName, projectData)
+    public AccountJournalReport(IXmlPrinter printer, IProjectData projectData, IClock clock)
+        : base(ResourceName, printer, projectData, clock)
     {
         this.accounts = projectData.Storage.AllAccounts.OrderBy(a => a.ID);
     }
@@ -33,9 +34,9 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
     /// </summary>
     public bool PageBreakBetweenAccounts { get; set; }
 
-    public void CreateReport(string title)
+    public void CreateReport()
     {
-        this.PreparePrintDocument(title, DateTime.Now);
+        this.PreparePrintDocument();
 
         XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table")!;
 
@@ -44,7 +45,8 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
         foreach (var account in this.accounts)
         {
             var accountEntries = this.YearData.Booking
-                .Where(x => x.Debit.Exists(a => a.Account == account.ID) || x.Credit.Exists(a => a.Account == account.ID))
+                .Where(
+                    x => x.Debit.Exists(a => a.Account == account.ID) || x.Credit.Exists(a => a.Account == account.ID))
                 .OrderBy(x => x.Date)
                 .ThenBy(x => x.ID)
                 .ToList();

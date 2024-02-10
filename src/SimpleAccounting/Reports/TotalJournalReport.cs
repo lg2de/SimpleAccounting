@@ -4,10 +4,10 @@
 
 namespace lg2de.SimpleAccounting.Reports;
 
-using System;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 
@@ -18,14 +18,14 @@ internal class TotalJournalReport : ReportBase, ITotalJournalReport
 {
     public const string ResourceName = "TotalJournal.xml";
 
-    public TotalJournalReport(IXmlPrinter printer, IProjectData projectData)
-        : base(printer, ResourceName, projectData)
+    public TotalJournalReport(IXmlPrinter printer, IProjectData projectData, IClock clock)
+        : base(ResourceName, printer, projectData, clock)
     {
     }
 
-    public void CreateReport(string title)
+    public void CreateReport()
     {
-        this.PreparePrintDocument(title, DateTime.Now);
+        this.PreparePrintDocument();
 
         XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data")!;
 

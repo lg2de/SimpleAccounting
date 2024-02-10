@@ -18,6 +18,10 @@ using lg2de.SimpleAccounting.Properties;
 [SuppressMessage(
     "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
     Justification = "Design view model defines useful values")]
+[SuppressMessage(
+    "Major Code Smell",
+    "S6354:Use a testable date/time provider",
+    Justification = "Is ok for design view model.")]
 internal class EditBookingDesignViewModel : EditBookingViewModel
 {
     public EditBookingDesignViewModel()

@@ -4,12 +4,12 @@
 
 namespace lg2de.SimpleAccounting.Reports;
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
@@ -22,15 +22,15 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
 
     private readonly List<AccountDefinition> allAccounts;
 
-    public AnnualBalanceReport(IXmlPrinter printer, IProjectData projectData)
-        : base(printer, ResourceName, projectData)
+    public AnnualBalanceReport(IXmlPrinter printer, IProjectData projectData, IClock clock)
+        : base(ResourceName, printer, projectData, clock)
     {
         this.allAccounts = projectData.Storage.AllAccounts.ToList();
     }
 
-    public void CreateReport(string title)
+    public void CreateReport()
     {
-        this.PreparePrintDocument(title, DateTime.Now);
+        this.PreparePrintDocument();
 
         // income / Einnahmen
         this.ProcessIncome(out var totalIncome);

@@ -248,9 +248,10 @@ public class ImportBookingsViewModelTests
         var projectData = Samples.SampleProjectData;
         var accountsViewModel = new AccountsViewModel(null!, projectData);
         var busy = Substitute.For<IBusy>();
+        var clock = Substitute.For<IClock>();
         var parent = new ShellViewModel(
             projectData, busy,
-            new MenuViewModel(projectData, busy, null!, null!, null!), new FullJournalViewModel(projectData),
+            new MenuViewModel(projectData, busy, null!, clock, null!, null!), new FullJournalViewModel(projectData),
             new AccountJournalViewModel(projectData), accountsViewModel, null!);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var bankAccount = accounts.Single(x => x.Name == "Bank account");

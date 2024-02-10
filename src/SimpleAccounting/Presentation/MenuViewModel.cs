@@ -26,22 +26,25 @@ using Screen = Caliburn.Micro.Screen;
 /// </summary>
 internal class MenuViewModel : Screen, IMenuViewModel
 {
-    private readonly IBusy busy;
-    private readonly IDialogs dialogs;
-    private readonly IProcess processApi;
     private readonly IProjectData projectData;
+    private readonly IBusy busy;
     private readonly IReportFactory reportFactory;
+    private readonly IClock clock;
+    private readonly IProcess processApi;
+    private readonly IDialogs dialogs;
 
     public MenuViewModel(
         IProjectData projectData,
         IBusy busy, IReportFactory reportFactory,
+        IClock clock,
         IProcess processApi, IDialogs dialogs)
     {
-        this.busy = busy;
         this.projectData = projectData;
+        this.busy = busy;
+        this.reportFactory = reportFactory;
+        this.clock = clock;
         this.processApi = processApi;
         this.dialogs = dialogs;
-        this.reportFactory = reportFactory;
     }
 
     public ICommand NewProjectCommand => new AsyncCommand(
@@ -90,7 +93,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     public ObservableCollection<MenuItemViewModel> RecentProjects { get; } = [];
 
     public ICommand AddBookingsCommand => new AsyncCommand(
-        () => this.projectData.ShowAddBookingDialogAsync(this.projectData.ShowInactiveAccounts),
+        () => this.projectData.ShowAddBookingDialogAsync(this.clock.Now().Date, this.projectData.ShowInactiveAccounts),
         () => !this.projectData.CurrentYear.Closed);
 
     public ICommand DuplicateBookingsCommand => new AsyncCommand(
@@ -252,7 +255,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     private void OnTotalJournalReport()
     {
         var report = this.reportFactory.CreateTotalJournal(this.projectData);
-        report.CreateReport(Resources.Header_Journal);
+        report.CreateReport();
         report.ShowPreview(Resources.Header_Journal);
     }
 
@@ -261,7 +264,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
         var report = this.reportFactory.CreateAccountJournal(this.projectData);
         report.PageBreakBetweenAccounts =
             this.projectData.Storage.Setup?.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
-        report.CreateReport(Resources.Header_AccountSheets);
+        report.CreateReport();
         report.ShowPreview(Resources.Header_AccountSheets);
     }
 
@@ -299,7 +302,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     {
         var report = this.reportFactory.CreateAnnualBalance(this.projectData);
         string title = Resources.Header_AnnualBalance;
-        report.CreateReport(title);
+        report.CreateReport();
         report.ShowPreview(title);
     }
 }

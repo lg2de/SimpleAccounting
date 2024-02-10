@@ -54,7 +54,7 @@ internal interface IProjectData
 
     Task EditProjectOptionsAsync();
 
-    Task ShowAddBookingDialogAsync(bool showInactiveAccounts);
+    Task ShowAddBookingDialogAsync(DateTime today, bool showInactiveAccounts);
 
     Task ShowEditBookingDialogAsync(IJournalItem item, bool showInactiveAccounts);
 

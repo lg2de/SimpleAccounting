@@ -4,11 +4,11 @@
 
 namespace lg2de.SimpleAccounting.Reports;
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
@@ -42,17 +42,19 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
     public TotalsAndBalancesReport(
         IXmlPrinter printer,
         IProjectData projectData,
+        IClock clock,
         IEnumerable<AccountingDataAccountGroup> accountGroups)
-        : base(printer, ResourceName, projectData)
+        : base(ResourceName, printer, projectData, clock)
     {
         this.accountGroups = accountGroups.ToList();
     }
 
     public List<string> Signatures { get; } = [];
 
-    public void CreateReport(string title)
+    public void CreateReport(string reportName)
     {
-        this.PreparePrintDocument(title, DateTime.Now);
+        this.PreparePrintDocument();
+        this.UpdatePlaceholder("ReportName", reportName);
 
         XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data")!;
 
@@ -160,7 +162,8 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
     {
         if (this.YearData.Booking.TrueForAll(
                 b =>
-                    b.Debit.TrueForAll(x => x.Account != account.ID) && b.Credit.TrueForAll(x => x.Account != account.ID)))
+                    b.Debit.TrueForAll(x => x.Account != account.ID) &&
+                    b.Credit.TrueForAll(x => x.Account != account.ID)))
         {
             return;
         }

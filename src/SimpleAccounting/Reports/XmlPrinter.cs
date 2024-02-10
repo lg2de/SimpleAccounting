@@ -618,7 +618,7 @@ internal class XmlPrinter : IXmlPrinter
             foreach (var element in textElements.OfType<XmlElement>())
             {
                 element.InnerText = element.InnerText.Replace(
-                    "{pageNumber}", pageNumberText, StringComparison.InvariantCultureIgnoreCase);
+                    "#PageNumber#", pageNumberText, StringComparison.InvariantCultureIgnoreCase);
             }
 
             insertParent.ParentNode!.InsertAfter(copiedChild, insertParent);
