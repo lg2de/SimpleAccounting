@@ -730,6 +730,28 @@ public partial class ShellViewModelTests
         return sut;
     }
 
+    private static ShellViewModel CreateSut(out IWindowManager windowManager, out IClock clock)
+    {
+        var busy = Substitute.For<IBusy>();
+        windowManager = Substitute.For<IWindowManager>();
+        var reportFactory = Substitute.For<IReportFactory>();
+        clock = Substitute.For<IClock>();
+        var applicationUpdate = Substitute.For<IApplicationUpdate>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var accountsViewModel = new AccountsViewModel(windowManager, projectData);
+        var sut =
+            new ShellViewModel(
+                projectData, busy,
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
+                new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
+                accountsViewModel, applicationUpdate);
+        return sut;
+    }
+
     private static ShellViewModel CreateSut(out IApplicationUpdate applicationUpdate, out IDialogs dialogs)
     {
         var busy = Substitute.For<IBusy>();

@@ -14,6 +14,7 @@ using Caliburn.Micro;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentAssertions.Extensions;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
@@ -223,6 +224,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut();
         sut.ProjectData.Load(Samples.SampleProject);
         sut.Menu.BookingYears[0].Command.Execute(null);
+        sut.ProjectData.CurrentYear.Closed.Should().BeTrue();
 
         sut.Menu.AddBookingsCommand.CanExecute(null).Should().BeFalse();
     }
@@ -233,8 +235,26 @@ public partial class ShellViewModelTests
         var sut = CreateSut();
         sut.ProjectData.Load(Samples.SampleProject);
         sut.Menu.BookingYears[^1].Command.Execute(null);
+        sut.ProjectData.CurrentYear.Closed.Should().BeFalse();
 
         sut.Menu.AddBookingsCommand.CanExecute(null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void AddBookingsCommand_HappyPath_DataTodayFromClock()
+    {
+        var sut = CreateSut(out IWindowManager windowManager, out IClock clock);
+        EditBookingViewModel vm = null;
+        windowManager.ShowDialogAsync(
+            Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
+            Arg.Any<IDictionary<string, object>>());
+        clock.Now().Returns(new DateTime(2024, 2, 2, 5, 6, 7, DateTimeKind.Local));
+        sut.ProjectData.Load(Samples.SampleProject);
+        sut.Menu.BookingYears[^1].Command.Execute(null);
+
+        sut.Menu.AddBookingsCommand.Execute(null);
+
+        vm.Date.Should().Be(new DateTime(2024, 2, 2, 0, 0, 0, DateTimeKind.Local));
     }
 
     [Fact]
