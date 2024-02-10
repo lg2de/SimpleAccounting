@@ -58,7 +58,7 @@ internal class ReportBase
             "CurrentDate", this.setup.Location + ", " + this.printingDate.ToString("D", CultureInfo.CurrentCulture));
     }
 
-    private void UpdatePlaceholder(string name, string value)
+    protected void UpdatePlaceholder(string name, string value)
     {
         string placeholder = $"#{name}#";
         var elements = this.PrintDocument.SelectNodes($"//*[contains(text(),'{placeholder}')]")!;

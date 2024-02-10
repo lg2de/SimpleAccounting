@@ -272,7 +272,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
     {
         var report = this.reportFactory.CreateTotalsAndBalances(
             this.projectData, this.projectData.Storage.Accounts);
-        report.CreateReport();
+        report.CreateReport(Resources.Header_TotalsAndBalances);
         report.ShowPreview(Resources.Header_TotalsAndBalances);
     }
 
@@ -294,7 +294,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
 
         var report = this.reportFactory.CreateTotalsAndBalances(this.projectData, accountGroups);
         this.projectData.Storage.Setup?.Reports?.TotalsAndBalancesReport?.ForEach(report.Signatures.Add);
-        report.CreateReport();
+        report.CreateReport(Resources.Header_AssetBalances);
         report.ShowPreview(Resources.Header_AssetBalances);
     }
 

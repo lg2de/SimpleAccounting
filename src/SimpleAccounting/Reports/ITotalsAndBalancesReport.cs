@@ -13,7 +13,7 @@ internal interface ITotalsAndBalancesReport
 {
     List<string> Signatures { get; }
 
-    void CreateReport();
+    void CreateReport(string reportName);
 
     void ShowPreview(string documentName);
 }

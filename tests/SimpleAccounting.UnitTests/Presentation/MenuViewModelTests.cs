@@ -263,6 +263,7 @@ public class MenuViewModelTests
 
         sut.AssetBalancesReportCommand.Execute(null);
 
+        assetBalancesReport.Received(1).CreateReport(Resources.Header_AssetBalances);
         assetBalancesReport.Received(1)
             .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
         reportFactory.Received(1).CreateTotalsAndBalances(
@@ -331,6 +332,7 @@ public class MenuViewModelTests
 
         sut.TotalsAndBalancesReportCommand.Execute(null);
 
+        totalsAndBalancesReport.Received(1).CreateReport(Resources.Header_TotalsAndBalances);
         totalsAndBalancesReport.Received(1)
             .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
     }

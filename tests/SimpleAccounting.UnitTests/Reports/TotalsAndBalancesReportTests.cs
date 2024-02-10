@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
+using System;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -25,7 +26,7 @@ public class TotalsAndBalancesReportTests
         var sut = new TotalsAndBalancesReport(
             new XmlPrinter(), projectData, clock, projectData.Storage.Accounts);
 
-        sut.CreateReport();
+        sut.CreateReport("-TotalsAndBalances-");
 
         var year = Samples.SampleProject.Journal[^1].Year;
         var expected = $@"
@@ -155,9 +156,27 @@ public class TotalsAndBalancesReportTests
             new XmlPrinter(), projectData, clock, projectData.Storage.Accounts);
         sut.Signatures.Add("The Name");
 
-        sut.CreateReport();
+        sut.CreateReport("-TotalsAndBalances-");
 
         sut.DocumentForTests.XPathSelectElements("//text[@tag='signature']")
             .Select(x => x.Value).Should().Equal("The Name");
+    }
+
+    [Theory]
+    [InlineData("Report 1")]
+    [InlineData("Report 2")]
+    public void CreateReport_ReportNames_NameAppliedToHeaderAndTitle(string reportName)
+    {
+        var projectData = Samples.SampleProjectData;
+        var clock = Substitute.For<IClock>();
+        var sut = new TotalsAndBalancesReport(
+            new XmlPrinter(), projectData, clock, projectData.Storage.Accounts);
+
+        sut.CreateReport(reportName);
+
+        var expectedText = $"- {reportName} {DateTime.Today.Year} -";
+        sut.DocumentForTests.XPathSelectElement("//text[@ID='page-header']")?.Value.Should().Be(expectedText);
+        expectedText = $"{reportName} {DateTime.Today.Year}";
+        sut.DocumentForTests.XPathSelectElement("//text[@ID='report-header']")?.Value.Should().Be(expectedText);
     }
 }

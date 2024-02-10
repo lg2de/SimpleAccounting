@@ -51,9 +51,10 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
 
     public List<string> Signatures { get; } = [];
 
-    public void CreateReport()
+    public void CreateReport(string reportName)
     {
         this.PreparePrintDocument();
+        this.UpdatePlaceholder("ReportName", reportName);
 
         XmlNode dataNode = this.PrintDocument.SelectSingleNode("//table/data")!;
 
