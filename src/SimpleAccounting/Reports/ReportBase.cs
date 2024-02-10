@@ -47,6 +47,8 @@ internal class ReportBase
 
     protected void PreparePrintDocument()
     {
+        // Placeholders are identified by # in the template.
+        // Dictionary entries are identified by @ in the template. (Handled later while printing.)
         this.UpdatePlaceholder("Organization", this.setup.Name);
         this.UpdatePlaceholder("YearName", this.YearData.Year);
         string startDate = this.YearData.DateStart.ToDateTime().ToString("d", CultureInfo.CurrentCulture);
