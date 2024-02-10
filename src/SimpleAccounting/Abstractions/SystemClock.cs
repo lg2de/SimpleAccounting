@@ -7,6 +7,9 @@ namespace lg2de.SimpleAccounting.Abstractions;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
+/// <summary>
+///     Default implementation of <see cref="IClock"/> using real time.
+/// </summary>
 [SuppressMessage(
     "Major Code Smell", "S6354:Use a testable date/time provider",
     Justification = "This is the one and only implementation according pattern.")]
