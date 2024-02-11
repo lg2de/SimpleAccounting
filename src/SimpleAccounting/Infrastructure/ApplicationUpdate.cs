@@ -88,7 +88,7 @@ internal class ApplicationUpdate : IApplicationUpdate
         int processId = this.process.GetCurrentProcessId();
         var info = new ProcessStartInfo(
             "powershell",
-            $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
+            $"-ExecutionPolicy Bypass -File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
         var updateProcess = this.process.Start(info);
 
         var exited = updateProcess?.WaitForExit(this.WaitTimeMilliseconds) == true;
