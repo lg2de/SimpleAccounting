@@ -25,6 +25,9 @@ using Octokit;
 /// <summary>
 ///     Implements the application update.
 /// </summary>
+[SuppressMessage(
+    "Major Code Smell", "S1200:Classes should not be coupled to too many other classes",
+    Justification = "Only interfaces and github API DTOs are referenced.")]
 internal class ApplicationUpdate : IApplicationUpdate
 {
     private readonly IDialogs dialogs;
