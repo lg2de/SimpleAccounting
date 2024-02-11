@@ -35,19 +35,20 @@ public partial class ShellViewModelTests
     }
 
     [WpfFact]
-    public async Task OnActivate_NewProject_ProjectLoadedAndAutoSaveActive()
+    public async Task OnActivate_NewProjectModifiedAfterSave_AutoSaveActive()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
         sut.ProjectData.AutoSaveInterval = 100.Milliseconds();
         sut.ProjectData.FileName = "new.project";
         var fileSaved = new TaskCompletionSource<bool>();
         fileSystem
-            .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
+            .When(x => x.WriteAllTextIntoFile("new.project~", Arg.Any<string>()))
             .Do(_ => fileSaved.SetResult(true));
 
         await ((IActivate)sut).ActivateAsync();
         sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
         sut.ProjectData.LoadData(new AccountingData());
+        sut.ProjectData.SaveProject();
         sut.ProjectData.IsModified = true;
         await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
 
@@ -418,14 +419,6 @@ public partial class ShellViewModelTests
         result.Should().BeTrue();
         fileSystem.Received(1).FileDelete(autoSaveFileName);
         fileSystem.Received(1).FileDelete(reservationFile);
-    }
-
-    [Fact]
-    public void Dispose_HappyPath_Completed()
-    {
-        var sut = CreateSut();
-
-        sut.Invoking(x => x.Dispose()).Should().NotThrow();
     }
 
     private static ShellViewModel CreateSut()

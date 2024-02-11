@@ -48,15 +48,15 @@ internal class MenuViewModel : Screen, IMenuViewModel
     }
 
     public ICommand NewProjectCommand => new AsyncCommand(
-        () =>
+        async () =>
         {
-            if (!this.projectData.TryDiscardModifiedProject())
+            if (!await this.projectData.TryCloseAsync())
             {
-                return Task.CompletedTask;
+                // abort
+                return;
             }
 
             this.projectData.NewProject();
-            return Task.CompletedTask;
         });
 
     public ICommand OpenProjectCommand => new AsyncCommand(

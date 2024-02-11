@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.Model;
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Presentation;
@@ -50,9 +49,7 @@ internal interface IProjectData
 
     void SaveProject();
 
-    Task AutoSaveAsync(CancellationToken cancellationToken);
-
-    void Close();
+    Task<bool> TryCloseAsync();
 
     Task EditProjectOptionsAsync();
 
@@ -65,8 +62,6 @@ internal interface IProjectData
     Task ShowImportDialogAsync();
 
     Task<bool> CloseYearAsync();
-
-    bool TryDiscardModifiedProject();
 
     void TriggerJournalChanged();
 

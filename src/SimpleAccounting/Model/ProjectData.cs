@@ -28,12 +28,14 @@ using lg2de.SimpleAccounting.Properties;
 [SuppressMessage(
     "Major Code Smell", "S1200:Classes should not be coupled to too many other classes",
     Justification = "This is the wrapper for the model which is generated code. So, this is ok here.")]
-internal class ProjectData : IProjectData
+internal sealed class ProjectData : IProjectData, IDisposable
 {
     private readonly IDialogs dialogs;
     private readonly IFileSystem fileSystem;
     private readonly IProcess processApi;
     private readonly IWindowManager windowManager;
+    private Task autoSaveTask = Task.CompletedTask;
+    private CancellationTokenSource? cancellationTokenSource; // TODO to cancel auto-save
     private AccountingData storage;
 
     public ProjectData(
@@ -48,6 +50,11 @@ internal class ProjectData : IProjectData
 
         this.storage = new AccountingData();
         this.CurrentYear = this.storage.Journal.SafeGetLatest();
+    }
+
+    public void Dispose()
+    {
+        this.cancellationTokenSource?.Dispose();
     }
 
     public Settings Settings { get; }
@@ -99,12 +106,10 @@ internal class ProjectData : IProjectData
 
     public async Task<OperationResult> LoadFromFileAsync(string projectFileName)
     {
-        if (!this.TryDiscardModifiedProject())
+        if (!await this.TryCloseAsync())
         {
             return OperationResult.Aborted;
         }
-
-        this.Close();
 
         var loader = new ProjectFileLoader(this.Settings, this.dialogs, this.fileSystem, this.processApi);
         var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName));
@@ -117,33 +122,9 @@ internal class ProjectData : IProjectData
         this.Storage = loader.ProjectData;
         this.IsModified = loader.Migrated;
 
+        this.ActivateAutoSave();
+
         return OperationResult.Completed;
-    }
-
-    public bool TryDiscardModifiedProject()
-    {
-        if (!this.IsModified)
-        {
-            // no need to save the project
-            return true;
-        }
-
-        var result = this.dialogs.ShowMessageBox(
-            Resources.Question_SaveBeforeProceed,
-            Resources.Header_Shutdown,
-            MessageBoxButton.YesNoCancel);
-        switch (result)
-        {
-        case MessageBoxResult.Yes:
-            this.SaveProject();
-            return true;
-        case MessageBoxResult.No:
-            // User wants to discard changes.
-            return true;
-        default:
-            // abort
-            return false;
-        }
     }
 
     public void SaveProject()
@@ -154,6 +135,7 @@ internal class ProjectData : IProjectData
                 this.dialogs.ShowSaveFileDialog(Resources.FileFilter_MainProject);
             if (result != DialogResult.OK)
             {
+                // TODO return false
                 return;
             }
 
@@ -176,31 +158,26 @@ internal class ProjectData : IProjectData
         }
 
         this.Settings.SetRecentProject(this.FileName);
+
+        this.ActivateAutoSave();
     }
 
-    public async Task AutoSaveAsync(CancellationToken cancellationToken)
+    public async Task<bool> TryCloseAsync()
     {
-        try
+        if (!this.TryDiscardModifiedProject())
         {
-            while (true)
-            {
-                await Task.Delay(this.AutoSaveInterval, cancellationToken);
-                if (!this.IsModified)
-                {
-                    continue;
-                }
-
-                this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.Storage.Serialize());
-            }
+            return false;
         }
-        catch (OperationCanceledException)
+
+        if (this.cancellationTokenSource != null)
         {
-            // expected behavior
-        }
-    }
+            await this.cancellationTokenSource.CancelAsync();
+            await this.autoSaveTask;
 
-    public void Close()
-    {
+            this.cancellationTokenSource.Dispose();
+            this.cancellationTokenSource = null;
+        }
+
         if (this.fileSystem.FileExists(this.AutoSaveFileName))
         {
             this.fileSystem.FileDelete(this.AutoSaveFileName);
@@ -212,6 +189,7 @@ internal class ProjectData : IProjectData
         }
 
         this.NewProject();
+        return true;
     }
 
     public async Task EditProjectOptionsAsync()
@@ -312,7 +290,7 @@ internal class ProjectData : IProjectData
     public async Task<bool> CloseYearAsync()
     {
         var viewModel = new CloseYearViewModel(this.CurrentYear);
-        this.Storage.AllAccounts.Where(x => x.Active && x.Type == AccountDefinitionType.Carryforward)
+        this.Storage.AllAccounts.Where(x => x is { Active: true, Type: AccountDefinitionType.Carryforward })
             .ToList().ForEach(viewModel.Accounts.Add);
 
         // restore project options
@@ -350,6 +328,66 @@ internal class ProjectData : IProjectData
     {
         this.JournalChanged(
             this, new JournalChangedEventArgs(0, this.storage.AllAccounts.Select(x => x.ID).ToList()));
+    }
+
+    private void ActivateAutoSave()
+    {
+        if (this.cancellationTokenSource != null)
+        {
+            // already active
+            return;
+        }
+
+        this.cancellationTokenSource = new CancellationTokenSource();
+        this.autoSaveTask = this.AutoSaveAsync(this.cancellationTokenSource.Token);
+    }
+
+    private async Task AutoSaveAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (true)
+            {
+                await Task.Delay(this.AutoSaveInterval, cancellationToken);
+                if (!this.IsModified)
+                {
+                    continue;
+                }
+
+                // TODO synchronize with save
+                this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.Storage.Serialize());
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // expected behavior
+        }
+    }
+
+    private bool TryDiscardModifiedProject()
+    {
+        if (!this.IsModified)
+        {
+            // no need to save the project
+            return true;
+        }
+
+        var result = this.dialogs.ShowMessageBox(
+            Resources.Question_SaveBeforeProceed,
+            Resources.Header_Shutdown,
+            MessageBoxButton.YesNoCancel);
+        switch (result)
+        {
+        case MessageBoxResult.Yes:
+            this.SaveProject();
+            return true;
+        case MessageBoxResult.No:
+            // User wants to discard changes.
+            return true;
+        default:
+            // abort
+            return false;
+        }
     }
 
     private EditBookingViewModel BookingFromJournal(

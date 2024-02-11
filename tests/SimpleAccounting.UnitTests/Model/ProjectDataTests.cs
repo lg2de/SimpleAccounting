@@ -26,6 +26,19 @@ using Xunit;
 public class ProjectDataTests
 {
     [Fact]
+    public void Dispose_HappyPath_Completed()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+
+        sut.Invoking(x => x.Dispose()).Should().NotThrow();
+    }
+
+    [Fact]
     public async Task LoadFromFileAsync_HappyPath_FileLoaded()
     {
         var windowManager = Substitute.For<IWindowManager>();
@@ -300,7 +313,7 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public void TryDiscardModifiedProject_NotModified_ReturnsTrue()
+    public async Task TryCloseAsync_NotModified_ReturnsTrue()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
@@ -308,7 +321,7 @@ public class ProjectDataTests
         var processApi = Substitute.For<IProcess>();
         var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
 
-        sut.TryDiscardModifiedProject().Should().BeTrue();
+        (await sut.Awaiting(x => x.TryCloseAsync()).Should().CompleteWithinAsync(1.Seconds())).Which.Should().BeTrue();
 
         dialogs.DidNotReceive().ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),
@@ -317,7 +330,7 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public void TryDiscardModifiedProject_AnswerCancel_NotSavedAndReturnsFalse()
+    public async Task TryCloseAsync_AnswerCancel_NotSavedAndReturnsFalse()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
@@ -332,7 +345,7 @@ public class ProjectDataTests
         sut.LoadData(Samples.SampleProject);
         sut.IsModified = true;
 
-        sut.TryDiscardModifiedProject().Should().BeFalse();
+        (await sut.Awaiting(x => x.TryCloseAsync()).Should().CompleteWithinAsync(1.Seconds())).Which.Should().BeFalse();
 
         dialogs.Received(1).ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),
@@ -342,7 +355,7 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public void TryDiscardModifiedProject_AnswerNo_NotSavedAndReturnsTrue()
+    public async Task TryCloseAsync_AnswerNo_NotSavedAndReturnsTrue()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
@@ -356,7 +369,7 @@ public class ProjectDataTests
             .Returns(MessageBoxResult.No);
         sut.LoadData(Samples.SampleProject);
 
-        sut.TryDiscardModifiedProject().Should().BeTrue();
+        (await sut.Awaiting(x => x.TryCloseAsync()).Should().CompleteWithinAsync(1.Seconds())).Which.Should().BeTrue();
 
         dialogs.Received(1).ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),
@@ -366,7 +379,7 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public void TryDiscardModifiedProject_AnswerYes_SavedAndReturnsTrue()
+    public async Task TryCloseAsync_AnswerYes_SavedAndReturnsTrue()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
@@ -380,7 +393,7 @@ public class ProjectDataTests
             .Returns(MessageBoxResult.Yes);
         sut.LoadData(Samples.SampleProject);
 
-        sut.TryDiscardModifiedProject().Should().BeTrue();
+        (await sut.Awaiting(x => x.TryCloseAsync()).Should().CompleteWithinAsync(1.Seconds())).Which.Should().BeTrue();
 
         dialogs.Received(1).ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),

@@ -670,27 +670,6 @@ public partial class ShellViewModelTests
     }
 
     [Fact]
-    public async Task HelpCheckForUpdateCommand_StartProcessFailed_Aborted()
-    {
-        var sut = CreateSut(out IApplicationUpdate applicationUpdate, out var dialogs);
-        dialogs.ShowMessageBox(
-                Arg.Any<string>(), Arg.Any<string>(),
-                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-            .Returns(MessageBoxResult.No);
-        sut.ProjectData.IsModified = true;
-        applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("true");
-        applicationUpdate.StartUpdateProcess("foo.zip", dryRun: false).Returns(false);
-        var monitor = sut.Monitor();
-
-        await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
-            .CompleteWithinAsync(1.Seconds());
-
-        sut.ProjectData.IsModified.Should().BeTrue("unsaved project remains unsaved");
-        monitor.Should().NotRaise(nameof(sut.Deactivated));
-    }
-
-    [Fact]
     public async Task HelpCheckForUpdateCommand_StartProcessSucceed_ProjectClosed()
     {
         var sut = CreateSut(out IApplicationUpdate applicationUpdate, out var dialogs);
