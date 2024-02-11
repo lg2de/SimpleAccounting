@@ -34,7 +34,7 @@ public class ApplicationUpdateTests
             "<ReleaseData><Release FileName=\"package-name.zip\"><EnglishDescription>eng</EnglishDescription></Release></ReleaseData>");
         var processApi = Substitute.For<IProcess>();
         processApi.Start(Arg.Any<ProcessStartInfo>())
-            .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c exit 5")));
+            .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c exit 5") { RedirectStandardError = true }));
         var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi)
         {
             WaitTimeMilliseconds = 1000

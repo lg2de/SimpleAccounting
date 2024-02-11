@@ -86,9 +86,12 @@ internal class ApplicationUpdate : IApplicationUpdate
         string assetUrl = asset.BrowserDownloadUrl;
         var targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
         int processId = this.process.GetCurrentProcessId();
-        var info = new ProcessStartInfo(
-            "powershell",
-            $"-ExecutionPolicy Bypass -File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
+        var arguments = new[]
+        {
+            "-ExecutionPolicy Bypass", $"-File {scriptPath}", $"-assetUrl {assetUrl}",
+            $"-targetFolder {targetFolder}", $"-processId {processId}"
+        };
+        var info = new ProcessStartInfo("powershell", arguments) { RedirectStandardError = true };
         var updateProcess = this.process.Start(info);
 
         var exited = updateProcess?.WaitForExit(this.WaitTimeMilliseconds) == true;
@@ -97,8 +100,10 @@ internal class ApplicationUpdate : IApplicationUpdate
             return true;
         }
 
+        var exitCode = updateProcess!.ExitCode;
+        var errorOutput = updateProcess.StandardError.ReadToEnd();
         var message = string.Format(
-            CultureInfo.CurrentUICulture, Resources.Update_ProcessFailed, updateProcess?.ExitCode);
+            CultureInfo.CurrentUICulture, Resources.Update_ProcessFailedX2, exitCode, errorOutput);
         this.dialogs.ShowMessageBox(message, Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
         return false;
     }

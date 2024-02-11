@@ -512,9 +512,10 @@ Si vous répondez Non", le fichier de sauvegarde sera supprimé."</value>
 	<data name="Question_UpdateToVersionX" xml:space="preserve">
     <value>Voulez-vous passer à la version {0} ?</value>
   </data>
-	<data name="Update_ProcessFailed" xml:space="preserve">
-    <value>Le processus de mise à jour a échoué avec le code de sortie {0}.</value>
-  </data>
+    <data name="Update_ProcessFailedX2" xml:space="preserve">
+		<value>Le processus de mise à jour a échoué avec le code de sortie {0}.
+Sortie d'erreur: {1}</value>
+	</data>
 	<data name="CloseYear_TextOptionDescription" xml:space="preserve">
     <value>Texte pour l'ouverture des journalisations</value>
   </data>
