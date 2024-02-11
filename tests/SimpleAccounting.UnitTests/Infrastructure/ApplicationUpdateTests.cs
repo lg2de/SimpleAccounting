@@ -181,6 +181,6 @@ public class ApplicationUpdateTests
 
         fileSystem.Received(1).WriteAllTextIntoFile(
             Arg.Is<string>(x => x.Contains(Path.GetTempPath(), StringComparison.InvariantCulture)), Arg.Any<string>());
-        processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(i => i.FileName == "powershell"));
+        processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(i => i.FileName.EndsWith("powershell.exe")));
     }
 }

@@ -86,12 +86,14 @@ internal class ApplicationUpdate : IApplicationUpdate
         string assetUrl = asset.BrowserDownloadUrl;
         var targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
         int processId = this.process.GetCurrentProcessId();
+        string fileName = Environment.ExpandEnvironmentVariables(
+            @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe");
         var arguments = new[]
         {
             "-ExecutionPolicy Bypass", $"-File {scriptPath}", $"-assetUrl {assetUrl}",
             $"-targetFolder {targetFolder}", $"-processId {processId}"
         };
-        var info = new ProcessStartInfo("powershell", arguments) { RedirectStandardError = true };
+        var info = new ProcessStartInfo(fileName, arguments) { RedirectStandardError = true };
         var updateProcess = this.process.Start(info);
 
         var exited = updateProcess?.WaitForExit(this.WaitTimeMilliseconds) == true;
