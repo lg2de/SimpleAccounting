@@ -34,7 +34,7 @@ public class ApplicationUpdateTests
             "<ReleaseData><Release FileName=\"package-name.zip\"><EnglishDescription>eng</EnglishDescription></Release></ReleaseData>");
         var processApi = Substitute.For<IProcess>();
         processApi.Start(Arg.Any<ProcessStartInfo>())
-            .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c exit 5")));
+            .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c exit 5") { RedirectStandardError = true }));
         var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi)
         {
             WaitTimeMilliseconds = 1000
@@ -42,7 +42,7 @@ public class ApplicationUpdateTests
         var releases = GithubReleaseExtensionTests.CreateRelease("2.1", "package-name.zip");
         await sut.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture);
 
-        sut.StartUpdateProcess("package-name.zip").Should().BeFalse();
+        sut.StartUpdateProcess("package-name.zip", dryRun: false).Should().BeFalse();
         dialogs.Received(1).ShowMessageBox(
             Arg.Is<string>(s => s.Contains("code 5.", StringComparison.InvariantCulture)),
             Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
@@ -177,10 +177,10 @@ public class ApplicationUpdateTests
             .Should().CompleteWithinAsync(10.Seconds());
         result.Subject.Should().Be("package-name.zip");
 
-        sut.StartUpdateProcess("package-name.zip").Should().BeTrue();
+        sut.StartUpdateProcess("package-name.zip", dryRun: false).Should().BeTrue();
 
         fileSystem.Received(1).WriteAllTextIntoFile(
             Arg.Is<string>(x => x.Contains(Path.GetTempPath(), StringComparison.InvariantCulture)), Arg.Any<string>());
-        processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(i => i.FileName == "powershell"));
+        processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(i => i.FileName.EndsWith("powershell.exe")));
     }
 }

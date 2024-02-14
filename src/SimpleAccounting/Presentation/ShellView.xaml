@@ -98,6 +98,9 @@
                     Command="{Binding Menu.HelpFeedbackCommand}" />
           <MenuItem Header="{x:Static properties:Resources.Menu_Help_CheckUpdate}"
                     Command="{Binding HelpCheckForUpdateCommand}" />
+          <MenuItem Header="TEST UPDATE"
+                    Command="{Binding HelpSimulateUpdate}"
+                    Visibility="{Binding HelpSimulateUpdateVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </MenuItem>
       </Menu>
       <Grid>

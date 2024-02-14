@@ -25,6 +25,9 @@ using Octokit;
 /// <summary>
 ///     Implements the application update.
 /// </summary>
+[SuppressMessage(
+    "Major Code Smell", "S1200:Classes should not be coupled to too many other classes",
+    Justification = "Only interfaces and github API DTOs are referenced.")]
 internal class ApplicationUpdate : IApplicationUpdate
 {
     private readonly IDialogs dialogs;
@@ -54,16 +57,13 @@ internal class ApplicationUpdate : IApplicationUpdate
         return await this.AskForUpdateAsync(releases, currentVersion, cultureInfo);
     }
 
-    public bool StartUpdateProcess(string packageName)
+    public bool StartUpdateProcess(string packageName, bool dryRun)
     {
-        if (this.newRelease == null)
-        {
-            throw new InvalidOperationException();
-        }
-
         // load script from resource and write into temp file
-        var stream = this.GetType().Assembly.GetManifestResourceStream(
-            "lg2de.SimpleAccounting.UpdateApplication.ps1");
+        string resourceName = dryRun
+            ? "lg2de.SimpleAccounting.Scripts.UpdateApplicationTest.ps1"
+            : "lg2de.SimpleAccounting.Scripts.UpdateApplication.ps1";
+        var stream = this.GetType().Assembly.GetManifestResourceStream(resourceName);
         if (stream == null)
         {
             // script not found :(
@@ -76,29 +76,43 @@ internal class ApplicationUpdate : IApplicationUpdate
         this.fileSystem.WriteAllTextIntoFile(scriptPath, script);
 
         // select and download the new version
-        var asset = this.newRelease.Assets.FirstOrDefault(x => x.Name == packageName);
-        if (asset == null)
-        {
-            // asset not found :(
-            return false;
-        }
+        var asset = this.newRelease?.Assets.FirstOrDefault(x => x.Name == packageName);
 
-        string assetUrl = asset.BrowserDownloadUrl;
+        var assetUrl = asset?.BrowserDownloadUrl ?? "dummy-asset";
         var targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
         int processId = this.process.GetCurrentProcessId();
-        var info = new ProcessStartInfo(
-            "powershell",
-            $"-File {scriptPath} -assetUrl {assetUrl} -targetFolder {targetFolder} -processId {processId}");
+        string fileName = Environment.ExpandEnvironmentVariables(
+            @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe");
+        var arguments = new[]
+        {
+            "-ExecutionPolicy Bypass", $"-File {scriptPath}", $"-assetUrl {assetUrl}",
+            $"-targetFolder {targetFolder}", $"-processId {processId}"
+        };
+        var info = new ProcessStartInfo(fileName, string.Join(" ", arguments));
         var updateProcess = this.process.Start(info);
 
         var exited = updateProcess?.WaitForExit(this.WaitTimeMilliseconds) == true;
         if (!exited)
         {
+            // succeed
             return true;
         }
 
+        // failed - retry with capturing output
+        info.RedirectStandardError = true;
+        info.WindowStyle = ProcessWindowStyle.Hidden;
+        updateProcess = this.process.Start(info);
+        exited = updateProcess?.WaitForExit(this.WaitTimeMilliseconds) == true;
+        if (!exited)
+        {
+            // succeed
+            return true;
+        }
+
+        var exitCode = updateProcess!.ExitCode;
+        var errorOutput = updateProcess.StandardError.ReadToEnd();
         var message = string.Format(
-            CultureInfo.CurrentUICulture, Resources.Update_ProcessFailed, updateProcess?.ExitCode);
+            CultureInfo.CurrentUICulture, Resources.Update_ProcessFailedX2, exitCode, errorOutput);
         this.dialogs.ShowMessageBox(message, Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
         return false;
     }
