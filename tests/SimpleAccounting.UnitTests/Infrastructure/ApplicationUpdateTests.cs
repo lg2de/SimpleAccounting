@@ -42,7 +42,7 @@ public class ApplicationUpdateTests
         var releases = GithubReleaseExtensionTests.CreateRelease("2.1", "package-name.zip");
         await sut.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture);
 
-        sut.StartUpdateProcess("package-name.zip").Should().BeFalse();
+        sut.StartUpdateProcess("package-name.zip", dryRun: false).Should().BeFalse();
         dialogs.Received(1).ShowMessageBox(
             Arg.Is<string>(s => s.Contains("code 5.", StringComparison.InvariantCulture)),
             Resources.Header_CheckForUpdates, icon: MessageBoxImage.Error);
@@ -177,7 +177,7 @@ public class ApplicationUpdateTests
             .Should().CompleteWithinAsync(10.Seconds());
         result.Subject.Should().Be("package-name.zip");
 
-        sut.StartUpdateProcess("package-name.zip").Should().BeTrue();
+        sut.StartUpdateProcess("package-name.zip", dryRun: false).Should().BeTrue();
 
         fileSystem.Received(1).WriteAllTextIntoFile(
             Arg.Is<string>(x => x.Contains(Path.GetTempPath(), StringComparison.InvariantCulture)), Arg.Any<string>());

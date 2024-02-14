@@ -57,16 +57,13 @@ internal class ApplicationUpdate : IApplicationUpdate
         return await this.AskForUpdateAsync(releases, currentVersion, cultureInfo);
     }
 
-    public bool StartUpdateProcess(string packageName)
+    public bool StartUpdateProcess(string packageName, bool dryRun)
     {
-        if (this.newRelease == null)
-        {
-            throw new InvalidOperationException();
-        }
-
         // load script from resource and write into temp file
-        var stream = this.GetType().Assembly.GetManifestResourceStream(
-            "lg2de.SimpleAccounting.UpdateApplication.ps1");
+        string resourceName = dryRun
+            ? "lg2de.SimpleAccounting.Scripts.UpdateApplicationTest.ps1"
+            : "lg2de.SimpleAccounting.Scripts.UpdateApplication.ps1";
+        var stream = this.GetType().Assembly.GetManifestResourceStream(resourceName);
         if (stream == null)
         {
             // script not found :(
@@ -79,14 +76,9 @@ internal class ApplicationUpdate : IApplicationUpdate
         this.fileSystem.WriteAllTextIntoFile(scriptPath, script);
 
         // select and download the new version
-        var asset = this.newRelease.Assets.FirstOrDefault(x => x.Name == packageName);
-        if (asset == null)
-        {
-            // asset not found :(
-            return false;
-        }
+        var asset = this.newRelease?.Assets.FirstOrDefault(x => x.Name == packageName);
 
-        string assetUrl = asset.BrowserDownloadUrl;
+        var assetUrl = asset?.BrowserDownloadUrl ?? "dummy-asset";
         var targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
         int processId = this.process.GetCurrentProcessId();
         string fileName = Environment.ExpandEnvironmentVariables(
@@ -96,12 +88,24 @@ internal class ApplicationUpdate : IApplicationUpdate
             "-ExecutionPolicy Bypass", $"-File {scriptPath}", $"-assetUrl {assetUrl}",
             $"-targetFolder {targetFolder}", $"-processId {processId}"
         };
-        var info = new ProcessStartInfo(fileName, arguments) { RedirectStandardError = true };
+        var info = new ProcessStartInfo(fileName, string.Join(" ", arguments));
         var updateProcess = this.process.Start(info);
 
         var exited = updateProcess?.WaitForExit(this.WaitTimeMilliseconds) == true;
         if (!exited)
         {
+            // succeed
+            return true;
+        }
+
+        // failed - retry with capturing output
+        info.RedirectStandardError = true;
+        info.WindowStyle = ProcessWindowStyle.Hidden;
+        updateProcess = this.process.Start(info);
+        exited = updateProcess?.WaitForExit(this.WaitTimeMilliseconds) == true;
+        if (!exited)
+        {
+            // succeed
             return true;
         }
 

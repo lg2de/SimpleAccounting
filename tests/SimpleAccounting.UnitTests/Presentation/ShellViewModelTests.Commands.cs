@@ -680,7 +680,7 @@ public partial class ShellViewModelTests
             .Returns(MessageBoxResult.No);
         sut.ProjectData.IsModified = true;
         applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("true");
-        applicationUpdate.StartUpdateProcess("foo.zip").Returns(false);
+        applicationUpdate.StartUpdateProcess("foo.zip", dryRun: false).Returns(false);
         var monitor = sut.Monitor();
 
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
@@ -701,7 +701,7 @@ public partial class ShellViewModelTests
             .Returns(MessageBoxResult.No);
         sut.ProjectData.IsModified = true;
         applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("package-name.zip");
-        applicationUpdate.StartUpdateProcess("package-name.zip").Returns(true);
+        applicationUpdate.StartUpdateProcess("package-name.zip", dryRun: false).Returns(true);
         var monitor = sut.Monitor();
 
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
@@ -720,7 +720,7 @@ public partial class ShellViewModelTests
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
             .CompleteWithinAsync(1.Seconds());
 
-        applicationUpdate.DidNotReceive().StartUpdateProcess("foo.zip");
+        applicationUpdate.DidNotReceive().StartUpdateProcess("foo.zip", dryRun: Arg.Any<bool>());
     }
 
     [Fact]
@@ -733,6 +733,6 @@ public partial class ShellViewModelTests
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
             .CompleteWithinAsync(1.Seconds());
 
-        applicationUpdate.DidNotReceive().StartUpdateProcess("foo.zip");
+        applicationUpdate.DidNotReceive().StartUpdateProcess("foo.zip", dryRun: Arg.Any<bool>());
     }
 }

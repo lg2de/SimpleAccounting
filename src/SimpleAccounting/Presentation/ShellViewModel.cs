@@ -24,6 +24,12 @@ internal class ShellViewModel : Screen, IDisposable
 
     private Task autoSaveTask = Task.CompletedTask;
     private CancellationTokenSource? cancellationTokenSource;
+    private readonly bool helpSimulateUpdateVisible =
+#if DEBUG
+        true;
+#else
+        false;
+#endif
 
     public ShellViewModel(
         IProjectData projectData,
@@ -92,6 +98,11 @@ internal class ShellViewModel : Screen, IDisposable
     public ICommand CloseApplicationCommand => new AsyncCommand(() => this.TryCloseAsync());
 
     public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this.Busy, this.OnCheckForUpdateAsync);
+
+    public IAsyncCommand HelpSimulateUpdate => new AsyncCommand(this.Busy, this.SimulateUpdateAsync);
+
+    // ReSharper disable once ConvertToAutoProperty
+    public bool HelpSimulateUpdateVisible => this.helpSimulateUpdateVisible;
 
     public ICommand NewAccountCommand => new AsyncCommand(this.Accounts.ShowNewAccountDialogAsync);
 
@@ -190,7 +201,8 @@ internal class ShellViewModel : Screen, IDisposable
 
     private async Task OnCheckForUpdateAsync()
     {
-        string packageName = await this.applicationUpdate.GetUpdatePackageAsync(this.version, CultureInfo.CurrentUICulture);
+        string packageName =
+            await this.applicationUpdate.GetUpdatePackageAsync(this.version, CultureInfo.CurrentUICulture);
         if (string.IsNullOrWhiteSpace(packageName))
         {
             return;
@@ -203,7 +215,7 @@ internal class ShellViewModel : Screen, IDisposable
 
         // starts separate process to update application in-place
         // Now we need to close this application.
-        if (!this.applicationUpdate.StartUpdateProcess(packageName))
+        if (!this.applicationUpdate.StartUpdateProcess(packageName, dryRun: false))
         {
             return;
         }
@@ -211,6 +223,23 @@ internal class ShellViewModel : Screen, IDisposable
         // The user was asked whether saving the project (CanDiscardModifiedProject).
         // It may have answered "No". So, the project may still be modified.
         // We do not want to ask again, and he doesn't want to save.
+        this.ProjectData.IsModified = false;
+
+        await this.TryCloseAsync();
+    }
+
+    private async Task SimulateUpdateAsync()
+    {
+        if (!this.ProjectData.CanDiscardModifiedProject())
+        {
+            return;
+        }
+
+        if (!this.applicationUpdate.StartUpdateProcess(string.Empty, dryRun: true))
+        {
+            return;
+        }
+
         this.ProjectData.IsModified = false;
 
         await this.TryCloseAsync();

@@ -14,5 +14,5 @@ internal interface IApplicationUpdate
 {
     Task<string> GetUpdatePackageAsync(string currentVersion, CultureInfo cultureInfo);
 
-    bool StartUpdateProcess(string packageName);
+    bool StartUpdateProcess(string packageName, bool dryRun);
 }

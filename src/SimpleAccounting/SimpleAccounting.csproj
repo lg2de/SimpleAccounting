@@ -17,7 +17,7 @@
     <None Remove="Reports\*.xml" />
     <None Remove="UpdateApplication.ps1" />
     <EmbeddedResource Include="Reports\*.xml" />
-    <EmbeddedResource Include="UpdateApplication.ps1" />
+    <EmbeddedResource Include="Scripts\*.ps1"/>
   </ItemGroup>
 
   <ItemGroup>

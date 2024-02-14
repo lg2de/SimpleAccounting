@@ -25,6 +25,6 @@ try {
   Write-Host Starting...
   & "$targetFolder\SimpleAccounting.exe"
 } catch {
-  $Shell = New-Object -ComObject "WScript.Shell"
-  $Button = $Shell.Popup($_.Exception.Message, 0, "Update failed", 0)
+  $shell = New-Object -ComObject "WScript.Shell"
+  $shell.Popup($_.Exception.Message, 0, "Update failed", 0) | Out-Null
 }
