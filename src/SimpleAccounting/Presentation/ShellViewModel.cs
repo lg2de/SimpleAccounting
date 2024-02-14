@@ -99,8 +99,10 @@ internal class ShellViewModel : Screen, IDisposable
 
     public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this.Busy, this.OnCheckForUpdateAsync);
 
+    [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
     public IAsyncCommand HelpSimulateUpdate => new AsyncCommand(this.Busy, this.SimulateUpdateAsync);
 
+    [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
     // ReSharper disable once ConvertToAutoProperty
     public bool HelpSimulateUpdateVisible => this.helpSimulateUpdateVisible;
 
@@ -228,6 +230,7 @@ internal class ShellViewModel : Screen, IDisposable
         await this.TryCloseAsync();
     }
 
+    [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
     private async Task SimulateUpdateAsync()
     {
         if (!this.ProjectData.CanDiscardModifiedProject())
