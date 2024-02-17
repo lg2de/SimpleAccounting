@@ -37,6 +37,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
     private readonly IFileSystem fileSystem;
     private readonly IProcess processApi;
     private readonly IWindowManager windowManager;
+    private readonly SemaphoreSlim saveSynchronization = new(initialCount: 1, maxCount: 1);
     private Task autoSaveTask = Task.CompletedTask;
     private CancellationTokenSource? cancellationTokenSource;
     private IDisposable? fileMonitoringHandle;
@@ -154,6 +155,8 @@ internal sealed class ProjectData : IProjectData, IDisposable
         this.savingCompleted = new TaskCompletionSource();
         try
         {
+            await this.saveSynchronization.WaitAsync();
+
             var fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
             var backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
             if (this.fileSystem.FileExists(this.FileName))
@@ -175,6 +178,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         {
             await Task.WhenAny(this.savingCompleted.Task, Task.Delay(TimeSpan.FromSeconds(1)));
             this.savingCompleted = null;
+            this.saveSynchronization.Release();
         }
 
         this.ActivateMonitoring();
@@ -420,18 +424,35 @@ internal sealed class ProjectData : IProjectData, IDisposable
             while (true)
             {
                 await Task.Delay(this.AutoSaveInterval, cancellationToken);
-                if (!this.IsModified)
-                {
-                    continue;
-                }
-
-                // TODO synchronize with save
-                this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.Storage.Serialize());
+                await AutoSaveCycleAsync();
             }
         }
         catch (OperationCanceledException)
         {
             // expected behavior
+        }
+
+        async Task AutoSaveCycleAsync()
+        {
+            if (!this.IsModified)
+            {
+                return;
+            }
+
+            try
+            {
+                await this.saveSynchronization.WaitAsync(cancellationToken);
+                if (!this.IsModified)
+                {
+                    return;
+                }
+
+                this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.Storage.Serialize());
+            }
+            finally
+            {
+                this.saveSynchronization.Release();
+            }
         }
     }
 
