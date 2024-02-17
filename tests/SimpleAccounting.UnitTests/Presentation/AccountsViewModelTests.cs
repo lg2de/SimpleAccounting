@@ -19,7 +19,7 @@ public class AccountsViewModelTests
     public void OnDataLoaded_DifferentImportConfigurations_ViewModelsBuildCorrect()
     {
         var windowManager = Substitute.For<IWindowManager>();
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
@@ -114,7 +114,7 @@ public class AccountsViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         AccountViewModel updatedViewModel = null;
         await windowManager.ShowDialogAsync(Arg.Do<object>(o => updatedViewModel = o as AccountViewModel));
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [

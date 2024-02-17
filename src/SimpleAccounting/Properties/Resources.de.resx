@@ -598,4 +598,12 @@ Computer-Name: {2}
 Geöffnet seit: {3}
 Möchten Sie das Projekt trotzdem öffnen? Gleichzeitiges Ändern kann zu Datenverlust führen.</value>
   </data>
+    <data name="Header_ProjectChanged" xml:space="preserve">
+    <value>Unerwartete Projektänderung</value>
+  </data>
+  <data name="Question_ProjectChanged" xml:space="preserve">
+    <value>An den Dateien des aktuellen Projektes wurden unerwartete Änderung durch einen anderen Prozess bzw. eine andere Person erkannt.
+Wollen Sie die aktuellen Änderungen unter einem anderen Projektnamen speichern? Dann drücken Sie "Ja".
+Wollen Sie die die eigenen Änderungen verwerfen? Dann drücken Sie "Nein".</value>
+  </data>
 </root>

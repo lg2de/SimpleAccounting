@@ -48,7 +48,7 @@ public partial class ShellViewModelTests
         await ((IActivate)sut).ActivateAsync();
         sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
         sut.ProjectData.LoadData(new AccountingData());
-        sut.ProjectData.SaveProject();
+        await sut.ProjectData.SaveProjectAsync();
         sut.ProjectData.IsModified = true;
         await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
 
@@ -135,7 +135,7 @@ public partial class ShellViewModelTests
         {
             RecentProject = "k:\\file2", RecentProjects = ["c:\\file1", "k:\\file2"], SecuredDrives = ["K:\\"]
         };
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -432,7 +432,7 @@ public partial class ShellViewModelTests
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -455,7 +455,7 @@ public partial class ShellViewModelTests
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -477,7 +477,7 @@ public partial class ShellViewModelTests
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -499,7 +499,7 @@ public partial class ShellViewModelTests
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -521,7 +521,7 @@ public partial class ShellViewModelTests
         fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -543,7 +543,7 @@ public partial class ShellViewModelTests
         fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(

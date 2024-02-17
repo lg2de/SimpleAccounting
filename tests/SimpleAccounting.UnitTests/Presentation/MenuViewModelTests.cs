@@ -33,7 +33,7 @@ public class MenuViewModelTests
     {
         var settings = new Settings();
         var fileSystem = Substitute.For<IFileSystem>();
-        var projectData = new ProjectData(settings, null!, null!, fileSystem, null!);
+        var projectData = new ProjectData(settings, null!, null!, fileSystem, null!, null!);
         var dialogs = Substitute.For<IDialogs>();
         var busy = new BusyControlModel();
         var clock = Substitute.For<IClock>();
@@ -83,13 +83,13 @@ public class MenuViewModelTests
     }
 
     [Fact]
-    public void RecentProjects_SaveNewFile_AddedToList()
+    public async Task RecentProjects_SaveNewFile_AddedToList()
     {
         var sut = CreateSut(out ProjectData projectData);
         sut.NewProjectCommand.Execute(null);
         projectData.FileName = "this-is-the-file-name";
 
-        sut.SaveProjectCommand.Execute(null);
+        await sut.SaveProjectCommand.ExecuteAsync(null);
 
         sut.RecentProjects.Should().BeEquivalentTo(new[] { new { Header = "this-is-the-file-name" } });
     }
@@ -403,7 +403,7 @@ public class MenuViewModelTests
         reportFactory = Substitute.For<IReportFactory>();
         var clock = Substitute.For<IClock>();
         var settings = new Settings();
-        projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs);
         return sut;
     }
@@ -418,7 +418,7 @@ public class MenuViewModelTests
         var reportFactory = Substitute.For<IReportFactory>();
         var clock = Substitute.For<IClock>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs);
         return sut;
     }

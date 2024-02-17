@@ -429,6 +429,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unexpected project changes.
+        /// </summary>
+        public static string Header_ProjectChanged {
+            get {
+                return ResourceManager.GetString("Header_ProjectChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Edit project options.
         /// </summary>
         public static string Header_ProjectOptions {
@@ -864,6 +873,17 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Question_LoadAutoSaveProjectFileX {
             get {
                 return ResourceManager.GetString("Question_LoadAutoSaveProjectFileX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected changes by another process or person have been detected in the files of the current project.
+        ///Do you want to save the current changes under a different project name? Then press &quot;Yes&quot;.
+        ///Do you want to discard your own changes? Then press &quot;No&quot;..
+        /// </summary>
+        public static string Question_ProjectChanged {
+            get {
+                return ResourceManager.GetString("Question_ProjectChanged", resourceCulture);
             }
         }
         

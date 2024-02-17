@@ -144,8 +144,9 @@ internal static class Samples
             var windowManager = Substitute.For<IWindowManager>();
             var dialogs = Substitute.For<IDialogs>();
             var fileSystem = Substitute.For<IFileSystem>();
+            var clock = Substitute.For<IClock>();
             var processApi = Substitute.For<IProcess>();
-            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+            var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
             projectData.LoadData(SampleProject);
             return projectData;
         }

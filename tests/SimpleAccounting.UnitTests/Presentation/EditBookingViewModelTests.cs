@@ -27,8 +27,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin - TimeSpan.FromDays(1));
 
         sut.Date.Should().Be(YearBegin);
@@ -40,8 +41,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin + TimeSpan.FromDays(1));
 
         sut.Date.Should().Be(YearBegin + TimeSpan.FromDays(1));
@@ -53,8 +55,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearEnd + TimeSpan.FromDays(1));
 
         sut.Date.Should().Be(YearEnd);
@@ -66,8 +69,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin);
 
         var oldNumber = sut.BookingIdentifier;
@@ -87,8 +91,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc",
@@ -107,8 +112,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc", DebitIndex = 2, BookingValue = 42
@@ -123,8 +129,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc", CreditIndex = 1, BookingValue = 42
@@ -139,8 +146,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingIdentifier = 0,
@@ -159,8 +167,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             CreditIndex = 1, DebitIndex = 2, BookingValue = 42
@@ -175,8 +184,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc", CreditIndex = 1, DebitIndex = 2
@@ -191,8 +201,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc", CreditIndex = 1, DebitIndex = 1, BookingValue = 42
@@ -207,8 +218,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc", CreditIndex = 1, DebitIndex = 2, BookingValue = 42
@@ -223,8 +235,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc",
@@ -253,8 +266,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc",
@@ -283,8 +297,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc",
@@ -313,8 +328,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc",
@@ -343,8 +359,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc",
@@ -373,8 +390,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc",
@@ -403,8 +421,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc",
@@ -433,8 +452,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingText = "abc",
@@ -463,8 +483,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin);
 
         await ((IActivate)sut).ActivateAsync();
@@ -479,8 +500,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin);
         foreach (AccountDefinitionType type in Enum.GetValues(typeof(AccountDefinitionType)))
         {
@@ -502,8 +524,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42
@@ -528,8 +551,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42
@@ -554,8 +578,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             CreditAccount = 1, DebitAccount = 2, BookingText = "default", BookingValue = 42
@@ -580,8 +605,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             CreditAccount = 1,
@@ -610,8 +636,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingIdentifier = 42, Date = new DateTime(2020, 6, 20, 0, 0, 0, DateTimeKind.Local)
@@ -646,8 +673,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingIdentifier = 42, Date = new DateTime(2020, 6, 20, 0, 0, 0, DateTimeKind.Local)
@@ -676,8 +704,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingIdentifier = 42, Date = new DateTime(2020, 6, 20, 0, 0, 0, DateTimeKind.Local)
@@ -712,8 +741,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin)
         {
             BookingIdentifier = 42, Date = new DateTime(2020, 6, 20, 0, 0, 0, DateTimeKind.Local)
@@ -742,8 +772,9 @@ public class EditBookingViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin);
 
         sut.SaveCommand.CanExecute(null).Should().BeFalse();

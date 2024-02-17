@@ -25,52 +25,16 @@ using Xunit;
 
 public class ProjectDataTests
 {
-    [Fact]
-    public void Dispose_HappyPath_Completed()
-    {
-        var windowManager = Substitute.For<IWindowManager>();
-        var dialogs = Substitute.For<IDialogs>();
-        var fileSystem = Substitute.For<IFileSystem>();
-        var processApi = Substitute.For<IProcess>();
-        var settings = new Settings();
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-
-        sut.Invoking(x => x.Dispose()).Should().NotThrow();
-    }
-
-    [Fact]
-    public async Task LoadFromFileAsync_HappyPath_FileLoaded()
-    {
-        var windowManager = Substitute.For<IWindowManager>();
-        var dialogs = Substitute.For<IDialogs>();
-        var fileSystem = Substitute.For<IFileSystem>();
-        var processApi = Substitute.For<IProcess>();
-        var settings = new Settings { SecuredDrives = ["K:\\"] };
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-        fileSystem.FileExists("the.fileName").Returns(true);
-        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-
-        (await sut.Awaiting(x => x.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(10.Seconds()))
-            .Which.Should().Be(OperationResult.Completed);
-
-        using var _ = new AssertionScope();
-        sut.FileName.Should().Be("the.fileName");
-        sut.IsModified.Should().BeFalse();
-        sut.Settings.RecentProject.Should().Be("the.fileName");
-        sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
-        fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
-    }
-
     [CulturedFact("en")]
     public async Task LoadFromFileAsync_UserWantsAutoSaveFile_AutoSaveFileLoaded()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings { SecuredDrives = ["K:\\"] };
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         dialogs.ShowMessageBox(
                 Arg.Is<string>(
                     s => s.Contains("automatically generated backup file for project", StringComparison.Ordinal)),
@@ -100,9 +64,10 @@ public class ProjectDataTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings { SecuredDrives = ["K:\\"] };
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         dialogs.ShowMessageBox(
                 Arg.Is<string>(
                     s => s.Contains("automatically generated backup file for project", StringComparison.Ordinal)),
@@ -127,40 +92,19 @@ public class ProjectDataTests
         fileSystem.Received(1).FileDelete("the.fileName~");
     }
 
-    [Fact]
-    public async Task LoadFromFileAsync_OtherProjectLoaded_ReservationFileRemoved()
-    {
-        var windowManager = Substitute.For<IWindowManager>();
-        var dialogs = Substitute.For<IDialogs>();
-        var fileSystem = Substitute.For<IFileSystem>();
-        var processApi = Substitute.For<IProcess>();
-        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi)
-        {
-            FileName = "fileName1"
-        };
-        fileSystem.FileExists("fileName1#").Returns(true);
-        fileSystem.FileExists("fileName2").Returns(true);
-        fileSystem.ReadAllTextFromFile("fileName2").Returns(Samples.SampleProject.Serialize());
-
-        (await sut.Awaiting(x => x.LoadFromFileAsync("fileName2")).Should()
-                .CompleteWithinAsync(10.Seconds()))
-            .Which.Should().Be(OperationResult.Completed);
-
-        fileSystem.Received(1).FileDelete("fileName1#");
-    }
-
     [Theory]
     [InlineData("Cryptomator File System")]
     [InlineData("cryptoFs")]
-    public async Task LoadProjectFromFileAsync_NewFileOnSecureDrive_StoreOpenedAndFileLoaded(
+    public async Task LoadFromFileAsync_NewFileOnSecureDrive_StoreOpenedAndFileLoaded(
         string cryptoDriveIdentifier)
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings { SecuredDrives = ["K:\\"] };
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
         fileSystem.GetDrives().Returns(
@@ -184,15 +128,110 @@ public class ProjectDataTests
         fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
     }
 
-    [Fact]
-    public async Task LoadProjectFromFileAsync_FullRecentList_NewFileOnTop()
+    [CulturedFact("en")]
+    public async Task LoadFromFileAsync_UserDoesNotWantSaveCurrentProject_LoadingAborted()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings { SecuredDrives = ["K:\\"] };
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi)
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi)
+        {
+            FileName = "old.fileName", IsModified = true
+        };
+        dialogs.ShowMessageBox(
+                Arg.Is<string>(s => s.Contains("Project data has been changed.", StringComparison.Ordinal)),
+                Arg.Any<string>(),
+                MessageBoxButton.YesNo, MessageBoxImage.Question,
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+            .Returns(MessageBoxResult.Cancel);
+        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+        fileSystem.FileExists("new.fileName").Returns(true);
+
+        (await sut.Awaiting(x => x.LoadFromFileAsync("the.fileName")).Should()
+                .CompleteWithinAsync(10.Seconds()))
+            .Which.Should().Be(OperationResult.Aborted);
+
+        using var _ = new AssertionScope();
+        sut.FileName.Should().Be("old.fileName", "the new file was not loaded");
+        sut.IsModified.Should().BeTrue("changes are (still) not yet saved");
+        fileSystem.DidNotReceive().ReadAllTextFromFile("the.fileName");
+    }
+
+    [Fact]
+    public void Dispose_HappyPath_Completed()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+
+        sut.Invoking(x => x.Dispose()).Should().NotThrow();
+    }
+
+    [Fact]
+    public async Task LoadFromFileAsync_HappyPath_FileLoaded()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings { SecuredDrives = ["K:\\"] };
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+        fileSystem.FileExists("the.fileName").Returns(true);
+        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
+
+        (await sut.Awaiting(x => x.LoadFromFileAsync("the.fileName")).Should()
+                .CompleteWithinAsync(10.Seconds()))
+            .Which.Should().Be(OperationResult.Completed);
+
+        using var _ = new AssertionScope();
+        sut.FileName.Should().Be("the.fileName");
+        sut.IsModified.Should().BeFalse();
+        sut.Settings.RecentProject.Should().Be("the.fileName");
+        sut.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
+        fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
+    }
+
+    [Fact]
+    public async Task LoadFromFileAsync_OtherProjectLoaded_ReservationFileRemoved()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi)
+        {
+            FileName = "fileName1"
+        };
+        fileSystem.FileExists("fileName1#").Returns(true);
+        fileSystem.FileExists("fileName2").Returns(true);
+        fileSystem.ReadAllTextFromFile("fileName2").Returns(Samples.SampleProject.Serialize());
+
+        (await sut.Awaiting(x => x.LoadFromFileAsync("fileName2")).Should()
+                .CompleteWithinAsync(10.Seconds()))
+            .Which.Should().Be(OperationResult.Completed);
+
+        fileSystem.Received(1).FileDelete("fileName1#");
+    }
+
+    [Fact]
+    public async Task LoadFromFileAsync_FullRecentList_NewFileOnTop()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings { SecuredDrives = ["K:\\"] };
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi)
         {
             Settings =
             {
@@ -223,14 +262,15 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public async Task LoadProjectFromFileAsync_MigrationRequired_ProjectModified()
+    public async Task LoadFromFileAsync_MigrationRequired_ProjectModified()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings { SecuredDrives = ["K:\\"] };
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountingData = new AccountingData { Years = [new AccountingDataYear { Name = 2020 }] };
         fileSystem.FileExists("the.fileName").Returns(true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
@@ -242,46 +282,16 @@ public class ProjectDataTests
         sut.IsModified.Should().BeTrue();
     }
 
-    [CulturedFact("en")]
-    public async Task LoadProjectFromFileAsync_UserDoesNotWantSaveCurrentProject_LoadingAborted()
-    {
-        var windowManager = Substitute.For<IWindowManager>();
-        var dialogs = Substitute.For<IDialogs>();
-        var fileSystem = Substitute.For<IFileSystem>();
-        var processApi = Substitute.For<IProcess>();
-        var settings = new Settings { SecuredDrives = ["K:\\"] };
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi)
-        {
-            FileName = "old.fileName", IsModified = true
-        };
-        dialogs.ShowMessageBox(
-                Arg.Is<string>(s => s.Contains("Project data has been changed.", StringComparison.Ordinal)),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo, MessageBoxImage.Question,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-            .Returns(MessageBoxResult.Cancel);
-        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-        fileSystem.FileExists("new.fileName").Returns(true);
-
-        (await sut.Awaiting(x => x.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(10.Seconds()))
-            .Which.Should().Be(OperationResult.Aborted);
-
-        using var _ = new AssertionScope();
-        sut.FileName.Should().Be("old.fileName", "the new file was not loaded");
-        sut.IsModified.Should().BeTrue("changes are (still) not yet saved");
-        fileSystem.DidNotReceive().ReadAllTextFromFile("the.fileName");
-    }
-
     [Fact]
-    public async Task LoadProjectFromFileAsync_KnownFileOnSecureDrive_StoreOpenedAndFileLoaded()
+    public async Task LoadFromFileAsync_KnownFileOnSecureDrive_StoreOpenedAndFileLoaded()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings { SecuredDrives = ["K:\\"] };
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         dialogs.ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
@@ -313,13 +323,143 @@ public class ProjectDataTests
     }
 
     [Fact]
+    public async Task OnProjectChanged_AutoSaveFileChanged_ChangeIgnored()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        Action<string> registeredCallback = null;
+        fileSystem
+            .When(x => x.StartMonitoring("the.fileName", Arg.Any<Action<string>>()))
+            .Do(x => registeredCallback = x.ArgAt<Action<string>>(1));
+        var clock = Substitute.For<IClock>();
+        clock.Now().Returns(new DateTime(2024, 2, 17, 1, 2, 3, DateTimeKind.Local));
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+        fileSystem.FileExists("the.fileName").Returns(true);
+        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(Samples.SampleProject.Serialize());
+        await sut.LoadFromFileAsync("the.fileName");
+
+        registeredCallback.Invoke("the.fileName~");
+
+        dialogs.DidNotReceive().ShowMessageBox(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+    }
+
+    [Fact]
+    public async Task OnProjectChanged_ProjectFileChangedUserDiscards_ProjectClosed()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        dialogs.ShowMessageBox(
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), MessageBoxImage.Warning,
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+            .Returns(MessageBoxResult.No);
+        var fileSystem = Substitute.For<IFileSystem>();
+        Action<string> registeredCallback = null;
+        fileSystem
+            .When(x => x.StartMonitoring("the.fileName", Arg.Any<Action<string>>()))
+            .Do(x => registeredCallback = x.ArgAt<Action<string>>(1));
+        var clock = Substitute.For<IClock>();
+        clock.Now().Returns(new DateTime(2024, 2, 17, 1, 2, 3, DateTimeKind.Local));
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+        fileSystem.FileExists("the.fileName").Returns(true);
+        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(Samples.SampleProject.Serialize());
+        await sut.LoadFromFileAsync("the.fileName");
+
+        registeredCallback.Invoke("the.fileName");
+
+        await sut.ProjectChangedHandlerTask;
+        fileSystem.DidNotReceive().WriteAllTextIntoFile("the.fileName", Arg.Any<string>());
+        sut.FileName.Should().Be("<new>");
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public async Task OnProjectChanged_ProjectFileChangedUserAccepts_ProjectClosed(int numberOfFileChanges)
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        dialogs.ShowMessageBox(
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), MessageBoxImage.Warning,
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+            .Returns(MessageBoxResult.Yes);
+        var fileSystem = Substitute.For<IFileSystem>();
+        Action<string> registeredCallback = null;
+        fileSystem
+            .When(x => x.StartMonitoring("the.fileName", Arg.Any<Action<string>>()))
+            .Do(x => registeredCallback = x.ArgAt<Action<string>>(1));
+        var clock = Substitute.For<IClock>();
+        clock.Now().Returns(new DateTime(2024, 2, 17, 1, 2, 3, DateTimeKind.Local));
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+        fileSystem.FileExists("the.fileName").Returns(true);
+        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(Samples.SampleProject.Serialize());
+        await sut.LoadFromFileAsync("the.fileName");
+
+        // We would expect to get only one notification for changing a file.
+        // But we see that changing a file most times create two notifications.
+        // Here we simulate different scenarios.
+        for (int i = 0; i < numberOfFileChanges; i++)
+        {
+            registeredCallback.Invoke("the.fileName");
+        }
+
+        await sut.ProjectChangedHandlerTask;
+        fileSystem.Received(1).WriteAllTextIntoFile("the_20240217010203.acml", Arg.Any<string>());
+        sut.FileName.Should().Be("the_20240217010203.acml");
+    }
+
+    [Fact]
+    public async Task OnProjectChanged_ProjectFileChangedWhileSaving_NotReportedAsUnexpectedChange()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        dialogs.ShowMessageBox(
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), MessageBoxImage.Warning,
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+            .Returns(MessageBoxResult.Yes);
+        var fileSystem = Substitute.For<IFileSystem>();
+        Action<string> registeredCallback = null;
+        fileSystem
+            .When(x => x.StartMonitoring("the.fileName", Arg.Any<Action<string>>()))
+            .Do(x => registeredCallback = x.ArgAt<Action<string>>(1));
+        fileSystem
+            .When(x => x.WriteAllTextIntoFile("the.fileName", Arg.Any<string>()))
+            .Do(_ => registeredCallback.Invoke("the.fileName"));
+        var clock = Substitute.For<IClock>();
+        clock.Now().Returns(new DateTime(2024, 2, 17, 1, 2, 3, DateTimeKind.Local));
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+        fileSystem.FileExists("the.fileName").Returns(true);
+        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(Samples.SampleProject.Serialize());
+        await sut.LoadFromFileAsync("the.fileName");
+
+        await sut.Awaiting(x => x.SaveProjectAsync()).Should().CompleteWithinAsync(1.Seconds());
+
+        await sut.ProjectChangedHandlerTask;
+        dialogs.DidNotReceive().ShowMessageBox(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+    }
+
+    [Fact]
     public async Task TryCloseAsync_NotModified_ReturnsTrue()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
 
         (await sut.Awaiting(x => x.TryCloseAsync()).Should().CompleteWithinAsync(1.Seconds())).Which.Should().BeTrue();
 
@@ -335,8 +475,9 @@ public class ProjectDataTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
@@ -360,8 +501,12 @@ public class ProjectDataTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi) { IsModified = true };
+        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi)
+        {
+            IsModified = true
+        };
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
@@ -384,8 +529,12 @@ public class ProjectDataTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
-        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, processApi) { IsModified = true };
+        var sut = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi)
+        {
+            IsModified = true
+        };
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
@@ -393,7 +542,7 @@ public class ProjectDataTests
             .Returns(MessageBoxResult.Yes);
         sut.LoadData(Samples.SampleProject);
 
-        (await sut.Awaiting(x => x.TryCloseAsync()).Should().CompleteWithinAsync(1.Seconds())).Which.Should().BeTrue();
+        (await sut.Awaiting(x => x.TryCloseAsync()).Should().CompleteWithinAsync(5.Seconds())).Which.Should().BeTrue();
 
         dialogs.Received(1).ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),
@@ -403,19 +552,20 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public void SaveProject_NotExisting_JustSaved()
+    public async Task SaveProjectAsync_NotExisting_JustSaved()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         fileSystem.GetLastWriteTime(Arg.Any<string>())
             .Returns(new DateTime(2020, 2, 29, 18, 45, 56, 0, 0, DateTimeKind.Local));
         sut.LoadData(Samples.SampleProject);
 
-        sut.SaveProject();
+        await sut.SaveProjectAsync();
 
         fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
         fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
@@ -423,31 +573,33 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public void SaveProject_NewProject_SaveAsDialog()
+    public async Task SaveProjectAsync_NewProject_SaveAsDialog()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         sut.NewProject();
 
-        sut.SaveProject();
+        await sut.SaveProjectAsync();
 
         dialogs.Received(1).ShowSaveFileDialog(Arg.Any<string>());
         fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
     }
 
     [Fact]
-    public void SaveProject_AutoSaveExisting_AutoSaveFileDeleted()
+    public async Task SaveProjectAsync_AutoSaveExisting_AutoSaveFileDeleted()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         fileSystem.GetLastWriteTime(Arg.Any<string>())
             .Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
         const string fileName = "project.name";
@@ -455,7 +607,7 @@ public class ProjectDataTests
         sut.LoadData(Samples.SampleProject);
         sut.FileName = fileName;
 
-        sut.SaveProject();
+        await sut.SaveProjectAsync();
 
         fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
         fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());
@@ -463,14 +615,15 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public void SaveProject_ProjectExisting_SavedAfterBackup()
+    public async Task SaveProjectAsync_ProjectExisting_SavedAfterBackup()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         fileSystem.GetLastWriteTime(Arg.Any<string>())
             .Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
         const string fileName = "project.name";
@@ -478,7 +631,7 @@ public class ProjectDataTests
         sut.LoadData(Samples.SampleProject);
         sut.FileName = fileName;
 
-        sut.SaveProject();
+        await sut.SaveProjectAsync();
 
         fileSystem.Received(1).FileMove(fileName, fileName + ".20200229184556");
         fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());
@@ -491,9 +644,10 @@ public class ProjectDataTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         sut.NewProject();
         windowManager.ShowDialogAsync(Arg.Any<ProjectOptionsViewModel>()).Returns(true);
 
@@ -508,9 +662,10 @@ public class ProjectDataTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         sut.NewProject();
         windowManager.ShowDialogAsync(Arg.Any<ProjectOptionsViewModel>()).Returns(false);
 
@@ -525,9 +680,10 @@ public class ProjectDataTests
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         sut.LoadData(Samples.SampleProject);
         sut.Storage.Accounts[^1].Account.Add(
             new AccountDefinition { ID = 99999, Name = "C2", Type = AccountDefinitionType.Carryforward });

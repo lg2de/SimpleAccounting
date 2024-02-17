@@ -22,7 +22,7 @@ using lg2de.SimpleAccounting.Properties;
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 internal class ShellDesignViewModel : ShellViewModel
 {
-    private static readonly ProjectData DesignProject = new(new Settings(), null!, null!, null!, null!);
+    private static readonly ProjectData DesignProject = new(new Settings(), null!, null!, null!, null!, null!);
 
     public ShellDesignViewModel()
         : base(

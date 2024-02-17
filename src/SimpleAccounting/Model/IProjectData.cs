@@ -47,7 +47,7 @@ internal interface IProjectData
 
     Task<OperationResult> LoadFromFileAsync(string projectFileName);
 
-    void SaveProject();
+    Task SaveProjectAsync();
 
     Task<bool> TryCloseAsync();
 

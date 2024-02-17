@@ -78,7 +78,7 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     };
 
     public ImportBookingsDesignViewModel()
-        : base(null!, null!, new ProjectData(new Settings(), null!, null!, null!, null!))
+        : base(null!, null!, new ProjectData(new Settings(), null!, null!, null!, null!, null!))
     {
         this.ProjectData.LoadData(SampleData);
         this.SelectedAccountNumber = 100;

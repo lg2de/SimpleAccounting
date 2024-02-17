@@ -15,8 +15,9 @@ internal static class Defines
 
     public const string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
     public const string NewIssueUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
+    public const string AutoSaveFileSuffix = "~";
 
-    public static string GetAutoSaveFileName(string fileName) => fileName + "~";
+    public static string GetAutoSaveFileName(string fileName) => fileName + AutoSaveFileSuffix;
 
     public static string GetReservationFileName(string fileName) => fileName + "#";
 }

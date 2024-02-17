@@ -613,4 +613,12 @@ Machine name: {2}
 Opened since: {3}
 Do you want to open the project anyway? Concurrent modification may cause data loss.</value>
   </data>
+    <data name="Header_ProjectChanged" xml:space="preserve">
+    <value>Unexpected project changes</value>
+  </data>
+  <data name="Question_ProjectChanged" xml:space="preserve">
+    <value>Unexpected changes by another process or person have been detected in the files of the current project.
+Do you want to save the current changes under a different project name? Then press "Yes".
+Do you want to discard your own changes? Then press "No".</value>
+  </data>
 </root>

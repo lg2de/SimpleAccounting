@@ -6,6 +6,8 @@ namespace lg2de.SimpleAccounting.Model;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,27 +32,35 @@ using lg2de.SimpleAccounting.Properties;
     Justification = "This is the wrapper for the model which is generated code. So, this is ok here.")]
 internal sealed class ProjectData : IProjectData, IDisposable
 {
+    private readonly IClock clock;
     private readonly IDialogs dialogs;
     private readonly IFileSystem fileSystem;
     private readonly IProcess processApi;
     private readonly IWindowManager windowManager;
     private Task autoSaveTask = Task.CompletedTask;
-    private CancellationTokenSource? cancellationTokenSource; // TODO to cancel auto-save
+    private CancellationTokenSource? cancellationTokenSource;
+    private IDisposable? fileMonitoringHandle;
+    private DateTime lastNotification = DateTime.MinValue;
+    private TaskCompletionSource? savingCompleted;
     private AccountingData storage;
 
     public ProjectData(
-        Settings settings, IWindowManager windowManager, IDialogs dialogs, IFileSystem fileSystem,
-        IProcess processApi)
+        Settings settings,
+        IWindowManager windowManager, IDialogs dialogs, IFileSystem fileSystem,
+        IClock clock, IProcess processApi)
     {
         this.Settings = settings;
         this.windowManager = windowManager;
         this.dialogs = dialogs;
         this.fileSystem = fileSystem;
+        this.clock = clock;
         this.processApi = processApi;
 
         this.storage = new AccountingData();
         this.CurrentYear = this.storage.Journal.SafeGetLatest();
     }
+
+    internal Task ProjectChangedHandlerTask { get; private set; } = Task.CompletedTask;
 
     public void Dispose()
     {
@@ -122,12 +132,12 @@ internal sealed class ProjectData : IProjectData, IDisposable
         this.Storage = loader.ProjectData;
         this.IsModified = loader.Migrated;
 
-        this.ActivateAutoSave();
+        this.ActivateMonitoring();
 
         return OperationResult.Completed;
     }
 
-    public void SaveProject()
+    public async Task SaveProjectAsync()
     {
         if (this.FileName == "<new>")
         {
@@ -142,29 +152,38 @@ internal sealed class ProjectData : IProjectData, IDisposable
             this.FileName = fileName;
         }
 
-        var fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
-        var backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
-        if (this.fileSystem.FileExists(this.FileName))
+        this.savingCompleted = new TaskCompletionSource();
+        try
         {
-            this.fileSystem.FileMove(this.FileName, backupFileName);
+            var fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
+            var backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
+            if (this.fileSystem.FileExists(this.FileName))
+            {
+                this.fileSystem.FileMove(this.FileName, backupFileName);
+            }
+
+            this.fileSystem.WriteAllTextIntoFile(this.FileName, this.Storage.Serialize());
+            this.IsModified = false;
+
+            if (this.fileSystem.FileExists(this.AutoSaveFileName))
+            {
+                this.fileSystem.FileDelete(this.AutoSaveFileName);
+            }
+
+            this.Settings.SetRecentProject(this.FileName);
+        }
+        finally
+        {
+            await Task.WhenAny(this.savingCompleted.Task, Task.Delay(TimeSpan.FromSeconds(1)));
+            this.savingCompleted = null;
         }
 
-        this.fileSystem.WriteAllTextIntoFile(this.FileName, this.Storage.Serialize());
-        this.IsModified = false;
-
-        if (this.fileSystem.FileExists(this.AutoSaveFileName))
-        {
-            this.fileSystem.FileDelete(this.AutoSaveFileName);
-        }
-
-        this.Settings.SetRecentProject(this.FileName);
-
-        this.ActivateAutoSave();
+        this.ActivateMonitoring();
     }
 
     public async Task<bool> TryCloseAsync()
     {
-        if (!this.TryDiscardModifiedProject())
+        if (!await this.TryDiscardModifiedProjectAsync())
         {
             return false;
         }
@@ -176,6 +195,9 @@ internal sealed class ProjectData : IProjectData, IDisposable
 
             this.cancellationTokenSource.Dispose();
             this.cancellationTokenSource = null;
+
+            this.fileMonitoringHandle?.Dispose();
+            this.fileMonitoringHandle = null;
         }
 
         if (this.fileSystem.FileExists(this.AutoSaveFileName))
@@ -330,7 +352,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
             this, new JournalChangedEventArgs(0, this.storage.AllAccounts.Select(x => x.ID).ToList()));
     }
 
-    private void ActivateAutoSave()
+    private void ActivateMonitoring()
     {
         if (this.cancellationTokenSource != null)
         {
@@ -340,6 +362,54 @@ internal sealed class ProjectData : IProjectData, IDisposable
 
         this.cancellationTokenSource = new CancellationTokenSource();
         this.autoSaveTask = this.AutoSaveAsync(this.cancellationTokenSource.Token);
+        this.fileMonitoringHandle = this.fileSystem.StartMonitoring(this.FileName, this.OnProjectChanged);
+    }
+
+    private void OnProjectChanged(string fileName)
+    {
+        if (fileName.EndsWith(Defines.AutoSaveFileSuffix, StringComparison.OrdinalIgnoreCase))
+        {
+            // ignore changes according to auto-save
+            return;
+        }
+
+        if (this.savingCompleted != null)
+        {
+            // we are currently in saving the (own) project
+            this.savingCompleted.TrySetResult();
+            return;
+        }
+
+        if ((this.clock.Now() - this.lastNotification) < TimeSpan.FromMilliseconds(100))
+        {
+            // debounce the file system watcher
+            return;
+        }
+
+        this.lastNotification = this.clock.Now();
+
+        this.ProjectChangedHandlerTask = this.ProjectChangedHandlerTask.ContinueWith(
+            async _ =>
+            {
+                var result = this.dialogs.ShowMessageBox(
+                    Resources.Question_ProjectChanged, Resources.Header_ProjectChanged, MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning, MessageBoxResult.Yes);
+                if (result == MessageBoxResult.Yes)
+                {
+                    string newFileName =
+                        Path.GetFileNameWithoutExtension(this.FileName)
+                        + "_"
+                        + this.clock.Now().ToString("yyyyMMddHHmmss", CultureInfo.CurrentUICulture);
+                    this.FileName = Path.Combine(Path.GetDirectoryName(this.FileName)!, newFileName + ".acml");
+                    await this.SaveProjectAsync();
+                    await this.LoadFromFileAsync(this.FileName);
+                }
+                else
+                {
+                    this.IsModified = false;
+                    this.NewProject();
+                }
+            });
     }
 
     private async Task AutoSaveAsync(CancellationToken cancellationToken)
@@ -364,7 +434,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         }
     }
 
-    private bool TryDiscardModifiedProject()
+    private async Task<bool> TryDiscardModifiedProjectAsync()
     {
         if (!this.IsModified)
         {
@@ -379,7 +449,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         switch (result)
         {
         case MessageBoxResult.Yes:
-            this.SaveProject();
+            await this.SaveProjectAsync();
             return true;
         case MessageBoxResult.No:
             // User wants to discard changes.

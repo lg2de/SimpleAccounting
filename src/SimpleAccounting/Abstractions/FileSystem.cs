@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
+using JetBrains.Annotations;
 
 /// <summary>
 ///     Redirects <see cref="IFileSystem" /> into real implementations from .NET framework.
@@ -17,7 +18,9 @@ using System.Text;
 ///     The reason for this class is testability.
 ///     This is why it is excluded from code coverage.
 /// </remarks>
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(
+    Justification = "This is an abstraction for testing because the file system cannot be tested.")]
+[UsedImplicitly]
 internal class FileSystem : IFileSystem
 {
     public bool FileExists(string filePath)
@@ -70,6 +73,41 @@ internal class FileSystem : IFileSystem
             }
 
             yield return info;
+        }
+    }
+
+    public IDisposable StartMonitoring(string filePath, Action<string> changedCallback)
+    {
+        return new FileSystemWatchWrapper(filePath, changedCallback);
+    }
+
+    private sealed class FileSystemWatchWrapper : IDisposable
+    {
+        private readonly Action<string> changedCallback;
+        private readonly FileSystemWatcher fileSystemWatcher;
+
+        public FileSystemWatchWrapper(string filePath, Action<string> changedCallback)
+        {
+            this.changedCallback = changedCallback;
+            var directoryName = Path.GetDirectoryName(filePath)!;
+            var fileName = Path.GetFileName(filePath);
+
+            this.fileSystemWatcher = new FileSystemWatcher(directoryName, fileName + "*");
+            this.fileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite;
+            this.fileSystemWatcher.EnableRaisingEvents = true;
+
+            this.fileSystemWatcher.Changed += this.OnFileChanged;
+        }
+
+        public void Dispose()
+        {
+            this.fileSystemWatcher.Changed -= this.OnFileChanged;
+            this.fileSystemWatcher.Dispose();
+        }
+
+        private void OnFileChanged(object sender, FileSystemEventArgs e)
+        {
+            this.changedCallback(e.Name!);
         }
     }
 }
