@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using Caliburn.Micro;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -22,6 +23,7 @@ using lg2de.SimpleAccounting.Properties;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
 using NSubstitute;
 using Xunit;
+using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 public class ProjectDataTests
 {
@@ -443,7 +445,8 @@ public class ProjectDataTests
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(Samples.SampleProject.Serialize());
         await sut.LoadFromFileAsync("the.fileName");
 
-        await sut.Awaiting(x => x.SaveProjectAsync()).Should().CompleteWithinAsync(1.Seconds());
+        (await sut.Awaiting(x => x.SaveProjectAsync()).Should().CompleteWithinAsync(1.Seconds()))
+            .Which.Should().BeTrue();
 
         await sut.ProjectChangedHandlerTask;
         dialogs.DidNotReceive().ShowMessageBox(
@@ -565,7 +568,8 @@ public class ProjectDataTests
             .Returns(new DateTime(2020, 2, 29, 18, 45, 56, 0, 0, DateTimeKind.Local));
         sut.LoadData(Samples.SampleProject);
 
-        await sut.SaveProjectAsync();
+        (await sut.Awaiting(x => x.SaveProjectAsync()).Should().CompleteWithinAsync(10.Seconds()))
+            .Which.Should().BeTrue();
 
         fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
         fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
@@ -573,10 +577,11 @@ public class ProjectDataTests
     }
 
     [Fact]
-    public async Task SaveProjectAsync_NewProject_SaveAsDialog()
+    public async Task SaveProjectAsync_NewProjectSaveAsDialogConfirmed_FileCreated()
     {
         var windowManager = Substitute.For<IWindowManager>();
         var dialogs = Substitute.For<IDialogs>();
+        dialogs.ShowSaveFileDialog(Arg.Any<string>()).Returns((DialogResult.OK, "newFile.acml"));
         var fileSystem = Substitute.For<IFileSystem>();
         var clock = Substitute.For<IClock>();
         var processApi = Substitute.For<IProcess>();
@@ -584,10 +589,32 @@ public class ProjectDataTests
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         sut.NewProject();
 
-        await sut.SaveProjectAsync();
+        (await sut.Awaiting(x => x.SaveProjectAsync()).Should().CompleteWithinAsync(10.Seconds()))
+            .Which.Should().BeTrue();
+
+        dialogs.Received(1).ShowSaveFileDialog(Arg.Any<string>());
+        fileSystem.Received(1).WriteAllTextIntoFile("newFile.acml", Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task SaveProjectAsync_NewProjectSaveAsDialogCancelled_ProjectRemainsNew()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        dialogs.ShowSaveFileDialog(Arg.Any<string>()).Returns((DialogResult.Cancel, string.Empty));
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+        sut.NewProject();
+
+        (await sut.Awaiting(x => x.SaveProjectAsync()).Should().CompleteWithinAsync(10.Seconds()))
+            .Which.Should().BeFalse();
 
         dialogs.Received(1).ShowSaveFileDialog(Arg.Any<string>());
         fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+        sut.FileName.Should().Be("<new>");
     }
 
     [Fact]
@@ -607,7 +634,8 @@ public class ProjectDataTests
         sut.LoadData(Samples.SampleProject);
         sut.FileName = fileName;
 
-        await sut.SaveProjectAsync();
+        (await sut.Awaiting(x => x.SaveProjectAsync()).Should().CompleteWithinAsync(10.Seconds()))
+            .Which.Should().BeTrue();
 
         fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
         fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());
@@ -631,7 +659,8 @@ public class ProjectDataTests
         sut.LoadData(Samples.SampleProject);
         sut.FileName = fileName;
 
-        await sut.SaveProjectAsync();
+        (await sut.Awaiting(x => x.SaveProjectAsync()).Should().CompleteWithinAsync(10.Seconds()))
+            .Which.Should().BeTrue();
 
         fileSystem.Received(1).FileMove(fileName, fileName + ".20200229184556");
         fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());

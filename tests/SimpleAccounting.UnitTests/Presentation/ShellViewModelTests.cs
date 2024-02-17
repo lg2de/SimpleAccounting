@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using Caliburn.Micro;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -21,6 +22,7 @@ using lg2de.SimpleAccounting.Properties;
 using lg2de.SimpleAccounting.Reports;
 using NSubstitute;
 using Xunit;
+using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 public partial class ShellViewModelTests
 {
@@ -397,12 +399,34 @@ public partial class ShellViewModelTests
     [Fact]
     public async Task CanClose_ModifiedProjectAbort_CloseRejected()
     {
-        var sut = CreateSut();
+        var sut = CreateSut(out IDialogs dialogs, out IFileSystem _);
+        dialogs.ShowMessageBox(
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+            .Returns(MessageBoxResult.Cancel);
         sut.ProjectData.IsModified = true;
 
         var result = await sut.CanCloseAsync();
 
         result.Should().BeFalse();
+        sut.ProjectData.IsModified.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CanClose_ModifiedProjectSaveAsCancelled_CloseRejected()
+    {
+        var sut = CreateSut(out IDialogs dialogs, out IFileSystem _);
+        dialogs.ShowMessageBox(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
+        dialogs.ShowSaveFileDialog(Arg.Any<string>()).Returns((DialogResult.Cancel, string.Empty));
+        sut.ProjectData.NewProject();
+        sut.ProjectData.IsModified = true;
+
+        var result = await sut.CanCloseAsync();
+
+        result.Should().BeFalse();
+        sut.ProjectData.IsModified.Should().BeTrue();
     }
 
     [Fact]

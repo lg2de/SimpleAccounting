@@ -137,7 +137,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         return OperationResult.Completed;
     }
 
-    public async Task SaveProjectAsync()
+    public async Task<bool> SaveProjectAsync()
     {
         if (this.FileName == "<new>")
         {
@@ -145,8 +145,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
                 this.dialogs.ShowSaveFileDialog(Resources.FileFilter_MainProject);
             if (result != DialogResult.OK)
             {
-                // TODO return false
-                return;
+                return false;
             }
 
             this.FileName = fileName;
@@ -179,6 +178,8 @@ internal sealed class ProjectData : IProjectData, IDisposable
         }
 
         this.ActivateMonitoring();
+
+        return true;
     }
 
     public async Task<bool> TryCloseAsync()
@@ -449,8 +450,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         switch (result)
         {
         case MessageBoxResult.Yes:
-            await this.SaveProjectAsync();
-            return true;
+            return await this.SaveProjectAsync();
         case MessageBoxResult.No:
             // User wants to discard changes.
             return true;
