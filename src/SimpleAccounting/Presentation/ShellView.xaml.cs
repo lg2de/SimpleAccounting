@@ -20,6 +20,9 @@ public partial class ShellView
         this.Loaded += (_, _) => this.ResetDataGridColumnSizes();
     }
 
+    [SuppressMessage(
+        "Minor Code Smell", "S2325:Methods and properties that don\'t access instance data should be static",
+        Justification = "FP")]
     private void OnGridSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!(sender is DataGrid grid) || grid.SelectedItem == null)
