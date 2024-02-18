@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using Caliburn.Micro;
@@ -15,7 +14,6 @@ using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
 using NSubstitute;
 
-[ExcludeFromCodeCoverage]
 internal static class Samples
 {
     public const int BankAccount = 100;

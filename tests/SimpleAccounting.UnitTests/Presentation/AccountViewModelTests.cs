@@ -22,7 +22,7 @@ public class AccountViewModelTests
     }
 
     [CulturedFact("de")]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo", Justification = "german test text")]
     public void TypeName_GermanCulture_CorrectlyInitialized()
     {
         AccountViewModel.ResetTypesLazy();

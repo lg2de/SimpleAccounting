@@ -39,7 +39,7 @@ public partial class AccountingData
         "Minor Code Smell",
         "S100:Methods and properties should be named in PascalCase",
         Justification = "fixed name")]
-    [SuppressMessage("ReSharper", "RedundantCheckBeforeAssignment")]
+    [SuppressMessage("ReSharper", "RedundantCheckBeforeAssignment", Justification = "FP")]
     public string xsiSchemaLocation
     {
         get => this.schema;
@@ -199,10 +199,7 @@ public partial class AccountingData
             var journal = this.Journal.SingleOrDefault(x => x.Year == oldYearName);
             if (journal == null)
             {
-                journal = new AccountingDataJournal
-                {
-                    Year = oldYearName, Booking = []
-                };
+                journal = new AccountingDataJournal { Year = oldYearName, Booking = [] };
                 this.Journal.Add(journal);
             }
 
@@ -315,7 +312,8 @@ internal static class AccountDataJournalExtensions
                 {
                     Year = today.Year.ToString(CultureInfo.InvariantCulture),
                     DateStart = new DateTime(today.Year, 1, 1, 0, 0, 0, DateTimeKind.Local).ToAccountingDate(),
-                    DateEnd = new DateTime(today.Year, december, decemberLast, 0, 0, 0, DateTimeKind.Local).ToAccountingDate(),
+                    DateEnd = new DateTime(today.Year, december, decemberLast, 0, 0, 0, DateTimeKind.Local)
+                        .ToAccountingDate(),
                     Booking = []
                 });
         }

@@ -23,7 +23,7 @@ public class InverseBooleanConverter : IValueConverter
         return !(bool)value;
     }
 
-    [ExcludeFromCodeCoverage] // not relevant
+    [ExcludeFromCodeCoverage(Justification = "This method is not used.")]
     public object ConvertBack(
         object? value, Type targetType, object? parameter, CultureInfo culture)
     {

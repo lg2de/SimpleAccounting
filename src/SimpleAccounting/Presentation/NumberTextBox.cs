@@ -15,7 +15,7 @@ using System.Windows.Input;
 /// <summary>
 ///     Implements a <see cref="TextBox"/> only accepting unsigned integer numbers.
 /// </summary>
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "The view cannot be tested.")]
 internal partial class NumberTextBox : TextBox
 {
     public static readonly DependencyProperty ScaleProperty =

@@ -15,7 +15,8 @@ using System.Drawing.Printing;
 ///     The reason for this class is testability.
 ///     This is why it is excluded from code coverage.
 /// </remarks>
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(
+    Justification = "The abstraction is for unit testing only. This is the simple implementation.")]
 internal class DrawingGraphics : IGraphics
 {
     private readonly PrintPageEventArgs printPageEventArgs;

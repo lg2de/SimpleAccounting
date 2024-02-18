@@ -14,7 +14,7 @@ using System.Windows;
 using System.Windows.Markup;
 using lg2de.SimpleAccounting.Properties;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "The application class cannot be tested.")]
 public partial class App
 {
     public App()

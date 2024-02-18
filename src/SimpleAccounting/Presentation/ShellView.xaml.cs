@@ -10,9 +10,9 @@ using System.Windows.Controls;
 /// <summary>
 ///     Implements the main view of the application.
 /// </summary>
+[ExcludeFromCodeCoverage(Justification = "The view class will not be tested.")]
 public partial class ShellView
 {
-    [ExcludeFromCodeCoverage]
     public ShellView()
     {
         this.InitializeComponent();
@@ -20,7 +20,6 @@ public partial class ShellView
         this.Loaded += (_, _) => this.ResetDataGridColumnSizes();
     }
 
-    [ExcludeFromCodeCoverage]
     private void OnGridSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!(sender is DataGrid grid) || grid.SelectedItem == null)

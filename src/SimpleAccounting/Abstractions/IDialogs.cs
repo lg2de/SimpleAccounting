@@ -14,7 +14,7 @@ using MessageBoxOptions = System.Windows.MessageBoxOptions;
 /// </summary>
 public interface IDialogs
 {
-    [ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage(Justification = "The default values (from framework API) are treat as code!?")]
     [SuppressMessage(
         "Critical Code Smell", "S2360:Optional parameters should not be used",
         Justification = "Signature follows wrapped framework API")]

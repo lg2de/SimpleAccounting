@@ -17,7 +17,8 @@ using MessageBoxOptions = System.Windows.MessageBoxOptions;
 /// <summary>
 ///     Default implementation of <see cref="IDialogs" /> using <see cref="System.Windows.MessageBox" />.
 /// </summary>
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(
+    Justification = "The abstraction is for unit testing only. This is the simple implementation.")]
 [UsedImplicitly]
 internal class WindowsDialogs : IDialogs
 {

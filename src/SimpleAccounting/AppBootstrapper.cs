@@ -16,7 +16,7 @@ using lg2de.SimpleAccounting.Presentation;
 using lg2de.SimpleAccounting.Properties;
 using lg2de.SimpleAccounting.Reports;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "This class cannot be tested.")]
 [SuppressMessage(
     "Major Code Smell",
     "S1200:Classes should not be coupled to too many other classes (Single Responsibility Principle)",

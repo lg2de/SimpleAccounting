@@ -15,7 +15,7 @@ public partial class EditBookingView
     internal const uint IncomePageIndex = 1;
     internal const uint ExpensePageIndex = 2;
 
-    [ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage(Justification = "The view class will not be tested.")]
     public EditBookingView()
     {
         this.InitializeComponent();

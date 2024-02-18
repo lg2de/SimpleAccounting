@@ -33,11 +33,7 @@ public class AccountingDataTests
                         {
                             Name = "3",
                             ImportMapping =
-                                new AccountDefinitionImportMapping
-                                {
-                                    Columns = [],
-                                    Patterns = []
-                                }
+                                new AccountDefinitionImportMapping { Columns = [], Patterns = [] }
                         },
                         new AccountDefinition
                         {
@@ -175,28 +171,48 @@ public class AccountingDataTests
                 {
                     ID = 1,
                     Opening = true,
-                    Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 1", Value = 65100 } },
-                    Debit = new[] { new { Account = Samples.BankAccount, Text = "Opening value 1", Value = 65100 } }
+                    Credit =
+                        new[]
+                        {
+                            new { Account = Samples.Carryforward, Text = "Opening value 1", Value = 65100 }
+                        },
+                    Debit =
+                        new[] { new { Account = Samples.BankAccount, Text = "Opening value 1", Value = 65100 } }
                 },
                 new
                 {
                     ID = 2,
                     Opening = true,
-                    Credit = new[] { new { Account = Samples.BankCredit, Text = "Opening value 2", Value = 260000 } },
-                    Debit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 2", Value = 260000 } }
+                    Credit =
+                        new[]
+                        {
+                            new { Account = Samples.BankCredit, Text = "Opening value 2", Value = 260000 }
+                        },
+                    Debit =
+                        new[]
+                        {
+                            new { Account = Samples.Carryforward, Text = "Opening value 2", Value = 260000 }
+                        }
                 },
                 new
                 {
                     ID = 3,
                     Opening = true,
-                    Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 3", Value = 9900 } },
-                    Debit = new[] { new { Account = Samples.FriendsDebit, Text = "Opening value 3", Value = 9900 } }
+                    Credit =
+                        new[]
+                        {
+                            new { Account = Samples.Carryforward, Text = "Opening value 3", Value = 9900 }
+                        },
+                    Debit = new[]
+                    {
+                        new { Account = Samples.FriendsDebit, Text = "Opening value 3", Value = 9900 }
+                    }
                 }
             });
     }
 
     [CulturedFact("de")]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo", Justification = "german test text")]
     public void CloseYear_SampleDataGerman_TextCorrect()
     {
         var sut = Samples.SampleProject;
@@ -236,7 +252,7 @@ public class AccountingDataTests
     }
 
     [CulturedFact("fr")]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo", Justification = "french test text")]
     public void CloseYear_SampleDataFrench_TextCorrect()
     {
         var sut = Samples.SampleProject;

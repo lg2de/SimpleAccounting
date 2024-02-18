@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 /// </summary>
 public partial class AccountView
 {
-    [ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage(Justification = "The view class will not be tested.")]
     public AccountView()
     {
         this.InitializeComponent();
