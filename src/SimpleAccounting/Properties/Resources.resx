@@ -621,4 +621,26 @@ Do you want to open the project anyway? Concurrent modification may cause data l
 Do you want to save the current changes under a different project name? Then press "Yes".
 Do you want to discard your own changes? Then press "No".</value>
   </data>
+    <data name="Word_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+    <data name="ErrorMessageView_GitHubButton" xml:space="preserve">
+    <value>Report at github</value>
+  </data>
+    <data name="ErrorMessageView_EmailButton" xml:space="preserve">
+    <value>Send my email</value>
+  </data>
+    <data name="ErrorMessageView_ClipboardButton" xml:space="preserve">
+    <value>Copy to clipboard</value>
+  </data>
+    <data name="ErrorMessageView_GitHubTooltip" xml:space="preserve">
+    <value>Opens you defaul browser to open a new issue.
+You need a GitHub account to create new issues.</value>
+  </data>
+    <data name="ErrorMessageView_EmailTooltip" xml:space="preserve">
+    <value>Opens your default email program with a new email prepared with error details.</value>
+  </data>
+    <data name="ErrorMessageView_ClipboardTooltip" xml:space="preserve">
+    <value>Copies error details to the clipboard.</value>
+  </data>
 </root>

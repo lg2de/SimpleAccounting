@@ -612,4 +612,7 @@ Voulez-vous quand même ouvrir le projet ? Une modification simultanée peut ent
 Voulez-vous enregistrer les modifications actuelles sous un autre nom de projet ? Dans ce cas, appuyez sur "Oui".
 Voulez-vous annuler vos propres modifications ? Appuyez alors sur "Non".</value>
 	</data>
+    <data name="Word_Close" xml:space="preserve">
+		<value>Fermer</value>
+	</data>
 </root>

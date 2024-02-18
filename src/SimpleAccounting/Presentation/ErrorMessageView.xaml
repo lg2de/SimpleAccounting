@@ -1,0 +1,62 @@
+<UserControl
+  x:Class="lg2de.SimpleAccounting.Presentation.ErrorMessageView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
+  xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
+  xmlns:draw="clr-namespace:System.Drawing;assembly=System.Drawing.Common"
+  mc:Ignorable="d"
+  d:DataContext="{d:DesignInstance Type=local:ErrorMessageDesignViewModel, IsDesignTimeCreatable=True}">
+  <UserControl.Resources>
+    <local:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
+  </UserControl.Resources>
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+      <Image
+        DockPanel.Dock="Top"
+        VerticalAlignment="Top"
+        Width="50" Height="50" Margin="10"
+        Source="{Binding Source={x:Static draw:SystemIcons.Error},
+        Converter={StaticResource IconToImageSourceConverter},
+        Mode=OneWay}" />
+      <TextBlock
+        Padding="10" MinWidth="300" MinHeight="150"
+        Text="{Binding ErrorText}" />
+    </StackPanel>
+    <Grid DockPanel.Dock="Bottom">
+      <Grid.Resources>
+        <Style TargetType="{x:Type Button}">
+          <Setter Property="Margin" Value="5" />
+          <Setter Property="Padding" Value="10" />
+        </Style>
+      </Grid.Resources>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Button
+        Grid.Column="0"
+        VerticalAlignment="Top"
+        Command="{Binding ReportGitGubCommand}"
+        Content="{x:Static properties:Resources.ErrorMessageView_GitHubButton}"
+        ToolTip="{x:Static properties:Resources.ErrorMessageView_GitHubTooltip}" />
+      <Button
+        Grid.Column="1"
+        VerticalAlignment="Top"
+        Command="{Binding ReportEmailCommand}"
+        Content="{x:Static properties:Resources.ErrorMessageView_EmailButton}"
+        ToolTip="{x:Static properties:Resources.ErrorMessageView_EmailTooltip}" />
+      <StackPanel Grid.Column="2" Orientation="Vertical">
+        <Button
+          VerticalAlignment="Top"
+          Command="{Binding ClipboardCommand}"
+          Content="{x:Static properties:Resources.ErrorMessageView_ClipboardButton}"
+          ToolTip="{x:Static properties:Resources.ErrorMessageView_ClipboardTooltip}" />
+        <Button Content="{x:Static properties:Resources.Word_Close}" IsCancel="True" />
+      </StackPanel>
+    </Grid>
+  </DockPanel>
+</UserControl>
