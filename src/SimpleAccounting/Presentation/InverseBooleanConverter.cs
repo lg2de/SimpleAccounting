@@ -20,7 +20,7 @@ public class InverseBooleanConverter : IValueConverter
             throw new ArgumentException(@"The target must be a boolean.", nameof(parameter));
         }
 
-        return !(bool)value;
+        return !(bool)value!;
     }
 
     [ExcludeFromCodeCoverage(Justification = "This method is not used.")]

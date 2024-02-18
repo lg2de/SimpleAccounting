@@ -17,6 +17,10 @@ using lg2de.SimpleAccounting.Properties;
 [ExcludeFromCodeCoverage(Justification = "The application class cannot be tested.")]
 public partial class App
 {
+    [SuppressMessage(
+        "Major Code Smell",
+        "S3011:Reflection should not be used to increase accessibility of classes, methods, or fields",
+        Justification = "Checked")]
     public App()
     {
         // upgrade Settings from older versions
