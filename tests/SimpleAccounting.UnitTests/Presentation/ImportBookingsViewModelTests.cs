@@ -22,7 +22,8 @@ public class ImportBookingsViewModelTests
     [Fact]
     public void Ctor_SampleData_AccountsFiltered()
     {
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
@@ -33,7 +34,8 @@ public class ImportBookingsViewModelTests
     [Fact]
     public void ImportStatus_NoImportAccount()
     {
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.Storage.Accounts =
         [
             new AccountingDataAccountGroup { Account = [new AccountDefinition { ID = 100, Name = "Bank" }] }
@@ -47,7 +49,8 @@ public class ImportBookingsViewModelTests
     [Fact]
     public void ImportStatus_AnyImportAccount()
     {
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.Storage.Accounts =
         [
             new AccountingDataAccountGroup
@@ -67,7 +70,8 @@ public class ImportBookingsViewModelTests
     [CulturedFact("en")]
     public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
     {
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.LoadData(Samples.SampleProject);
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
@@ -128,7 +132,8 @@ public class ImportBookingsViewModelTests
     public void LoadDataCommand_NoAccountSelected_CannotExecute()
     {
         var dialogs = Substitute.For<IDialogs>();
-        var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, dialogs, null!, clock, null!);
         var sut = new ImportBookingsViewModel(dialogs, null!, projectData);
 
         sut.LoadDataCommand.CanExecute(null).Should().BeFalse();
@@ -138,7 +143,8 @@ public class ImportBookingsViewModelTests
     public void LoadDataCommand_NoLastImportFolder_DefaultUsedAndSelectedStored()
     {
         var dialogs = Substitute.For<IDialogs>();
-        var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, dialogs, null!, clock, null!);
         var fileSystem = Substitute.For<IFileSystem>();
         var sut = new ImportBookingsViewModel(dialogs, fileSystem, projectData) { SelectedAccountNumber = 100 };
         dialogs
@@ -154,8 +160,9 @@ public class ImportBookingsViewModelTests
     [Fact]
     public void LoadDataCommand_LoadFileCancelled_IsBusyReset()
     {
+        var clock = Substitute.For<IClock>();
         var dialogs = Substitute.For<IDialogs>();
-        var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!, null!);
+        var projectData = new ProjectData(new Settings(), null!, dialogs, null!, clock, null!);
         var sut = new ImportBookingsViewModel(dialogs, null!, projectData) { SelectedAccountNumber = 100 };
         dialogs
             .ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
@@ -171,8 +178,9 @@ public class ImportBookingsViewModelTests
     [Fact]
     public void LoadDataCommand_LastImportFolder_LastUsedAndNewStored()
     {
+        var clock = Substitute.For<IClock>();
         var dialogs = Substitute.For<IDialogs>();
-        var projectData = new ProjectData(new Settings(), null!, dialogs, null!, null!, null!);
+        var projectData = new ProjectData(new Settings(), null!, dialogs, null!, clock, null!);
         projectData.Storage.Setup.Behavior.LastBookingImportFolder = "E:\\MySelectedFolder";
         var fileSystem = Substitute.For<IFileSystem>();
         var sut = new ImportBookingsViewModel(dialogs, fileSystem, projectData) { SelectedAccountNumber = 100 };
@@ -189,7 +197,8 @@ public class ImportBookingsViewModelTests
     [Fact]
     public void BookAllCommand_EntryNotMapped_CannotExecute()
     {
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
@@ -203,7 +212,8 @@ public class ImportBookingsViewModelTests
     [Fact]
     public void BookAllCommand_EntryMapped_CanExecute()
     {
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
@@ -217,7 +227,8 @@ public class ImportBookingsViewModelTests
     [Fact]
     public void BookAllCommand_EntrySkipped_CanExecute()
     {
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
@@ -231,7 +242,8 @@ public class ImportBookingsViewModelTests
     [Fact]
     public void BookAllCommand_EntryExisting_CannotExecute()
     {
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.LoadData(Samples.SampleProject);
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();

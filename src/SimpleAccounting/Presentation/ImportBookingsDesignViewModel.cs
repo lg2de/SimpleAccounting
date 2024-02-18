@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
 
@@ -78,7 +79,7 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     };
 
     public ImportBookingsDesignViewModel()
-        : base(null!, null!, new ProjectData(new Settings(), null!, null!, null!, null!, null!))
+        : base(null!, null!, new ProjectData(new Settings(), null!, null!, null!, new SystemClock(), null!))
     {
         this.ProjectData.LoadData(SampleData);
         this.SelectedAccountNumber = 100;

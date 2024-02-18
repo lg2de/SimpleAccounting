@@ -33,10 +33,10 @@ public class MenuViewModelTests
     {
         var settings = new Settings();
         var fileSystem = Substitute.For<IFileSystem>();
-        var projectData = new ProjectData(settings, null!, null!, fileSystem, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(settings, null!, null!, fileSystem, clock, null!);
         var dialogs = Substitute.For<IDialogs>();
         var busy = new BusyControlModel();
-        var clock = Substitute.For<IClock>();
         var sut = new MenuViewModel(projectData, busy, null!, clock, null!, dialogs);
         long counter = 0;
         var tcs = new TaskCompletionSource<bool>();

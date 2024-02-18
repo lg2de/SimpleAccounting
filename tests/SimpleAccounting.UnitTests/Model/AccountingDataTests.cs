@@ -134,7 +134,7 @@ public class AccountingDataTests
     {
         var sut = new List<AccountingDataJournal>();
 
-        var latest = sut.SafeGetLatest();
+        var latest = sut.GetOrCreateLatest(DateTime.Today);
 
         latest.Booking.Should().BeEmpty();
     }
@@ -144,7 +144,7 @@ public class AccountingDataTests
     {
         var sut = new List<AccountingDataJournal> { new() { Year = "Year" } };
 
-        var latest = sut.SafeGetLatest();
+        var latest = sut.GetOrCreateLatest(DateTime.Today);
 
         latest.Booking.Should().BeEmpty();
     }
@@ -172,10 +172,7 @@ public class AccountingDataTests
                     ID = 1,
                     Opening = true,
                     Credit =
-                        new[]
-                        {
-                            new { Account = Samples.Carryforward, Text = "Opening value 1", Value = 65100 }
-                        },
+                        new[] { new { Account = Samples.Carryforward, Text = "Opening value 1", Value = 65100 } },
                     Debit =
                         new[] { new { Account = Samples.BankAccount, Text = "Opening value 1", Value = 65100 } }
                 },
@@ -184,29 +181,17 @@ public class AccountingDataTests
                     ID = 2,
                     Opening = true,
                     Credit =
-                        new[]
-                        {
-                            new { Account = Samples.BankCredit, Text = "Opening value 2", Value = 260000 }
-                        },
+                        new[] { new { Account = Samples.BankCredit, Text = "Opening value 2", Value = 260000 } },
                     Debit =
-                        new[]
-                        {
-                            new { Account = Samples.Carryforward, Text = "Opening value 2", Value = 260000 }
-                        }
+                        new[] { new { Account = Samples.Carryforward, Text = "Opening value 2", Value = 260000 } }
                 },
                 new
                 {
                     ID = 3,
                     Opening = true,
                     Credit =
-                        new[]
-                        {
-                            new { Account = Samples.Carryforward, Text = "Opening value 3", Value = 9900 }
-                        },
-                    Debit = new[]
-                    {
-                        new { Account = Samples.FriendsDebit, Text = "Opening value 3", Value = 9900 }
-                    }
+                        new[] { new { Account = Samples.Carryforward, Text = "Opening value 3", Value = 9900 } },
+                    Debit = new[] { new { Account = Samples.FriendsDebit, Text = "Opening value 3", Value = 9900 } }
                 }
             });
     }

@@ -58,7 +58,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         this.processApi = processApi;
 
         this.storage = new AccountingData();
-        this.CurrentYear = this.storage.Journal.SafeGetLatest();
+        this.CurrentYear = this.storage.Journal.GetOrCreateLatest(this.clock.Now());
     }
 
     internal Task ProjectChangedHandlerTask { get; private set; } = Task.CompletedTask;
@@ -78,7 +78,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         private set
         {
             this.storage = value;
-            this.CurrentYear = this.Storage.Journal.SafeGetLatest();
+            this.CurrentYear = this.Storage.Journal.GetOrCreateLatest(this.clock.Now());
             Execute.OnUIThread(() => this.DataLoaded(this, EventArgs.Empty));
         }
     }
@@ -107,7 +107,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
     {
         this.IsModified = false;
         this.FileName = "<new>";
-        this.LoadData(AccountingData.GetTemplateProject());
+        this.LoadData(AccountingData.GetTemplateProject(this.clock.Now().Year));
     }
 
     public void LoadData(AccountingData accountingData)

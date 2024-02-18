@@ -28,6 +28,7 @@ public class EditBookingViewModelTests
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
         var clock = Substitute.For<IClock>();
+        clock.Now().Returns(DateTime.Now);
         var processApi = Substitute.For<IProcess>();
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin - TimeSpan.FromDays(1));
@@ -42,6 +43,7 @@ public class EditBookingViewModelTests
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
         var clock = Substitute.For<IClock>();
+        clock.Now().Returns(DateTime.Now);
         var processApi = Substitute.For<IProcess>();
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin + TimeSpan.FromDays(1));
@@ -56,6 +58,7 @@ public class EditBookingViewModelTests
         var dialogs = Substitute.For<IDialogs>();
         var fileSystem = Substitute.For<IFileSystem>();
         var clock = Substitute.For<IClock>();
+        clock.Now().Returns(DateTime.Now);
         var processApi = Substitute.For<IProcess>();
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearEnd + TimeSpan.FromDays(1));
