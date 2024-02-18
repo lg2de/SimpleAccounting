@@ -21,7 +21,8 @@ internal class DotNetProcess : IProcess
 {
     public Process? GetProcessByName(string processName)
     {
-        return Process.GetProcesses().FirstOrDefault(
+        return Array.Find(
+            Process.GetProcesses(),
             x => x.ProcessName.Equals(processName, StringComparison.InvariantCultureIgnoreCase));
     }
 
