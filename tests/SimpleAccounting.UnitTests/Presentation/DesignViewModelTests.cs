@@ -10,8 +10,9 @@ using FluentAssertions;
 using lg2de.SimpleAccounting.Presentation;
 using Xunit;
 
-[SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
-[SuppressMessage("Performance", "CA1806:Do not ignore method results", Justification = "We are testing the constructor only.")]
+[SuppressMessage("ReSharper", "ObjectCreationAsStatement", Justification = "These tests are better readable that way.")]
+[SuppressMessage(
+    "Performance", "CA1806:Do not ignore method results", Justification = "We are testing the constructor only.")]
 public class DesignViewModelTests
 {
     [Fact]

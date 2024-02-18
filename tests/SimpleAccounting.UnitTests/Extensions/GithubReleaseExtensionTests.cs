@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Extensions;
 using Octokit;
@@ -52,13 +51,13 @@ public class GithubReleaseExtensionTests
         result.Should().BeNull();
     }
 
-    [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-    internal static IReadOnlyList<Release> CreateRelease(string tag, string assetName1 = "x.zip", string assetName2 = null)
+    internal static IReadOnlyList<Release> CreateRelease(
+        string tag, string assetName1 = "x.zip", string assetName2 = null)
     {
         Type releaseType = typeof(Release);
-        var tagProperty = releaseType.GetProperty(nameof(Release.TagName));
-        var preReleaseProperty = releaseType.GetProperty(nameof(Release.Prerelease));
-        var assetsProperty = releaseType.GetProperty(nameof(Release.Assets));
+        var tagProperty = releaseType.GetProperty(nameof(Release.TagName))!;
+        var preReleaseProperty = releaseType.GetProperty(nameof(Release.Prerelease))!;
+        var assetsProperty = releaseType.GetProperty(nameof(Release.Assets))!;
         var release = new Release();
         tagProperty.SetValue(release, tag);
         if (tag.Contains("beta", StringComparison.Ordinal))

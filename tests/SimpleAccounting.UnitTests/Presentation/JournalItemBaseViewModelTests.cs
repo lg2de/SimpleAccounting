@@ -11,7 +11,8 @@ using Xunit;
 
 public class JournalItemBaseViewModelTests
 {
-    [SuppressMessage("Minor Code Smell", "S2094:Classes should not be empty")]
+    [SuppressMessage(
+        "Minor Code Smell", "S2094:Classes should not be empty", Justification = "Its for testing that way.")]
     private class TestJournalItemBaseViewModel : JournalItemBaseViewModel;
 
     [Fact]

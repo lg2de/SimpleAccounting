@@ -80,7 +80,7 @@ internal class ApplicationUpdate : IApplicationUpdate
 
         var assetUrl = asset?.BrowserDownloadUrl ?? "dummy-asset";
         var targetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
-        int processId = this.process.GetCurrentProcessId();
+        int processId = Environment.ProcessId;
         string fileName = Environment.ExpandEnvironmentVariables(
             @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe");
         var arguments = new[]

@@ -26,9 +26,10 @@ public class ImportBookingsViewModelTests
         AccountingData project = GetProject();
 
         var dialogs = Substitute.For<IDialogs>();
+        var clock = Substitute.For<IClock>();
         var accounts = project.AllAccounts.ToList();
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.LoadData(project);
         var sut = new ImportBookingsViewModel(dialogs, null!, projectData)
         {
@@ -227,10 +228,11 @@ public class ImportBookingsViewModelTests
     {
         AccountingData project = GetProject();
 
+        var clock = Substitute.For<IClock>();
         var dialogs = Substitute.For<IDialogs>();
         var accounts = project.AllAccounts.ToList();
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.LoadData(project);
         var sut = new ImportBookingsViewModel(dialogs, null!, projectData)
         {

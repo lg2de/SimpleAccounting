@@ -11,7 +11,7 @@ namespace lg2de.SimpleAccounting.Presentation
     /// </summary>
     public partial class UpdateOptionsView
     {
-        [ExcludeFromCodeCoverage]
+        [ExcludeFromCodeCoverage(Justification = "The view class will not be tested.")]
         public UpdateOptionsView()
         {
             this.InitializeComponent();

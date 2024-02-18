@@ -9,9 +9,9 @@ using System.Diagnostics.CodeAnalysis;
 /// <summary>
 ///     Interaction logic for CloseYearView.xaml
 /// </summary>
-[ExcludeFromCodeCoverage]
 public partial class CloseYearView
 {
+    [ExcludeFromCodeCoverage(Justification = "The view class will not be tested.")]
     public CloseYearView()
     {
         this.InitializeComponent();

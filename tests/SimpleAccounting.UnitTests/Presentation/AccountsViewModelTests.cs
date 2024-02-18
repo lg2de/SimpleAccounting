@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using FluentAssertions;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
 using lg2de.SimpleAccounting.Properties;
@@ -19,7 +20,8 @@ public class AccountsViewModelTests
     public void OnDataLoaded_DifferentImportConfigurations_ViewModelsBuildCorrect()
     {
         var windowManager = Substitute.For<IWindowManager>();
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
@@ -112,9 +114,10 @@ public class AccountsViewModelTests
     public async Task OnEditAccount_ImportPatternsConfigured_ImportPatternsBuilt()
     {
         var windowManager = Substitute.For<IWindowManager>();
+        var clock = Substitute.For<IClock>();
         AccountViewModel updatedViewModel = null;
         await windowManager.ShowDialogAsync(Arg.Do<object>(o => updatedViewModel = o as AccountViewModel));
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [

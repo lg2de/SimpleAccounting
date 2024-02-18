@@ -9,27 +9,26 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 
 /// <summary>
 ///     Implements <see cref="IProcess"/> using default framework implementations.
 /// </summary>
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(
+    Justification = "The abstraction is for unit testing only. This is the simple implementation.")]
+[UsedImplicitly]
 internal class DotNetProcess : IProcess
 {
     public Process? GetProcessByName(string processName)
     {
-        return Process.GetProcesses().FirstOrDefault(
+        return Array.Find(
+            Process.GetProcesses(),
             x => x.ProcessName.Equals(processName, StringComparison.InvariantCultureIgnoreCase));
     }
 
     public Process GetCurrentProcess()
     {
         return Process.GetCurrentProcess();
-    }
-
-    public int GetCurrentProcessId()
-    {
-        return Process.GetCurrentProcess().Id;
     }
 
     public Process? Start(ProcessStartInfo info)
@@ -73,7 +72,7 @@ internal class DotNetProcess : IProcess
         Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
     }
 
-    [ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage(Justification = "The WinAPI cannot be tested.")]
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Names are following external API.")]
     private static class WinApi
     {

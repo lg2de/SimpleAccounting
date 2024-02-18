@@ -13,7 +13,7 @@ using lg2de.SimpleAccounting.Model;
 /// <summary>
 ///     Implements <see cref="IReportFactory"/> using real report implementations.
 /// </summary>
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "This is a simple wrapper without test relevance.")]
 [UsedImplicitly]
 internal class ReportFactory : IReportFactory
 {

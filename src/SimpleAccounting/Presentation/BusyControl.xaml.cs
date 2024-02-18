@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 /// </summary>
 public partial class BusyControl
 {
-    [ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage(Justification = "The view class will not be tested.")]
     public BusyControl()
     {
         this.InitializeComponent();

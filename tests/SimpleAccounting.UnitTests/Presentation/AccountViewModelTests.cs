@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
@@ -17,12 +16,11 @@ public class AccountViewModelTests
     public void Types_DefaultCulture_NoFallbackValue()
     {
         AccountViewModel.ResetTypesLazy();
-        AccountViewModel.Types.Values.Should()
-            .NotContain(x => x.StartsWith("<", StringComparison.InvariantCulture));
+        AccountViewModel.Types.Values.Should().NotContain(x => x.StartsWith('<'));
     }
 
     [CulturedFact("de")]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo", Justification = "german test text")]
     public void TypeName_GermanCulture_CorrectlyInitialized()
     {
         AccountViewModel.ResetTypesLazy();

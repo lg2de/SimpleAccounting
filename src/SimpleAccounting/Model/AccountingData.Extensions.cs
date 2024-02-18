@@ -39,7 +39,7 @@ public partial class AccountingData
         "Minor Code Smell",
         "S100:Methods and properties should be named in PascalCase",
         Justification = "fixed name")]
-    [SuppressMessage("ReSharper", "RedundantCheckBeforeAssignment")]
+    [SuppressMessage("ReSharper", "RedundantCheckBeforeAssignment", Justification = "FP")]
     public string xsiSchemaLocation
     {
         get => this.schema;
@@ -59,9 +59,9 @@ public partial class AccountingData
     /// <summary>
     ///     Creates new project with some template data.
     /// </summary>
-    internal static AccountingData GetTemplateProject()
+    /// <param name="currentYear">The current year number to create initial booking year.</param>
+    internal static AccountingData GetTemplateProject(int currentYear)
     {
-        var year = (ushort)DateTime.Now.Year;
         var defaultAccounts = new List<AccountDefinition>
         {
             new() { ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset },
@@ -71,9 +71,9 @@ public partial class AccountingData
         };
         var accountJournal = new AccountingDataJournal
         {
-            Year = year.ToString(CultureInfo.InvariantCulture),
-            DateStart = (uint)year * 10000 + 101,
-            DateEnd = (uint)year * 10000 + 1231,
+            Year = currentYear.ToString(CultureInfo.InvariantCulture),
+            DateStart = (uint)currentYear * 10000 + 101,
+            DateEnd = (uint)currentYear * 10000 + 1231,
             Booking = []
         };
         return new AccountingData
@@ -199,10 +199,7 @@ public partial class AccountingData
             var journal = this.Journal.SingleOrDefault(x => x.Year == oldYearName);
             if (journal == null)
             {
-                journal = new AccountingDataJournal
-                {
-                    Year = oldYearName, Booking = []
-                };
+                journal = new AccountingDataJournal { Year = oldYearName, Booking = [] };
                 this.Journal.Add(journal);
             }
 
@@ -303,19 +300,19 @@ public partial class AccountDefinitionImportMapping
 /// </summary>
 internal static class AccountDataJournalExtensions
 {
-    public static AccountingDataJournal SafeGetLatest(this IList<AccountingDataJournal> journals)
+    public static AccountingDataJournal GetOrCreateLatest(this IList<AccountingDataJournal> journals, DateTime now)
     {
         if (journals.Count == 0)
         {
-            var today = DateTime.Today;
             const int december = 12;
             const int decemberLast = 31;
             journals.Add(
                 new AccountingDataJournal
                 {
-                    Year = today.Year.ToString(CultureInfo.InvariantCulture),
-                    DateStart = new DateTime(today.Year, 1, 1, 0, 0, 0, DateTimeKind.Local).ToAccountingDate(),
-                    DateEnd = new DateTime(today.Year, december, decemberLast, 0, 0, 0, DateTimeKind.Local).ToAccountingDate(),
+                    Year = now.Year.ToString(CultureInfo.InvariantCulture),
+                    DateStart = new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Local).ToAccountingDate(),
+                    DateEnd = new DateTime(now.Year, december, decemberLast, 0, 0, 0, DateTimeKind.Local)
+                        .ToAccountingDate(),
                     Booking = []
                 });
         }

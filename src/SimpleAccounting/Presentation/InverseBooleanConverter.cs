@@ -20,10 +20,10 @@ public class InverseBooleanConverter : IValueConverter
             throw new ArgumentException(@"The target must be a boolean.", nameof(parameter));
         }
 
-        return !(bool)value;
+        return !(bool)value!;
     }
 
-    [ExcludeFromCodeCoverage] // not relevant
+    [ExcludeFromCodeCoverage(Justification = "This method is not used.")]
     public object ConvertBack(
         object? value, Type targetType, object? parameter, CultureInfo culture)
     {

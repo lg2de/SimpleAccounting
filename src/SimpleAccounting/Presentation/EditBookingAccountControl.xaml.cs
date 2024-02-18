@@ -77,7 +77,7 @@ public partial class EditBookingAccountControl : INotifyPropertyChanged
             typeof(EditBookingAccountControl),
             new PropertyMetadata(0.0));
 
-    [ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage(Justification = "The view class will not be tested.")]
     public EditBookingAccountControl()
     {
         this.InitializeComponent();

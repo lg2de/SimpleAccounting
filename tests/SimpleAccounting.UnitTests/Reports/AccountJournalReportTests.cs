@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
@@ -18,7 +17,6 @@ using lg2de.SimpleAccounting.UnitTests.Presentation;
 using NSubstitute;
 using Xunit;
 
-[SuppressMessage("ReSharper", "UseStringInterpolation")]
 public class AccountJournalReportTests
 {
     [CulturedTheory("en")]
@@ -39,123 +37,126 @@ public class AccountJournalReportTests
         var year = DateTime.Now.Year;
         var expectedBankAccount = string.Format(
             CultureInfo.InvariantCulture,
-            @"
-<data>
-  <tr topLine=""True"">
-    <td>1/1/{0}</td>
-    <td>1</td>
-    <td>Open 1</td>
-    <td>1000.00</td>
-    <td />
-    <td>990</td>
-  </tr>
-  <tr topLine=""True"">
-    <td>1/28/{0}</td>
-    <td>3</td>
-    <td>Salary</td>
-    <td>200.00</td>
-    <td />
-    <td>Various</td>
-  </tr>
-  <tr topLine=""True"">
-    <td>1/29/{0}</td>
-    <td>4</td>
-    <td>Credit rate</td>
-    <td />
-    <td>400.00</td>
-    <td>5000</td>
-  </tr>
-  <tr topLine=""True"">
-    <td>2/1/{0}</td>
-    <td>5</td>
-    <td>Shoes</td>
-    <td />
-    <td>50.00</td>
-    <td>Various</td>
-  </tr>
-  <tr topLine=""True"">
-    <td>2/5/{0}</td>
-    <td>6</td>
-    <td>Rent to friend</td>
-    <td />
-    <td>99.00</td>
-    <td>6000</td>
-  </tr>
-  <tr topLine=""True"">
-    <td align=""right"">Total</td>
-    <td />
-    <td />
-    <td>1200.00</td>
-    <td>549.00</td>
-    <td />
-  </tr>
-  <tr topLine=""True"">
-    <td align=""right"">Balance</td>
-    <td />
-    <td />
-    <td>651.00</td>
-    <td />
-    <td />
-  </tr>
-</data>", year);
+            """
+            <data>
+              <tr topLine="True">
+                <td>1/1/{0}</td>
+                <td>1</td>
+                <td>Open 1</td>
+                <td>1000.00</td>
+                <td />
+                <td>990</td>
+              </tr>
+              <tr topLine="True">
+                <td>1/28/{0}</td>
+                <td>3</td>
+                <td>Salary</td>
+                <td>200.00</td>
+                <td />
+                <td>Various</td>
+              </tr>
+              <tr topLine="True">
+                <td>1/29/{0}</td>
+                <td>4</td>
+                <td>Credit rate</td>
+                <td />
+                <td>400.00</td>
+                <td>5000</td>
+              </tr>
+              <tr topLine="True">
+                <td>2/1/{0}</td>
+                <td>5</td>
+                <td>Shoes</td>
+                <td />
+                <td>50.00</td>
+                <td>Various</td>
+              </tr>
+              <tr topLine="True">
+                <td>2/5/{0}</td>
+                <td>6</td>
+                <td>Rent to friend</td>
+                <td />
+                <td>99.00</td>
+                <td>6000</td>
+              </tr>
+              <tr topLine="True">
+                <td align="right">Total</td>
+                <td />
+                <td />
+                <td>1200.00</td>
+                <td>549.00</td>
+                <td />
+              </tr>
+              <tr topLine="True">
+                <td align="right">Balance</td>
+                <td />
+                <td />
+                <td>651.00</td>
+                <td />
+                <td />
+              </tr>
+            </data>
+            """, year);
         var expectedSalary = string.Format(
             CultureInfo.InvariantCulture,
-            @"
-<data>
-  <tr topLine=""True"">
-    <td>1/28/{0}</td>
-    <td>3</td>
-    <td>Salary1</td>
-    <td />
-    <td>120.00</td>
-    <td>100</td>
-  </tr>
-  <tr topLine=""True"">
-    <td>1/28/{0}</td>
-    <td>3</td>
-    <td>Salary2</td>
-    <td />
-    <td>80.00</td>
-    <td>100</td>
-  </tr>
-  <tr topLine=""True"">
-    <td align=""right"">Balance</td>
-    <td />
-    <td />
-    <td />
-    <td>200.00</td>
-    <td />
-  </tr>
-</data>", year);
+            """
+            <data>
+              <tr topLine="True">
+                <td>1/28/{0}</td>
+                <td>3</td>
+                <td>Salary1</td>
+                <td />
+                <td>120.00</td>
+                <td>100</td>
+              </tr>
+              <tr topLine="True">
+                <td>1/28/{0}</td>
+                <td>3</td>
+                <td>Salary2</td>
+                <td />
+                <td>80.00</td>
+                <td>100</td>
+              </tr>
+              <tr topLine="True">
+                <td align="right">Balance</td>
+                <td />
+                <td />
+                <td />
+                <td>200.00</td>
+                <td />
+              </tr>
+            </data>
+            """, year);
         var expectedShoes = string.Format(
             CultureInfo.InvariantCulture,
-            @"
-<data>
-  <tr topLine=""True"">
-    <td>2/1/{0}</td>
-    <td>5</td>
-    <td>Shoes1</td>
-    <td>20.00</td>
-    <td />
-    <td>100</td>
-  </tr>
-  <tr topLine=""True"">
-    <td>2/1/{0}</td>
-    <td>5</td>
-    <td>Shoes2</td>
-    <td>30.00</td>
-    <td />
-    <td>100</td>
-  </tr>
-  <tr topLine=""True"">
-    <td align=""right"">Balance</td>
-    <td />
-    <td />
-    <td>50.00</td>
-    <td />
-    <td />
-  </tr>
-</data>", year);
+            """
+            <data>
+              <tr topLine="True">
+                <td>2/1/{0}</td>
+                <td>5</td>
+                <td>Shoes1</td>
+                <td>20.00</td>
+                <td />
+                <td>100</td>
+              </tr>
+              <tr topLine="True">
+                <td>2/1/{0}</td>
+                <td>5</td>
+                <td>Shoes2</td>
+                <td>30.00</td>
+                <td />
+                <td>100</td>
+              </tr>
+              <tr topLine="True">
+                <td align="right">Balance</td>
+                <td />
+                <td />
+                <td>50.00</td>
+                <td />
+                <td />
+              </tr>
+            </data>
+            """, year);
         var expectedCarryforward = string.Format(
             CultureInfo.InvariantCulture,
             @"

@@ -19,7 +19,7 @@ using JetBrains.Annotations;
 ///     This is why it is excluded from code coverage.
 /// </remarks>
 [ExcludeFromCodeCoverage(
-    Justification = "This is an abstraction for testing because the file system cannot be tested.")]
+    Justification = "The abstraction is for unit testing only. This is the simple implementation.")]
 [UsedImplicitly]
 internal class FileSystem : IFileSystem
 {

@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 /// </summary>
 public partial class ImportBookingsView
 {
-    [ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage(Justification = "The view class will not be tested.")]
     public ImportBookingsView()
     {
         this.InitializeComponent();
