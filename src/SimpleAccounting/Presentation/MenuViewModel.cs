@@ -48,22 +48,22 @@ internal class MenuViewModel : Screen, IMenuViewModel
     }
 
     public ICommand NewProjectCommand => new AsyncCommand(
-        () =>
+        async () =>
         {
-            if (!this.projectData.CanDiscardModifiedProject())
+            if (!await this.projectData.TryCloseAsync())
             {
-                return Task.CompletedTask;
+                // abort
+                return;
             }
 
             this.projectData.NewProject();
-            return Task.CompletedTask;
         });
 
     public ICommand OpenProjectCommand => new AsyncCommand(
         this.OnOpenProjectAsync);
 
-    public ICommand SaveProjectCommand => new AsyncCommand(
-        this.OnSaveProject,
+    public IAsyncCommand SaveProjectCommand => new AsyncCommand(
+        this.OnSaveProjectAsync,
         () => this.projectData.IsModified);
 
     public ICommand ProjectOptionsCommand => new AsyncCommand(
@@ -202,9 +202,9 @@ internal class MenuViewModel : Screen, IMenuViewModel
             });
     }
 
-    private void OnSaveProject()
+    private async Task OnSaveProjectAsync()
     {
-        this.projectData.SaveProject();
+        await this.projectData.SaveProjectAsync();
         this.BuildRecentProjectsMenu();
     }
 

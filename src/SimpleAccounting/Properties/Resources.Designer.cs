@@ -429,6 +429,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unexpected project changes.
+        /// </summary>
+        public static string Header_ProjectChanged {
+            get {
+                return ResourceManager.GetString("Header_ProjectChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Edit project options.
         /// </summary>
         public static string Header_ProjectOptions {
@@ -841,14 +850,40 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There exists an automatically created backup file for project
+        ///   Looks up a localized string similar to The project
+        ///{1}
+        ///seems to be opened already by a different user.
+        ///User name: {1}
+        ///Machine name: {2}
+        ///Opened since: {3}
+        ///Do you want to open the project anyway? Concurrent modification may cause data loss..
+        /// </summary>
+        public static string Question_ExistingFileReservationX4 {
+            get {
+                return ResourceManager.GetString("Question_ExistingFileReservationX4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is an automatically generated backup file for project 
         ///{0}.
-        ///Do you want to load this backup file?
-        ///When answering &apos;No&apos; the backup file will be deleted..
+        ///Would you like to load this backup file?
+        ///Choosing &apos;No&apos; will result in the deletion of the backup file..
         /// </summary>
         public static string Question_LoadAutoSaveProjectFileX {
             get {
                 return ResourceManager.GetString("Question_LoadAutoSaveProjectFileX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected changes by another process or person have been detected in the files of the current project.
+        ///Do you want to save the current changes under a different project name? Then press &quot;Yes&quot;.
+        ///Do you want to discard your own changes? Then press &quot;No&quot;..
+        /// </summary>
+        public static string Question_ProjectChanged {
+            get {
+                return ResourceManager.GetString("Question_ProjectChanged", resourceCulture);
             }
         }
         

@@ -69,4 +69,12 @@ internal interface IFileSystem
     /// </summary>
     /// <returns>An enumeration of type <see cref="System.IO.DriveInfo"/> that represents the logical drives on a computer.</returns>
     IEnumerable<(string RootPath, Func<string> GetFormat)> GetDrives();
+
+    /// <summary>
+    ///     Starts monitoring of changes on the specified file or its backup.
+    /// </summary>
+    /// <param name="filePath">The full path of the file to be monitored.</param>
+    /// <param name="changedCallback">The callback method to be invoked on file change.</param>
+    /// <returns>An instance of <see cref="IDisposable"/> to be disposed to stop monitoring.</returns>
+    IDisposable StartMonitoring(string filePath, Action<string> changedCallback);
 }

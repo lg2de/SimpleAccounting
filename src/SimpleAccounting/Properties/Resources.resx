@@ -507,10 +507,10 @@ This drive is currently not accessible.
 Do you want to start 'Cryptomator'?</value>
   </data>
   <data name="Question_LoadAutoSaveProjectFileX" xml:space="preserve">
-    <value>There exists an automatically created backup file for project
+    <value>There is an automatically generated backup file for project 
 {0}.
-Do you want to load this backup file?
-When answering 'No' the backup file will be deleted.</value>
+Would you like to load this backup file?
+Choosing 'No' will result in the deletion of the backup file.</value>
   </data>
   <data name="Header_CheckForUpdates" xml:space="preserve">
     <value>Check for updates</value>
@@ -603,5 +603,22 @@ Without such configuration for at least one account, this function is disabled.<
   </data>
   <data name="Update_SkipVersion" xml:space="preserve">
     <value>No, skip this version!</value>
+  </data>
+  <data name="Question_ExistingFileReservationX4" xml:space="preserve">
+    <value>The project
+{1}
+seems to be opened already by a different user.
+User name: {1}
+Machine name: {2}
+Opened since: {3}
+Do you want to open the project anyway? Concurrent modification may cause data loss.</value>
+  </data>
+    <data name="Header_ProjectChanged" xml:space="preserve">
+    <value>Unexpected project changes</value>
+  </data>
+  <data name="Question_ProjectChanged" xml:space="preserve">
+    <value>Unexpected changes by another process or person have been detected in the files of the current project.
+Do you want to save the current changes under a different project name? Then press "Yes".
+Do you want to discard your own changes? Then press "No".</value>
   </data>
 </root>

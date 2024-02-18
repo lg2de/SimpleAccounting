@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.Presentation;
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -17,13 +16,11 @@ using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
 
-internal class ShellViewModel : Screen, IDisposable
+internal class ShellViewModel : Screen
 {
     private readonly IApplicationUpdate applicationUpdate;
     private readonly string version;
 
-    private Task autoSaveTask = Task.CompletedTask;
-    private CancellationTokenSource? cancellationTokenSource;
     private readonly bool helpSimulateUpdateVisible =
 #if DEBUG
         true;
@@ -114,24 +111,11 @@ internal class ShellViewModel : Screen, IDisposable
 
     internal Task LoadingTask { get; private set; } = Task.CompletedTask;
 
-    public void Dispose()
-    {
-        this.Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
     public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = new())
     {
         await base.CanCloseAsync(cancellationToken);
 
-        if (!this.ProjectData.CanDiscardModifiedProject())
-        {
-            return false;
-        }
-
-        this.ProjectData.RemoveAutoSaveFile();
-
-        return true;
+        return await this.ProjectData.TryCloseAsync();
     }
 
     protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
@@ -146,7 +130,6 @@ internal class ShellViewModel : Screen, IDisposable
         await base.OnActivateAsync(cancellationToken);
 
         var dispatcher = Dispatcher.CurrentDispatcher;
-        this.cancellationTokenSource = new CancellationTokenSource();
         if (!string.IsNullOrEmpty(this.ProjectData.Settings.RecentProject))
         {
             // We move execution into thread pool thread.
@@ -164,41 +147,24 @@ internal class ShellViewModel : Screen, IDisposable
                             this.Menu.BuildRecentProjectsMenu();
                             this.Busy.IsBusy = false;
                         });
-                    this.autoSaveTask = this.ProjectData.AutoSaveAsync(this.cancellationTokenSource.Token);
                 },
                 cancellationToken);
         }
         else
         {
             this.Menu.BuildRecentProjectsMenu();
-            this.autoSaveTask = Task.Run(
-                () => this.ProjectData.AutoSaveAsync(this.cancellationTokenSource.Token),
-                cancellationToken);
         }
     }
 
-    [SuppressMessage(
-        "Critical Bug", "S2952:Classes should \"Dispose\" of members from the classes' own \"Dispose\" methods",
-        Justification = "FP")]
     protected override async Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
     {
         await this.LoadingTask;
-        await this.cancellationTokenSource!.CancelAsync();
-        await this.autoSaveTask;
-        this.cancellationTokenSource.Dispose();
-        this.cancellationTokenSource = null;
+
+        await this.ProjectData.TryCloseAsync();
 
         this.ProjectData.Settings.Save();
 
         await base.OnDeactivateAsync(close, cancellationToken);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            this.cancellationTokenSource?.Dispose();
-        }
     }
 
     private async Task OnCheckForUpdateAsync()
@@ -210,7 +176,7 @@ internal class ShellViewModel : Screen, IDisposable
             return;
         }
 
-        if (!this.ProjectData.CanDiscardModifiedProject())
+        if (!await this.ProjectData.TryCloseAsync())
         {
             return;
         }
@@ -222,18 +188,13 @@ internal class ShellViewModel : Screen, IDisposable
             return;
         }
 
-        // The user was asked whether saving the project (CanDiscardModifiedProject).
-        // It may have answered "No". So, the project may still be modified.
-        // We do not want to ask again, and he doesn't want to save.
-        this.ProjectData.IsModified = false;
-
         await this.TryCloseAsync();
     }
 
     [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
     private async Task SimulateUpdateAsync()
     {
-        if (!this.ProjectData.CanDiscardModifiedProject())
+        if (!await this.ProjectData.TryCloseAsync())
         {
             return;
         }
@@ -242,8 +203,6 @@ internal class ShellViewModel : Screen, IDisposable
         {
             return;
         }
-
-        this.ProjectData.IsModified = false;
 
         await this.TryCloseAsync();
     }

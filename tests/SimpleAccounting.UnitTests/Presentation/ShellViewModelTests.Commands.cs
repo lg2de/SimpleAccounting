@@ -30,7 +30,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut();
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 100));
 
@@ -65,7 +65,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut();
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 400));
 
@@ -85,7 +85,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut();
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 600));
 
@@ -125,7 +125,7 @@ public partial class ShellViewModelTests
         windowManager
             .ShowDialogAsync(Arg.Do<object>(UpdateAction), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
             .Returns(true);
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
 
         sut.NewAccountCommand.Execute(null);
 
@@ -139,7 +139,7 @@ public partial class ShellViewModelTests
     public void EditAccountCommand_Abort_AllDataUpdated()
     {
         var sut = CreateSut(out IWindowManager windowManager);
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
 
         sut.EditAccountCommand.Execute(sut.Accounts.AccountList[0]);
 
@@ -161,7 +161,7 @@ public partial class ShellViewModelTests
                         vm.Identifier += 1000;
                     }), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
             .Returns(true);
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         var booking = new AccountingDataJournalBooking
         {
             Date = DateTime.Now.ToAccountingDate(),
@@ -209,7 +209,7 @@ public partial class ShellViewModelTests
     public void EditAccountCommand_NullParameter_JustIgnored()
     {
         var sut = CreateSut(out IWindowManager windowManager);
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
 
         sut.EditAccountCommand.Execute(null);
 
@@ -222,7 +222,7 @@ public partial class ShellViewModelTests
     public void AddBookingsCommand_ClosedYear_CannotExecute()
     {
         var sut = CreateSut();
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         sut.Menu.BookingYears[0].Command.Execute(null);
         sut.ProjectData.CurrentYear.Closed.Should().BeTrue();
 
@@ -233,7 +233,7 @@ public partial class ShellViewModelTests
     public void AddBookingsCommand_OpenYear_CanExecute()
     {
         var sut = CreateSut();
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         sut.Menu.BookingYears[^1].Command.Execute(null);
         sut.ProjectData.CurrentYear.Closed.Should().BeFalse();
 
@@ -249,7 +249,7 @@ public partial class ShellViewModelTests
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         clock.Now().Returns(new DateTime(2024, 2, 2, 5, 6, 7, DateTimeKind.Local));
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         sut.Menu.BookingYears[^1].Command.Execute(null);
 
         sut.Menu.AddBookingsCommand.Execute(null);
@@ -265,7 +265,7 @@ public partial class ShellViewModelTests
         windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         sut.Accounts.ShowInactiveAccounts = true;
 
         sut.Menu.AddBookingsCommand.Execute(null);
@@ -283,7 +283,7 @@ public partial class ShellViewModelTests
         windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         sut.Accounts.ShowInactiveAccounts = false;
 
         sut.Menu.AddBookingsCommand.Execute(null);
@@ -301,7 +301,7 @@ public partial class ShellViewModelTests
         windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         sut.ProjectData.Storage.Setup.BookingTemplates = new AccountingDataSetupBookingTemplates
         {
             Template =
@@ -341,7 +341,7 @@ public partial class ShellViewModelTests
             Arg.Any<IDictionary<string, object>>());
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Menu.EditBookingCommand.Execute(sut.FullJournal.Items[^1]);
 
@@ -362,7 +362,7 @@ public partial class ShellViewModelTests
             Arg.Any<IDictionary<string, object>>());
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Menu.EditBookingCommand.Execute(sut.FullJournal.Items.First(x => x.Identifier == 3));
 
@@ -385,7 +385,7 @@ public partial class ShellViewModelTests
             Arg.Any<IDictionary<string, object>>());
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Menu.EditBookingCommand.Execute(sut.FullJournal.Items.First(x => x.Identifier == 5));
 
@@ -415,7 +415,7 @@ public partial class ShellViewModelTests
             .Returns(true);
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Menu.EditBookingCommand.Execute(sut.FullJournal.Items[^1]);
 
@@ -431,7 +431,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut(out IWindowManager windowManager);
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Menu.EditBookingCommand.Execute(null);
 
@@ -451,7 +451,7 @@ public partial class ShellViewModelTests
             Arg.Any<IDictionary<string, object>>());
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Menu.DuplicateBookingsCommand.Execute(sut.FullJournal.Items[^1]);
 
@@ -470,7 +470,7 @@ public partial class ShellViewModelTests
         windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as ImportBookingsViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
 
         sut.Menu.ImportBookingsCommand.Execute(null);
 
@@ -491,7 +491,7 @@ public partial class ShellViewModelTests
     public void ImportBookingsCommand_ClosedYear_CannotExecute()
     {
         var sut = CreateSut();
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         sut.Menu.BookingYears[0].Command.Execute(null);
 
         sut.Menu.ImportBookingsCommand.CanExecute(null).Should().BeFalse();
@@ -501,7 +501,7 @@ public partial class ShellViewModelTests
     public void ImportBookingsCommand_OpenYear_CanExecute()
     {
         var sut = CreateSut();
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         sut.Menu.BookingYears[^1].Command.Execute(null);
 
         sut.Menu.ImportBookingsCommand.CanExecute(null).Should().BeTrue();
@@ -523,7 +523,7 @@ public partial class ShellViewModelTests
             });
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Menu.CloseYearCommand.Execute(null);
 
@@ -607,7 +607,7 @@ public partial class ShellViewModelTests
             {
                 ID = myCarryForwardNumber, Name = "MyCarryForward", Type = AccountDefinitionType.Carryforward
             });
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Menu.CloseYearCommand.Execute(null);
 
@@ -667,27 +667,6 @@ public partial class ShellViewModelTests
                 new { Text = "Total", IsSummary = true, DebitValue = 651, CreditValue = 0 },
                 new { Text = "Balance", IsSummary = true, DebitValue = 651, CreditValue = 0 }
             });
-    }
-
-    [Fact]
-    public async Task HelpCheckForUpdateCommand_StartProcessFailed_Aborted()
-    {
-        var sut = CreateSut(out IApplicationUpdate applicationUpdate, out var dialogs);
-        dialogs.ShowMessageBox(
-                Arg.Any<string>(), Arg.Any<string>(),
-                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-            .Returns(MessageBoxResult.No);
-        sut.ProjectData.IsModified = true;
-        applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("true");
-        applicationUpdate.StartUpdateProcess("foo.zip", dryRun: false).Returns(false);
-        var monitor = sut.Monitor();
-
-        await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
-            .CompleteWithinAsync(1.Seconds());
-
-        sut.ProjectData.IsModified.Should().BeTrue("unsaved project remains unsaved");
-        monitor.Should().NotRaise(nameof(sut.Deactivated));
     }
 
     [Fact]

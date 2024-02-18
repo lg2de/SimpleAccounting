@@ -5,7 +5,6 @@
 namespace lg2de.SimpleAccounting.Model;
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Presentation;
@@ -21,6 +20,8 @@ internal interface IProjectData
     string FileName { get; set; }
 
     string AutoSaveFileName { get; }
+
+    string ReservationFileName { get; }
 
     AccountingData Storage { get; }
 
@@ -42,15 +43,13 @@ internal interface IProjectData
 
     void NewProject();
 
-    void Load(AccountingData accountingData);
+    void LoadData(AccountingData accountingData);
 
     Task<OperationResult> LoadFromFileAsync(string projectFileName);
 
-    void SaveProject();
+    Task<bool> SaveProjectAsync();
 
-    Task AutoSaveAsync(CancellationToken cancellationToken);
-
-    void RemoveAutoSaveFile();
+    Task<bool> TryCloseAsync();
 
     Task EditProjectOptionsAsync();
 
@@ -63,8 +62,6 @@ internal interface IProjectData
     Task ShowImportDialogAsync();
 
     Task<bool> CloseYearAsync();
-
-    bool CanDiscardModifiedProject();
 
     void TriggerJournalChanged();
 

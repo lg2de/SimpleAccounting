@@ -28,8 +28,8 @@ public class ImportBookingsViewModelTests
         var dialogs = Substitute.For<IDialogs>();
         var accounts = project.AllAccounts.ToList();
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Load(project);
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        projectData.LoadData(project);
         var sut = new ImportBookingsViewModel(dialogs, null!, projectData)
         {
             SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID, IsForceEnglish = true
@@ -230,8 +230,8 @@ public class ImportBookingsViewModelTests
         var dialogs = Substitute.For<IDialogs>();
         var accounts = project.AllAccounts.ToList();
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!);
-        projectData.Load(project);
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, null!, null!);
+        projectData.LoadData(project);
         var sut = new ImportBookingsViewModel(dialogs, null!, projectData)
         {
             SelectedAccount = bankAccount,

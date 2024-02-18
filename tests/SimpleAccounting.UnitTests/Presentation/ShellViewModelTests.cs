@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using Caliburn.Micro;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -21,6 +22,7 @@ using lg2de.SimpleAccounting.Properties;
 using lg2de.SimpleAccounting.Reports;
 using NSubstitute;
 using Xunit;
+using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 public partial class ShellViewModelTests
 {
@@ -35,19 +37,20 @@ public partial class ShellViewModelTests
     }
 
     [WpfFact]
-    public async Task OnActivate_NewProject_ProjectLoadedAndAutoSaveActive()
+    public async Task OnActivate_NewProjectModifiedAfterSave_AutoSaveActive()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
         sut.ProjectData.AutoSaveInterval = 100.Milliseconds();
         sut.ProjectData.FileName = "new.project";
         var fileSaved = new TaskCompletionSource<bool>();
         fileSystem
-            .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
+            .When(x => x.WriteAllTextIntoFile("new.project~", Arg.Any<string>()))
             .Do(_ => fileSaved.SetResult(true));
 
         await ((IActivate)sut).ActivateAsync();
         sut.LoadingTask.Status.Should().Be(TaskStatus.RanToCompletion);
-        sut.ProjectData.Load(new AccountingData());
+        sut.ProjectData.LoadData(new AccountingData());
+        await sut.ProjectData.SaveProjectAsync();
         sut.ProjectData.IsModified = true;
         await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(1.Seconds());
 
@@ -71,15 +74,15 @@ public partial class ShellViewModelTests
         };
         fileSystem.FileExists("recent.project").Returns(true);
         fileSystem.ReadAllTextFromFile("recent.project").Returns(sample.Serialize());
-        var fileSaved = new TaskCompletionSource<bool>();
+        var autoFileSaved = new TaskCompletionSource<bool>();
         fileSystem
-            .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
-            .Do(_ => fileSaved.SetResult(true));
+            .When(x => x.WriteAllTextIntoFile("recent.project~", Arg.Any<string>()))
+            .Do(_ => autoFileSaved.SetResult(true));
         await ((IActivate)sut).ActivateAsync();
         await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(1.Seconds());
         sut.ProjectData.IsModified = true;
 
-        await fileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(
+        await autoFileSaved.Awaiting(x => x.Task).Should().CompleteWithinAsync(
             1.Seconds(), "file should be saved by auto-save task");
 
         using var _ = new AssertionScope();
@@ -87,6 +90,7 @@ public partial class ShellViewModelTests
             .BeTrue("the project is ONLY auto-saved and not saved to real project file");
         sut.Accounts.AccountList.Should().BeEquivalentTo(new[] { new { Name = "TheAccount" } });
         fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project", Arg.Any<string>());
+        fileSystem.Received(1).WriteAllTextIntoFile("recent.project#", Arg.Any<string>());
         fileSystem.Received(1).WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
     }
 
@@ -105,18 +109,17 @@ public partial class ShellViewModelTests
         };
         fileSystem.FileExists("recent.project").Returns(true);
         fileSystem.ReadAllTextFromFile("recent.project").Returns(sample.Serialize());
-        var fileSaved = new TaskCompletionSource<bool>();
+        var autoFileSaved = new TaskCompletionSource<bool>();
         fileSystem
-            .When(x => x.WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>()))
-            .Do(_ => fileSaved.SetResult(true));
+            .When(x => x.WriteAllTextIntoFile("recent.project~", Arg.Any<string>()))
+            .Do(_ => autoFileSaved.SetResult(true));
         await ((IActivate)sut).ActivateAsync();
         await sut.Awaiting(x => x.LoadingTask).Should().CompleteWithinAsync(10.Seconds());
         sut.ProjectData.IsModified = false;
 
-        var delayTask = Task.Delay(200.Milliseconds());
-        var completedTask = await Task.WhenAny(fileSaved.Task, delayTask);
-        completedTask.Should().Be(delayTask, "file should not be saved");
+        await autoFileSaved.Should().NotCompleteWithinAsync(300.Milliseconds());
 
+        fileSystem.Received(1).WriteAllTextIntoFile("recent.project#", Arg.Any<string>());
         fileSystem.DidNotReceive().WriteAllTextIntoFile("recent.project~", Arg.Any<string>());
     }
 
@@ -134,7 +137,7 @@ public partial class ShellViewModelTests
         {
             RecentProject = "k:\\file2", RecentProjects = ["c:\\file1", "k:\\file2"], SecuredDrives = ["K:\\"]
         };
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -171,7 +174,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut();
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         await ((IActivate)sut).ActivateAsync();
 
@@ -293,7 +296,7 @@ public partial class ShellViewModelTests
     public void AddBooking_FirstBooking_JournalsUpdated()
     {
         var sut = CreateSut();
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         var booking = new AccountingDataJournalBooking
         {
             Date = Samples.BaseDate + 401,
@@ -345,7 +348,7 @@ public partial class ShellViewModelTests
     public void AddBooking_BookingWithoutCurrentAccount_AccountJournalUnchanged()
     {
         var sut = CreateSut();
-        sut.ProjectData.Load(Samples.SampleProject);
+        sut.ProjectData.LoadData(Samples.SampleProject);
         var booking = new AccountingDataJournalBooking
         {
             Date = Samples.BaseDate + 401,
@@ -365,273 +368,12 @@ public partial class ShellViewModelTests
     }
 
     [Fact]
-    public void CanDiscardModifiedProject_AnswerNo_NotSavedAndReturnsTrue()
-    {
-        var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
-        sut.ProjectData.IsModified = true;
-        dialogs.ShowMessageBox(
-                Arg.Any<string>(), Arg.Any<string>(),
-                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-            .Returns(MessageBoxResult.No);
-        sut.ProjectData.Load(Samples.SampleProject);
-
-        sut.ProjectData.CanDiscardModifiedProject().Should().BeTrue();
-
-        dialogs.Received(1).ShowMessageBox(
-            Arg.Any<string>(), Arg.Any<string>(),
-            Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-        fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
-    }
-
-    [Fact]
-    public void CanDiscardModifiedProject_AnswerYes_SavedAndReturnsTrue()
-    {
-        var sut = CreateSut(out var messageBox, out IFileSystem fileSystem);
-        sut.ProjectData.IsModified = true;
-        messageBox.ShowMessageBox(
-                Arg.Any<string>(), Arg.Any<string>(),
-                Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-            .Returns(MessageBoxResult.Yes);
-        sut.ProjectData.Load(Samples.SampleProject);
-
-        sut.ProjectData.CanDiscardModifiedProject().Should().BeTrue();
-
-        messageBox.Received(1).ShowMessageBox(
-            Arg.Any<string>(), Arg.Any<string>(),
-            Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-        fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
-    }
-
-    [Fact]
-    public void CanDiscardModifiedProject_NotModified_ReturnsTrue()
-    {
-        var sut = CreateSut(out IDialogs dialogs);
-
-        sut.ProjectData.CanDiscardModifiedProject().Should().BeTrue();
-
-        dialogs.DidNotReceive().ShowMessageBox(
-            Arg.Any<string>(), Arg.Any<string>(),
-            Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-    }
-
-    [Fact]
-    public async Task LoadProjectFromFileAsync_HappyPath_FileLoaded()
-    {
-        var sut = CreateSut(out IFileSystem fileSystem);
-        fileSystem.FileExists("the.fileName").Returns(true);
-        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-
-        (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(10.Seconds()))
-            .Which.Should().Be(OperationResult.Completed);
-
-        using var _ = new AssertionScope();
-        sut.ProjectData.FileName.Should().Be("the.fileName");
-        sut.ProjectData.IsModified.Should().BeFalse();
-        sut.ProjectData.Settings.RecentProject.Should().Be("the.fileName");
-        sut.ProjectData.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
-        fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
-    }
-
-    [CulturedFact("en")]
-    public async Task LoadProjectFromFileAsync_UserWantsAutoSaveFile_AutoSaveFileLoaded()
-    {
-        var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
-        dialogs.ShowMessageBox(
-                Arg.Is<string>(s => s.Contains("automatically created backup file", StringComparison.Ordinal)),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo, MessageBoxImage.Question,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-            .Returns(MessageBoxResult.Yes);
-        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-        fileSystem.FileExists("the.fileName").Returns(true);
-        fileSystem.FileExists("the.fileName~").Returns(true);
-
-        (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(5.Seconds()))
-            .Which.Should().Be(OperationResult.Completed);
-
-        using var _ = new AssertionScope();
-        sut.ProjectData.FileName.Should().Be("the.fileName");
-        sut.ProjectData.IsModified.Should().BeTrue("changes are (still) not yet saved");
-        sut.ProjectData.Settings.RecentProject.Should().Be("the.fileName");
-        sut.ProjectData.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
-        fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
-    }
-
-    [CulturedFact("en")]
-    public async Task LoadProjectFromFileAsync_UserDoesNotWantAutoSaveFileExists_AutoSaveFileLoaded()
-    {
-        var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
-        dialogs.ShowMessageBox(
-                Arg.Is<string>(s => s.Contains("automatically created backup file", StringComparison.Ordinal)),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo, MessageBoxImage.Question,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-            .Returns(MessageBoxResult.No);
-        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-        fileSystem.FileExists("the.fileName").Returns(true);
-        fileSystem.FileExists("the.fileName~").Returns(true);
-
-        (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(10.Seconds()))
-            .Which.Should().Be(OperationResult.Completed);
-
-        using var _ = new AssertionScope();
-        sut.ProjectData.FileName.Should().Be("the.fileName");
-        sut.ProjectData.IsModified.Should().BeFalse();
-        sut.ProjectData.Settings.RecentProject.Should().Be("the.fileName");
-        sut.ProjectData.Settings.RecentProjects.OfType<string>().Should().Equal("the.fileName");
-        fileSystem.Received(1).ReadAllTextFromFile("the.fileName");
-        fileSystem.Received(1).FileDelete("the.fileName~");
-    }
-
-    [Theory]
-    [InlineData("Cryptomator File System")]
-    [InlineData("cryptoFs")]
-    public async Task LoadProjectFromFileAsync_NewFileOnSecureDrive_StoreOpenedAndFileLoaded(
-        string cryptoDriveIdentifier)
-    {
-        var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
-        fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(true);
-        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-        fileSystem.GetDrives().Returns(
-            _ =>
-            {
-                var func1 = new Func<string>(() => "Normal");
-                var func2 = new Func<string>(() => cryptoDriveIdentifier);
-                return new[] { (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2) };
-            });
-
-        (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("K:\\the.fileName")).Should()
-                .CompleteWithinAsync(10.Seconds()))
-            .Which.Should().Be(OperationResult.Completed);
-
-        sut.ProjectData.Settings.SecuredDrives.Should().BeEquivalentTo(new object[] { "K:\\" });
-        dialogs.DidNotReceive().ShowMessageBox(
-            Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
-            Arg.Any<string>(),
-            Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
-        fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
-    }
-
-    [Fact]
-    public async Task LoadProjectFromFileAsync_FullRecentList_NewFileOnTop()
-    {
-        var sut = CreateSut(out IFileSystem fileSystem);
-        sut.ProjectData.Settings.RecentProjects =
-        [
-            "A",
-            "B",
-            "C",
-            "D",
-            "E",
-            "F",
-            "G",
-            "H",
-            "I",
-            "J"
-        ];
-        fileSystem.FileExists("the.fileName").Returns(true);
-        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-
-        (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(10.Seconds()))
-            .Which.Should().Be(OperationResult.Completed);
-
-        sut.ProjectData.Settings.RecentProjects.OfType<string>().Should()
-            .Equal("the.fileName", "A", "B", "C", "D", "E", "F", "G", "H", "I");
-    }
-
-    [Fact]
-    public async Task LoadProjectFromFileAsync_MigrationRequired_ProjectModified()
-    {
-        var sut = CreateSut(out IFileSystem fileSystem);
-        var accountingData = new AccountingData { Years = [new AccountingDataYear { Name = 2020 }] };
-        fileSystem.FileExists("the.fileName").Returns(true);
-        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
-
-        (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(10.Seconds()))
-            .Which.Should().Be(OperationResult.Completed);
-
-        sut.ProjectData.IsModified.Should().BeTrue();
-    }
-
-    [CulturedFact("en")]
-    public async Task LoadProjectFromFileAsync_UserDoesNotWantSaveCurrentProject_LoadingAborted()
-    {
-        var sut = CreateSut(out var dialogs, out IFileSystem fileSystem);
-        sut.ProjectData.FileName = "old.fileName";
-        sut.ProjectData.IsModified = true;
-        dialogs.ShowMessageBox(
-                Arg.Is<string>(s => s.Contains("Project data has been changed.", StringComparison.Ordinal)),
-                Arg.Any<string>(),
-                MessageBoxButton.YesNo, MessageBoxImage.Question,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
-            .Returns(MessageBoxResult.Cancel);
-        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-        fileSystem.FileExists("new.fileName").Returns(true);
-
-        (await sut.Awaiting(x => x.ProjectData.LoadFromFileAsync("the.fileName")).Should()
-                .CompleteWithinAsync(10.Seconds()))
-            .Which.Should().Be(OperationResult.Aborted);
-
-        using var _ = new AssertionScope();
-        sut.ProjectData.FileName.Should().Be("old.fileName", "the new file was not loaded");
-        sut.ProjectData.IsModified.Should().BeTrue("changes are (still) not yet saved");
-        fileSystem.DidNotReceive().ReadAllTextFromFile("the.fileName");
-    }
-
-    [Fact]
-    public void SaveProject_AutoSaveExisting_AutoSaveFileDeleted()
-    {
-        var sut = CreateSut(out IFileSystem fileSystem);
-        fileSystem.GetLastWriteTime(Arg.Any<string>())
-            .Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
-        var fileName = "project.name";
-        fileSystem.FileExists(fileName + "~").Returns(true);
-        sut.ProjectData.Load(Samples.SampleProject);
-        sut.ProjectData.FileName = fileName;
-
-        sut.ProjectData.SaveProject();
-
-        fileSystem.DidNotReceive().FileMove(Arg.Any<string>(), Arg.Any<string>());
-        fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());
-        fileSystem.Received(1).FileDelete(fileName + "~");
-    }
-
-    [Fact]
-    public void SaveProject_ProjectExisting_SavedAfterBackup()
-    {
-        var sut = CreateSut(out IFileSystem fileSystem);
-        fileSystem.GetLastWriteTime(Arg.Any<string>())
-            .Returns(new DateTime(2020, 2, 29, 18, 45, 56, DateTimeKind.Local));
-        var fileName = "project.name";
-        fileSystem.FileExists(fileName).Returns(true);
-        sut.ProjectData.Load(Samples.SampleProject);
-        sut.ProjectData.FileName = fileName;
-
-        sut.ProjectData.SaveProject();
-
-        fileSystem.Received(1).FileMove(fileName, fileName + ".20200229184556");
-        fileSystem.Received(1).WriteAllTextIntoFile(fileName, Arg.Any<string>());
-        fileSystem.DidNotReceive().FileDelete(Arg.Any<string>());
-    }
-
-    [Fact]
     public void ShowInactiveAccounts_SetTrue_InactiveAccountsGetVisible()
     {
         var sut = CreateSut();
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
-        sut.ProjectData.Load(project);
+        sut.ProjectData.LoadData(project);
 
         sut.Accounts.ShowInactiveAccounts = true;
 
@@ -657,32 +399,50 @@ public partial class ShellViewModelTests
     [Fact]
     public async Task CanClose_ModifiedProjectAbort_CloseRejected()
     {
-        var sut = CreateSut();
+        var sut = CreateSut(out IDialogs dialogs, out IFileSystem _);
+        dialogs.ShowMessageBox(
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+            .Returns(MessageBoxResult.Cancel);
         sut.ProjectData.IsModified = true;
 
         var result = await sut.CanCloseAsync();
 
         result.Should().BeFalse();
+        sut.ProjectData.IsModified.Should().BeTrue();
     }
 
     [Fact]
-    public async Task CanClose_AutoSaveFileExists_FileRemoved()
+    public async Task CanClose_ModifiedProjectSaveAsCancelled_CloseRejected()
+    {
+        var sut = CreateSut(out IDialogs dialogs, out IFileSystem _);
+        dialogs.ShowMessageBox(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
+            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
+        dialogs.ShowSaveFileDialog(Arg.Any<string>()).Returns((DialogResult.Cancel, string.Empty));
+        sut.ProjectData.NewProject();
+        sut.ProjectData.IsModified = true;
+
+        var result = await sut.CanCloseAsync();
+
+        result.Should().BeFalse();
+        sut.ProjectData.IsModified.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task CanClose_ActiveProject_BackgroundFilesCleared()
     {
         var sut = CreateSut(out IFileSystem fileSystem);
-        fileSystem.FileExists(sut.ProjectData.AutoSaveFileName).Returns(true);
+        string autoSaveFileName = sut.ProjectData.AutoSaveFileName;
+        var reservationFile = sut.ProjectData.ReservationFileName;
+        fileSystem.FileExists(autoSaveFileName).Returns(true);
+        fileSystem.FileExists(reservationFile).Returns(true);
 
         var result = await sut.CanCloseAsync();
 
         result.Should().BeTrue();
-        fileSystem.Received(1).FileDelete(sut.ProjectData.AutoSaveFileName);
-    }
-
-    [Fact]
-    public void Dispose_HappyPath_Completed()
-    {
-        var sut = CreateSut();
-
-        sut.Invoking(x => x.Dispose()).Should().NotThrow();
+        fileSystem.Received(1).FileDelete(autoSaveFileName);
+        fileSystem.Received(1).FileDelete(reservationFile);
     }
 
     private static ShellViewModel CreateSut()
@@ -696,7 +456,7 @@ public partial class ShellViewModelTests
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -719,7 +479,7 @@ public partial class ShellViewModelTests
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -741,7 +501,7 @@ public partial class ShellViewModelTests
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -763,29 +523,7 @@ public partial class ShellViewModelTests
         var fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
-        var accountsViewModel = new AccountsViewModel(windowManager, projectData);
-        var sut =
-            new ShellViewModel(
-                projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
-                new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                accountsViewModel, applicationUpdate);
-        return sut;
-    }
-
-    private static ShellViewModel CreateSut(out IDialogs dialogs)
-    {
-        var busy = Substitute.For<IBusy>();
-        var windowManager = Substitute.For<IWindowManager>();
-        var reportFactory = Substitute.For<IReportFactory>();
-        var clock = Substitute.For<IClock>();
-        var applicationUpdate = Substitute.For<IApplicationUpdate>();
-        dialogs = Substitute.For<IDialogs>();
-        var fileSystem = Substitute.For<IFileSystem>();
-        var processApi = Substitute.For<IProcess>();
-        var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -807,7 +545,7 @@ public partial class ShellViewModelTests
         fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(
@@ -829,7 +567,7 @@ public partial class ShellViewModelTests
         fileSystem = Substitute.For<IFileSystem>();
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings();
-        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, processApi);
+        var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         var accountsViewModel = new AccountsViewModel(windowManager, projectData);
         var sut =
             new ShellViewModel(

@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
+using lg2de.SimpleAccounting.Infrastructure;
 
 /// <summary>
 ///     Defines abstraction for <see cref="MenuViewModel"/>.
@@ -15,7 +16,7 @@ internal interface IMenuViewModel : INotifyPropertyChanged
 {
     ICommand NewProjectCommand { get; }
     ICommand OpenProjectCommand { get; }
-    ICommand SaveProjectCommand { get; }
+    IAsyncCommand SaveProjectCommand { get; }
     ICommand ProjectOptionsCommand { get; }
 
     ObservableCollection<MenuItemViewModel> RecentProjects { get; }

@@ -51,9 +51,10 @@ internal class ProjectFileLoader
                 return OperationResult.Aborted;
             }
 
-            if (!this.LoadFile(projectFileName, out bool autoSaveFileLoaded))
+            OperationResult result = this.LoadFile(projectFileName, out bool autoSaveFileLoaded);
+            if (result != OperationResult.Completed)
             {
-                return OperationResult.Failed;
+                return result;
             }
 
             if (this.ProjectData.Migrate() || autoSaveFileLoaded)
@@ -121,8 +122,14 @@ internal class ProjectFileLoader
         return true;
     }
 
-    private bool LoadFile(string projectFileName, out bool autoSaveFileLoaded)
+    private OperationResult LoadFile(string projectFileName, out bool autoSaveFileLoaded)
     {
+        if (!this.CheckFileReservation(projectFileName))
+        {
+            autoSaveFileLoaded = false;
+            return OperationResult.Aborted;
+        }
+
         var result = MessageBoxResult.No;
         var autoSaveFileName = Defines.GetAutoSaveFileName(projectFileName);
         if (this.fileSystem.FileExists(autoSaveFileName))
@@ -147,12 +154,55 @@ internal class ProjectFileLoader
         string fileName = autoSaveFileLoaded ? autoSaveFileName : projectFileName;
         if (!this.fileSystem.FileExists(fileName))
         {
-            return false;
+            // The project is not existing (anymore).
+            return OperationResult.Failed;
         }
 
         var projectXml = this.fileSystem.ReadAllTextFromFile(fileName);
         this.ProjectData = AccountingData.Deserialize(projectXml);
-        return true;
+        this.WriteFileReservation(projectFileName);
+
+        return OperationResult.Completed;
+    }
+
+    private bool CheckFileReservation(string projectFileName)
+    {
+        var reservationFileName = Defines.GetReservationFileName(projectFileName);
+        if (!this.fileSystem.FileExists(reservationFileName))
+        {
+            return true;
+        }
+
+        var reservationXml = this.fileSystem.ReadAllTextFromFile(reservationFileName);
+        var reservationData = ReservationData.Deserialize(reservationXml);
+        if (reservationData.UserName == Environment.UserName && reservationData.MachineName == Environment.MachineName)
+        {
+            return true;
+        }
+
+        var reservationDate = this.fileSystem.GetLastWriteTime(reservationFileName);
+        var message = string.Format(
+            CultureInfo.CurrentUICulture,
+            Resources.Question_ExistingFileReservationX4,
+            projectFileName,
+            reservationData.UserName,
+            reservationData.MachineName,
+            reservationDate);
+        var result = this.dialogs.ShowMessageBox(
+            message,
+            Resources.Header_LoadProject,
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        return result == MessageBoxResult.Yes;
+    }
+
+    private void WriteFileReservation(string projectFileName)
+    {
+        var reservationFileName = Defines.GetReservationFileName(projectFileName);
+        var reservationData =
+            new ReservationData { UserName = Environment.UserName, MachineName = Environment.MachineName };
+        var reservationXml = reservationData.Serialize();
+        this.fileSystem.WriteAllTextIntoFile(reservationFileName, reservationXml);
     }
 
     [SuppressMessage(
