@@ -31,11 +31,6 @@ internal class DotNetProcess : IProcess
         return Process.GetCurrentProcess();
     }
 
-    public int GetCurrentProcessId()
-    {
-        return Process.GetCurrentProcess().Id;
-    }
-
     public Process? Start(ProcessStartInfo info)
     {
         return Process.Start(info);

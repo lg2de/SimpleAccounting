@@ -15,8 +15,6 @@ internal interface IProcess
 
     Process GetCurrentProcess();
 
-    int GetCurrentProcessId();
-
     Process? Start(ProcessStartInfo info);
 
     bool IsProcessWindowVisible(Process process);
