@@ -26,7 +26,7 @@ internal class EditBookingViewModel : Screen
     private ulong debitAccount;
     private BookingTemplate? selectedTemplate;
 
-    public EditBookingViewModel(IProjectData projectData, DateTime date, bool editMode = false)
+    public EditBookingViewModel(IProjectData projectData, DateTime date, bool editMode)
     {
         this.projectData = projectData;
         this.Date = date;
