@@ -138,7 +138,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
         () => this.processApi.ShellExecute(Defines.ProjectUrl));
 
     public ICommand HelpFeedbackCommand => new AsyncCommand(
-        () => this.processApi.ShellExecute(Defines.NewIssueUrl));
+        () => this.processApi.ShellExecute(Defines.NewBugUrl));
 
     public void BuildRecentProjectsMenu()
     {

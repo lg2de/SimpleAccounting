@@ -606,4 +606,7 @@ Möchten Sie das Projekt trotzdem öffnen? Gleichzeitiges Ändern kann zu Datenv
 Wollen Sie die aktuellen Änderungen unter einem anderen Projektnamen speichern? Dann drücken Sie "Ja".
 Wollen Sie die die eigenen Änderungen verwerfen? Dann drücken Sie "Nein".</value>
   </data>
+    <data name="Word_Close" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
 </root>

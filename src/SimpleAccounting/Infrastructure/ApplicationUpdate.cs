@@ -53,8 +53,8 @@ internal class ApplicationUpdate : IApplicationUpdate
 
     public async Task<string> GetUpdatePackageAsync(string currentVersion, CultureInfo cultureInfo)
     {
-        IEnumerable<Release> releases = await this.GetAllReleasesAsync();
-        return await this.AskForUpdateAsync(releases, currentVersion, cultureInfo);
+        IReadOnlyList<Release> releases = await this.GetAllReleasesAsync();
+        return releases.Any() ? await this.AskForUpdateAsync(releases, currentVersion, cultureInfo) : string.Empty;
     }
 
     public bool StartUpdateProcess(string packageName, bool dryRun)
@@ -120,26 +120,30 @@ internal class ApplicationUpdate : IApplicationUpdate
     [SuppressMessage(
         "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
         Justification = "catch exceptions from external library")]
-    internal Task<IEnumerable<Release>> GetAllReleasesAsync()
+    internal async Task<IReadOnlyList<Release>> GetAllReleasesAsync()
     {
-        return Task.Run(
-            async () =>
-            {
-                try
+        try
+        {
+            var queryTask = Task.Run(
+                async () =>
                 {
+                    throw new NotImplementedException("foo");
                     var productInformation = new ProductHeaderValue(Defines.ProjectName);
                     var client = new GitHubClient(productInformation);
                     return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
-                }
-                catch (Exception exception)
-                {
-                    this.dialogs.ShowMessageBox(
-                        Resources.Update_QueryVersionsFailed + $"\n{exception.Message}",
-                        Resources.Header_CheckForUpdates,
-                        icon: MessageBoxImage.Error);
-                    return Enumerable.Empty<Release>();
-                }
-            });
+                });
+            return await queryTask;
+        }
+        catch (Exception exception)
+        {
+            var vm = new ErrorMessageViewModel(this.process)
+            {
+                DisplayName = Resources.Header_CheckForUpdates,
+                ErrorText = $"{Resources.Update_QueryVersionsFailed}\n{exception.Message}"
+            };
+            await this.windowManager.ShowDialogAsync(vm);
+            return new List<Release>();
+        }
     }
 
     [SuppressMessage("Minor Code Smell", "S1075:URIs should not be hardcoded", Justification = "Checked.")]
