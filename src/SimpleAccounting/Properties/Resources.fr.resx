@@ -615,4 +615,23 @@ Voulez-vous annuler vos propres modifications ? Appuyez alors sur "Non".</value>
     <data name="Word_Close" xml:space="preserve">
 		<value>Fermer</value>
 	</data>
+    <data name="ErrorMessageView_ClipboardButton" xml:space="preserve">
+		<value>Copier dans le presse-papiers</value>
+	</data>
+    <data name="ErrorMessageView_ClipboardTooltip" xml:space="preserve">
+		<value>Copie les détails de l'erreur dans le presse-papiers.</value>
+	</data>
+    <data name="ErrorMessageView_EmailButton" xml:space="preserve">
+		<value>Créer un courriel</value>
+	</data>
+    <data name="ErrorMessageView_EmailTooltip" xml:space="preserve">
+		<value>Ouvre votre programme de messagerie par défaut avec un nouvel e-mail contenant les détails de l'erreur.</value>
+	</data>
+    <data name="ErrorMessageView_GitHubButton" xml:space="preserve">
+		<value>Rapport sur GitHub</value>
+	</data>
+    <data name="ErrorMessageView_GitHubTooltip" xml:space="preserve">
+		<value>Ouvre votre navigateur par défaut pour ouvrir un nouveau problème.
+Vous devez disposer d'un compte GitHub pour créer de nouveaux problèmes.</value>
+	</data>
 </root>

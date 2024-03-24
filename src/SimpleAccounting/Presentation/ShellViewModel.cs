@@ -148,9 +148,13 @@ internal class ShellViewModel : Screen
         Justification = "We need to block the UI to show the exception before the application is closing.")]
     private void HandleException(Exception exception)
     {
+        // this.ProjectData.CrashSave;
+
         var vm = new ErrorMessageViewModel(this.processApi)
         {
-            DisplayName = Resources.Header_Shutdown, ErrorText = exception.Message
+            DisplayName = Resources.Header_Shutdown,
+            ErrorText = exception.Message,
+            CallStack = exception.StackTrace ?? string.Empty
         };
         var task = this.windowManager.ShowDialogAsync(vm);
         task.Wait();

@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation;
 
 using System;
 using System.Text;
+using System.Windows;
 using System.Windows.Input;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
@@ -24,6 +25,8 @@ internal class ErrorMessageViewModel : Screen
 
     public string ErrorText { get; init; } = string.Empty;
 
+    public string CallStack { get; init; } = string.Empty;
+
     public ICommand ReportGitGubCommand => new ActionCommand(this.OnReportToGitHub);
 
     public ICommand ReportEmailCommand => new ActionCommand(this.OnSendByEmail);
@@ -39,15 +42,28 @@ internal class ErrorMessageViewModel : Screen
 
     private void OnSendByEmail()
     {
+        string errorReportText = this.CreateErrorReportText();
+        Uri uri = Defines.FormatEmailUri(errorReportText);
+        this.processApi.ShellExecute(uri.AbsoluteUri);
     }
 
     private void OnCopyToClipboard()
     {
+        string errorReportText = this.CreateErrorReportText();
+        Clipboard.SetText(errorReportText);
     }
 
     private string CreateErrorReportText()
     {
         var builder = new StringBuilder(this.ErrorText);
+        builder.AppendLine();
+
+        if (!string.IsNullOrWhiteSpace(this.CallStack))
+        {
+            builder.AppendLine(this.CallStack);
+            builder.AppendLine();
+        }
+
         builder.AppendLine();
         builder.AppendLine($"Version: {this.GetType().GetInformationalVersion()}");
         string errorReportText = builder.ToString();
