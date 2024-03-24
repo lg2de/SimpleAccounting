@@ -112,7 +112,7 @@ public partial class ShellViewModelTests
     }
 
     [Fact]
-    public void NewAccountCommand_AccountCreatedAndSorted()
+    public void NewAccountCommand_IntoDefaultGroup_AccountCreatedAndSorted()
     {
         static void UpdateAction(object parameter)
         {
@@ -133,6 +133,85 @@ public partial class ShellViewModelTests
             "Bank account", "Salary", "New Account", "Shoes", "Carryforward", "Bank credit", "Friends debit",
             "Active empty Asset", "Active empty Income", "Active empty Expense", "Active empty Credit",
             "Active empty Debit", "Active empty Carryforward");
+        sut.ProjectData.Storage.Accounts.Should()
+            .BeEquivalentTo(
+                new[]
+                {
+                    new
+                    {
+                        Name = "Default",
+                        Account =
+                            new[]
+                            {
+                                new { Name = "Bank account" }, new { Name = "Salary" }, new { Name = "Shoes" },
+                                new { Name = "Carryforward" }, new { Name = "New Account" }
+                            }
+                    },
+                    new
+                    {
+                        Name = "Second",
+                        Account = new[]
+                        {
+                            new { Name = "Bank credit" }, new { Name = "Friends debit" },
+                            new { Name = "Inactive" }, new { Name = "Active empty Asset" },
+                            new { Name = "Active empty Income" }, new { Name = "Active empty Expense" },
+                            new { Name = "Active empty Credit" }, new { Name = "Active empty Debit" },
+                            new { Name = "Active empty Carryforward" }
+                        }
+                    }
+                });
+    }
+
+    [Fact]
+    public void NewAccountCommand_IntoSecondGroup_AccountCreatedAndSorted()
+    {
+        var sut = CreateSut(out IWindowManager windowManager);
+        windowManager
+            .ShowDialogAsync(Arg.Do<object>(UpdateAction), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
+            .Returns(true);
+        sut.ProjectData.LoadData(Samples.SampleProject);
+
+        sut.NewAccountCommand.Execute(null);
+
+        sut.Accounts.AccountList.Select(x => x.Name).Should().Equal(
+            "Bank account", "Salary", "New Account", "Shoes", "Carryforward", "Bank credit", "Friends debit",
+            "Active empty Asset", "Active empty Income", "Active empty Expense", "Active empty Credit",
+            "Active empty Debit", "Active empty Carryforward");
+        sut.ProjectData.Storage.Accounts.Should()
+            .BeEquivalentTo(
+                new[]
+                {
+                    new
+                    {
+                        Name = "Default",
+                        Account =
+                            new[]
+                            {
+                                new { Name = "Bank account" }, new { Name = "Salary" }, new { Name = "Shoes" },
+                                new { Name = "Carryforward" }
+                            }
+                    },
+                    new
+                    {
+                        Name = "Second",
+                        Account = new[]
+                        {
+                            new { Name = "Bank credit" }, new { Name = "Friends debit" },
+                            new { Name = "Inactive" }, new { Name = "Active empty Asset" },
+                            new { Name = "Active empty Income" }, new { Name = "Active empty Expense" },
+                            new { Name = "Active empty Credit" }, new { Name = "Active empty Debit" },
+                            new { Name = "Active empty Carryforward" }, new { Name = "New Account" }
+                        }
+                    }
+                });
+
+        void UpdateAction(object parameter)
+        {
+            var vm = (AccountViewModel)parameter;
+            vm.Name = "New Account";
+            vm.Identifier = 500;
+            vm.Group = sut.ProjectData.Storage.Accounts[1];
+        }
     }
 
     [Fact]
