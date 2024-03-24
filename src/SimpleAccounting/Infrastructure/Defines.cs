@@ -20,6 +20,7 @@ internal static class Defines
     public const string ProjectUrl = $"https://{GithubDomain}/{OrganizationName}/{ProjectName}";
     public const string NewBugUrl = $"{ProjectUrl}/issues/new?template=bug-report.md";
     private const string NewIssueUrlTemplate = $"{ProjectUrl}/issues/new?body={{0}}";
+    private const string MailtoTemplate = $"mailto:?subject={ProjectName}&body={{0}}";
     public const string AutoSaveFileSuffix = "~";
 
     public static string GetAutoSaveFileName(string fileName) => fileName + AutoSaveFileSuffix;
@@ -30,5 +31,11 @@ internal static class Defines
     {
         var convertedText = UrlEncoder.Default.Encode(bodyText);
         return new Uri(string.Format(CultureInfo.CurrentUICulture, NewIssueUrlTemplate, convertedText));
+    }
+
+    public static Uri FormatEmailUri(string bodyText)
+    {
+        var convertedText = UrlEncoder.Default.Encode(bodyText);
+        return new Uri(string.Format(CultureInfo.CurrentUICulture, MailtoTemplate, convertedText));
     }
 }

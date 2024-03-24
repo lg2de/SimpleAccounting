@@ -303,7 +303,7 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Send my email.
+        ///   Looks up a localized string similar to Create an email.
         /// </summary>
         public static string ErrorMessageView_EmailButton {
             get {
@@ -321,7 +321,7 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Report at github.
+        ///   Looks up a localized string similar to Report at GitHub.
         /// </summary>
         public static string ErrorMessageView_GitHubButton {
             get {

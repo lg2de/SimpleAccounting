@@ -624,11 +624,11 @@ Do you want to discard your own changes? Then press "No".</value>
     <data name="Word_Close" xml:space="preserve">
     <value>Close</value>
   </data>
-    <data name="ErrorMessageView_GitHubButton" xml:space="preserve">
-    <value>Report at github</value>
+  <data name="ErrorMessageView_GitHubButton" xml:space="preserve">
+    <value>Report at GitHub</value>
   </data>
-    <data name="ErrorMessageView_EmailButton" xml:space="preserve">
-    <value>Send my email</value>
+  <data name="ErrorMessageView_EmailButton" xml:space="preserve">
+    <value>Create an email</value>
   </data>
     <data name="ErrorMessageView_ClipboardButton" xml:space="preserve">
     <value>Copy to clipboard</value>

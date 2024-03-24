@@ -127,7 +127,7 @@ internal class ApplicationUpdate : IApplicationUpdate
             var queryTask = Task.Run(
                 async () =>
                 {
-                    throw new NotImplementedException("foo");
+                    throw new NotImplementedException("Das ist die Fehlermeldung");
                     var productInformation = new ProductHeaderValue(Defines.ProjectName);
                     var client = new GitHubClient(productInformation);
                     return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
