@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -78,7 +79,7 @@ public class ImportBookingsViewModelTests
 
         sut.SelectedAccountNumber = 100;
 
-        var year = Convert.ToInt32(Samples.SampleProject.Journal[^1].Year);
+        var year = Convert.ToInt32(Samples.SampleProject.Journal[^1].Year, CultureInfo.InvariantCulture);
         sut.ImportDataFiltered.Should().BeEmpty("start date should be set after last booking");
         sut.ExistingData.Should()
             .BeEquivalentTo(
@@ -264,7 +265,7 @@ public class ImportBookingsViewModelTests
         var parent = new ShellViewModel(
             projectData, busy,
             new MenuViewModel(projectData, busy, null!, clock, null!, null!), new FullJournalViewModel(projectData),
-            new AccountJournalViewModel(projectData), accountsViewModel, null!);
+            new AccountJournalViewModel(projectData), accountsViewModel, null!, null!, null!);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
         var sut = new ImportBookingsViewModel(

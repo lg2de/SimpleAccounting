@@ -4,21 +4,27 @@
 
 namespace lg2de.SimpleAccounting.Presentation;
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Caliburn.Micro;
+using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
+using lg2de.SimpleAccounting.Properties;
 
 internal class ShellViewModel : Screen
 {
     private readonly IApplicationUpdate applicationUpdate;
+    private readonly IWindowManager windowManager;
+    private readonly IProcess processApi;
     private readonly string version;
 
     private readonly bool helpSimulateUpdateVisible =
@@ -28,6 +34,7 @@ internal class ShellViewModel : Screen
         false;
 #endif
 
+    [SuppressMessage("Major Code Smell", "S107:Methods should not have too many parameters", Justification = "checked")]
     public ShellViewModel(
         IProjectData projectData,
         IBusy busy,
@@ -35,7 +42,9 @@ internal class ShellViewModel : Screen
         IFullJournalViewModel fullJournal,
         IAccountJournalViewModel accountJournal,
         IAccountsViewModel accounts,
-        IApplicationUpdate applicationUpdate)
+        IApplicationUpdate applicationUpdate,
+        IWindowManager windowManager,
+        IProcess processApi)
     {
         this.ProjectData = projectData;
         this.Busy = busy;
@@ -44,6 +53,8 @@ internal class ShellViewModel : Screen
         this.AccountJournal = accountJournal;
         this.Accounts = accounts;
         this.applicationUpdate = applicationUpdate;
+        this.windowManager = windowManager;
+        this.processApi = processApi;
 
         this.version = this.GetType().GetInformationalVersion();
 
@@ -122,7 +133,27 @@ internal class ShellViewModel : Screen
     {
         await base.OnInitializeAsync(cancellationToken);
 
+        AppDomain.CurrentDomain.UnhandledException +=
+            (_, args) => this.HandleException((Exception)args.ExceptionObject);
+        if (Application.Current != null)
+        {
+            Application.Current.DispatcherUnhandledException += (_, args) => this.HandleException(args.Exception);
+        }
+
         this.UpdateDisplayName();
+    }
+
+    [SuppressMessage(
+        "Blocker Code Smell", "S4462:Calls to \"async\" methods should not be blocking",
+        Justification = "We need to block the UI to show the exception before the application is closing.")]
+    private void HandleException(Exception exception)
+    {
+        var vm = new ErrorMessageViewModel(this.processApi)
+        {
+            DisplayName = Resources.Header_Shutdown, ErrorText = exception.Message
+        };
+        var task = this.windowManager.ShowDialogAsync(vm);
+        task.Wait();
     }
 
     protected override async Task OnActivateAsync(CancellationToken cancellationToken)
