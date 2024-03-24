@@ -178,6 +178,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         {
             ID = accountVm.Identifier, Name = accountVm.Name, Type = accountVm.Type, Active = accountVm.IsActivated
         };
+        accountGroup = accountVm.Group;
         accountGroup.Account.Add(newAccount);
         accountGroup.Account = accountVm.Group.Account.OrderBy(x => x.ID).ToList();
 
