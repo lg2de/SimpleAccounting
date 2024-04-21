@@ -9,7 +9,7 @@
   </Setup>
   <Accounts>
     <AccountGroup Name="Default">
-      <Account ID="100" Name="Bank account" Type="Asset">
+      <Account ID="101" Name="Bank account" Type="Asset">
         <ImportMapping>
           <Columns>
             <Column Target="Date" Source="Date" />

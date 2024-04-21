@@ -148,7 +148,7 @@ internal class ShellViewModel : Screen
         Justification = "We need to block the UI to show the exception before the application is closing.")]
     private void HandleException(Exception exception)
     {
-        // this.ProjectData.CrashSave;
+        this.ProjectData.CrashSave();
 
         var vm = new ErrorMessageViewModel(this.processApi)
         {

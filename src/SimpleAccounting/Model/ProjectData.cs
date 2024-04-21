@@ -186,6 +186,13 @@ internal sealed class ProjectData : IProjectData, IDisposable
         return true;
     }
 
+    public void CrashSave()
+    {
+        this.cancellationTokenSource?.Cancel();
+
+        this.AutoSaveAsync(CancellationToken.None).Wait();
+    }
+
     public async Task<bool> TryCloseAsync()
     {
         if (!await this.TryDiscardModifiedProjectAsync())
