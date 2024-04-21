@@ -12,10 +12,25 @@
   <UserControl.Resources>
     <local:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
   </UserControl.Resources>
-  <DockPanel>
-    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+  <Grid>
+    <Grid.Resources>
+      <Style TargetType="{x:Type Button}">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="Padding" Value="10" />
+      </Style>
+    </Grid.Resources>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+    <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
       <Image
-        DockPanel.Dock="Top"
+        DockPanel.Dock="Left"
         VerticalAlignment="Top"
         Width="50" Height="50" Margin="10"
         Source="{Binding Source={x:Static draw:SystemIcons.Error},
@@ -23,40 +38,28 @@
         Mode=OneWay}" />
       <TextBlock
         Padding="10" MinWidth="300" MinHeight="150"
-        Text="{Binding ErrorText}" />
+        Text="{Binding FullErrorText}"
+        HorizontalAlignment="Stretch" TextWrapping="Wrap" />
+    </DockPanel>
+    <Button
+      Grid.Row="1" Grid.Column="0"
+      VerticalAlignment="Top"
+      Command="{Binding ReportGitHubCommand}"
+      Content="{x:Static properties:Resources.ErrorMessageView_GitHubButton}"
+      ToolTip="{x:Static properties:Resources.ErrorMessageView_GitHubTooltip}" />
+    <Button
+      Grid.Row="1" Grid.Column="1"
+      VerticalAlignment="Top"
+      Command="{Binding ReportEmailCommand}"
+      Content="{x:Static properties:Resources.ErrorMessageView_EmailButton}"
+      ToolTip="{x:Static properties:Resources.ErrorMessageView_EmailTooltip}" />
+    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical">
+      <Button
+        VerticalAlignment="Top"
+        Command="{Binding ClipboardCommand}"
+        Content="{x:Static properties:Resources.ErrorMessageView_ClipboardButton}"
+        ToolTip="{x:Static properties:Resources.ErrorMessageView_ClipboardTooltip}" />
+      <Button Content="{x:Static properties:Resources.Word_Close}" IsCancel="True" />
     </StackPanel>
-    <Grid DockPanel.Dock="Bottom">
-      <Grid.Resources>
-        <Style TargetType="{x:Type Button}">
-          <Setter Property="Margin" Value="5" />
-          <Setter Property="Padding" Value="10" />
-        </Style>
-      </Grid.Resources>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
-      <Button
-        Grid.Column="0"
-        VerticalAlignment="Top"
-        Command="{Binding ReportGitGubCommand}"
-        Content="{x:Static properties:Resources.ErrorMessageView_GitHubButton}"
-        ToolTip="{x:Static properties:Resources.ErrorMessageView_GitHubTooltip}" />
-      <Button
-        Grid.Column="1"
-        VerticalAlignment="Top"
-        Command="{Binding ReportEmailCommand}"
-        Content="{x:Static properties:Resources.ErrorMessageView_EmailButton}"
-        ToolTip="{x:Static properties:Resources.ErrorMessageView_EmailTooltip}" />
-      <StackPanel Grid.Column="2" Orientation="Vertical">
-        <Button
-          VerticalAlignment="Top"
-          Command="{Binding ClipboardCommand}"
-          Content="{x:Static properties:Resources.ErrorMessageView_ClipboardButton}"
-          ToolTip="{x:Static properties:Resources.ErrorMessageView_ClipboardTooltip}" />
-        <Button Content="{x:Static properties:Resources.Word_Close}" IsCancel="True" />
-      </StackPanel>
-    </Grid>
-  </DockPanel>
+  </Grid>
 </UserControl>

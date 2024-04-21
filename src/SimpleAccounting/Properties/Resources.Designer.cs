@@ -340,6 +340,18 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An internal error has occurred. The application must be terminated.
+        ///You can report error details with the development team on GitHub
+        ///or contact other experts by forwarding the detailed information via email or other channels (clipboard).
+        ///Error message: {0}.
+        /// </summary>
+        public static string ErrorMessageView_UnhandledException {
+            get {
+                return ResourceManager.GetString("ErrorMessageView_UnhandledException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Booking data files (*.csv)|*.csv.
         /// </summary>
         public static string FileFilter_ImportData {
@@ -516,6 +528,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Header_Shutdown {
             get {
                 return ResourceManager.GetString("Header_Shutdown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application will be terminated.
+        /// </summary>
+        public static string Header_Termination {
+            get {
+                return ResourceManager.GetString("Header_Termination", resourceCulture);
             }
         }
         

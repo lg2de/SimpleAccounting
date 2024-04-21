@@ -23,11 +23,15 @@ internal class ErrorMessageViewModel : Screen
         this.processApi = processApi;
     }
 
-    public string ErrorText { get; init; } = string.Empty;
+    public string Introduction { get; init; } = string.Empty;
+
+    public string ErrorMessage { get; init; } = string.Empty;
+
+    public string FullErrorText => this.Introduction + Environment.NewLine + this.ErrorMessage;
 
     public string CallStack { get; init; } = string.Empty;
 
-    public ICommand ReportGitGubCommand => new ActionCommand(this.OnReportToGitHub);
+    public ICommand ReportGitHubCommand => new ActionCommand(this.OnReportToGitHub);
 
     public ICommand ReportEmailCommand => new ActionCommand(this.OnSendByEmail);
 
@@ -55,7 +59,7 @@ internal class ErrorMessageViewModel : Screen
 
     private string CreateErrorReportText()
     {
-        var builder = new StringBuilder(this.ErrorText);
+        var builder = new StringBuilder(this.ErrorMessage);
         builder.AppendLine();
 
         if (!string.IsNullOrWhiteSpace(this.CallStack))

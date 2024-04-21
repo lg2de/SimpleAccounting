@@ -127,7 +127,6 @@ internal class ApplicationUpdate : IApplicationUpdate
             var queryTask = Task.Run(
                 async () =>
                 {
-                    throw new NotImplementedException("Das ist die Fehlermeldung");
                     var productInformation = new ProductHeaderValue(Defines.ProjectName);
                     var client = new GitHubClient(productInformation);
                     return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
@@ -139,7 +138,9 @@ internal class ApplicationUpdate : IApplicationUpdate
             var vm = new ErrorMessageViewModel(this.process)
             {
                 DisplayName = Resources.Header_CheckForUpdates,
-                ErrorText = $"{Resources.Update_QueryVersionsFailed}\n{exception.Message}"
+                Introduction = Resources.Update_QueryVersionsFailed,
+                ErrorMessage = exception.Message,
+                CallStack = exception.StackTrace ?? string.Empty
             };
             await this.windowManager.ShowDialogAsync(vm);
             return new List<Release>();

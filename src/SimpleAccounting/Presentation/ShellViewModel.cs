@@ -152,8 +152,9 @@ internal class ShellViewModel : Screen
 
         var vm = new ErrorMessageViewModel(this.processApi)
         {
-            DisplayName = Resources.Header_Shutdown,
-            ErrorText = exception.Message,
+            DisplayName = Resources.Header_Termination,
+            Introduction = Resources.ErrorMessageView_UnhandledException,
+            ErrorMessage = exception.Message,
             CallStack = exception.StackTrace ?? string.Empty
         };
         var task = this.windowManager.ShowDialogAsync(vm);
