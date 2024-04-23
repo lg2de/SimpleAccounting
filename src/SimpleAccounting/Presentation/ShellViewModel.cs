@@ -20,6 +20,9 @@ using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
 
+/// <summary>
+///     Implements the root view model of the application.
+/// </summary>
 internal class ShellViewModel : Screen
 {
     private readonly IApplicationUpdate applicationUpdate;

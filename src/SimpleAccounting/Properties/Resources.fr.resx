@@ -150,8 +150,8 @@ Voulez-vous enregistrer ?</value>
     <value>Créer une nouvelle entrée de journalisation</value>
   </data>
 	<data name="Header_CreateAccount" xml:space="preserve">
-    <value>Créer un compte</value>
-  </data>
+		<value>Créer un compte</value>
+	</data>
 	<data name="Header_EditAccount" xml:space="preserve">
     <value>Modifier le compte</value>
   </data>
@@ -595,53 +595,53 @@ Sans une telle configuration pour au moins un compte, cette fonction est désact
   <data name="Update_SkipVersion" xml:space="preserve">
     <value>Non, passez cette version!</value>
   </data>
-    <data name="Question_ExistingFileReservationX4" xml:space="preserve">
-		<value>Le projet
+  <data name="Question_ExistingFileReservationX4" xml:space="preserve">
+	<value>Le projet
 {1}
 semble avoir été ouvert par un autre utilisateur.
 Nom d'utilisateur: {1}
 Nom de l'ordinateur : {2}
 Ouvert depuis : {3}
 Voulez-vous quand même ouvrir le projet ? Une modification simultanée peut entraîner une perte de données.</value>
-	</data>
-    <data name="Header_ProjectChanged" xml:space="preserve">
-		<value>Modifications inattendues du projet</value>
-	</data>
-    <data name="Question_ProjectChanged" xml:space="preserve">
-		<value>Des modifications inattendues ont été détectées dans les fichiers du projet actuel par un autre processus ou une autre personne.
+  </data>
+  <data name="Header_ProjectChanged" xml:space="preserve">
+	<value>Modifications inattendues du projet</value>
+  </data>
+  <data name="Question_ProjectChanged" xml:space="preserve">
+	<value>Des modifications inattendues ont été détectées dans les fichiers du projet actuel par un autre processus ou une autre personne.
 Voulez-vous enregistrer les modifications actuelles sous un autre nom de projet ? Dans ce cas, appuyez sur "Oui".
 Voulez-vous annuler vos propres modifications ? Appuyez alors sur "Non".</value>
-	</data>
-    <data name="Word_Close" xml:space="preserve">
-		<value>Fermer</value>
-	</data>
-    <data name="ErrorMessageView_ClipboardButton" xml:space="preserve">
-		<value>Copier dans le presse-papiers</value>
-	</data>
-    <data name="ErrorMessageView_ClipboardTooltip" xml:space="preserve">
-		<value>Copie les détails de l'erreur dans le presse-papiers.</value>
-	</data>
-    <data name="ErrorMessageView_EmailButton" xml:space="preserve">
-		<value>Créer un courriel</value>
-	</data>
-    <data name="ErrorMessageView_EmailTooltip" xml:space="preserve">
-		<value>Ouvre votre programme de messagerie par défaut avec un nouvel e-mail contenant les détails de l'erreur.</value>
-	</data>
-    <data name="ErrorMessageView_GitHubButton" xml:space="preserve">
-		<value>Rapport sur GitHub</value>
-	</data>
-    <data name="ErrorMessageView_GitHubTooltip" xml:space="preserve">
-		<value>Ouvre votre navigateur par défaut pour ouvrir un nouveau problème.
+  </data>
+  <data name="Word_Close" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="ErrorMessageView_ClipboardButton" xml:space="preserve">
+    <value>Copier dans le presse-papiers</value>
+  </data>
+  <data name="ErrorMessageView_ClipboardTooltip" xml:space="preserve">
+    <value>Copie les détails de l'erreur dans le presse-papiers.</value>
+  </data>
+  <data name="ErrorMessageView_EmailButton" xml:space="preserve">
+    <value>Créer un courriel</value>
+  </data>
+  <data name="ErrorMessageView_EmailTooltip" xml:space="preserve">
+    <value>Ouvre votre programme de messagerie par défaut avec un nouvel e-mail contenant les détails de l'erreur.</value>
+  </data>
+  <data name="ErrorMessageView_GitHubButton" xml:space="preserve">
+    <value>Rapport sur GitHub</value>
+  </data>
+  <data name="ErrorMessageView_GitHubTooltip" xml:space="preserve">
+    <value>Ouvre votre navigateur par défaut pour ouvrir un nouveau problème.
 Vous devez disposer d'un compte GitHub pour créer de nouveaux problèmes.</value>
-	</data>
-    <data name="Header_Termination" xml:space="preserve">
-		<value>L'application se termine</value>
-	</data>
-    <data name="ShellViewModel_UnhandledException" xml:space="preserve">
-		<value>Une erreur interne est survenue. L'application doit être fermée.
+  </data>
+  <data name="Header_Termination" xml:space="preserve">
+    <value>L'application se termine</value>
+  </data>
+  <data name="ShellViewModel_UnhandledException" xml:space="preserve">
+    <value>Une erreur interne est survenue. L'application doit être fermée.
 Vous pouvez signaler les détails de l'erreur à l'équipe de développement sur GitHub
 ou
  vous adresser à d'autres professionnels en transmettant les informations détaillées par e-mail ou par d'autres canaux (presse-papiers).
 Texte d'erreur:</value>
-	</data>
+  </data>
 </root>

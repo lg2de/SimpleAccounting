@@ -14,6 +14,9 @@ using lg2de.SimpleAccounting.Infrastructure;
 using Microsoft.Xaml.Behaviors.Core;
 using Screen = Caliburn.Micro.Screen;
 
+/// <summary>
+///     Implements the view model to visualize an application error.
+/// </summary>
 internal class ErrorMessageViewModel : Screen
 {
     private readonly IProcess processApi;

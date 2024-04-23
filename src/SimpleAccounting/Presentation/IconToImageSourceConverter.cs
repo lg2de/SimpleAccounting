@@ -14,7 +14,12 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-// https://stackoverflow.com/a/29757845/3621055
+/// <summary>
+///     Implements the converter to create WPF image from standard Windows icon. 
+/// </summary>
+/// <remarks>
+///     Implemented based on https://stackoverflow.com/a/29757845/3621055
+/// </remarks>
 public class IconToImageSourceConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
