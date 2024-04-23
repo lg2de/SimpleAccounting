@@ -631,10 +631,10 @@ Sie benötigen einen GitHub-Zugang zum Erstellen eines Fehlers.</value>
   <data name="Header_Termination" xml:space="preserve">
     <value>Programm wird beendet</value>
   </data>
-  <data name="ErrorMessageView_UnhandledException" xml:space="preserve">
+  <data name="ShellViewModel_UnhandledException" xml:space="preserve">
     <value>Ein interner Fehler ist aufgetreten. Die Anwendung muss beendet werden.
 Sie können Fehlerdetails mit dem Entwicklerteam bei GitHub melden
 oder sich an andere Fachleute werden, indem Sie die Detailinformationen per Mail oder anderen Kanälen (Zwischenablage) weiterleiten.
-Fehlertext: {0}</value>
+Fehlertext:</value>
   </data>
 </root>

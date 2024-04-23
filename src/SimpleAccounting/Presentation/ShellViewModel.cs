@@ -134,10 +134,10 @@ internal class ShellViewModel : Screen
         await base.OnInitializeAsync(cancellationToken);
 
         AppDomain.CurrentDomain.UnhandledException +=
-            (_, args) => this.HandleException((Exception)args.ExceptionObject);
+            (_, args) => this.OnUnhandledException((Exception)args.ExceptionObject);
         if (Application.Current != null)
         {
-            Application.Current.DispatcherUnhandledException += (_, args) => this.HandleException(args.Exception);
+            Application.Current.DispatcherUnhandledException += (_, args) => this.OnUnhandledException(args.Exception);
         }
 
         this.UpdateDisplayName();
@@ -146,19 +146,27 @@ internal class ShellViewModel : Screen
     [SuppressMessage(
         "Blocker Code Smell", "S4462:Calls to \"async\" methods should not be blocking",
         Justification = "We need to block the UI to show the exception before the application is closing.")]
-    private void HandleException(Exception exception)
+    [SuppressMessage(
+        "Blocker Code Smell", "S1147:Exit methods should not be called",
+        Justification = "This is the final handler for unhandled exceptions.")]
+    private void OnUnhandledException(Exception exception)
     {
+        // run crash save, which is the synchronous version of the cyclic auto save
         this.ProjectData.CrashSave();
 
+        // inform the user
         var vm = new ErrorMessageViewModel(this.processApi)
         {
             DisplayName = Resources.Header_Termination,
-            Introduction = Resources.ErrorMessageView_UnhandledException,
+            Introduction = Resources.ShellViewModel_UnhandledException,
             ErrorMessage = exception.Message,
             CallStack = exception.StackTrace ?? string.Empty
         };
         var task = this.windowManager.ShowDialogAsync(vm);
         task.Wait();
+
+        // exit after unrecoverable error
+        Environment.Exit(1);
     }
 
     protected override async Task OnActivateAsync(CancellationToken cancellationToken)

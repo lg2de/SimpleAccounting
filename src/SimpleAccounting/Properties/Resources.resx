@@ -646,10 +646,10 @@ You need a GitHub account to create new issues.</value>
   <data name="Header_Termination" xml:space="preserve">
     <value>Application will be terminated</value>
   </data>
-  <data name="ErrorMessageView_UnhandledException" xml:space="preserve">
+  <data name="ShellViewModel_UnhandledException" xml:space="preserve">
     <value>An internal error has occurred. The application must be terminated.
 You can report error details with the development team on GitHub
 or contact other experts by forwarding the detailed information via email or other channels (clipboard).
-Error message: {0}</value>
+Error message:</value>
   </data>
 </root>

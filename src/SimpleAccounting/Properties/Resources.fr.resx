@@ -637,11 +637,11 @@ Vous devez disposer d'un compte GitHub pour créer de nouveaux problèmes.</valu
     <data name="Header_Termination" xml:space="preserve">
 		<value>L'application se termine</value>
 	</data>
-    <data name="ErrorMessageView_UnhandledException" xml:space="preserve">
+    <data name="ShellViewModel_UnhandledException" xml:space="preserve">
 		<value>Une erreur interne est survenue. L'application doit être fermée.
 Vous pouvez signaler les détails de l'erreur à l'équipe de développement sur GitHub
 ou
  vous adresser à d'autres professionnels en transmettant les informations détaillées par e-mail ou par d'autres canaux (presse-papiers).
-Texte d'erreur: {0}</value>
+Texte d'erreur:</value>
 	</data>
 </root>
