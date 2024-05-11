@@ -143,7 +143,7 @@ public partial class ShellViewModelTests
             new ShellViewModel(
                 projectData, busy,
                 new MenuViewModel(projectData, busy, null!, clock, null!, null!), new FullJournalViewModel(projectData),
-                new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate, null!, null!);
+                new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate, null!, null!, null!);
         dialogs.ShowMessageBox(
                 Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
@@ -464,7 +464,7 @@ public partial class ShellViewModelTests
                 busy,
                 new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData),
-                new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate, null!, null!);
+                new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate, null!, null!, null!);
         return sut;
     }
 
@@ -486,7 +486,7 @@ public partial class ShellViewModelTests
                 projectData, busy,
                 new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                accountsViewModel, applicationUpdate, null!, null!);
+                accountsViewModel, applicationUpdate, null!, null!, null!);
         return sut;
     }
 
@@ -508,7 +508,7 @@ public partial class ShellViewModelTests
                 projectData, busy,
                 new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                accountsViewModel, applicationUpdate, null!, null!);
+                accountsViewModel, applicationUpdate, null!, null!, null!);
         return sut;
     }
 
@@ -530,7 +530,7 @@ public partial class ShellViewModelTests
                 projectData, busy,
                 new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                accountsViewModel, applicationUpdate, null!, null!);
+                accountsViewModel, applicationUpdate, null!, null!, null!);
         return sut;
     }
 
@@ -552,7 +552,7 @@ public partial class ShellViewModelTests
                 projectData, busy,
                 new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                accountsViewModel, applicationUpdate, null!, null!);
+                accountsViewModel, applicationUpdate, null!, null!, null!);
         return sut;
     }
 
@@ -574,7 +574,7 @@ public partial class ShellViewModelTests
                 projectData, busy,
                 new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
-                accountsViewModel, applicationUpdate, null!, null!);
+                accountsViewModel, applicationUpdate, null!, null!, null!);
         return sut;
     }
 }

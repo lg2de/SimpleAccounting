@@ -35,7 +35,7 @@ public class ApplicationUpdateTests
         var processApi = Substitute.For<IProcess>();
         processApi.Start(Arg.Any<ProcessStartInfo>())
             .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c exit 5") { RedirectStandardError = true }));
-        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi)
+        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi, null!)
         {
             WaitTimeMilliseconds = 1000
         };
@@ -74,7 +74,7 @@ public class ApplicationUpdateTests
             + "<Release FileName=\"def.zip\"><EnglishDescription>bar</EnglishDescription></Release>"
             + "</ReleaseData>");
         var processApi = Substitute.For<IProcess>();
-        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi);
+        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi, null!);
         var releases = GithubReleaseExtensionTests.CreateRelease("2.1", "abc.zip", "def.zip");
 
         var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
@@ -98,7 +98,7 @@ public class ApplicationUpdateTests
         var fileSystem = Substitute.For<IFileSystem>();
         var httpClient = Substitute.For<IHttpClient>();
         var processApi = Substitute.For<IProcess>();
-        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi);
+        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi, null!);
         var releases = GithubReleaseExtensionTests.CreateRelease("2.0");
 
         var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
@@ -125,7 +125,7 @@ public class ApplicationUpdateTests
         var httpClient = Substitute.For<IHttpClient>();
         httpClient.GetStringAsync(Arg.Any<Uri>()).Returns("<ReleaseData />");
         var processApi = Substitute.For<IProcess>();
-        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi);
+        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi, null!);
         var releases = GithubReleaseExtensionTests.CreateRelease("2.1");
         dialogs.ShowMessageBox(
                 Arg.Any<string>(),
@@ -162,7 +162,7 @@ public class ApplicationUpdateTests
         var processApi = Substitute.For<IProcess>();
         processApi.Start(Arg.Any<ProcessStartInfo>())
             .Returns(Process.Start(new ProcessStartInfo("cmd.exe", "/c ping 127.0.0.1")));
-        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi)
+        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi, null!)
         {
             WaitTimeMilliseconds = 0
         };

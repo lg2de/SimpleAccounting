@@ -33,6 +33,7 @@ internal class ShellDesignViewModel : ShellViewModel
             new MenuViewModel(DesignProject, null!, null!, Clock, null!, null!),
             new FullJournalViewModel(DesignProject),
             new AccountJournalViewModel(DesignProject), new AccountsViewModel(null!, DesignProject), null!, null!,
+            null!,
             null!)
     {
         var menuItem = new MenuItemViewModel("c:\\Test.acml", null!);

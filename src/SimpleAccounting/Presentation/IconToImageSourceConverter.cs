@@ -6,6 +6,7 @@ namespace lg2de.SimpleAccounting.Presentation;
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Windows;
@@ -20,6 +21,7 @@ using System.Windows.Media.Imaging;
 /// <remarks>
 ///     Implemented based on https://stackoverflow.com/a/29757845/3621055
 /// </remarks>
+[ExcludeFromCodeCoverage(Justification = "Cannot be tested.")]
 public class IconToImageSourceConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

@@ -265,7 +265,7 @@ public class ImportBookingsViewModelTests
         var parent = new ShellViewModel(
             projectData, busy,
             new MenuViewModel(projectData, busy, null!, clock, null!, null!), new FullJournalViewModel(projectData),
-            new AccountJournalViewModel(projectData), accountsViewModel, null!, null!, null!);
+            new AccountJournalViewModel(projectData), accountsViewModel, null!, null!, null!, null!);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
         var sut = new ImportBookingsViewModel(

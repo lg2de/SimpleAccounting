@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
     Justification = "This is test code only.")]
 internal class ErrorMessageDesignViewModel : ErrorMessageViewModel
 {
-    public ErrorMessageDesignViewModel() : base(null!)
+    public ErrorMessageDesignViewModel() : base(null!, null!)
     {
         this.Introduction =
             "This is the sample error text"

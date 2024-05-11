@@ -45,6 +45,7 @@ public class AppBootstrapper : BootstrapperBase
             .Singleton<IProcess, DotNetProcess>();
         this.container.PerRequest<IHttpClient, DotNetHttpClient>();
         this.container.Singleton<IClock, SystemClock>();
+        this.container.Singleton<IClipboard, WindowsClipboard>();
         this.container.PerRequest<ShellViewModel>();
     }
 

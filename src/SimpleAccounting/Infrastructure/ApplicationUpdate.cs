@@ -31,22 +31,24 @@ using Octokit;
 internal class ApplicationUpdate : IApplicationUpdate
 {
     private readonly IDialogs dialogs;
+    private readonly IWindowManager windowManager;
     private readonly IFileSystem fileSystem;
     private readonly IHttpClient httpClient;
     private readonly IProcess process;
-    private readonly IWindowManager windowManager;
+    private readonly IClipboard clipboard;
 
     private Release? newRelease;
 
     public ApplicationUpdate(
         IDialogs dialogs, IWindowManager windowManager, IFileSystem fileSystem, IHttpClient httpClient,
-        IProcess process)
+        IProcess process, IClipboard clipboard)
     {
         this.dialogs = dialogs;
         this.windowManager = windowManager;
         this.fileSystem = fileSystem;
         this.httpClient = httpClient;
         this.process = process;
+        this.clipboard = clipboard;
     }
 
     internal int WaitTimeMilliseconds { get; set; } = 5000;
@@ -135,7 +137,7 @@ internal class ApplicationUpdate : IApplicationUpdate
         }
         catch (Exception exception)
         {
-            var vm = new ErrorMessageViewModel(this.process)
+            var vm = new ErrorMessageViewModel(this.process, this.clipboard)
             {
                 DisplayName = Resources.Header_CheckForUpdates,
                 Introduction = Resources.Update_QueryVersionsFailed,

@@ -28,6 +28,7 @@ internal class ShellViewModel : Screen
     private readonly IApplicationUpdate applicationUpdate;
     private readonly IWindowManager windowManager;
     private readonly IProcess processApi;
+    private readonly IClipboard clipboard;
     private readonly string version;
 
     private readonly bool helpSimulateUpdateVisible =
@@ -47,7 +48,8 @@ internal class ShellViewModel : Screen
         IAccountsViewModel accounts,
         IApplicationUpdate applicationUpdate,
         IWindowManager windowManager,
-        IProcess processApi)
+        IProcess processApi,
+        IClipboard clipboard)
     {
         this.ProjectData = projectData;
         this.Busy = busy;
@@ -58,6 +60,7 @@ internal class ShellViewModel : Screen
         this.applicationUpdate = applicationUpdate;
         this.windowManager = windowManager;
         this.processApi = processApi;
+        this.clipboard = clipboard;
 
         this.version = this.GetType().GetInformationalVersion();
 
@@ -152,13 +155,14 @@ internal class ShellViewModel : Screen
     [SuppressMessage(
         "Blocker Code Smell", "S1147:Exit methods should not be called",
         Justification = "This is the final handler for unhandled exceptions.")]
+    [ExcludeFromCodeCoverage(Justification = "Cannot be tested")]
     private void OnUnhandledException(Exception exception)
     {
         // run crash save, which is the synchronous version of the cyclic auto save
         this.ProjectData.CrashSave();
 
         // inform the user
-        var vm = new ErrorMessageViewModel(this.processApi)
+        var vm = new ErrorMessageViewModel(this.processApi, this.clipboard)
         {
             DisplayName = Resources.Header_Termination,
             Introduction = Resources.ShellViewModel_UnhandledException,

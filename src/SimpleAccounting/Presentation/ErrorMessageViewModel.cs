@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.Presentation;
 
 using System;
 using System.Text;
-using System.Windows;
 using System.Windows.Input;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
@@ -20,10 +19,12 @@ using Screen = Caliburn.Micro.Screen;
 internal class ErrorMessageViewModel : Screen
 {
     private readonly IProcess processApi;
+    private readonly IClipboard clipboard;
 
-    public ErrorMessageViewModel(IProcess processApi)
+    public ErrorMessageViewModel(IProcess processApi, IClipboard clipboard)
     {
         this.processApi = processApi;
+        this.clipboard = clipboard;
     }
 
     public string Introduction { get; init; } = string.Empty;
@@ -57,7 +58,7 @@ internal class ErrorMessageViewModel : Screen
     private void OnCopyToClipboard()
     {
         string errorReportText = this.CreateErrorReportText();
-        Clipboard.SetText(errorReportText);
+        this.clipboard.SetText(errorReportText);
     }
 
     private string CreateErrorReportText()

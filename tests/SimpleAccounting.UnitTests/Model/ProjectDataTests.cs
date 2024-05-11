@@ -735,4 +735,39 @@ public class ProjectDataTests
         invokedViewModel.Should().BeEquivalentTo(
             new { TextOption = new { Option = OpeningTextOption.AccountName }, RemoteAccount = new { ID = 99999 } });
     }
+
+    [Fact]
+    public void CrashSave_Unmodified_NothingSaved()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+        sut.LoadData(Samples.SampleProject);
+
+        sut.CrashSave();
+
+        fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public void CrashSave_Modified_NothingSaved()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+        sut.LoadData(Samples.SampleProject);
+        sut.IsModified = true;
+
+        sut.CrashSave();
+
+        fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+    }
 }
