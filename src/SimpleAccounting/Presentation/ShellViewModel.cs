@@ -189,7 +189,7 @@ internal class ShellViewModel : Screen
         {
             // We move execution into thread pool thread.
             // In case there is an auto-save file, the dialog should be shown on top of main window.
-            // Therefore OnActivate needs to completed.
+            // Therefore, OnActivate needs to complete first.
             this.LoadingTask = Task.Run(
                 async () =>
                 {

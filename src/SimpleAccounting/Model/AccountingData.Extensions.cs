@@ -345,7 +345,7 @@ public partial class AccountDefinition
 }
 
 /// <summary>
-///     Implements a single pattern of an account definition for semi automatic import.
+///     Implements a single pattern of an account definition for semi-automatic import.
 /// </summary>
 public partial class AccountDefinitionImportMappingPattern
 {

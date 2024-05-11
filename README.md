@@ -38,7 +38,7 @@ The software focuses on journal and balance sheet reporting.
 * Support for split booking entries, either on credit or debit side
 * Import of booking entries from your bank account using CSV files incl. semi-automatic assignment of offsetting accounts
 * Printable reports for full journal, account journal, accounts and balances, and annual financial statements
-* Semi automatic update of the application
+* Semi-automatic update of the application
 
 Some screenshots for first impression:
 
@@ -93,7 +93,8 @@ I do not like closed source reuse of my software.
 This is why I decided to license the software under GPLV3.
 
 The application uses several external packages licensed under [MIT](https://opensource.org/licenses/MIT).
-Additionally the package [CsvHelper](https://github.com/JoshClose/CsvHelper) is licensed from Josh Close under [MS-PL](https://opensource.org/licenses/MS-PL).
+Additionally, the package [CsvHelper](https://github.com/JoshClose/CsvHelper) is licensed from Josh Close
+under [MS-PL](https://opensource.org/licenses/MS-PL).
 
 For the unit tests additional packages are used licensed under
 [Apache 2.0](https://licenses.nuget.org/Apache-2.0),
