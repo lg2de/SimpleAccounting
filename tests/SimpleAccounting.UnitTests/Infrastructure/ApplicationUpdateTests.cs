@@ -40,7 +40,7 @@ public class ApplicationUpdateTests
             WaitTimeMilliseconds = 1000
         };
         var releases = GithubReleaseExtensionTests.CreateRelease("2.1", "package-name.zip");
-        await sut.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture);
+        await sut.AskForUpdateAsync(userInvoked: false, releases, "2.0", CultureInfo.InvariantCulture);
 
         sut.StartUpdateProcess("package-name.zip", dryRun: false).Should().BeFalse();
         dialogs.Received(1).ShowMessageBox(
@@ -77,7 +77,8 @@ public class ApplicationUpdateTests
         var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi, null!);
         var releases = GithubReleaseExtensionTests.CreateRelease("2.1", "abc.zip", "def.zip");
 
-        var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
+        var result = await sut.Awaiting(
+                x => x.AskForUpdateAsync(userInvoked: false, releases, "2.0", CultureInfo.InvariantCulture))
             .Should().CompleteWithinAsync(10.Seconds());
 
         option.Text.Should().Be(expectedDescription);
@@ -91,7 +92,7 @@ public class ApplicationUpdateTests
     }
 
     [Fact]
-    public async Task AskForUpdateAsync_NoNewVersion_AppIsUpToDate()
+    public async Task AskForUpdateAsync_NoNewVersionInteractive_AppIsUpToDate()
     {
         var dialogs = Substitute.For<IDialogs>();
         var windowsManager = Substitute.For<IWindowManager>();
@@ -101,10 +102,38 @@ public class ApplicationUpdateTests
         var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi, null!);
         var releases = GithubReleaseExtensionTests.CreateRelease("2.0");
 
-        var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
+        var result = await sut.Awaiting(
+                x => x.AskForUpdateAsync(userInvoked: true, releases, "2.0", CultureInfo.InvariantCulture))
             .Should().CompleteWithinAsync(10.Seconds());
         result.Subject.Should().BeEmpty();
         dialogs.Received(1).ShowMessageBox(
+            Arg.Any<string>(),
+            Arg.Any<string>(),
+            MessageBoxButton.OK, Arg.Any<MessageBoxImage>(),
+            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+        dialogs.DidNotReceive().ShowMessageBox(
+            Arg.Any<string>(),
+            Arg.Any<string>(),
+            MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
+            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+    }
+
+    [Fact]
+    public async Task AskForUpdateAsync_NoNewVersionBackground_AppIsUpToDate()
+    {
+        var dialogs = Substitute.For<IDialogs>();
+        var windowsManager = Substitute.For<IWindowManager>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var httpClient = Substitute.For<IHttpClient>();
+        var processApi = Substitute.For<IProcess>();
+        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi, null!);
+        var releases = GithubReleaseExtensionTests.CreateRelease("2.0");
+
+        var result = await sut.Awaiting(
+                x => x.AskForUpdateAsync(userInvoked: false, releases, "2.0", CultureInfo.InvariantCulture))
+            .Should().CompleteWithinAsync(10.Seconds());
+        result.Subject.Should().BeEmpty();
+        dialogs.DidNotReceive().ShowMessageBox(
             Arg.Any<string>(),
             Arg.Any<string>(),
             MessageBoxButton.OK, Arg.Any<MessageBoxImage>(),
@@ -134,7 +163,8 @@ public class ApplicationUpdateTests
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.No);
 
-        var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
+        var result = await sut.Awaiting(
+                x => x.AskForUpdateAsync(userInvoked: false, releases, "2.0", CultureInfo.InvariantCulture))
             .Should().CompleteWithinAsync(10.Seconds());
 
         result.Subject.Should().BeEmpty();
@@ -173,7 +203,8 @@ public class ApplicationUpdateTests
                 MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.Yes);
-        var result = await sut.Awaiting(x => x.AskForUpdateAsync(releases, "2.0", CultureInfo.InvariantCulture))
+        var result = await sut.Awaiting(
+                x => x.AskForUpdateAsync(userInvoked: false, releases, "2.0", CultureInfo.InvariantCulture))
             .Should().CompleteWithinAsync(10.Seconds());
         result.Subject.Should().Be("package-name.zip");
 

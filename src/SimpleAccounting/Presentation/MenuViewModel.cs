@@ -249,7 +249,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
 
         // refresh menu and select the new year
         this.UpdateBookingYears();
-        this.BookingYears[^1].Command.Execute(null);
+        await this.BookingYears[^1].Command.ExecuteAsync(null);
     }
 
     private void OnTotalJournalReport()

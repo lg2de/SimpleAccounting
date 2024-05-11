@@ -758,7 +758,8 @@ public partial class ShellViewModelTests
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.No);
         sut.ProjectData.IsModified = true;
-        applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("package-name.zip");
+        applicationUpdate.GetUpdatePackageAsync(userInvoked: true, Arg.Any<string>(), Arg.Any<CultureInfo>())
+            .Returns("package-name.zip");
         applicationUpdate.StartUpdateProcess("package-name.zip", dryRun: false).Returns(true);
         var monitor = sut.Monitor();
 
@@ -773,7 +774,8 @@ public partial class ShellViewModelTests
     public async Task HelpCheckForUpdateCommand_NoUpdateAvailable_UpdateProcessNotStarted()
     {
         var sut = CreateSut(out IApplicationUpdate applicationUpdate, out _);
-        applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("false");
+        applicationUpdate.GetUpdatePackageAsync(userInvoked: false, Arg.Any<string>(), Arg.Any<CultureInfo>())
+            .Returns("false");
 
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()
             .CompleteWithinAsync(1.Seconds());
@@ -785,7 +787,8 @@ public partial class ShellViewModelTests
     public async Task HelpCheckForUpdateCommand_UserDoesNotWantToSave_UpdateProcessNotStarted()
     {
         var sut = CreateSut(out IApplicationUpdate applicationUpdate, out _);
-        applicationUpdate.GetUpdatePackageAsync(Arg.Any<string>(), Arg.Any<CultureInfo>()).Returns("true");
+        applicationUpdate.GetUpdatePackageAsync(userInvoked: false, Arg.Any<string>(), Arg.Any<CultureInfo>())
+            .Returns("true");
         sut.ProjectData.IsModified = true;
 
         await sut.Awaiting(x => x.HelpCheckForUpdateCommand.ExecuteAsync(null)).Should()

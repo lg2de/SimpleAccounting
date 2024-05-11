@@ -34,7 +34,8 @@ internal class ShellDesignViewModel : ShellViewModel
             new FullJournalViewModel(DesignProject),
             new AccountJournalViewModel(DesignProject), new AccountsViewModel(null!, DesignProject), null!, null!,
             null!,
-            null!)
+            null!,
+            new SystemClock())
     {
         var menuItem = new MenuItemViewModel("c:\\Test.acml", null!);
         this.Menu.RecentProjects.Add(menuItem);
