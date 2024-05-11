@@ -254,7 +254,7 @@ internal class ImportBookingsViewModel : Screen
                 this.LoadedData.Add(item);
             }
 
-            if (!this.LoadedData.Any())
+            if (this.LoadedData.Count == 0)
             {
                 this.dialogs.ShowMessageBox(
                     string.Format(

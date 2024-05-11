@@ -88,9 +88,9 @@ internal partial class NumberTextBox : TextBox
         // Build resulting text from current text, current selection and new text.
         // Accept the new input only if result matches the number expression.
         var newText =
-            this.Text.Substring(0, this.SelectionStart)
+            this.Text[..this.SelectionStart]
             + e.Text
-            + this.Text.Substring(this.SelectionStart + this.SelectionLength);
+            + this.Text[(this.SelectionStart + this.SelectionLength)..];
         var isValid = this.numberExpression!.IsMatch(newText);
         e.Handled = !isValid;
     }
@@ -103,7 +103,7 @@ internal partial class NumberTextBox : TextBox
             return;
         }
 
-        var text = (string)e.DataObject.GetData(typeof(string));
+        var text = (string?)e.DataObject.GetData(typeof(string));
         if (text == null || !this.numberExpression!.IsMatch(text))
         {
             e.CancelCommand();

@@ -20,7 +20,7 @@ using lg2de.SimpleAccounting.Properties;
 /// </summary>
 internal class AccountsViewModel : Screen, IAccountsViewModel
 {
-    private readonly IList<AccountViewModel> allAccounts = new List<AccountViewModel>();
+    private readonly List<AccountViewModel> allAccounts = [];
     private readonly IProjectData projectData;
     private readonly IWindowManager windowManager;
 
@@ -162,7 +162,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             DisplayName = Resources.Header_CreateAccount,
             Group = accountGroup,
             Groups = this.projectData.Storage.Accounts,
-            IsValidIdentifierFunc = id => this.allAccounts.All(a => a.Identifier != id)
+            IsValidIdentifierFunc = id => this.allAccounts.TrueForAll(a => a.Identifier != id)
         };
         this.UpdateImportCandidateAccounts(accountVm);
 

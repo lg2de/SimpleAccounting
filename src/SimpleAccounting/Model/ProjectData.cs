@@ -95,7 +95,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
 
     public string ReservationFileName => Defines.GetReservationFileName(this.FileName);
 
-    public ulong MaxBookIdent => !this.CurrentYear.Booking.Any() ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
+    public ulong MaxBookIdent => this.CurrentYear.Booking.Count == 0 ? 0 : this.CurrentYear.Booking.Max(b => b.ID);
 
     public event EventHandler DataLoaded = (_, _) => { };
 
