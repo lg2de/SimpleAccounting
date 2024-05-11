@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 /// </summary>
 internal interface IApplicationUpdate
 {
-    Task<string> GetUpdatePackageAsync(string currentVersion, CultureInfo cultureInfo);
+    Task<string> GetUpdatePackageAsync(bool userInvoked, string currentVersion, CultureInfo cultureInfo);
 
     bool StartUpdateProcess(string packageName, bool dryRun);
 }

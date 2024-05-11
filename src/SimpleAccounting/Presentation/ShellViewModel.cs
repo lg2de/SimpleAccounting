@@ -29,6 +29,7 @@ internal class ShellViewModel : Screen
     private readonly IWindowManager windowManager;
     private readonly IProcess processApi;
     private readonly IClipboard clipboard;
+    private readonly IClock clock;
     private readonly string version;
 
     private readonly bool helpSimulateUpdateVisible =
@@ -49,7 +50,8 @@ internal class ShellViewModel : Screen
         IApplicationUpdate applicationUpdate,
         IWindowManager windowManager,
         IProcess processApi,
-        IClipboard clipboard)
+        IClipboard clipboard,
+        IClock clock)
     {
         this.ProjectData = projectData;
         this.Busy = busy;
@@ -61,6 +63,7 @@ internal class ShellViewModel : Screen
         this.windowManager = windowManager;
         this.processApi = processApi;
         this.clipboard = clipboard;
+        this.clock = clock;
 
         this.version = this.GetType().GetInformationalVersion();
 
@@ -111,7 +114,8 @@ internal class ShellViewModel : Screen
 
     public ICommand CloseApplicationCommand => new AsyncCommand(() => this.TryCloseAsync());
 
-    public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(this.Busy, this.OnCheckForUpdateAsync);
+    public IAsyncCommand HelpCheckForUpdateCommand => new AsyncCommand(
+        this.Busy, () => this.OnCheckForUpdateAsync(userInvoked: true));
 
     [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
     public IAsyncCommand HelpSimulateUpdate => new AsyncCommand(this.Busy, this.SimulateUpdateAsync);
@@ -196,6 +200,7 @@ internal class ShellViewModel : Screen
                             this.Busy.IsBusy = true;
                             await this.ProjectData.LoadFromFileAsync(this.ProjectData.Settings.RecentProject);
                             this.Menu.BuildRecentProjectsMenu();
+                            await this.CheckForUpdateAfterStartAsync();
                             this.Busy.IsBusy = false;
                         });
                 },
@@ -204,6 +209,7 @@ internal class ShellViewModel : Screen
         else
         {
             this.Menu.BuildRecentProjectsMenu();
+            await this.CheckForUpdateAfterStartAsync();
         }
     }
 
@@ -218,10 +224,20 @@ internal class ShellViewModel : Screen
         await base.OnDeactivateAsync(close, cancellationToken);
     }
 
-    private async Task OnCheckForUpdateAsync()
+    private async Task CheckForUpdateAfterStartAsync()
+    {
+        var lastCheckTimeout = this.clock.Now() - this.ProjectData.Settings.LastUpdateCheck;
+        if (lastCheckTimeout > TimeSpan.FromDays(1))
+        {
+            await this.OnCheckForUpdateAsync(userInvoked: false);
+            this.ProjectData.Settings.LastUpdateCheck = this.clock.Now();
+        }
+    }
+
+    private async Task OnCheckForUpdateAsync(bool userInvoked)
     {
         string packageName =
-            await this.applicationUpdate.GetUpdatePackageAsync(this.version, CultureInfo.CurrentUICulture);
+            await this.applicationUpdate.GetUpdatePackageAsync(userInvoked, this.version, CultureInfo.CurrentUICulture);
         if (string.IsNullOrWhiteSpace(packageName))
         {
             return;

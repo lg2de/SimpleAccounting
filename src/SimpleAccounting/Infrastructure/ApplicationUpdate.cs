@@ -53,10 +53,12 @@ internal class ApplicationUpdate : IApplicationUpdate
 
     internal int WaitTimeMilliseconds { get; set; } = 5000;
 
-    public async Task<string> GetUpdatePackageAsync(string currentVersion, CultureInfo cultureInfo)
+    public async Task<string> GetUpdatePackageAsync(bool userInvoked, string currentVersion, CultureInfo cultureInfo)
     {
         IReadOnlyList<Release> releases = await this.GetAllReleasesAsync();
-        return releases.Any() ? await this.AskForUpdateAsync(releases, currentVersion, cultureInfo) : string.Empty;
+        return releases.Any()
+            ? await this.AskForUpdateAsync(userInvoked, releases, currentVersion, cultureInfo)
+            : string.Empty;
     }
 
     public bool StartUpdateProcess(string packageName, bool dryRun)
@@ -151,13 +153,17 @@ internal class ApplicationUpdate : IApplicationUpdate
 
     [SuppressMessage("Minor Code Smell", "S1075:URIs should not be hardcoded", Justification = "Checked.")]
     internal async Task<string> AskForUpdateAsync(
-        IEnumerable<Release> releases, string currentVersion, CultureInfo cultureInfo)
+        bool userInvoked, IEnumerable<Release> releases, string currentVersion, CultureInfo cultureInfo)
     {
         this.newRelease = releases.GetNewRelease(currentVersion);
         string caption = Resources.Header_CheckForUpdates;
         if (this.newRelease == null)
         {
-            this.dialogs.ShowMessageBox(Resources.Update_UpToDate, caption);
+            if (userInvoked)
+            {
+                this.dialogs.ShowMessageBox(Resources.Update_UpToDate, caption);
+            }
+
             return string.Empty;
         }
 
