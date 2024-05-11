@@ -44,6 +44,13 @@ public class DesignViewModelTests
     }
 
     [Fact]
+    public void ErrorMessageDesignViewModel_ConstructorSucceed()
+    {
+        Action action = () => new ErrorMessageDesignViewModel();
+        action.Should().NotThrow();
+    }
+
+    [Fact]
     public void ImportBookingsDesignViewModel_ConstructorSucceed()
     {
         Action action = () => new ImportBookingsDesignViewModel();

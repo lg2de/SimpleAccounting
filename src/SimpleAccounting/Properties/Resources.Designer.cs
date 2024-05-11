@@ -285,6 +285,61 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy to clipboard.
+        /// </summary>
+        public static string ErrorMessageView_ClipboardButton {
+            get {
+                return ResourceManager.GetString("ErrorMessageView_ClipboardButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copies error details to the clipboard..
+        /// </summary>
+        public static string ErrorMessageView_ClipboardTooltip {
+            get {
+                return ResourceManager.GetString("ErrorMessageView_ClipboardTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create an email.
+        /// </summary>
+        public static string ErrorMessageView_EmailButton {
+            get {
+                return ResourceManager.GetString("ErrorMessageView_EmailButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens your default email program with a new email prepared with error details..
+        /// </summary>
+        public static string ErrorMessageView_EmailTooltip {
+            get {
+                return ResourceManager.GetString("ErrorMessageView_EmailTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report at GitHub.
+        /// </summary>
+        public static string ErrorMessageView_GitHubButton {
+            get {
+                return ResourceManager.GetString("ErrorMessageView_GitHubButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opens you defaul browser to open a new issue.
+        ///You need a GitHub account to create new issues..
+        /// </summary>
+        public static string ErrorMessageView_GitHubTooltip {
+            get {
+                return ResourceManager.GetString("ErrorMessageView_GitHubTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Booking data files (*.csv)|*.csv.
         /// </summary>
         public static string FileFilter_ImportData {
@@ -461,6 +516,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Header_Shutdown {
             get {
                 return ResourceManager.GetString("Header_Shutdown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application will be terminated.
+        /// </summary>
+        public static string Header_Termination {
+            get {
+                return ResourceManager.GetString("Header_Termination", resourceCulture);
             }
         }
         
@@ -974,6 +1038,18 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An internal error has occurred. The application must be terminated.
+        ///You can report error details with the development team on GitHub
+        ///or contact other experts by forwarding the detailed information via email or other channels (clipboard).
+        ///Error message:.
+        /// </summary>
+        public static string ShellViewModel_UnhandledException {
+            get {
+                return ResourceManager.GetString("ShellViewModel_UnhandledException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All entries with assigned remote account will be booked..
         /// </summary>
         public static string Tooltip_BookPartially {
@@ -1143,6 +1219,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_CarriedForwardAccount {
             get {
                 return ResourceManager.GetString("Word_CarriedForwardAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        public static string Word_Close {
+            get {
+                return ResourceManager.GetString("Word_Close", resourceCulture);
             }
         }
         

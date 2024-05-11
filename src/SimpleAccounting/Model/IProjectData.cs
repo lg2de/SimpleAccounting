@@ -49,6 +49,8 @@ internal interface IProjectData
 
     Task<bool> SaveProjectAsync();
 
+    void CrashSave();
+
     Task<bool> TryCloseAsync();
 
     Task EditProjectOptionsAsync();

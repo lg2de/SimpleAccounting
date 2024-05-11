@@ -25,7 +25,7 @@ public class ApplicationUpdateTests
         var fileSystem = Substitute.For<IFileSystem>();
         var httpClient = Substitute.For<IHttpClient>();
         var processApi = Substitute.For<IProcess>();
-        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi);
+        var sut = new ApplicationUpdate(dialogs, windowsManager, fileSystem, httpClient, processApi, null!);
 
         var task = sut.GetAllReleasesAsync();
         (await this.Awaiting(_ => task).Should().CompleteWithinAsync(10.Seconds()))

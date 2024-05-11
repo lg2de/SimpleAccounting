@@ -606,4 +606,35 @@ Möchten Sie das Projekt trotzdem öffnen? Gleichzeitiges Ändern kann zu Datenv
 Wollen Sie die aktuellen Änderungen unter einem anderen Projektnamen speichern? Dann drücken Sie "Ja".
 Wollen Sie die die eigenen Änderungen verwerfen? Dann drücken Sie "Nein".</value>
   </data>
+    <data name="Word_Close" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
+  <data name="ErrorMessageView_ClipboardButton" xml:space="preserve">
+    <value>Zwischenablage</value>
+  </data>
+  <data name="ErrorMessageView_ClipboardTooltip" xml:space="preserve">
+    <value>Kopiert die Details des Fehlers in die Zwischenablage.</value>
+  </data>
+  <data name="ErrorMessageView_EmailButton" xml:space="preserve">
+    <value>Email erstellen</value>
+  </data>
+  <data name="ErrorMessageView_EmailTooltip" xml:space="preserve">
+    <value>Bereitet eine Email vor und öffnet diese mit Ihrem Standard-Email-Programm.</value>
+  </data>
+  <data name="ErrorMessageView_GitHubButton" xml:space="preserve">
+    <value>GitHub-Bericht</value>
+  </data>
+  <data name="ErrorMessageView_GitHubTooltip" xml:space="preserve">
+    <value>Öffnet Ihren Standard-Browser zu Erstellen eines Fehlers beim github-Projekt.
+Sie benötigen einen GitHub-Zugang zum Erstellen eines Fehlers.</value>
+  </data>
+  <data name="Header_Termination" xml:space="preserve">
+    <value>Programm wird beendet</value>
+  </data>
+  <data name="ShellViewModel_UnhandledException" xml:space="preserve">
+    <value>Ein interner Fehler ist aufgetreten. Die Anwendung muss beendet werden.
+Sie können Fehlerdetails mit dem Entwicklerteam bei GitHub melden
+oder sich an andere Fachleute werden, indem Sie die Detailinformationen per Mail oder anderen Kanälen (Zwischenablage) weiterleiten.
+Fehlertext:</value>
+  </data>
 </root>

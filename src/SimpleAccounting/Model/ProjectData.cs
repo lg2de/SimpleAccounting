@@ -36,8 +36,8 @@ internal sealed class ProjectData : IProjectData, IDisposable
     private readonly IDialogs dialogs;
     private readonly IFileSystem fileSystem;
     private readonly IProcess processApi;
-    private readonly IWindowManager windowManager;
     private readonly SemaphoreSlim saveSynchronization = new(initialCount: 1, maxCount: 1);
+    private readonly IWindowManager windowManager;
     private Task autoSaveTask = Task.CompletedTask;
     private CancellationTokenSource? cancellationTokenSource;
     private IDisposable? fileMonitoringHandle;
@@ -184,6 +184,21 @@ internal sealed class ProjectData : IProjectData, IDisposable
         this.ActivateMonitoring();
 
         return true;
+    }
+
+    [SuppressMessage(
+        "Blocker Code Smell", "S4462:Calls to \"async\" methods should not be blocking",
+        Justification = "We need to block the UI to show the exception before the application is closing.")]
+    public void CrashSave()
+    {
+        if (!this.IsModified)
+        {
+            return;
+        }
+
+        this.cancellationTokenSource?.Cancel();
+        this.autoSaveTask.Wait(TimeSpan.FromSeconds(2));
+        this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.Storage.Serialize());
     }
 
     public async Task<bool> TryCloseAsync()

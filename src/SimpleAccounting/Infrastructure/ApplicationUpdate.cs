@@ -31,30 +31,32 @@ using Octokit;
 internal class ApplicationUpdate : IApplicationUpdate
 {
     private readonly IDialogs dialogs;
+    private readonly IWindowManager windowManager;
     private readonly IFileSystem fileSystem;
     private readonly IHttpClient httpClient;
     private readonly IProcess process;
-    private readonly IWindowManager windowManager;
+    private readonly IClipboard clipboard;
 
     private Release? newRelease;
 
     public ApplicationUpdate(
         IDialogs dialogs, IWindowManager windowManager, IFileSystem fileSystem, IHttpClient httpClient,
-        IProcess process)
+        IProcess process, IClipboard clipboard)
     {
         this.dialogs = dialogs;
         this.windowManager = windowManager;
         this.fileSystem = fileSystem;
         this.httpClient = httpClient;
         this.process = process;
+        this.clipboard = clipboard;
     }
 
     internal int WaitTimeMilliseconds { get; set; } = 5000;
 
     public async Task<string> GetUpdatePackageAsync(string currentVersion, CultureInfo cultureInfo)
     {
-        IEnumerable<Release> releases = await this.GetAllReleasesAsync();
-        return await this.AskForUpdateAsync(releases, currentVersion, cultureInfo);
+        IReadOnlyList<Release> releases = await this.GetAllReleasesAsync();
+        return releases.Any() ? await this.AskForUpdateAsync(releases, currentVersion, cultureInfo) : string.Empty;
     }
 
     public bool StartUpdateProcess(string packageName, bool dryRun)
@@ -120,26 +122,31 @@ internal class ApplicationUpdate : IApplicationUpdate
     [SuppressMessage(
         "Minor Code Smell", "S2221:\"Exception\" should not be caught when not required by called methods",
         Justification = "catch exceptions from external library")]
-    internal Task<IEnumerable<Release>> GetAllReleasesAsync()
+    internal async Task<IReadOnlyList<Release>> GetAllReleasesAsync()
     {
-        return Task.Run(
-            async () =>
-            {
-                try
+        try
+        {
+            var queryTask = Task.Run(
+                async () =>
                 {
                     var productInformation = new ProductHeaderValue(Defines.ProjectName);
                     var client = new GitHubClient(productInformation);
                     return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
-                }
-                catch (Exception exception)
-                {
-                    this.dialogs.ShowMessageBox(
-                        Resources.Update_QueryVersionsFailed + $"\n{exception.Message}",
-                        Resources.Header_CheckForUpdates,
-                        icon: MessageBoxImage.Error);
-                    return Enumerable.Empty<Release>();
-                }
-            });
+                });
+            return await queryTask;
+        }
+        catch (Exception exception)
+        {
+            var vm = new ErrorMessageViewModel(this.process, this.clipboard)
+            {
+                DisplayName = Resources.Header_CheckForUpdates,
+                Introduction = Resources.Update_QueryVersionsFailed,
+                ErrorMessage = exception.Message,
+                CallStack = exception.StackTrace ?? string.Empty
+            };
+            await this.windowManager.ShowDialogAsync(vm);
+            return new List<Release>();
+        }
     }
 
     [SuppressMessage("Minor Code Smell", "S1075:URIs should not be hardcoded", Justification = "Checked.")]

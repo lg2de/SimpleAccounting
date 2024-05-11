@@ -1,559 +1,564 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-	<!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
-
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
-	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-		<xsd:element name="root" msdata:IsDataSet="true">
-			<xsd:complexType>
-				<xsd:choice maxOccurs="unbounded">
-					<xsd:element name="metadata">
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="value" type="xsd:string" minOccurs="0" />
-							</xsd:sequence>
-							<xsd:attribute name="name" use="required" type="xsd:string" />
-							<xsd:attribute name="type" type="xsd:string" />
-							<xsd:attribute name="mimetype" type="xsd:string" />
-							<xsd:attribute ref="xml:space" />
-						</xsd:complexType>
-					</xsd:element>
-					<xsd:element name="assembly">
-						<xsd:complexType>
-							<xsd:attribute name="alias" type="xsd:string" />
-							<xsd:attribute name="name" type="xsd:string" />
-						</xsd:complexType>
-					</xsd:element>
-					<xsd:element name="data">
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-							</xsd:sequence>
-							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-							<xsd:attribute ref="xml:space" />
-						</xsd:complexType>
-					</xsd:element>
-					<xsd:element name="resheader">
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-							</xsd:sequence>
-							<xsd:attribute name="name" type="xsd:string" use="required" />
-						</xsd:complexType>
-					</xsd:element>
-				</xsd:choice>
-			</xsd:complexType>
-		</xsd:element>
-	</xsd:schema>
-	<resheader name="resmimetype">
-		<value>text/microsoft-resx</value>
-	</resheader>
-	<resheader name="version">
-		<value>2.0</value>
-	</resheader>
-	<resheader name="reader">
-		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-	</resheader>
-	<resheader name="writer">
-		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-	</resheader>
-	<data name="Word_Date" xml:space="preserve">
+    <!-- 
+      Microsoft ResX Schema 
+      
+      Version 2.0
+      
+      The primary goals of this format is to allow a simple XML format 
+      that is mostly human readable. The generation and parsing of the 
+      various data types are done through the TypeConverter classes 
+      associated with the data types.
+      
+      Example:
+      
+      ... ado.net/XML headers & schema ...
+      <resheader name="resmimetype">text/microsoft-resx</resheader>
+      <resheader name="version">2.0</resheader>
+      <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+      <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+      <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+      <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+      <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+          <value>[base64 mime encoded serialized .NET Framework object]</value>
+      </data>
+      <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+          <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+          <comment>This is a comment</comment>
+      </data>
+                  
+      There are any number of "resheader" rows that contain simple 
+      name/value pairs.
+      
+      Each data row contains a name, and value. The row also contains a 
+      type or mimetype. Type corresponds to a .NET class that support 
+      text/value conversion through the TypeConverter architecture. 
+      Classes that don't support this are serialized and stored with the 
+      mimetype set.
+      
+      The mimetype is used for serialized objects, and tells the 
+      ResXResourceReader how to depersist the object. This is currently not 
+      extensible. For a given mimetype the value must be set accordingly:
+      
+      Note - application/x-microsoft.net.object.binary.base64 is the format 
+      that the ResXResourceWriter will generate, however the reader can 
+      read any of the formats listed below.
+      
+      mimetype: application/x-microsoft.net.object.binary.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+              : and then encoded with base64 encoding.
+      
+      mimetype: application/x-microsoft.net.object.soap.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+              : and then encoded with base64 encoding.
+  
+      mimetype: application/x-microsoft.net.object.bytearray.base64
+      value   : The object must be serialized into a byte array 
+              : using a System.ComponentModel.TypeConverter
+              : and then encoded with base64 encoding.
+      -->
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+        <xsd:element name="root" msdata:IsDataSet="true">
+            <xsd:complexType>
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="metadata">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string"/>
+                            <xsd:attribute name="type" type="xsd:string"/>
+                            <xsd:attribute name="mimetype" type="xsd:string"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="assembly">
+                        <xsd:complexType>
+                            <xsd:attribute name="alias" type="xsd:string"/>
+                            <xsd:attribute name="name" type="xsd:string"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="resheader">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
+            </xsd:complexType>
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="Word_Date" xml:space="preserve">
     <value>Date</value>
   </data>
-	<data name="Information_CultureChangeRestartRequired" xml:space="preserve">
+    <data name="Information_CultureChangeRestartRequired" xml:space="preserve">
     <value>Vous avez changé la langue d'affichage.
 Vous devez redémarrer l'application pour que les paramètres prennent effet.</value>
   </data>
-	<data name="Header_SettingsChanged" xml:space="preserve">
+    <data name="Header_SettingsChanged" xml:space="preserve">
     <value>Paramètres modifiés</value>
   </data>
-	<data name="Header_Shutdown" xml:space="preserve">
+    <data name="Header_Shutdown" xml:space="preserve">
     <value>Arrêt de l'application</value>
   </data>
-	<data name="Question_SaveBeforeProceed" xml:space="preserve">
+    <data name="Question_SaveBeforeProceed" xml:space="preserve">
     <value>Les données du projet ont été modifiées.
 Voulez-vous enregistrer ?</value>
   </data>
-	<data name="FileFilter_MainProject" xml:space="preserve">
+    <data name="FileFilter_MainProject" xml:space="preserve">
     <value>Fichiers de projet comptable (*.acml)|*.acml</value>
   </data>
-	<data name="Word_Total" xml:space="preserve">
+    <data name="Word_Total" xml:space="preserve">
     <value>Total</value>
   </data>
-	<data name="Word_Balance" xml:space="preserve">
+    <data name="Word_Balance" xml:space="preserve">
     <value>Solde</value>
   </data>
-	<data name="Header_EditBooking" xml:space="preserve">
+    <data name="Header_EditBooking" xml:space="preserve">
     <value>Modifier l'entrée de journalisation</value>
   </data>
-	<data name="Header_NewBooking" xml:space="preserve">
+    <data name="Header_NewBooking" xml:space="preserve">
     <value>Créer une nouvelle entrée de journalisation</value>
   </data>
-	<data name="Header_CreateAccount" xml:space="preserve">
+    <data name="Header_CreateAccount" xml:space="preserve">
     <value>Créer un compte</value>
   </data>
-	<data name="Header_EditAccount" xml:space="preserve">
+    <data name="Header_EditAccount" xml:space="preserve">
     <value>Modifier le compte</value>
   </data>
-	<data name="Word_Various" xml:space="preserve">
+    <data name="Word_Various" xml:space="preserve">
     <value>Divers</value>
   </data>
   <data name="Header_AccountSheets" xml:space="preserve">
     <value>Feuilles des comptes</value>
   </data>
-	<data name="Header_TotalsAndBalances" xml:space="preserve">
+    <data name="Header_TotalsAndBalances" xml:space="preserve">
     <value>Totaux et soldes</value>
   </data>
-	<data name="Header_AssetBalances" xml:space="preserve">
+    <data name="Header_AssetBalances" xml:space="preserve">
     <value>Soldes des actifs</value>
   </data>
-	<data name="Header_AnnualBalance" xml:space="preserve">
+    <data name="Header_AnnualBalance" xml:space="preserve">
     <value>Bilan annuel</value>
   </data>
-	<data name="Word_AccountNumber" xml:space="preserve">
+    <data name="Word_AccountNumber" xml:space="preserve">
     <value>Numéro de compte</value>
   </data>
-	<data name="Word_AccountName" xml:space="preserve">
+    <data name="Word_AccountName" xml:space="preserve">
     <value>Nom du compte</value>
   </data>
-	<data name="Word_AccountGroup" xml:space="preserve">
+    <data name="Word_AccountGroup" xml:space="preserve">
     <value>Compte de groupe</value>
   </data>
-	<data name="Word_AccountType" xml:space="preserve">
+    <data name="Word_AccountType" xml:space="preserve">
     <value>Type de compte</value>
   </data>
-	<data name="EditAccount_AccountActive" xml:space="preserve">
+    <data name="EditAccount_AccountActive" xml:space="preserve">
     <value>le compte est-il actif</value>
   </data>
   <data name="Word_Cancel" xml:space="preserve">
     <value>Annuler</value>
   </data>
-	<data name="Word_CarriedForwardAccount" xml:space="preserve">
+    <data name="Word_CarriedForwardAccount" xml:space="preserve">
     <value>Solde pour balance</value>
   </data>
-	<data name="Header_CloseYear" xml:space="preserve">
+    <data name="Header_CloseYear" xml:space="preserve">
     <value>Clôturer l'année</value>
   </data>
-	<data name="Question_CloseYearX" xml:space="preserve">
+    <data name="Question_CloseYearX" xml:space="preserve">
     <value>Voulez-vous clôturer l'année {0} ?</value>
   </data>
-	<data name="Word_Split" xml:space="preserve">
+    <data name="Word_Split" xml:space="preserve">
     <value>Fractionner</value>
   </data>
-	<data name="Word_BookingText" xml:space="preserve">
+    <data name="Word_BookingText" xml:space="preserve">
     <value>Texte de journalisation</value>
   </data>
-	<data name="Tooltip_SplitBookingValue" xml:space="preserve">
+    <data name="Tooltip_SplitBookingValue" xml:space="preserve">
     <value>Diviser la valeur de la journalisation</value>
   </data>
-	<data name="Word_BookingNumber" xml:space="preserve">
+    <data name="Word_BookingNumber" xml:space="preserve">
     <value>Numéro de journalisation</value>
   </data>
   <data name="Header_DebitCredit" xml:space="preserve">
     <value>Débit/Crédit</value>
   </data>
-	<data name="Word_Debit" xml:space="preserve">
+    <data name="Word_Debit" xml:space="preserve">
     <value>Débit</value>
   </data>
-	<data name="Word_Credit" xml:space="preserve">
+    <data name="Word_Credit" xml:space="preserve">
     <value>Crédit</value>
   </data>
-	<data name="Word_Income" xml:space="preserve">
+    <data name="Word_Income" xml:space="preserve">
     <value>Revenu</value>
   </data>
-	<data name="Word_IncomeType" xml:space="preserve">
+    <data name="Word_IncomeType" xml:space="preserve">
     <value>Type de revenu</value>
   </data>
-	<data name="Label_SourceAndRemoteAccount" xml:space="preserve">
+    <data name="Label_SourceAndRemoteAccount" xml:space="preserve">
     <value>Source
 (Compte distant)</value>
   </data>
-	<data name="Word_Expense" xml:space="preserve">
+    <data name="Word_Expense" xml:space="preserve">
     <value>Frais</value>
   </data>
-	<data name="Word_ExpenseType" xml:space="preserve">
+    <data name="Word_ExpenseType" xml:space="preserve">
     <value>Type de dépense</value>
   </data>
-	<data name="Label_DebitAccountRemoteAccount" xml:space="preserve">
+    <data name="Label_DebitAccountRemoteAccount" xml:space="preserve">
     <value>Compte de débit
 (Compte distant)</value>
   </data>
-	<data name="Word_OpeningBooking" xml:space="preserve">
+    <data name="Word_OpeningBooking" xml:space="preserve">
     <value>Ouverture de la journalisation</value>
   </data>
-	<data name="Word_FollowUp" xml:space="preserve">
+    <data name="Word_FollowUp" xml:space="preserve">
     <value>Solde à nouveau</value>
   </data>
-	<data name="Action_Book" xml:space="preserve">
+    <data name="Action_Book" xml:space="preserve">
     <value>Comptabiliser (CTRL-ENTRÉE)</value>
   </data>
-	<data name="Action_Save" xml:space="preserve">
+    <data name="Action_Save" xml:space="preserve">
     <value>Enregister (CTRL-ENTRÉE)</value>
   </data>
-	<data name="Action_Close" xml:space="preserve">
+    <data name="Action_Close" xml:space="preserve">
     <value>Fermer (ESC)</value>
   </data>
-	<data name="ImportData_Notes" xml:space="preserve">
+    <data name="ImportData_Notes" xml:space="preserve">
     <value>Remarques:
 Sélectionnez le compte vers lequel les journalisations doivent être importées.
 (Seuls les comptes disposant d'une configuration d'importation peuvent être sélectionnés).
 Les noms de destinataires importés et les textes de transaction peuvent être modifiés.</value>
   </data>
-	<data name="ImportData_FileHasEnglishFormat" xml:space="preserve">
+    <data name="ImportData_FileHasEnglishFormat" xml:space="preserve">
     <value>Le fichier est au format anglais</value>
   </data>
-	<data name="Action_LoadData" xml:space="preserve">
+    <data name="Action_LoadData" xml:space="preserve">
     <value>Charger les données</value>
   </data>
-	<data name="ImportData_StartImport" xml:space="preserve">
+    <data name="ImportData_StartImport" xml:space="preserve">
     <value>Démarrer l'importation :</value>
   </data>
-	<data name="Action_BookPartially" xml:space="preserve">
+    <data name="Action_BookPartially" xml:space="preserve">
     <value>Réserver partiellement</value>
   </data>
-	<data name="Tooltip_BookPartially" xml:space="preserve">
+    <data name="Tooltip_BookPartially" xml:space="preserve">
     <value>Toutes les entrées avec un compte distant attribué seront réservées.</value>
   </data>
-	<data name="Action_BookAll" xml:space="preserve">
+    <data name="Action_BookAll" xml:space="preserve">
     <value>Tout réserver</value>
   </data>
-	<data name="Word_BookingNumber_Short" xml:space="preserve">
+    <data name="Word_BookingNumber_Short" xml:space="preserve">
     <value>No de journalisation</value>
   </data>
-	<data name="Word_Recipient" xml:space="preserve">
+    <data name="Word_Recipient" xml:space="preserve">
     <value>Destinataire</value>
   </data>
-	<data name="Word_Skip" xml:space="preserve">
+    <data name="Word_Skip" xml:space="preserve">
     <value>Sauter</value>
   </data>
-	<data name="Word_Value" xml:space="preserve">
+    <data name="Word_Value" xml:space="preserve">
     <value>Évaluer</value>
   </data>
-	<data name="Word_RemoteAccount" xml:space="preserve">
+    <data name="Word_RemoteAccount" xml:space="preserve">
     <value>Compte distant</value>
   </data>
-	<data name="Word_IsFollowup" xml:space="preserve">
+    <data name="Word_IsFollowup" xml:space="preserve">
     <value>est un suivi</value>
   </data>
-	<data name="Word_ResetAssignment" xml:space="preserve">
+    <data name="Word_ResetAssignment" xml:space="preserve">
     <value>Réinitialiser l'affectation</value>
   </data>
-	<data name="ImportData_Title" xml:space="preserve">
+    <data name="ImportData_Title" xml:space="preserve">
     <value>Importation des données de compte bancaire</value>
   </data>
-	<data name="FileFilter_ImportData" xml:space="preserve">
+    <data name="FileFilter_ImportData" xml:space="preserve">
     <value>Fichiers de données de journalisation (*.csv)|*.csv</value>
   </data>
-	<data name="ImportData_AlreadyBooked" xml:space="preserve">
+    <data name="ImportData_AlreadyBooked" xml:space="preserve">
     <value>&lt;déjà journalisé&gt;</value>
   </data>
-	<data name="ImportData_NoRelevantDataFoundInX" xml:space="preserve">
+    <data name="ImportData_NoRelevantDataFoundInX" xml:space="preserve">
     <value>Aucune donnée pertinente trouvée dans {0}.</value>
   </data>
-	<data name="ImportData_MessageTitle" xml:space="preserve">
+    <data name="ImportData_MessageTitle" xml:space="preserve">
     <value>Importer</value>
   </data>
-	<data name="Information_FailedToLoadX" xml:space="preserve">
+    <data name="Information_FailedToLoadX" xml:space="preserve">
     <value>Impossible de charger le fichier '{0}'.</value>
   </data>
-	<data name="Menu_Project" xml:space="preserve">
+    <data name="Menu_Project" xml:space="preserve">
     <value>Projet</value>
   </data>
-	<data name="Menu_Project_New" xml:space="preserve">
+    <data name="Menu_Project_New" xml:space="preserve">
     <value>Nouveau</value>
   </data>
-	<data name="Menu_Project_Open" xml:space="preserve">
+    <data name="Menu_Project_Open" xml:space="preserve">
     <value>Ouvert</value>
   </data>
-	<data name="Menu_Project_Save" xml:space="preserve">
+    <data name="Menu_Project_Save" xml:space="preserve">
     <value>Sauvegarder</value>
   </data>
-	<data name="Menu_Project_RecentProjects" xml:space="preserve">
+    <data name="Menu_Project_RecentProjects" xml:space="preserve">
     <value>Derniers projets</value>
   </data>
-	<data name="Menu_Project_Settings" xml:space="preserve">
+    <data name="Menu_Project_Settings" xml:space="preserve">
     <value>Réglages</value>
   </data>
-	<data name="Menu_Project_Exit" xml:space="preserve">
+    <data name="Menu_Project_Exit" xml:space="preserve">
     <value>Quitter</value>
   </data>
-	<data name="Menu_Actions" xml:space="preserve">
+    <data name="Menu_Actions" xml:space="preserve">
     <value>Actions</value>
   </data>
-	<data name="Menu_Actions_AddBooking" xml:space="preserve">
+    <data name="Menu_Actions_AddBooking" xml:space="preserve">
     <value>Ajouter une journalisation</value>
   </data>
-	<data name="Menu_Actions_ImportBookings" xml:space="preserve">
+    <data name="Menu_Actions_ImportBookings" xml:space="preserve">
     <value>Importation des journalisations</value>
   </data>
-	<data name="Menu_Actions_CloseYear" xml:space="preserve">
+    <data name="Menu_Actions_CloseYear" xml:space="preserve">
     <value>Clôturer l'année</value>
   </data>
-	<data name="Menu_Actions_SelectYear" xml:space="preserve">
+    <data name="Menu_Actions_SelectYear" xml:space="preserve">
     <value>Sélectionnez l'année de journalisation</value>
   </data>
-	<data name="Menu_Actions_NewAccount" xml:space="preserve">
+    <data name="Menu_Actions_NewAccount" xml:space="preserve">
     <value>Nouveau compte</value>
   </data>
-	<data name="Menu_Reports" xml:space="preserve">
+    <data name="Menu_Reports" xml:space="preserve">
     <value>Rapports</value>
   </data>
   <data name="Menu_Reports_AccountJournal" xml:space="preserve">
     <value>Feuilles des comptes</value>
   </data>
-	<data name="Menu_Reports_TotalsAndBalances" xml:space="preserve">
+    <data name="Menu_Reports_TotalsAndBalances" xml:space="preserve">
     <value>Totaux et soldes</value>
   </data>
-	<data name="Menu_Reports_AssetBalance" xml:space="preserve">
+    <data name="Menu_Reports_AssetBalance" xml:space="preserve">
     <value>Solde de l'actif</value>
   </data>
-	<data name="Menu_Reports_AnnualBalance" xml:space="preserve">
+    <data name="Menu_Reports_AnnualBalance" xml:space="preserve">
     <value>Bilan annuel</value>
   </data>
-	<data name="Menu_Help" xml:space="preserve">
+    <data name="Menu_Help" xml:space="preserve">
     <value>Aide</value>
   </data>
-	<data name="Menu_Help_About" xml:space="preserve">
+    <data name="Menu_Help_About" xml:space="preserve">
     <value>À propos de</value>
   </data>
-	<data name="Menu_Help_Feedback" xml:space="preserve">
+    <data name="Menu_Help_Feedback" xml:space="preserve">
     <value>Créer des commentaires</value>
   </data>
-	<data name="Menu_Help_CheckUpdate" xml:space="preserve">
+    <data name="Menu_Help_CheckUpdate" xml:space="preserve">
     <value>Vérifier les mises à jour</value>
   </data>
-	<data name="Header_AnnualJournal" xml:space="preserve">
+    <data name="Header_AnnualJournal" xml:space="preserve">
     <value>Journal de l'année</value>
   </data>
-	<data name="Word_DebitAccount" xml:space="preserve">
+    <data name="Word_DebitAccount" xml:space="preserve">
     <value>Compte à débiter</value>
   </data>
-	<data name="Word_CreditAccount" xml:space="preserve">
+    <data name="Word_CreditAccount" xml:space="preserve">
     <value>Compte à créditer</value>
   </data>
-	<data name="Header_AccountJournalX" xml:space="preserve">
+    <data name="Header_AccountJournalX" xml:space="preserve">
     <value>Journal de compte '{0}'</value>
   </data>
-	<data name="Word_DebitValue" xml:space="preserve">
+    <data name="Word_DebitValue" xml:space="preserve">
     <value>Valeur du débit</value>
   </data>
-	<data name="Word_CreditValue" xml:space="preserve">
+    <data name="Word_CreditValue" xml:space="preserve">
     <value>Valeur du crédit</value>
   </data>
-	<data name="Word_Accounts" xml:space="preserve">
+    <data name="Word_Accounts" xml:space="preserve">
     <value>Comptes</value>
   </data>
-	<data name="Word_Number" xml:space="preserve">
+    <data name="Word_Number" xml:space="preserve">
     <value>Numéro</value>
   </data>
-	<data name="AccountsContextMenu_RefreshAccountJournal" xml:space="preserve">
+    <data name="AccountsContextMenu_RefreshAccountJournal" xml:space="preserve">
     <value>Actualiser le journal</value>
   </data>
-	<data name="AccountsContextMenu_EditAccount" xml:space="preserve">
+    <data name="AccountsContextMenu_EditAccount" xml:space="preserve">
     <value>Modifier le compte</value>
   </data>
-	<data name="AccountsContextMenu_NewAccount" xml:space="preserve">
+    <data name="AccountsContextMenu_NewAccount" xml:space="preserve">
     <value>Créer un compte</value>
   </data>
-	<data name="AccountsContextMenu_ShowInactiveAccounts" xml:space="preserve">
+    <data name="AccountsContextMenu_ShowInactiveAccounts" xml:space="preserve">
     <value>Afficher les comptes inactifs</value>
   </data>
-	<data name="Word_Page" xml:space="preserve">
+    <data name="Word_Page" xml:space="preserve">
     <value>Page</value>
   </data>
-	<data name="Word_Number_Short" xml:space="preserve">
+    <data name="Word_Number_Short" xml:space="preserve">
     <value>Non.</value>
   </data>
-	<data name="Word_DebitValue_Wrapped" xml:space="preserve">
+    <data name="Word_DebitValue_Wrapped" xml:space="preserve">
     <value>Valeur
 du débit</value>
   </data>
-	<data name="Word_CreditValue_Wrapped" xml:space="preserve">
+    <data name="Word_CreditValue_Wrapped" xml:space="preserve">
     <value>Valeur 
 du crédit</value>
   </data>
-	<data name="Word_RemoteAccount_Wrapped" xml:space="preserve">
+    <data name="Word_RemoteAccount_Wrapped" xml:space="preserve">
     <value>Compte
 distant</value>
   </data>
-	<data name="Word_Receivables" xml:space="preserve">
+    <data name="Word_Receivables" xml:space="preserve">
     <value>Passifs débiteurs</value>
   </data>
-	<data name="Word_Liabilities" xml:space="preserve">
+    <data name="Word_Liabilities" xml:space="preserve">
     <value>Passifs créditeurs</value>
   </data>
-	<data name="Word_Incomes" xml:space="preserve">
+    <data name="Word_Incomes" xml:space="preserve">
     <value>Revenus/Produit</value>
   </data>
-	<data name="Word_Expenses" xml:space="preserve">
+    <data name="Word_Expenses" xml:space="preserve">
     <value>Charges</value>
   </data>
-	<data name="Report_AnnualNetProfitAndLoss" xml:space="preserve">
+    <data name="Report_AnnualNetProfitAndLoss" xml:space="preserve">
     <value>Résultat net annuel</value>
   </data>
-	<data name="Word_Asset" xml:space="preserve">
+    <data name="Word_Asset" xml:space="preserve">
     <value>Actif</value>
   </data>
-	<data name="Word_DebitAccount_Wrapped" xml:space="preserve">
+    <data name="Word_DebitAccount_Wrapped" xml:space="preserve">
     <value>Compte
 de débit</value>
   </data>
-	<data name="Word_CreditAccount_Wrapped" xml:space="preserve">
+    <data name="Word_CreditAccount_Wrapped" xml:space="preserve">
     <value>Compte
 de crédit</value>
   </data>
-	<data name="Report_LastBooking_Wrapped" xml:space="preserve">
+    <data name="Report_LastBooking_Wrapped" xml:space="preserve">
     <value>Dernière
 journalisation</value>
   </data>
-	<data name="Report_OpeningAssets" xml:space="preserve">
+    <data name="Report_OpeningAssets" xml:space="preserve">
     <value>Actifs</value>
   </data>
-	<data name="Report_OpeningLiabilities" xml:space="preserve">
+    <data name="Report_OpeningLiabilities" xml:space="preserve">
     <value>Passifs</value>
   </data>
-	<data name="Word_OpeningBalance" xml:space="preserve">
+    <data name="Word_OpeningBalance" xml:space="preserve">
     <value>Solde d'ouverture</value>
   </data>
-	<data name="Report_TotalsInTimeRange" xml:space="preserve">
+    <data name="Report_TotalsInTimeRange" xml:space="preserve">
     <value>Totaux dans la plage</value>
   </data>
-	<data name="Report_BalanceAtTheEnd" xml:space="preserve">
+    <data name="Report_BalanceAtTheEnd" xml:space="preserve">
     <value>Bilan à la fin</value>
   </data>
-	<data name="Word_AccountNumber_Wrapped" xml:space="preserve">
+    <data name="Word_AccountNumber_Wrapped" xml:space="preserve">
     <value>Numéro 
 de compte</value>
   </data>
-	<data name="Header_LoadProject" xml:space="preserve">
+    <data name="Header_LoadProject" xml:space="preserve">
     <value>Charger le projet</value>
   </data>
-	<data name="Question_StartSecureDriverX" xml:space="preserve">
+    <data name="Question_StartSecureDriverX" xml:space="preserve">
     <value>Le projet {0} semble être stocké sur un lecteur sécurisé.
 (Cryptomateur)
 Ce lecteur n'est actuellement pas accessible.
 Voulez-vous démarrer 'Cryptomator'?</value>
   </data>
-	<data name="Question_LoadAutoSaveProjectFileX" xml:space="preserve">
+    <data name="Question_LoadAutoSaveProjectFileX" xml:space="preserve">
     <value>Il existe un fichier de sauvegarde créé automatiquement pour le projet
 {0}.
 Voulez-vous charger ce fichier de sauvegarde ?
 Si vous répondez Non", le fichier de sauvegarde sera supprimé."</value>
   </data>
-	<data name="Header_CheckForUpdates" xml:space="preserve">
+    <data name="Header_CheckForUpdates" xml:space="preserve">
     <value>Vérifier les mises à jour</value>
   </data>
-	<data name="Update_QueryVersionsFailed" xml:space="preserve">
+    <data name="Update_QueryVersionsFailed" xml:space="preserve">
     <value>Échec de la recherche de versions plus récentes :</value>
   </data>
-	<data name="Update_UpToDate" xml:space="preserve">
+    <data name="Update_UpToDate" xml:space="preserve">
     <value>Vous avez déjà la dernière version.</value>
   </data>
-	<data name="Question_UpdateToVersionX" xml:space="preserve">
+    <data name="Question_UpdateToVersionX" xml:space="preserve">
     <value>Voulez-vous passer à la version {0} ?</value>
   </data>
     <data name="Update_ProcessFailedX2" xml:space="preserve">
-		<value>Le processus de mise à jour a échoué avec le code de sortie {0}.
+    <value>Le processus de mise à jour a échoué avec le code de sortie {0}.
 Sortie d'erreur: {1}</value>
-	</data>
-	<data name="CloseYear_TextOptionDescription" xml:space="preserve">
+  </data>
+    <data name="CloseYear_TextOptionDescription" xml:space="preserve">
     <value>Texte pour l'ouverture des journalisations</value>
   </data>
-	<data name="CloseYear_TextOptionNumbered" xml:space="preserve">
+    <data name="CloseYear_TextOptionNumbered" xml:space="preserve">
     <value>Numéroté</value>
   </data>
-	<data name="CloseYear_TextOptionAccountName" xml:space="preserve">
+    <data name="CloseYear_TextOptionAccountName" xml:space="preserve">
     <value>Avec nom de compte</value>
   </data>
-	<data name="CloseYear_OpeningValueX" xml:space="preserve">
+    <data name="CloseYear_OpeningValueX" xml:space="preserve">
     <value>Valeur d'ouverture {0}</value>
   </data>
-	<data name="ImportData_UseReverseOrder" xml:space="preserve">
+    <data name="ImportData_UseReverseOrder" xml:space="preserve">
     <value>Importer dans l'ordre inverse</value>
   </data>
-	<data name="ImportData_MissingAccountWarning" xml:space="preserve">
+    <data name="ImportData_MissingAccountWarning" xml:space="preserve">
     <value>Attention, actuellement aucun compte de journalisation n'est configuré pour l'import.
 Sans une telle configuration pour au moins un compte, cette fonction est désactivée.</value>
   </data>
-	<data name="EditAccount_ImportActive" xml:space="preserve">
+    <data name="EditAccount_ImportActive" xml:space="preserve">
     <value>l'importation est-elle active</value>
   </data>
-	<data name="Word_Source" xml:space="preserve">
+    <data name="Word_Source" xml:space="preserve">
     <value>Source</value>
   </data>
-	<data name="AccountConfiguration_IgnorePattern" xml:space="preserve">
+    <data name="AccountConfiguration_IgnorePattern" xml:space="preserve">
     <value>Ignorer le modèle</value>
   </data>
-	<data name="Word_Name" xml:space="preserve">
+    <data name="Word_Name" xml:space="preserve">
     <value>Nom</value>
   </data>
-	<data name="Word_Expression" xml:space="preserve">
+    <data name="Word_Expression" xml:space="preserve">
     <value>Expression</value>
   </data>
-	<data name="AccountConfiguration_SourceDescription" xml:space="preserve">
+    <data name="AccountConfiguration_SourceDescription" xml:space="preserve">
     <value>Nom de la colonne dans le fichier d'importation (CSV)</value>
   </data>
-	<data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
+    <data name="AccountConfiguration_IgnorePatternDescription" xml:space="preserve">
     <value>Expression régulière utilisée pour supprimer des sous-chaînes</value>
   </data>
   <data name="Header_ProjectOptions" xml:space="preserve">
@@ -595,21 +600,53 @@ Sans une telle configuration pour au moins un compte, cette fonction est désact
   <data name="Update_SkipVersion" xml:space="preserve">
     <value>Non, passez cette version!</value>
   </data>
-    <data name="Question_ExistingFileReservationX4" xml:space="preserve">
-		<value>Le projet
+  <data name="Question_ExistingFileReservationX4" xml:space="preserve">
+  <value>Le projet
 {1}
 semble avoir été ouvert par un autre utilisateur.
 Nom d'utilisateur: {1}
 Nom de l'ordinateur : {2}
 Ouvert depuis : {3}
 Voulez-vous quand même ouvrir le projet ? Une modification simultanée peut entraîner une perte de données.</value>
-	</data>
-    <data name="Header_ProjectChanged" xml:space="preserve">
-		<value>Modifications inattendues du projet</value>
-	</data>
-    <data name="Question_ProjectChanged" xml:space="preserve">
-		<value>Des modifications inattendues ont été détectées dans les fichiers du projet actuel par un autre processus ou une autre personne.
+  </data>
+  <data name="Header_ProjectChanged" xml:space="preserve">
+  <value>Modifications inattendues du projet</value>
+  </data>
+  <data name="Question_ProjectChanged" xml:space="preserve">
+  <value>Des modifications inattendues ont été détectées dans les fichiers du projet actuel par un autre processus ou une autre personne.
 Voulez-vous enregistrer les modifications actuelles sous un autre nom de projet ? Dans ce cas, appuyez sur "Oui".
 Voulez-vous annuler vos propres modifications ? Appuyez alors sur "Non".</value>
-	</data>
+  </data>
+  <data name="Word_Close" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="ErrorMessageView_ClipboardButton" xml:space="preserve">
+    <value>Copier dans le presse-papiers</value>
+  </data>
+  <data name="ErrorMessageView_ClipboardTooltip" xml:space="preserve">
+    <value>Copie les détails de l'erreur dans le presse-papiers.</value>
+  </data>
+  <data name="ErrorMessageView_EmailButton" xml:space="preserve">
+    <value>Créer un courriel</value>
+  </data>
+  <data name="ErrorMessageView_EmailTooltip" xml:space="preserve">
+    <value>Ouvre votre programme de messagerie par défaut avec un nouvel e-mail contenant les détails de l'erreur.</value>
+  </data>
+  <data name="ErrorMessageView_GitHubButton" xml:space="preserve">
+    <value>Rapport sur GitHub</value>
+  </data>
+  <data name="ErrorMessageView_GitHubTooltip" xml:space="preserve">
+    <value>Ouvre votre navigateur par défaut pour ouvrir un nouveau problème.
+Vous devez disposer d'un compte GitHub pour créer de nouveaux problèmes.</value>
+  </data>
+  <data name="Header_Termination" xml:space="preserve">
+    <value>L'application se termine</value>
+  </data>
+  <data name="ShellViewModel_UnhandledException" xml:space="preserve">
+    <value>Une erreur interne est survenue. L'application doit être fermée.
+Vous pouvez signaler les détails de l'erreur à l'équipe de développement sur GitHub
+ou
+ vous adresser à d'autres professionnels en transmettant les informations détaillées par e-mail ou par d'autres canaux (presse-papiers).
+Texte d'erreur:</value>
+  </data>
 </root>
