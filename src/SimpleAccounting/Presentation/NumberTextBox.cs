@@ -13,7 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 /// <summary>
-///     Implements a <see cref="TextBox"/> only accepting unsigned integer numbers.
+///     Implements a <see cref="TextBox" /> only accepting unsigned integer numbers.
 /// </summary>
 [ExcludeFromCodeCoverage(Justification = "The view cannot be tested.")]
 internal partial class NumberTextBox : TextBox
@@ -49,6 +49,16 @@ internal partial class NumberTextBox : TextBox
     {
         base.OnInitialized(e);
         DataObject.AddPastingHandler(this, this.OnPasteText);
+    }
+
+    internal bool IsNewTextValid(string enteredText, int selectionStart, int selectionLength, out string newText)
+    {
+        newText =
+            this.Text[..selectionStart]
+            + enteredText
+            + this.Text[(selectionStart + selectionLength)..];
+        var isValid = this.numberExpression!.IsMatch(newText);
+        return isValid;
     }
 
     private static void OnScaleChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
@@ -95,11 +105,7 @@ internal partial class NumberTextBox : TextBox
     {
         // Build resulting text from current text, current selection and new text.
         // Accept the new input only if result matches the number expression.
-        var newText =
-            this.Text[..this.SelectionStart]
-            + eventArgs.Text
-            + this.Text[(this.SelectionStart + this.SelectionLength)..];
-        var isValid = this.numberExpression!.IsMatch(newText);
+        bool isValid = this.IsNewTextValid(eventArgs.Text, this.SelectionStart, this.SelectionLength, out _);
         eventArgs.Handled = !isValid;
     }
 
