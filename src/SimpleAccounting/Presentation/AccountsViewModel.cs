@@ -229,8 +229,9 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             // update all references of this identifier
             accountData.ID = clonedViewModel.Identifier;
 
-            selectedAccountViewModel.Group!.Account =
-                selectedAccountViewModel.Group.Account.OrderBy(x => x.ID).ToList();
+            // reorder the list of accounts within the account group
+            clonedViewModel.Group!.Account =
+                clonedViewModel.Group.Account.OrderBy(x => x.ID).ToList();
 
             this.projectData.Storage.Journal.ForEach(
                 j => j.Booking?.ForEach(
