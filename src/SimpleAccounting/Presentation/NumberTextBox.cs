@@ -51,22 +51,30 @@ internal partial class NumberTextBox : TextBox
         DataObject.AddPastingHandler(this, this.OnPasteText);
     }
 
-    private static void OnScaleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnScaleChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
     {
-        if (!(d is NumberTextBox numberTextBox) || !(e.NewValue is uint))
+        if (dependencyObject is not NumberTextBox numberTextBox)
         {
             return;
         }
 
-        numberTextBox.Scale = (uint)e.NewValue;
+        if (eventArgs.NewValue is not uint newValue)
+        {
+            return;
+        }
+
+        numberTextBox.Scale = newValue;
     }
 
-    private static void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    private static void OnPreviewKeyDown(object sender, KeyEventArgs eventArgs)
     {
         // The space character is NOT routed through PreviewTextInput.
         // We need this hook only to remove SPACE from input.
-        e.Handled = e.Key == Key.Space;
+        eventArgs.Handled = eventArgs.Key == Key.Space;
     }
+
+    [GeneratedRegex("^[0-9]*$", RegexOptions.Compiled)]
+    private static partial Regex NumberRegex();
 
     private void UpdateExpression()
     {
@@ -83,16 +91,16 @@ internal partial class NumberTextBox : TextBox
             TimeSpan.FromSeconds(1));
     }
 
-    private void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
+    private void OnPreviewTextInput(object sender, TextCompositionEventArgs eventArgs)
     {
         // Build resulting text from current text, current selection and new text.
         // Accept the new input only if result matches the number expression.
         var newText =
             this.Text[..this.SelectionStart]
-            + e.Text
+            + eventArgs.Text
             + this.Text[(this.SelectionStart + this.SelectionLength)..];
         var isValid = this.numberExpression!.IsMatch(newText);
-        e.Handled = !isValid;
+        eventArgs.Handled = !isValid;
     }
 
     private void OnPasteText(object sender, DataObjectPastingEventArgs e)
@@ -109,7 +117,4 @@ internal partial class NumberTextBox : TextBox
             e.CancelCommand();
         }
     }
-
-    [GeneratedRegex("^[0-9]*$", RegexOptions.Compiled)]
-    private static partial Regex NumberRegex();
 }
