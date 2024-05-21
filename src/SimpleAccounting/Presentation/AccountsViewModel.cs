@@ -244,6 +244,17 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
                     }));
         }
 
+        if (selectedAccountViewModel.Group != clonedViewModel.Group)
+        {
+            // move to new group
+            selectedAccountViewModel.Group!.Account.Remove(accountData);
+            clonedViewModel.Group!.Account.Add(accountData);
+
+            // reorder the accounts in the new group
+            clonedViewModel.Group!.Account =
+                clonedViewModel.Group.Account.OrderBy(x => x.ID).ToList();
+        }
+
         this.SaveImportConfiguration(clonedViewModel, accountData);
 
         // update view model
