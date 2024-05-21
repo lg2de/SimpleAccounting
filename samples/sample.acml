@@ -26,17 +26,17 @@
       <Account ID="990" Name="Carryforward" Type="Carryforward" />
     </AccountGroup>
   </Accounts>
-  <Journal Year="2023" DateStart="20230101" DateEnd="20231231">
-    <Booking Date="20230101" ID="1" Followup="true" Opening="true">
+  <Journal Year="2024" DateStart="20240101" DateEnd="20241231">
+    <Booking Date="20240101" ID="1" Followup="true" Opening="true">
       <Debit Value="10000" Account="100" Text="Opening value 1" />
       <Credit Value="10000" Account="990" Text="Opening value 1" />
     </Booking>
-    <Booking Date="20230115" ID="2">
+    <Booking Date="20240115" ID="2">
       <Debit Value="1000" Account="600" Text="Apples" />
       <Debit Value="2500" Account="610" Text="Shoes" />
       <Credit Value="3500" Account="100" Text="My Supermarket - Shopping Reference 4711" />
     </Booking>
-    <Booking Date="20230128" ID="3">
+    <Booking Date="20240128" ID="3">
       <Debit Value="55000" Account="100" Text="My Company - Salary" />
       <Credit Value="40000" Account="400" Text="Monthly salary" />
       <Credit Value="15000" Account="400" Text="Annual extra salary" />
