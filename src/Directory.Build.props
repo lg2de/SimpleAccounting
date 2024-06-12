@@ -1,7 +1,5 @@
 ﻿<Project>
 
-  <Import Project="../Directory.Build.props" />
-
   <PropertyGroup>
     <NullableContextOptions>enable</NullableContextOptions>
     <Nullable>enable</Nullable>
