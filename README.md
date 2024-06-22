@@ -1,6 +1,6 @@
 # SimpleAccounting - Simple Accounting Software
 
-![Build status](https://github.com/lg2de/SimpleAccounting/workflows/continous%20integration/badge.svg?branch=main)
+![Build status](https://github.com/lg2de/SimpleAccounting/actions/workflows/dotnetcore.yml/badge.svg?branch=main)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=coverage)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=lg2de_SimpleAccounting)
 
