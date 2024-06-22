@@ -7,16 +7,14 @@ namespace lg2de.SimpleAccounting.Presentation;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 /// <summary>
-///     Implements a <see cref="TextBox"/> only accepting unsigned integer numbers.
+///     Implements a <see cref="TextBox" /> only accepting unsigned integer numbers.
 /// </summary>
-[ExcludeFromCodeCoverage(Justification = "The view cannot be tested.")]
-internal partial class NumberTextBox : TextBox
+internal class NumberTextBox : TextBox
 {
     public static readonly DependencyProperty ScaleProperty =
         DependencyProperty.Register(
@@ -24,92 +22,134 @@ internal partial class NumberTextBox : TextBox
             typeof(NumberTextBox),
             new FrameworkPropertyMetadata((uint)0, OnScaleChanged));
 
-    private Regex? numberExpression;
-
     public NumberTextBox()
     {
         this.GotFocus += (_, _) => this.SelectAll();
         this.GotMouseCapture += (_, _) => this.SelectAll();
-        this.PreviewKeyDown += OnPreviewKeyDown;
-        this.PreviewTextInput += this.OnPreviewTextInput;
-        this.UpdateExpression();
     }
 
     public uint Scale
     {
         get => (uint)this.GetValue(ScaleProperty);
-        set
-        {
-            this.SetValue(ScaleProperty, value);
-            this.UpdateExpression();
-        }
+        set => this.SetValue(ScaleProperty, value);
     }
 
+    [ExcludeFromCodeCoverage(Justification = "This view function cannot be tested.")]
     protected override void OnInitialized(EventArgs e)
     {
         base.OnInitialized(e);
         DataObject.AddPastingHandler(this, this.OnPasteText);
     }
 
-    private static void OnScaleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (!(d is NumberTextBox numberTextBox) || !(e.NewValue is uint))
-        {
-            return;
-        }
-
-        numberTextBox.Scale = (uint)e.NewValue;
-    }
-
-    private static void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    [ExcludeFromCodeCoverage(Justification = "This view function cannot be tested.")]
+    protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         // The space character is NOT routed through PreviewTextInput.
         // We need this hook only to remove SPACE from input.
         e.Handled = e.Key == Key.Space;
     }
 
-    private void UpdateExpression()
+    [ExcludeFromCodeCoverage(Justification = "This view function cannot be tested.")]
+    protected override void OnPreviewTextInput(TextCompositionEventArgs e)
     {
-        if (this.Scale == 0)
+        // Always take responsibility for the resulting text.
+        e.Handled = true;
+
+        // Process entered text into new text and cursor state.
+        this.ProcessTextInput(e.Text);
+    }
+
+    internal void ProcessTextInput(string enteredText)
+    {
+        int selectionStart = this.SelectionStart;
+        if (!this.TryBuildNewText(enteredText, selectionStart, this.SelectionLength, out var newText))
         {
-            this.numberExpression = NumberRegex();
             return;
         }
 
-        var decimalSeparator = CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator;
-        this.numberExpression = new Regex(
-            $"^[0-9]*({decimalSeparator}[0-9]{{0,{this.Scale}}})?$",
-            RegexOptions.Compiled,
-            TimeSpan.FromSeconds(1));
+        this.Text = newText;
+        this.SelectionStart = selectionStart + enteredText.Length;
+        this.SelectionLength = 0;
+
+        string separator = CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator;
+        if (this.SelectionStart > 0
+            && this.Text.Substring(this.SelectionStart - 1, 1) == separator
+            && enteredText != separator)
+        {
+            // In case reformatting cuts leading zero, the cursor gets unexpected position.
+            this.SelectionStart--;
+        }
     }
 
-    private void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
+    private static void OnScaleChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
     {
-        // Build resulting text from current text, current selection and new text.
-        // Accept the new input only if result matches the number expression.
-        var newText =
-            this.Text[..this.SelectionStart]
-            + e.Text
-            + this.Text[(this.SelectionStart + this.SelectionLength)..];
-        var isValid = this.numberExpression!.IsMatch(newText);
-        e.Handled = !isValid;
+        if (dependencyObject is not NumberTextBox numberTextBox)
+        {
+            return;
+        }
+
+        if (eventArgs.NewValue is not uint newValue)
+        {
+            return;
+        }
+
+        numberTextBox.Scale = newValue;
     }
 
+    /// <summary>
+    ///     Checks whether the new text will result into valid number.
+    /// </summary>
+    /// <param name="enteredText">The new text entered to the box.</param>
+    /// <param name="selectionStart">The current selection (cursor) position.</param>
+    /// <param name="selectionLength">The length of the current selection.</param>
+    /// <param name="newText">The resulting new text.</param>
+    /// <returns>Value indicating whether the resulting text is valid.</returns>
+    private bool TryBuildNewText(string enteredText, int selectionStart, int selectionLength, out string newText)
+    {
+        // Build new text from current text, current selection and new text.
+        newText =
+            this.Text[..selectionStart]
+            + enteredText
+            + this.Text[(selectionStart + selectionLength)..];
+
+        // Remove duplicated separator.
+        var separator = CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator;
+        newText = newText.Replace(separator + separator, separator, StringComparison.CurrentCulture);
+
+        // Parse and reformat with current scale.
+        if (!double.TryParse(newText, CultureInfo.CurrentUICulture, out double newValue))
+        {
+            return false;
+        }
+
+        string formattedValue = newValue.ToString($"F{this.Scale}", CultureInfo.CurrentUICulture);
+        if (newText.Length > formattedValue.Length)
+        {
+            // Cut-off text below the precision of the current scale.
+            newText = formattedValue;
+        }
+
+        return true;
+    }
+
+    [ExcludeFromCodeCoverage(Justification = "This view function cannot be tested.")]
     private void OnPasteText(object sender, DataObjectPastingEventArgs e)
     {
+        // Always take responsibility for the resulting text.
+        e.CancelCommand();
+
         if (!e.DataObject.GetDataPresent(typeof(string)))
         {
-            e.CancelCommand();
             return;
         }
 
         var text = (string?)e.DataObject.GetData(typeof(string));
-        if (text == null || !this.numberExpression!.IsMatch(text))
+        if (text == null)
         {
-            e.CancelCommand();
+            return;
         }
-    }
 
-    [GeneratedRegex("^[0-9]*$", RegexOptions.Compiled)]
-    private static partial Regex NumberRegex();
+        // Process entered text into new text and cursor state.
+        this.ProcessTextInput(text);
+    }
 }
