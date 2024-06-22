@@ -7,7 +7,6 @@ namespace lg2de.SimpleAccounting.Presentation;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,7 +14,7 @@ using System.Windows.Input;
 /// <summary>
 ///     Implements a <see cref="TextBox" /> only accepting unsigned integer numbers.
 /// </summary>
-internal partial class NumberTextBox : TextBox
+internal class NumberTextBox : TextBox
 {
     public static readonly DependencyProperty ScaleProperty =
         DependencyProperty.Register(
@@ -23,23 +22,16 @@ internal partial class NumberTextBox : TextBox
             typeof(NumberTextBox),
             new FrameworkPropertyMetadata((uint)0, OnScaleChanged));
 
-    private Regex? numberExpression;
-
     public NumberTextBox()
     {
         this.GotFocus += (_, _) => this.SelectAll();
         this.GotMouseCapture += (_, _) => this.SelectAll();
-        this.UpdateExpression();
     }
 
     public uint Scale
     {
         get => (uint)this.GetValue(ScaleProperty);
-        set
-        {
-            this.SetValue(ScaleProperty, value);
-            this.UpdateExpression();
-        }
+        set => this.SetValue(ScaleProperty, value);
     }
 
     [ExcludeFromCodeCoverage(Justification = "This view function cannot be tested.")]
@@ -104,24 +96,6 @@ internal partial class NumberTextBox : TextBox
         numberTextBox.Scale = newValue;
     }
 
-    [GeneratedRegex("^[0-9]*$", RegexOptions.Compiled)]
-    private static partial Regex NumberRegex();
-
-    private void UpdateExpression()
-    {
-        if (this.Scale == 0)
-        {
-            this.numberExpression = NumberRegex();
-            return;
-        }
-
-        var decimalSeparator = CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator;
-        this.numberExpression = new Regex(
-            $"^[0-9]*({decimalSeparator}[0-9]{{0,{this.Scale}}})?$",
-            RegexOptions.Compiled,
-            TimeSpan.FromSeconds(1));
-    }
-
     /// <summary>
     ///     Checks whether the new text will result into valid number.
     /// </summary>
@@ -155,14 +129,7 @@ internal partial class NumberTextBox : TextBox
             newText = formattedValue;
         }
 
-        // Double-check with regular expression. 
-        if (this.numberExpression!.IsMatch(newText))
-        {
-            return true;
-        }
-
-        // TODO Is regex required?
-        return false;
+        return true;
     }
 
     [ExcludeFromCodeCoverage(Justification = "This view function cannot be tested.")]
