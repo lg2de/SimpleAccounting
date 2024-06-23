@@ -1,6 +1,6 @@
 # SimpleAccounting - Simple Accounting Software
 
-![Build status](https://github.com/lg2de/SimpleAccounting/workflows/continous%20integration/badge.svg?branch=main)
+![Build status](https://github.com/lg2de/SimpleAccounting/actions/workflows/dotnetcore.yml/badge.svg?branch=main)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=coverage)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=lg2de_SimpleAccounting)
 
@@ -50,13 +50,13 @@ Some screenshots for first impression:
 
 The application is based on [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
 There is
-a [self-contained package](https://github.com/lg2de/SimpleAccounting/releases/download/2.3.2/SimpleAccounting-self-contained.zip)
+a [self-contained package](https://github.com/lg2de/SimpleAccounting/releases/download/2.4.0/SimpleAccounting-self-contained.zip)
 available. Using this package you do not need to install the .NET 8 runtime. I'll update this package with security
 fixes if needed.
-There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.3.2/SimpleAccounting.zip)
+There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.4.0/SimpleAccounting.zip)
 available which requires .NET runtime to be installed.
 Please download and install the Runtime in
-version [8.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.3-windows-x64-installer)
+version [8.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.6-windows-x64-installer)
 or above.
 
 Download one of the `SimpleAccounting` packages from
