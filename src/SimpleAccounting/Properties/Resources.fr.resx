@@ -602,7 +602,7 @@ Sans une telle configuration pour au moins un compte, cette fonction est désact
   </data>
   <data name="Question_ExistingFileReservationX4" xml:space="preserve">
   <value>Le projet
-{1}
+{0}
 semble avoir été ouvert par un autre utilisateur.
 Nom d'utilisateur: {1}
 Nom de l'ordinateur : {2}

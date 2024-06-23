@@ -915,7 +915,7 @@ namespace lg2de.SimpleAccounting.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to The project
-        ///{1}
+        ///{0}
         ///seems to be opened already by a different user.
         ///User name: {1}
         ///Machine name: {2}

@@ -606,7 +606,7 @@ Without such configuration for at least one account, this function is disabled.<
   </data>
   <data name="Question_ExistingFileReservationX4" xml:space="preserve">
     <value>The project
-{1}
+{0}
 seems to be opened already by a different user.
 User name: {1}
 Machine name: {2}

@@ -591,7 +591,7 @@ Ohne eine solche Konfiguration für mindestens ein Konto ist diese Funktion deak
   </data>
     <data name="Question_ExistingFileReservationX4" xml:space="preserve">
     <value>Das Projekt
-{1}
+{0}
 scheint bereits von einem anderen Benutzer geöffnet worden zu sein.
 Benutzername: {1}
 Computer-Name: {2}
