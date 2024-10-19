@@ -30,7 +30,7 @@
     <!-- license is MIT -->
     <PackageReference Include="MagicFileEncoding" Version="3.0.0"/>
     <!-- license is MIT -->
-    <PackageReference Include="Octokit" Version="12.0.0"/>
+    <PackageReference Include="Octokit" Version="13.0.1"/>
   </ItemGroup>
 
   <ItemGroup>
