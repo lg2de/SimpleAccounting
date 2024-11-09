@@ -10,7 +10,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
+using FluentAssertions.Extensions;
 using lg2de.SimpleAccounting.Abstractions;
+using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
@@ -196,6 +198,162 @@ public class ImportBookingsViewModelTests
     }
 
     [Fact]
+    public void BookMappedCommand_FirstEntryMapped_CanExecute()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var accounts = projectData.Storage.AllAccounts.ToList();
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
+            });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = false, IsExisting = false
+            });
+
+        sut.BookMappedCommand.CanExecute(null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void BookMappedCommand_FirstEntrySkippedSecondMapped_CanExecute()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var accounts = projectData.Storage.AllAccounts.ToList();
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = true, IsExisting = false
+            });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
+            });
+
+        sut.BookMappedCommand.CanExecute(null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void BookMappedCommand_FirstEntryExistingSecondMapped_CanExecute()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var accounts = projectData.Storage.AllAccounts.ToList();
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = false, IsExisting = true
+            });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
+            });
+
+        sut.BookMappedCommand.CanExecute(null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void BookMappedCommand_UnmappedEntryBeforeStart_CanExecute()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var accounts = projectData.Storage.AllAccounts.ToList();
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
+        var sut = new ImportBookingsViewModel(null!, null!, projectData) { StartDate = sampleDate };
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate - 1.Days(), RemoteAccount = null, IsSkip = false, IsExisting = false
+            });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate + 1.Days(), RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
+            });
+
+        sut.BookMappedCommand.CanExecute(null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void BookMappedCommand_NoEntry_CannotExecute()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+
+        sut.BookMappedCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void BookMappedCommand_FirstEntryNotMapped_CannotExecute()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var accounts = projectData.Storage.AllAccounts.ToList();
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = false, IsExisting = false
+            });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
+            });
+
+        sut.BookMappedCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void BookMappedCommand_AllEntriesIgnored_CannotExecute()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var accounts = projectData.Storage.AllAccounts.ToList();
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = true, IsExisting = false
+            });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = false, IsExisting = true
+            });
+
+        sut.BookMappedCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
     public void BookAllCommand_EntryNotMapped_CannotExecute()
     {
         var clock = Substitute.For<IClock>();
@@ -204,8 +362,17 @@ public class ImportBookingsViewModelTests
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
         sut.LoadedData.Add(
-            new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = false, IsExisting = false });
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = false, IsExisting = false
+            });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
+            });
 
         sut.BookAllCommand.CanExecute(null).Should().BeFalse();
     }
@@ -219,8 +386,12 @@ public class ImportBookingsViewModelTests
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
         sut.LoadedData.Add(
-            new ImportEntryViewModel(accounts) { RemoteAccount = accounts[0], IsSkip = false, IsExisting = false });
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
+            });
 
         sut.BookAllCommand.CanExecute(null).Should().BeTrue();
     }
@@ -234,8 +405,12 @@ public class ImportBookingsViewModelTests
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
         sut.LoadedData.Add(
-            new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = true, IsExisting = false });
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = true, IsExisting = false
+            });
 
         sut.BookAllCommand.CanExecute(null).Should().BeTrue();
     }
@@ -249,8 +424,12 @@ public class ImportBookingsViewModelTests
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
         sut.LoadedData.Add(
-            new ImportEntryViewModel(accounts) { RemoteAccount = null, IsSkip = false, IsExisting = true });
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = false, IsExisting = true
+            });
 
         sut.BookAllCommand.CanExecute(null).Should().BeTrue();
     }

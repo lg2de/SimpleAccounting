@@ -142,11 +142,34 @@ internal class ImportBookingsViewModel : Screen
 
     public IAsyncCommand BookAllCommand => new AsyncCommand(
         this.ProcessDataAsync,
-        () => this.LoadedData.Exists(x => x.RemoteAccount != null || x.IsSkip || x.IsExisting));
+        () => this.ImportDataFiltered.All(x => x.RemoteAccount != null || x.IsSkip || x.IsExisting));
 
     public ICommand BookMappedCommand => new AsyncCommand(
         this.ProcessDataAsync,
-        () => this.LoadedData.Exists(x => x.RemoteAccount != null));
+        () =>
+        {
+            if (this.ImportDataFiltered.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (ImportEntryViewModel item in this.ImportDataFiltered)
+            {
+                if (item.RemoteAccount != null)
+                {
+                    return true;
+                }
+
+                if (item.IsSkip || item.IsExisting)
+                {
+                    continue;
+                }
+
+                return false;
+            }
+
+            return false;
+        });
 
     protected IProjectData ProjectData { get; }
 

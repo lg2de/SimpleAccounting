@@ -53,6 +53,9 @@ public class ImportEntryViewModel : JournalItemBaseViewModel
         }
     }
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether the import candidate was already booked.
+    /// </summary>
     public bool IsExisting { get; set; }
 
     public bool IsCandidate => !this.IsExisting;
