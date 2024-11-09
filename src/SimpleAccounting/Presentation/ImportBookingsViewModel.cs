@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using JetBrains.Annotations;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Infrastructure;
@@ -68,12 +69,12 @@ internal class ImportBookingsViewModel : Screen
     public bool IsImportBroken => !this.ImportAccounts.Any();
 
     /// <summary>
-    ///     Gets the minimal date valid for selecting <see cref="StartDate"/>.
+    ///     Gets the minimal date valid for selecting <see cref="StartDate" />.
     /// </summary>
     public DateTime RangeMin { get; }
 
     /// <summary>
-    ///     Gets the maximal date valid for selecting <see cref="StartDate"/>.
+    ///     Gets the maximal date valid for selecting <see cref="StartDate" />.
     /// </summary>
     public DateTime RangeMax { get; }
 
@@ -173,7 +174,7 @@ internal class ImportBookingsViewModel : Screen
 
     protected IProjectData ProjectData { get; }
 
-    private ulong FirstBookingNumber { get; }
+    [UsedImplicitly] internal ulong FirstBookingNumber { get; }
 
     protected void UpdateIdentifierInLoadedData()
     {
