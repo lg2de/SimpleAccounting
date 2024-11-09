@@ -561,7 +561,7 @@ public partial class ShellViewModelTests
                     FirstBookingNumber = 1,
                     RangeMin = new DateTime(DateTime.Now.Year, 1, 1, 0, 0, 0, DateTimeKind.Local),
                     RangeMax = new DateTime(DateTime.Now.Year, 12, 31, 0, 0, 0, DateTimeKind.Local)
-                });
+                }, o => o.IncludingInternalProperties());
             vm.ImportAccounts.Should().NotBeEmpty();
         }
     }
