@@ -50,10 +50,10 @@ Some screenshots for first impression:
 
 The application is based on [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
 There is
-a [self-contained package](https://github.com/lg2de/SimpleAccounting/releases/download/2.4.0/SimpleAccounting-self-contained.zip)
+a [self-contained package](https://github.com/lg2de/SimpleAccounting/releases/download/2.4.1/SimpleAccounting-self-contained.zip)
 available. Using this package you do not need to install the .NET 8 runtime. I'll update this package with security
 fixes if needed.
-There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.4.0/SimpleAccounting.zip)
+There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.4.1/SimpleAccounting.zip)
 available which requires .NET runtime to be installed.
 Please download and install the Runtime in
 version [8.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.10-windows-x64-installer)
