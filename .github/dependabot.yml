@@ -13,3 +13,5 @@ updates:
       xunit:
         patterns:
           - "xunit*"
+        exclude-patterns:
+          - "Xunit.StaFact"
