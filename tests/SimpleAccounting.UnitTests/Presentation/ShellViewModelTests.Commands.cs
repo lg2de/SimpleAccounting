@@ -322,18 +322,19 @@ public partial class ShellViewModelTests
     [Fact]
     public void AddBookingsCommand_HappyPath_DataTodayFromClock()
     {
-        var sut = CreateSut(out IWindowManager windowManager, out IClock clock);
+        var clock = Substitute.For<IClock>();
+        clock.Now().Returns(new DateTime(2025, 2, 2, 5, 6, 7, DateTimeKind.Local));
+        var sut = CreateSut(clock, out IWindowManager windowManager);
         EditBookingViewModel vm = null;
         windowManager.ShowDialogAsync(
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
-        clock.Now().Returns(new DateTime(2024, 2, 2, 5, 6, 7, DateTimeKind.Local));
         sut.ProjectData.LoadData(Samples.SampleProject);
         sut.Menu.BookingYears[^1].Command.Execute(null);
 
         sut.Menu.AddBookingsCommand.Execute(null);
 
-        vm.Date.Should().Be(new DateTime(2024, 2, 2, 0, 0, 0, DateTimeKind.Local));
+        vm.Date.Should().Be(new DateTime(2025, 2, 2, 0, 0, 0, DateTimeKind.Local));
     }
 
     [Fact]
