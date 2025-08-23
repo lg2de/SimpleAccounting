@@ -22,7 +22,7 @@ jobs:
       shell: pwsh
 
     - name: Set up JDK for SonarScanner
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
         java-version: 17
