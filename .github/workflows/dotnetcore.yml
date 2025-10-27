@@ -73,12 +73,12 @@ jobs:
       run: dotnet sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
 
     - name: Upload small artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: SimpleAccounting
         path: src\SimpleAccounting\bin\Release\net8.0-windows\publish
     - name: Upload large artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: SimpleAccounting-self-contained
         path: src\SimpleAccounting\bin\Release\net8.0-windows\win-x64\publish
