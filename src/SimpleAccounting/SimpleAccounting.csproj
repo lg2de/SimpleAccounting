@@ -3,12 +3,12 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <RootNamespace>lg2de.SimpleAccounting</RootNamespace>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Authors>Lukas Grützmacher</Authors>
-    <Copyright>Copyright © 2007-2023</Copyright>
+    <Copyright>Copyright © 2007-2025</Copyright>
     <InformationalVersion>DEVEL</InformationalVersion>
     <ApplicationIcon>App.ico</ApplicationIcon>
   </PropertyGroup>
