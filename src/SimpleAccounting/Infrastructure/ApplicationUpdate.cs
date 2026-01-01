@@ -89,8 +89,8 @@ internal class ApplicationUpdate : IApplicationUpdate
             @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe");
         var arguments = new[]
         {
-            "-ExecutionPolicy Bypass", $"-File {scriptPath}", $"-assetUrl {assetUrl}",
-            $"-targetFolder {targetFolder}", $"-processId {processId}"
+            "-ExecutionPolicy Bypass", $"-File \"{scriptPath}\"", $"-assetUrl {assetUrl}",
+            $"-targetFolder \"{targetFolder}\"", $"-processId {processId}"
         };
         var info = new ProcessStartInfo(fileName, string.Join(" ", arguments));
         var updateProcess = this.process.Start(info);
