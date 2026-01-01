@@ -782,4 +782,33 @@ public class EditBookingViewModelTests
 
         sut.SaveCommand.CanExecute(null).Should().BeFalse();
     }
+    [Fact]
+    public async Task OnInitialize_WithInactiveAccounts_FiltersInactiveAccounts()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
+
+        var sut = new EditBookingViewModel(projectData, YearBegin, editMode: false);
+
+        sut.Accounts.Add(new AccountDefinition { ID = 1, Name = "Active Income", Type = AccountDefinitionType.Income, Active = true });
+        sut.Accounts.Add(new AccountDefinition { ID = 2, Name = "Inactive Income", Type = AccountDefinitionType.Income, Active = false });
+
+        sut.Accounts.Add(new AccountDefinition { ID = 3, Name = "Active Expense", Type = AccountDefinitionType.Expense, Active = true });
+        sut.Accounts.Add(new AccountDefinition { ID = 4, Name = "Inactive Expense", Type = AccountDefinitionType.Expense, Active = false });
+
+        await ((IActivate)sut).ActivateAsync();
+
+
+        using var _ = new AssertionScope();
+
+        sut.IncomeAccounts.Should().ContainSingle(x => x.Name == "Active Income");
+        sut.IncomeAccounts.Should().NotContain(x => x.Name == "Inactive Income");
+
+        sut.ExpenseAccounts.Should().ContainSingle(x => x.Name == "Active Expense");
+        sut.ExpenseAccounts.Should().NotContain(x => x.Name == "Inactive Expense");
+    }
 }
