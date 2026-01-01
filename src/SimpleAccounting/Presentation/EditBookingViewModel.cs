@@ -281,16 +281,16 @@ internal class EditBookingViewModel : Screen
 
         this.DisplayName = this.EditMode ? Resources.Header_EditBooking : Resources.Header_NewBooking;
 
-        this.IncomeAccounts = this.Accounts.Where(x => x.Type == AccountDefinitionType.Income && x.Active).ToList();
+        this.IncomeAccounts = this.Accounts.Where(x => x.Type == AccountDefinitionType.Income).ToList();
 
         this.IncomeRemoteAccounts =
-            this.Accounts.Where(x => x.Type != AccountDefinitionType.Income && x.Active).ToList();
+            this.Accounts.Where(x => x.Type != AccountDefinitionType.Income).ToList();
 
         this.ExpenseAccounts =
-            this.Accounts.Where(x => x.Type == AccountDefinitionType.Expense && x.Active).ToList();
+            this.Accounts.Where(x => x.Type == AccountDefinitionType.Expense).ToList();
 
         this.ExpenseRemoteAccounts =
-            this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense && x.Active).ToList();
+            this.Accounts.Where(x => x.Type != AccountDefinitionType.Expense).ToList();
     }
 
     private bool IsDataValid()

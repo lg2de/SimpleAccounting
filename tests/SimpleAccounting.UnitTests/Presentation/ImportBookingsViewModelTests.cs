@@ -550,4 +550,42 @@ public class ImportBookingsViewModelTests
             });
         projectDataMonitor.Should().Raise(nameof(projectData.JournalChanged)).Should().HaveCount(1);
     }
+    [Fact]
+    public void ImportAccounts_InactiveAccountWithMapping_Excluded()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+
+        var activeAccount = new AccountDefinition
+        {
+            ID = 101,
+            Name = "Active Bank",
+            Active = true,
+            ImportMapping = Samples.SimpleImportConfiguration
+        };
+
+        var inactiveAccount = new AccountDefinition
+        {
+            ID = 102,
+            Name = "Old Bank (Inactive)",
+            Active = false, 
+            ImportMapping = Samples.SimpleImportConfiguration
+        };
+
+        projectData.Storage.Accounts =
+        [
+            new AccountingDataAccountGroup
+            {
+                Account = [activeAccount, inactiveAccount]
+            }
+        ];
+
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+
+        sut.ImportAccounts.Should().HaveCount(1);
+
+        sut.ImportAccounts.Should().Contain(x => x.Name == "Active Bank");
+
+        sut.ImportAccounts.Should().NotContain(x => x.Name == "Old Bank (Inactive)");
+    }
 }
