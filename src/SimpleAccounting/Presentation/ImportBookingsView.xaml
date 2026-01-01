@@ -81,6 +81,11 @@
         Orientation="Horizontal">
         <Button
           Width="100"
+          Content="Foo"
+          ToolTip="XYX"
+          Command="{Binding SetRemoteAccountCommand}" />
+        <Button
+          Width="100"
           Content="{x:Static properties:Resources.Action_BookPartially}"
           ToolTip="{x:Static properties:Resources.Tooltip_BookPartially}"
           IsEnabled="{Binding IsImportPossible}"

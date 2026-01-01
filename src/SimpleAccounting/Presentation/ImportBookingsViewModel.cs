@@ -20,6 +20,7 @@ using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
+using Microsoft.Xaml.Behaviors.Core;
 using Screen = Caliburn.Micro.Screen;
 
 /// <summary>
@@ -140,6 +141,42 @@ internal class ImportBookingsViewModel : Screen
     public ICommand LoadDataCommand => new AsyncCommand(
         this.OnLoadData,
         () => this.SelectedAccount != null);
+
+    public ICommand SetRemoteAccountCommand => new ActionCommand(this.OnSetRemoteAccount);
+
+    private void OnSetRemoteAccount()
+    {
+        var filteredAccounts = this.accounts.Where(
+            x => x.ID != this.selectedAccountNumber && x.Type != AccountDefinitionType.Carryforward).ToList();
+
+        foreach (var entry in this.ImportDataFiltered)
+        {
+            if (entry.RemoteAccount != null || entry.IsSkip || entry.IsExisting)
+            {
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(entry.Name))
+            {
+                continue;
+            }
+
+            entry.RemoteAccount = filteredAccounts.FirstOrDefault(x => x.Name.Contains(entry.Name, StringComparison.CurrentCultureIgnoreCase));
+            if (entry.RemoteAccount != null)
+            {
+                continue;
+            }
+            
+            var accountDistances = filteredAccounts
+                .Select(x => (Distance: x.Name.LevenshteinDistance(entry.Name), Account: x))
+                .OrderBy(x => x.Distance)
+                .ToList();
+
+            entry.RemoteAccount = accountDistances.FirstOrDefault().Account;
+        }
+
+        this.NotifyOfPropertyChange(nameof(this.ImportDataFiltered));
+    }
 
     public IAsyncCommand BookAllCommand => new AsyncCommand(
         this.ProcessDataAsync,
