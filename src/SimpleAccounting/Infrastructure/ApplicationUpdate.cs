@@ -63,14 +63,12 @@ internal class ApplicationUpdate : IApplicationUpdate
 
     public bool StartUpdateProcess(string packageName, bool dryRun)
     {
-        // load script from resource and write into temp file
-        string resourceName = dryRun
-            ? "lg2de.SimpleAccounting.Scripts.UpdateApplicationTest.ps1"
-            : "lg2de.SimpleAccounting.Scripts.UpdateApplication.ps1";
+        // load script from resources and write into a temporary file
+        const string resourceName = "lg2de.SimpleAccounting.Scripts.UpdateApplication.ps1";
         var stream = this.GetType().Assembly.GetManifestResourceStream(resourceName);
         if (stream == null)
         {
-            // script not found :(
+            // script wasn't found :(
             return false;
         }
 
@@ -90,7 +88,7 @@ internal class ApplicationUpdate : IApplicationUpdate
         var arguments = new[]
         {
             "-ExecutionPolicy Bypass", $"-File \"{scriptPath}\"", $"-assetUrl {assetUrl}",
-            $"-targetFolder \"{targetFolder}\"", $"-processId {processId}"
+            $"-targetFolder \"{targetFolder}\"", $"-processId {processId}", $"-dryRun {(dryRun ? "1" : "0")}"
         };
         var info = new ProcessStartInfo(fileName, string.Join(" ", arguments));
         var updateProcess = this.process.Start(info);
@@ -128,13 +126,12 @@ internal class ApplicationUpdate : IApplicationUpdate
     {
         try
         {
-            var queryTask = Task.Run(
-                async () =>
-                {
-                    var productInformation = new ProductHeaderValue(Defines.ProjectName);
-                    var client = new GitHubClient(productInformation);
-                    return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
-                });
+            var queryTask = Task.Run(async () =>
+            {
+                var productInformation = new ProductHeaderValue(Defines.ProjectName);
+                var client = new GitHubClient(productInformation);
+                return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
+            });
             return await queryTask;
         }
         catch (Exception exception)
@@ -190,12 +187,11 @@ internal class ApplicationUpdate : IApplicationUpdate
         {
             vm.AddOption(
                 releaseMap?.GetValueOrDefault(assetName.ToUpperInvariant(), assetName) ?? "<unknown>",
-                new AsyncCommand(
-                    () =>
-                    {
-                        selectedPackage = assetName;
-                        return vm.TryCloseAsync(dialogResult: true);
-                    }));
+                new AsyncCommand(() =>
+                {
+                    selectedPackage = assetName;
+                    return vm.TryCloseAsync(dialogResult: true);
+                }));
         }
 
         var result = await this.windowManager.ShowDialogAsync(vm);
