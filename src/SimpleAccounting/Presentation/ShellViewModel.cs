@@ -139,9 +139,9 @@ internal class ShellViewModel : Screen
         return await this.ProjectData.TryCloseAsync();
     }
 
-    protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
+    protected override async Task OnInitializedAsync(CancellationToken cancellationToken)
     {
-        await base.OnInitializeAsync(cancellationToken);
+        await base.OnInitializedAsync(cancellationToken);
 
         AppDomain.CurrentDomain.UnhandledException +=
             (_, args) => this.OnUnhandledException((Exception)args.ExceptionObject);
@@ -180,9 +180,9 @@ internal class ShellViewModel : Screen
         Environment.Exit(1);
     }
 
-    protected override async Task OnActivateAsync(CancellationToken cancellationToken)
+    protected override async Task OnActivatedAsync(CancellationToken cancellationToken)
     {
-        await base.OnActivateAsync(cancellationToken);
+        await base.OnActivatedAsync(cancellationToken);
 
         var dispatcher = Dispatcher.CurrentDispatcher;
         if (!string.IsNullOrEmpty(this.ProjectData.Settings.RecentProject))

@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <!-- licecnse is MIT -->
-    <PackageReference Include="Caliburn.Micro" Version="4.0.230"/>
+    <PackageReference Include="Caliburn.Micro" Version="5.0.258" />
     <!-- license is MS-PL -->
     <PackageReference Include="CsvHelper" Version="33.1.0" />
     <!-- licecnse is MIT -->

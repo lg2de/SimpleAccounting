@@ -23,6 +23,6 @@ internal sealed class CloseYearDesignViewModel : CloseYearViewModel
         : base(new AccountingDataJournal { Year = "2020" })
     {
         this.Accounts.Add(new AccountDefinition { ID = 990, Name = "My CarryForward" });
-        this.OnInitializeAsync(CancellationToken.None).Wait();
+        this.OnInitializedAsync(CancellationToken.None).Wait();
     }
 }
