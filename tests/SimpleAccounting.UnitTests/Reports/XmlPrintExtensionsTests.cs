@@ -10,7 +10,7 @@ using Xunit;
 
 public class XmlPrintExtensionsTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void Translate_NoReferenceText_UnchangedStringReturned()
     {
         var result = "abc".Translate();
@@ -18,7 +18,7 @@ public class XmlPrintExtensionsTests
         result.Should().Be("abc");
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void Translate_ReferenceText_TranslatedStringReturned()
     {
         var result = $"@{nameof(Resources.Word_AccountName)}@".Translate();
@@ -26,7 +26,7 @@ public class XmlPrintExtensionsTests
         result.Should().Be(Resources.Word_AccountName);
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void Translate_TwoReferenceTexts_TranslatedStringsReturned()
     {
         var result = $"@{nameof(Resources.Word_AccountName)}@@{nameof(Resources.Word_BookingNumber)}@".Translate();
@@ -34,7 +34,7 @@ public class XmlPrintExtensionsTests
         result.Should().Be(Resources.Word_AccountName + Resources.Word_BookingNumber);
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void Translate_UnbalancedKeyCharacters_UnchangedStringReturned()
     {
         var result = "@abc".Translate();
@@ -42,7 +42,7 @@ public class XmlPrintExtensionsTests
         result.Should().Be("@abc");
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void Translate_UnknownReferenceText_ReferenceTextReturned()
     {
         var result = "@abc@".Translate();

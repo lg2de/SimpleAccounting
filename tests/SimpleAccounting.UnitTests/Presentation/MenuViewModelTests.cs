@@ -63,7 +63,7 @@ public class MenuViewModelTests
         values.Should().Equal(true, false);
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void SwitchCultureCommand_DummyLanguage_MessageBoxShownAndConfigurationUpdated()
     {
         var sut = CreateSut(out IDialogs dialogs);

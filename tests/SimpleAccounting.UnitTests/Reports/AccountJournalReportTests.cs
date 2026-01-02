@@ -17,7 +17,7 @@ using Xunit;
 
 public class AccountJournalReportTests
 {
-    [CulturedTheory("en")]
+    [CulturedTheory(["en"])]
     [InlineData(true)]
     [InlineData(false)]
     public void CreateReport_SampleData_Converted(bool pageBreakBetweenAccounts)

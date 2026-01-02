@@ -21,7 +21,7 @@ using Xunit;
 
 public partial class ShellViewModelTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void AccountSelectionCommand_SampleBookingsBankAccount_AccountJournalUpdated()
     {
         var sut = CreateSut();
@@ -56,7 +56,7 @@ public partial class ShellViewModelTests
             });
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void AccountSelectionCommand_SampleBookingsSalary_AccountJournalUpdated()
     {
         var sut = CreateSut();
@@ -76,7 +76,7 @@ public partial class ShellViewModelTests
             });
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void AccountSelectionCommand_SampleBookingsShoes_AccountJournalUpdated()
     {
         var sut = CreateSut();
@@ -224,7 +224,7 @@ public partial class ShellViewModelTests
             Arg.Any<object>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>());
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void EditAccountCommand_Confirmed_AllDataUpdated()
     {
         var sut = CreateSut(out IWindowManager windowManager);
@@ -585,7 +585,7 @@ public partial class ShellViewModelTests
         sut.Menu.ImportBookingsCommand.CanExecute(null).Should().BeTrue();
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void CloseYearCommand_HappyPath_YearClosedAndNewAdded()
     {
         var sut = CreateSut(out IWindowManager windowManager);
@@ -663,7 +663,7 @@ public partial class ShellViewModelTests
             });
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void CloseYearCommand_SecondCarryForwardAccount_OpeningsWithSelectedAccount()
     {
         const ulong myCarryForwardNumber = 999;

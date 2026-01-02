@@ -32,7 +32,7 @@ public class ProjectFileLoaderTests
         result.Subject.Should().Be(OperationResult.Failed);
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task LoadAsync_UserDoesNotWantToOpenReservedProject_ReturnsAborted()
     {
         var dialogs = Substitute.For<IDialogs>();
@@ -60,7 +60,7 @@ public class ProjectFileLoaderTests
             Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task LoadAsync_ReservationForCurrentUserAndHost_ReturnsCompleted()
     {
         var dialogs = Substitute.For<IDialogs>();

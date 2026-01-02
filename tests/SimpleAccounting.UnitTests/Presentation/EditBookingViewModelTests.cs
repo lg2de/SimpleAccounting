@@ -489,7 +489,7 @@ public class EditBookingViewModelTests
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin, editMode: false);
 
-        await ((IActivate)sut).ActivateAsync();
+        await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
 
         sut.DisplayName.Should().NotBeNullOrWhiteSpace();
         sut.SelectedTemplate.Should().BeNull("not template should be selected by default");
@@ -510,7 +510,7 @@ public class EditBookingViewModelTests
             sut.Accounts.Add(new AccountDefinition { Name = type.ToString(), Type = type });
         }
 
-        ((IActivate)sut).ActivateAsync();
+        ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
 
         sut.Accounts.Should().NotBeEmpty();
         sut.IncomeAccounts.Should().NotBeEmpty();

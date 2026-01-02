@@ -14,7 +14,7 @@ public class AccountJournalViewModelTests
     private const ulong TestAccountNumber = Samples.BankAccount;
     private const ulong OtherAccountNumber = Samples.Carryforward;
 
-    [CulturedTheory("en")]
+    [CulturedTheory(["en"])]
     [InlineData(true)]
     [InlineData(false)]
     public void Rebuild_Variations_FollowupBuildCorrectly(bool followup)

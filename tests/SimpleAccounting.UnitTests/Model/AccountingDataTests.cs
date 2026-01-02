@@ -148,7 +148,7 @@ public class AccountingDataTests
         latest.Booking.Should().BeEmpty();
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void CloseYear_SampleDataEnglish_AllRelevantDataCorrect()
     {
         var sut = Samples.SampleProject;
@@ -195,7 +195,7 @@ public class AccountingDataTests
             });
     }
 
-    [CulturedFact("de")]
+    [CulturedFact(["de"])]
     [SuppressMessage("ReSharper", "StringLiteralTypo", Justification = "german test text")]
     public void CloseYear_SampleDataGerman_TextCorrect()
     {
@@ -235,7 +235,7 @@ public class AccountingDataTests
             });
     }
 
-    [CulturedFact("fr")]
+    [CulturedFact(["fr"])]
     [SuppressMessage("ReSharper", "StringLiteralTypo", Justification = "french test text")]
     public void CloseYear_SampleDataFrench_TextCorrect()
     {
@@ -275,7 +275,7 @@ public class AccountingDataTests
             });
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void CloseYear_TextOptionAccountName_TextCorrect()
     {
         var sut = Samples.SampleProject;

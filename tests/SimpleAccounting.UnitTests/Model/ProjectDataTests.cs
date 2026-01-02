@@ -24,7 +24,7 @@ using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 public class ProjectDataTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task LoadFromFileAsync_UserWantsAutoSaveFile_AutoSaveFileLoaded()
     {
         var windowManager = Substitute.For<IWindowManager>();
@@ -57,7 +57,7 @@ public class ProjectDataTests
         fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task LoadFromFileAsync_UserDoesNotWantAutoSaveFileExists_ProjectFileLoaded()
     {
         var windowManager = Substitute.For<IWindowManager>();
@@ -127,7 +127,7 @@ public class ProjectDataTests
         fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task LoadFromFileAsync_UserDoesNotWantSaveCurrentProject_LoadingAborted()
     {
         var windowManager = Substitute.For<IWindowManager>();
