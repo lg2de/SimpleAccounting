@@ -9,8 +9,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FluentAssertions;
-using FluentAssertions.Extensions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Infrastructure;

@@ -14,8 +14,6 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Caliburn.Micro;
-using FluentAssertions;
-using FluentAssertions.Extensions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;

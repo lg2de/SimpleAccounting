@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
 using Xunit;

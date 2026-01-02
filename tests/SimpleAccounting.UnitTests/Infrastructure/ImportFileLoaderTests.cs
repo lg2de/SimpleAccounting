@@ -8,7 +8,6 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using FluentAssertions;
 using JetBrains.Annotations;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;

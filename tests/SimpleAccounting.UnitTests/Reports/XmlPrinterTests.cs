@@ -9,8 +9,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Xml.Linq;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Reports;
 using NSubstitute;

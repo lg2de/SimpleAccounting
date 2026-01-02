@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.UnitTests.Presentation;

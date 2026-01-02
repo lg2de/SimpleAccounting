@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Model;
 
 using System;
 using System.IO;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
 using Xunit;
 

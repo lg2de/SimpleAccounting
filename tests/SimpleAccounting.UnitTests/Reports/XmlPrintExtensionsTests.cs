@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
-using FluentAssertions;
 using lg2de.SimpleAccounting.Properties;
 using lg2de.SimpleAccounting.Reports;
 using Xunit;

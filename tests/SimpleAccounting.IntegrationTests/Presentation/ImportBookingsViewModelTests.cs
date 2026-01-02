@@ -7,7 +7,6 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation;
 using System;
 using System.Linq;
 using System.Windows;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
