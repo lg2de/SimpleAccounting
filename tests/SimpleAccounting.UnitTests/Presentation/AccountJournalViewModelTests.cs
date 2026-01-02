@@ -14,7 +14,7 @@ public class AccountJournalViewModelTests
     private const ulong TestAccountNumber = Samples.BankAccount;
     private const ulong OtherAccountNumber = Samples.Carryforward;
 
-    [CulturedTheory("en")]
+    [CulturedTheory(["en"])]
     [InlineData(true)]
     [InlineData(false)]
     public void Rebuild_Variations_FollowupBuildCorrectly(bool followup)
@@ -22,23 +22,23 @@ public class AccountJournalViewModelTests
         var projectData = Samples.SampleProjectData;
         uint date = projectData.CurrentYear.DateStart;
         projectData.CurrentYear.Booking.AddRange(
-            collection: new[]
-            {
+            collection:
+            [
                 CreateBooking(date, identifier: 1, creditCount: 1, debitCount: 1, followup),
                 CreateBooking(date, identifier: 2, creditCount: 1, debitCount: 2, followup),
                 CreateBooking(date, identifier: 3, creditCount: 2, debitCount: 1, followup)
-            });
+            ]);
         var sut = new AccountJournalViewModel(projectData: projectData);
 
         sut.Rebuild(accountNumber: TestAccountNumber);
 
         sut.Items.Should().BeEquivalentTo(
-            expectation: new[]
-            {
+            expectation:
+            [
                 new { Identifier = 1, RemoteAccount = "990 (Carryforward)", IsFollowup = followup },
                 new { Identifier = 2, RemoteAccount = "Various", IsFollowup = followup },
                 new { Identifier = 3, RemoteAccount = "Various", IsFollowup = followup }
-            }, config: o => o.WithStrictOrdering());
+            ], config: o => o.WithStrictOrdering());
     }
 
     [Fact]

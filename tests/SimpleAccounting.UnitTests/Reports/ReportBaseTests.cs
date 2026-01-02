@@ -31,7 +31,7 @@ public class ReportBaseTests
         }
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void PreparePrintDocument_SampleXml_PlaceholdersUpdates()
     {
         var printer = Substitute.For<IXmlPrinter>();

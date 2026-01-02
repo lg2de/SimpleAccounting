@@ -29,7 +29,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut();
 
-        await ((IActivate)sut).ActivateAsync();
+        await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
 
         sut.DisplayName.Should().NotBeNullOrWhiteSpace();
     }
@@ -191,7 +191,7 @@ public partial class ShellViewModelTests
             Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task OnActivate_SampleProject_JournalsUpdates()
     {
         var sut = CreateSut();
@@ -208,29 +208,18 @@ public partial class ShellViewModelTests
             "Active empty Credit", "Active empty Debit", "Active empty Carryforward");
 
         sut.FullJournal.Items.Should().BeEquivalentTo(
-            new[]
-            {
-                new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
-                new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
-                new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
-                new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
-                new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
-                new
-                {
-                    Text = "Credit rate",
-                    CreditAccount = "100 (Bank account)",
-                    DebitAccount = "5000 (Bank credit)"
-                },
-                new { Text = "Shoes1", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes2", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = string.Empty },
-                new
-                {
-                    Text = "Rent to friend",
-                    CreditAccount = "100 (Bank account)",
-                    DebitAccount = "6000 (Friends debit)"
-                }
-            });
+        [
+            new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
+            new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
+            new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
+            new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
+            new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
+            new { Text = "Credit rate", CreditAccount = "100 (Bank account)", DebitAccount = "5000 (Bank credit)" },
+            new { Text = "Shoes1", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+            new { Text = "Shoes2", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+            new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = string.Empty },
+            new { Text = "Rent to friend", CreditAccount = "100 (Bank account)", DebitAccount = "6000 (Friends debit)" }
+        ]);
         sut.AccountJournal.Items.Should().BeEquivalentTo(
             new object[]
             {
@@ -251,7 +240,7 @@ public partial class ShellViewModelTests
         fileSystem.FileExists(Arg.Is("file1")).Returns(true);
         fileSystem.FileExists(Arg.Is("file2")).Returns(false);
 
-        await ((IActivate)sut).ActivateAsync();
+        await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
 
         // even the file is not available currently it should not be removed immediately from menu
         sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("file1", "file2");
@@ -265,7 +254,7 @@ public partial class ShellViewModelTests
         fileSystem.FileExists(Arg.Is("file1")).Returns(true);
         fileSystem.FileExists(Arg.Is("file2")).Returns(false);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-        await ((IActivate)sut).ActivateAsync();
+        await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
         sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("file1", "file2");
 
         foreach (var viewModel in sut.Menu.RecentProjects.ToList())
@@ -292,7 +281,7 @@ public partial class ShellViewModelTests
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
             .Returns(MessageBoxResult.No);
-        await ((IActivate)sut).ActivateAsync();
+        await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
         sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("K:\\file1", "file2");
 
         foreach (var viewModel in sut.Menu.RecentProjects.ToList())
@@ -308,14 +297,17 @@ public partial class ShellViewModelTests
     public async Task OnDeactivate_HappyPath_Completes()
     {
         var sut = CreateSut();
-        await ((IActivate)sut).ActivateAsync();
+        await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
 
-        var task = Task.Run(() => ((IDeactivate)sut).DeactivateAsync(close: true));
+        var task =
+            Task.Run(
+                () => ((IDeactivate)sut).DeactivateAsync(close: true, TestContext.Current.CancellationToken),
+                TestContext.Current.CancellationToken);
 
         await task.Awaiting(x => x).Should().CompleteWithinAsync(10.Seconds());
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void AddBooking_FirstBooking_JournalsUpdated()
     {
         var sut = CreateSut();
@@ -334,18 +326,17 @@ public partial class ShellViewModelTests
 
         using var _ = new AssertionScope();
         sut.FullJournal.Items.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    Identifier = 4567,
-                    Date = new DateTime(DateTime.Now.Year, 4, 1, 0, 0, 0, DateTimeKind.Local),
-                    Text = "Init",
-                    Value = 0.42,
-                    CreditAccount = "990 (Carryforward)",
-                    DebitAccount = "100 (Bank account)"
-                }
-            });
+                Identifier = 4567,
+                Date = new DateTime(DateTime.Now.Year, 4, 1, 0, 0, 0, DateTimeKind.Local),
+                Text = "Init",
+                Value = 0.42,
+                CreditAccount = "990 (Carryforward)",
+                DebitAccount = "100 (Bank account)"
+            }
+        ]);
         fullJournalMonitor.Should().RaisePropertyChangeFor(x => x.SelectedItem);
         sut.FullJournal.SelectedItem.Should().BeEquivalentTo(new { Identifier = 4567 });
         sut.AccountJournal.Items.Should().BeEquivalentTo(
@@ -367,7 +358,7 @@ public partial class ShellViewModelTests
         sut.AccountJournal.SelectedItem.Should().BeEquivalentTo(new { Identifier = 4567 });
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void AddBooking_BookingWithoutCurrentAccount_AccountJournalUnchanged()
     {
         var sut = CreateSut();
@@ -414,7 +405,7 @@ public partial class ShellViewModelTests
     {
         var sut = CreateSut();
 
-        var result = await sut.CanCloseAsync();
+        var result = await sut.CanCloseAsync(TestContext.Current.CancellationToken);
 
         result.Should().BeTrue();
     }
@@ -429,7 +420,7 @@ public partial class ShellViewModelTests
             .Returns(MessageBoxResult.Cancel);
         sut.ProjectData.IsModified = true;
 
-        var result = await sut.CanCloseAsync();
+        var result = await sut.CanCloseAsync(TestContext.Current.CancellationToken);
 
         result.Should().BeFalse();
         sut.ProjectData.IsModified.Should().BeTrue();
@@ -446,7 +437,7 @@ public partial class ShellViewModelTests
         sut.ProjectData.NewProject();
         sut.ProjectData.IsModified = true;
 
-        var result = await sut.CanCloseAsync();
+        var result = await sut.CanCloseAsync(TestContext.Current.CancellationToken);
 
         result.Should().BeFalse();
         sut.ProjectData.IsModified.Should().BeTrue();
@@ -461,7 +452,7 @@ public partial class ShellViewModelTests
         fileSystem.FileExists(autoSaveFileName).Returns(true);
         fileSystem.FileExists(reservationFile).Returns(true);
 
-        var result = await sut.CanCloseAsync();
+        var result = await sut.CanCloseAsync(TestContext.Current.CancellationToken);
 
         result.Should().BeTrue();
         fileSystem.Received(1).FileDelete(autoSaveFileName);

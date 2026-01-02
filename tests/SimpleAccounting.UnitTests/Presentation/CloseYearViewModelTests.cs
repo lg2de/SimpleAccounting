@@ -36,7 +36,7 @@ public class CloseYearViewModelTests
         var sut = new CloseYearViewModel(new AccountingDataJournal());
         sut.Accounts.Add(new AccountDefinition { ID = 1, Name = "CF", Type = AccountDefinitionType.Carryforward });
 
-        await ((IActivate)sut).ActivateAsync();
+        await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
 
         sut.RemoteAccount.Should().Be(sut.Accounts.Single());
     }
@@ -46,7 +46,7 @@ public class CloseYearViewModelTests
     {
         var sut = new CloseYearViewModel(new AccountingDataJournal());
 
-        await ((IActivate)sut).ActivateAsync();
+        await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
 
         sut.RemoteAccount.Should().BeNull();
     }

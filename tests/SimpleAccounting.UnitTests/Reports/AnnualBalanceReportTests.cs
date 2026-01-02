@@ -14,7 +14,7 @@ using Xunit;
 
 public class AnnualBalanceReportTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void CreateReport_SampleData_Converted()
     {
         var projectData = Samples.SampleProjectData;

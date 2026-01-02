@@ -68,7 +68,7 @@ public class ImportBookingsViewModelTests
         sut.IsImportBroken.Should().BeFalse();
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void SelectedAccountNumber_BankAccountSelected_ExistingBookingsSetUp()
     {
         var clock = Substitute.For<IClock>();

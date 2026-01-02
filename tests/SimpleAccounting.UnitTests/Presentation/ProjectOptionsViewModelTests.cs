@@ -18,7 +18,7 @@ public class ProjectOptionsViewModelTests
         var data = new AccountingData();
         var sut = new ProjectOptionsViewModel(data);
 
-        await sut.As<IActivate>().ActivateAsync();
+        await sut.As<IActivate>().ActivateAsync(TestContext.Current.CancellationToken);
 
         sut.DisplayName.Should().NotBe(sut.GetType().FullName);
     }

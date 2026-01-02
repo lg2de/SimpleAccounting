@@ -16,7 +16,7 @@ using Xunit;
 
 public class TotalsAndBalancesReportTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void CreateReport_SampleData_Converted()
     {
         var projectData = Samples.SampleProjectData;

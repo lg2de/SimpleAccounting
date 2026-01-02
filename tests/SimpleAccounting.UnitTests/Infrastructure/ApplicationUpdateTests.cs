@@ -21,7 +21,7 @@ using Xunit;
 
 public class ApplicationUpdateTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task StartUpdateProcess_UpdateProcessFailed_UpdateAborted()
     {
         var dialogs = Substitute.For<IDialogs>();
