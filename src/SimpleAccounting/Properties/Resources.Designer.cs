@@ -231,6 +231,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Assign Remote Accounts.
+        /// </summary>
+        public static string Action_SetRemoteAccounts {
+            get {
+                return ResourceManager.GetString("Action_SetRemoteAccounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Opening value {0}.
         /// </summary>
         public static string CloseYear_OpeningValueX {
@@ -1055,6 +1064,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Tooltip_BookPartially {
             get {
                 return ResourceManager.GetString("Tooltip_BookPartially", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All entries without set remote account will be updated with an account which is as close as possible to the name of the booking..
+        /// </summary>
+        public static string Tooltip_SetRemoteAccounts {
+            get {
+                return ResourceManager.GetString("Tooltip_SetRemoteAccounts", resourceCulture);
             }
         }
         
