@@ -84,6 +84,8 @@ public sealed class StringExtensionsTests : IDisposable
     [InlineData(null, null, 0)]
     [InlineData(null, "", 0)]
     [InlineData("", "", 0)]
+    [InlineData("", "A", 1)]
+    [InlineData("A", "", 1)]
     [InlineData("A", "A", 0)]
     [InlineData("A", "AA", 1)]
     [InlineData("A", "B", 1)]

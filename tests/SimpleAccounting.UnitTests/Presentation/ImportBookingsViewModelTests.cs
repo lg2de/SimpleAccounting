@@ -254,17 +254,23 @@ public class ImportBookingsViewModelTests
         var accounts = projectData.Storage.AllAccounts.ToList();
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
         var sampleDate = (Samples.BaseDate + 110).ToDateTime();
-        sut.LoadedData.Add(new ImportEntryViewModel(accounts) { Date = sampleDate, Name = "New Shoes" });
+        sut.LoadedData.Add(new ImportEntryViewModel(accounts) { Date = sampleDate });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts) { Date = sampleDate, Name = "irrelevant", RemoteAccount = accounts[0] });
+        sut.LoadedData.Add(new ImportEntryViewModel(accounts) { Date = sampleDate, Name = "Shoes" });
         sut.LoadedData.Add(new ImportEntryViewModel(accounts) { Date = sampleDate, Name = "Frieds spend" });
 
         sut.SetRemoteAccountsCommand.Execute(null);
 
         sut.LoadedData.Should()
             .BeEquivalentTo(
-            [
-                new { RemoteAccount = new { Name = "Shoes" } },
-                new { RemoteAccount = new { Name = "Friends debit" } }
-            ]);
+                new object[]
+                {
+                    new { RemoteAccount = new { Name = "Bank account" } },
+                    new { RemoteAccount = (object)null },
+                    new { RemoteAccount = new { Name = "Shoes" } },
+                    new { RemoteAccount = new { Name = "Friends debit" } }
+                });
     }
 
     [Fact]
