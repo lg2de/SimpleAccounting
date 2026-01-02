@@ -652,4 +652,10 @@ You can report error details with the development team on GitHub
 or contact other experts by forwarding the detailed information via email or other channels (clipboard).
 Error message:</value>
   </data>
+  <data name="Action_SetRemoteAccounts" xml:space="preserve">
+    <value>Assign Remote Accounts</value>
+  </data>
+  <data name="Tooltip_SetRemoteAccounts" xml:space="preserve">
+    <value>All entries without set remote account will be updated with an account which is as close as possible to the name of the booking.</value>
+  </data>
 </root>

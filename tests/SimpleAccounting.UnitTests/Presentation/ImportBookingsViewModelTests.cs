@@ -31,7 +31,7 @@ public class ImportBookingsViewModelTests
         projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
 
-        sut.ImportAccounts.Should().BeEquivalentTo(new[] { new { Name = "Bank account" } });
+        sut.ImportAccounts.Should().BeEquivalentTo([new { Name = "Bank account" }]);
     }
 
     [Fact]
@@ -85,49 +85,48 @@ public class ImportBookingsViewModelTests
         sut.ImportDataFiltered.Should().BeEmpty("start date should be set after last booking");
         sut.ExistingData.Should()
             .BeEquivalentTo(
-                new[]
+            [
+                new
                 {
-                    new
-                    {
-                        Date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Local),
-                        Identifier = 1,
-                        Text = "Open 1",
-                        Value = 1000,
-                        RemoteAccount = new { ID = 990 }
-                    },
-                    new
-                    {
-                        Date = new DateTime(year, 1, 28, 0, 0, 0, DateTimeKind.Local),
-                        Identifier = 3,
-                        Text = "Salary",
-                        Value = 200,
-                        RemoteAccount = new { ID = 400 }
-                    },
-                    new
-                    {
-                        Date = new DateTime(year, 1, 29, 0, 0, 0, DateTimeKind.Local),
-                        Identifier = 4,
-                        Text = "Credit rate",
-                        Value = -400,
-                        RemoteAccount = new { ID = 5000 }
-                    },
-                    new
-                    {
-                        Date = new DateTime(year, 2, 1, 0, 0, 0, DateTimeKind.Local),
-                        Identifier = 5,
-                        Text = "Shoes",
-                        Value = -50,
-                        RemoteAccount = new { ID = 600 }
-                    },
-                    new
-                    {
-                        Date = new DateTime(year, 2, 5, 0, 0, 0, DateTimeKind.Local),
-                        Identifier = 6,
-                        Text = "Rent to friend",
-                        Value = -99,
-                        RemoteAccount = new { ID = 6000 }
-                    }
-                })
+                    Date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                    Identifier = 1,
+                    Text = "Open 1",
+                    Value = 1000,
+                    RemoteAccount = new { ID = 990 }
+                },
+                new
+                {
+                    Date = new DateTime(year, 1, 28, 0, 0, 0, DateTimeKind.Local),
+                    Identifier = 3,
+                    Text = "Salary",
+                    Value = 200,
+                    RemoteAccount = new { ID = 400 }
+                },
+                new
+                {
+                    Date = new DateTime(year, 1, 29, 0, 0, 0, DateTimeKind.Local),
+                    Identifier = 4,
+                    Text = "Credit rate",
+                    Value = -400,
+                    RemoteAccount = new { ID = 5000 }
+                },
+                new
+                {
+                    Date = new DateTime(year, 2, 1, 0, 0, 0, DateTimeKind.Local),
+                    Identifier = 5,
+                    Text = "Shoes",
+                    Value = -50,
+                    RemoteAccount = new { ID = 600 }
+                },
+                new
+                {
+                    Date = new DateTime(year, 2, 5, 0, 0, 0, DateTimeKind.Local),
+                    Identifier = 6,
+                    Text = "Rent to friend",
+                    Value = -99,
+                    RemoteAccount = new { ID = 6000 }
+                }
+            ])
             .And.AllBeEquivalentTo(new { Name = "<already booked>", IsExisting = true });
     }
 
@@ -195,6 +194,77 @@ public class ImportBookingsViewModelTests
 
         projectData.Storage.Setup.Behavior.LastBookingImportFolder.Should().Be("F:\\MySelectedFolder");
         dialogs.Received(1).ShowOpenFileDialog(Arg.Any<string>(), Arg.Is<string>(x => x == "E:\\MySelectedFolder"));
+    }
+
+    [Fact]
+    public void SetRemoteAccountsCommand_EntryNotMapped_CanExecute()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var accounts = projectData.Storage.AllAccounts.ToList();
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
+            });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = null, IsSkip = false, IsExisting = false
+            });
+
+        sut.SetRemoteAccountsCommand.CanExecute(null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void SetRemoteAccountsCommand_EntriesMapped_CannotExecute()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var accounts = projectData.Storage.AllAccounts.ToList();
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = accounts[0], IsSkip = false, IsExisting = false
+            });
+        sut.LoadedData.Add(
+            new ImportEntryViewModel(accounts)
+            {
+                Date = sampleDate, RemoteAccount = accounts[1], IsSkip = false, IsExisting = false
+            });
+
+        sut.SetRemoteAccountsCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void SetRemoteAccountsCommand_EntryNotMapped_AccountsSelected()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        projectData.LoadData(Samples.SampleProject);
+        projectData.Storage.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        var accounts = projectData.Storage.AllAccounts.ToList();
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var sampleDate = (Samples.BaseDate + 110).ToDateTime();
+        sut.LoadedData.Add(new ImportEntryViewModel(accounts) { Date = sampleDate, Name = "New Shoes" });
+        sut.LoadedData.Add(new ImportEntryViewModel(accounts) { Date = sampleDate, Name = "Frieds spend" });
+
+        sut.SetRemoteAccountsCommand.Execute(null);
+
+        sut.LoadedData.Should()
+            .BeEquivalentTo(
+            [
+                new { RemoteAccount = new { Name = "Shoes" } },
+                new { RemoteAccount = new { Name = "Friends debit" } }
+            ]);
     }
 
     [Fact]
@@ -455,69 +525,68 @@ public class ImportBookingsViewModelTests
         int year = DateTime.Today.Year;
         sut.StartDate = new DateTime(year, 1, 2, 0, 0, 0, DateTimeKind.Local);
         sut.LoadedData.AddRange(
-            new[]
+        [
+            new ImportEntryViewModel(accounts)
             {
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Local),
-                    Identifier = 101,
-                    Name = "Name",
-                    Text = "Text",
-                    Value = 1,
-                    RemoteAccount = remoteAccount
-                },
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 2, 0, 0, 0, DateTimeKind.Local),
-                    Identifier = 102,
-                    Text = "Text",
-                    Value = 2,
-                    RemoteAccount = remoteAccount,
-                    IsFollowup = true
-                },
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
-                    Identifier = 103,
-                    Name = "Name",
-                    Value = -1,
-                    RemoteAccount = remoteAccount,
-                    IsSkip = true
-                },
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
-                    Identifier = 104,
-                    Name = "Name",
-                    Value = -1,
-                    RemoteAccount = remoteAccount
-                },
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
-                    Identifier = 105,
-                    Name = "Already booked",
-                    Value = -2,
-                    RemoteAccount = remoteAccount,
-                    IsExisting = true
-                },
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
-                    Identifier = 106,
-                    Name = "Ignore",
-                    Value = -3,
-                    RemoteAccount = null
-                },
-                new ImportEntryViewModel(accounts)
-                {
-                    Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
-                    Identifier = 107,
-                    Name = "Ignore too",
-                    Value = -4,
-                    RemoteAccount = remoteAccount
-                }
-            });
+                Date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                Identifier = 101,
+                Name = "Name",
+                Text = "Text",
+                Value = 1,
+                RemoteAccount = remoteAccount
+            },
+            new ImportEntryViewModel(accounts)
+            {
+                Date = new DateTime(year, 1, 2, 0, 0, 0, DateTimeKind.Local),
+                Identifier = 102,
+                Text = "Text",
+                Value = 2,
+                RemoteAccount = remoteAccount,
+                IsFollowup = true
+            },
+            new ImportEntryViewModel(accounts)
+            {
+                Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
+                Identifier = 103,
+                Name = "Name",
+                Value = -1,
+                RemoteAccount = remoteAccount,
+                IsSkip = true
+            },
+            new ImportEntryViewModel(accounts)
+            {
+                Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
+                Identifier = 104,
+                Name = "Name",
+                Value = -1,
+                RemoteAccount = remoteAccount
+            },
+            new ImportEntryViewModel(accounts)
+            {
+                Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
+                Identifier = 105,
+                Name = "Already booked",
+                Value = -2,
+                RemoteAccount = remoteAccount,
+                IsExisting = true
+            },
+            new ImportEntryViewModel(accounts)
+            {
+                Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
+                Identifier = 106,
+                Name = "Ignore",
+                Value = -3,
+                RemoteAccount = null
+            },
+            new ImportEntryViewModel(accounts)
+            {
+                Date = new DateTime(year, 1, 3, 0, 0, 0, DateTimeKind.Local),
+                Identifier = 107,
+                Name = "Ignore too",
+                Value = -4,
+                RemoteAccount = remoteAccount
+            }
+        ]);
         var projectDataMonitor = projectData.Monitor();
 
         await sut.BookAllCommand.ExecuteAsync(null);

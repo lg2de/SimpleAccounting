@@ -637,4 +637,10 @@ Sie können Fehlerdetails mit dem Entwicklerteam bei GitHub melden
 oder sich an andere Fachleute werden, indem Sie die Detailinformationen per Mail oder anderen Kanälen (Zwischenablage) weiterleiten.
 Fehlertext:</value>
   </data>
+  <data name="Action_SetRemoteAccounts" xml:space="preserve">
+    <value>Setze Gegenkonten</value>
+  </data>
+  <data name="Tooltip_SetRemoteAccounts" xml:space="preserve">
+    <value>Alle Einträge ohne ausgewähltes Gegenkonto werden aktualisiert und ein Konto ausgewählt, welches so gut wie möglich mit dem Buchungsnamen übereinstimmt.</value>
+  </data>
 </root>

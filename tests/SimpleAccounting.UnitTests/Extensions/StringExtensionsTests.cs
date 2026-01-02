@@ -80,6 +80,21 @@ public sealed class StringExtensionsTests : IDisposable
         result.Should().Be(expected);
     }
 
+    [Theory]
+    [InlineData(null, null, 0)]
+    [InlineData(null, "", 0)]
+    [InlineData("", "", 0)]
+    [InlineData("A", "A", 0)]
+    [InlineData("A", "AA", 1)]
+    [InlineData("A", "B", 1)]
+    [InlineData("A", "BB", 2)]
+    public void LevenshteinDistance_Samples_ResultValidated(string input, string other, int expected)
+    {
+        var result = input.LevenshteinDistance(other);
+        
+        result.Should().Be(expected);
+    }
+
     public void Dispose()
     {
         this.testFont?.Dispose();
