@@ -32,28 +32,15 @@ public partial class ShellViewModelTests
         sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 100));
 
         sut.AccountJournal.Items.Should().BeEquivalentTo(
-            new[]
-            {
-                new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
-                new { Text = "Salary", RemoteAccount = "Various", CreditValue = 0, DebitValue = 200 },
-                new
-                {
-                    Text = "Credit rate",
-                    RemoteAccount = "5000 (Bank credit)",
-                    CreditValue = 400,
-                    DebitValue = 0
-                },
-                new { Text = "Shoes", RemoteAccount = "Various", CreditValue = 50, DebitValue = 0 },
-                new
-                {
-                    Text = "Rent to friend",
-                    RemoteAccount = "6000 (Friends debit)",
-                    CreditValue = 99,
-                    DebitValue = 0
-                },
-                new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 549, DebitValue = 1200 },
-                new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 651 }
-            });
+        [
+            new { Text = "Open 1", RemoteAccount = "990 (Carryforward)", CreditValue = 0, DebitValue = 1000 },
+            new { Text = "Salary", RemoteAccount = "Various", CreditValue = 0, DebitValue = 200 },
+            new { Text = "Credit rate", RemoteAccount = "5000 (Bank credit)", CreditValue = 400, DebitValue = 0 },
+            new { Text = "Shoes", RemoteAccount = "Various", CreditValue = 50, DebitValue = 0 },
+            new { Text = "Rent to friend", RemoteAccount = "6000 (Friends debit)", CreditValue = 99, DebitValue = 0 },
+            new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 549, DebitValue = 1200 },
+            new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 651 }
+        ]);
     }
 
     [CulturedFact(["en"])]
@@ -67,13 +54,12 @@ public partial class ShellViewModelTests
         sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 400));
 
         sut.AccountJournal.Items.Should().BeEquivalentTo(
-            new[]
-            {
-                new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 120, DebitValue = 0 },
-                new { Text = "Salary2", RemoteAccount = "100 (Bank account)", CreditValue = 80, DebitValue = 0 },
-                new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 },
-                new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 }
-            });
+        [
+            new { Text = "Salary1", RemoteAccount = "100 (Bank account)", CreditValue = 120, DebitValue = 0 },
+            new { Text = "Salary2", RemoteAccount = "100 (Bank account)", CreditValue = 80, DebitValue = 0 },
+            new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 },
+            new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 200, DebitValue = 0 }
+        ]);
     }
 
     [CulturedFact(["en"])]
@@ -87,13 +73,12 @@ public partial class ShellViewModelTests
         sut.Accounts.AccountSelectionCommand.Execute(sut.Accounts.AccountList.Single(x => x.Identifier == 600));
 
         sut.AccountJournal.Items.Should().BeEquivalentTo(
-            new[]
-            {
-                new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 20 },
-                new { Text = "Shoes2", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 30 },
-                new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 },
-                new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 }
-            });
+        [
+            new { Text = "Shoes1", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 20 },
+            new { Text = "Shoes2", RemoteAccount = "100 (Bank account)", CreditValue = 0, DebitValue = 30 },
+            new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 },
+            new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 0, DebitValue = 50 }
+        ]);
     }
 
     [Fact]
@@ -230,12 +215,11 @@ public partial class ShellViewModelTests
         var sut = CreateSut(out IWindowManager windowManager);
         windowManager
             .ShowDialogAsync(
-                Arg.Do<object>(
-                    model =>
-                    {
-                        var vm = (AccountViewModel)model;
-                        vm.Identifier += 1000;
-                    }), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
+                Arg.Do<object>(model =>
+                {
+                    var vm = (AccountViewModel)model;
+                    vm.Identifier += 1000;
+                }), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
             .Returns(true);
         sut.ProjectData.LoadData(Samples.SampleProject);
         var booking = new AccountingDataJournalBooking
@@ -267,11 +251,10 @@ public partial class ShellViewModelTests
                 "Active empty Asset", "Active empty Income", "Active empty Expense", "Active empty Credit",
                 "Active empty Debit", "Active empty Carryforward");
             sut.FullJournal.Items.Should().BeEquivalentTo(
-                new[]
-                {
-                    new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
-                    new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" }
-                });
+            [
+                new { CreditAccount = "990 (Carryforward)", DebitAccount = "1100 (Bank account)" },
+                new { CreditAccount = "1100 (Bank account)", DebitAccount = "990 (Carryforward)" }
+            ]);
             sut.AccountJournal.Items.Should().BeEquivalentTo(
                 new object[]
                 {
@@ -592,13 +575,12 @@ public partial class ShellViewModelTests
         windowManager.ShowDialogAsync(
             Arg.Any<CloseYearViewModel>(),
             Arg.Any<object>(),
-            Arg.Any<IDictionary<string, object>>()).Returns(
-            info =>
-            {
-                var vm = info.Arg<CloseYearViewModel>();
-                vm.RemoteAccount = vm.Accounts[0];
-                return true;
-            });
+            Arg.Any<IDictionary<string, object>>()).Returns(info =>
+        {
+            var vm = info.Arg<CloseYearViewModel>();
+            vm.RemoteAccount = vm.Accounts[0];
+            return true;
+        });
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         sut.ProjectData.LoadData(project);
@@ -616,36 +598,35 @@ public partial class ShellViewModelTests
                 "2000", thisYear.ToString(CultureInfo.InvariantCulture),
                 (thisYear + 1).ToString(CultureInfo.InvariantCulture));
         sut.FullJournal.Items.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
-                    Text = "Opening value 1",
-                    Value = 651,
-                    CreditAccount = "990 (Carryforward)",
-                    DebitAccount = "100 (Bank account)"
-                },
-                new
-                {
-                    Identifier = 2,
-                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
-                    Text = "Opening value 2",
-                    Value = 2600,
-                    CreditAccount = "5000 (Bank credit)",
-                    DebitAccount = "990 (Carryforward)"
-                },
-                new
-                {
-                    Identifier = 3,
-                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
-                    Text = "Opening value 3",
-                    Value = 99,
-                    CreditAccount = "990 (Carryforward)",
-                    DebitAccount = "6000 (Friends debit)"
-                }
-            });
+                Identifier = 1,
+                Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                Text = "Opening value 1",
+                Value = 651,
+                CreditAccount = "990 (Carryforward)",
+                DebitAccount = "100 (Bank account)"
+            },
+            new
+            {
+                Identifier = 2,
+                Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                Text = "Opening value 2",
+                Value = 2600,
+                CreditAccount = "5000 (Bank credit)",
+                DebitAccount = "990 (Carryforward)"
+            },
+            new
+            {
+                Identifier = 3,
+                Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                Text = "Opening value 3",
+                Value = 99,
+                CreditAccount = "990 (Carryforward)",
+                DebitAccount = "6000 (Friends debit)"
+            }
+        ]);
         sut.AccountJournal.Items.Should().BeEquivalentTo(
             new object[]
             {
@@ -671,13 +652,12 @@ public partial class ShellViewModelTests
         windowManager.ShowDialogAsync(
             Arg.Any<CloseYearViewModel>(),
             Arg.Any<object>(),
-            Arg.Any<IDictionary<string, object>>()).Returns(
-            info =>
-            {
-                var vm = info.Arg<CloseYearViewModel>();
-                vm.RemoteAccount = vm.Accounts.Single(x => x.ID == myCarryForwardNumber);
-                return true;
-            });
+            Arg.Any<IDictionary<string, object>>()).Returns(info =>
+        {
+            var vm = info.Arg<CloseYearViewModel>();
+            vm.RemoteAccount = vm.Accounts.Single(x => x.ID == myCarryForwardNumber);
+            return true;
+        });
         var project = Samples.SampleProject;
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         project.Accounts[0].Account.Add(
@@ -700,36 +680,35 @@ public partial class ShellViewModelTests
                 "2000", thisYear.ToString(CultureInfo.InvariantCulture),
                 (thisYear + 1).ToString(CultureInfo.InvariantCulture));
         sut.FullJournal.Items.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    Identifier = 1,
-                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
-                    Text = "Opening value 1",
-                    Value = 651,
-                    CreditAccount = "999 (MyCarryForward)",
-                    DebitAccount = "100 (Bank account)"
-                },
-                new
-                {
-                    Identifier = 2,
-                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
-                    Text = "Opening value 2",
-                    Value = 2600,
-                    CreditAccount = "5000 (Bank credit)",
-                    DebitAccount = "999 (MyCarryForward)"
-                },
-                new
-                {
-                    Identifier = 3,
-                    Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
-                    Text = "Opening value 3",
-                    Value = 99,
-                    CreditAccount = "999 (MyCarryForward)",
-                    DebitAccount = "6000 (Friends debit)"
-                }
-            });
+                Identifier = 1,
+                Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                Text = "Opening value 1",
+                Value = 651,
+                CreditAccount = "999 (MyCarryForward)",
+                DebitAccount = "100 (Bank account)"
+            },
+            new
+            {
+                Identifier = 2,
+                Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                Text = "Opening value 2",
+                Value = 2600,
+                CreditAccount = "5000 (Bank credit)",
+                DebitAccount = "999 (MyCarryForward)"
+            },
+            new
+            {
+                Identifier = 3,
+                Date = new DateTime(thisYear + 1, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                Text = "Opening value 3",
+                Value = 99,
+                CreditAccount = "999 (MyCarryForward)",
+                DebitAccount = "6000 (Friends debit)"
+            }
+        ]);
         sut.AccountJournal.Items.Should().BeEquivalentTo(
             new object[]
             {

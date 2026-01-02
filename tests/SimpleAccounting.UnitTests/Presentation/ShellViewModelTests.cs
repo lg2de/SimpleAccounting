@@ -208,29 +208,18 @@ public partial class ShellViewModelTests
             "Active empty Credit", "Active empty Debit", "Active empty Carryforward");
 
         sut.FullJournal.Items.Should().BeEquivalentTo(
-            new[]
-            {
-                new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
-                new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
-                new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
-                new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
-                new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
-                new
-                {
-                    Text = "Credit rate",
-                    CreditAccount = "100 (Bank account)",
-                    DebitAccount = "5000 (Bank credit)"
-                },
-                new { Text = "Shoes1", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes2", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
-                new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = string.Empty },
-                new
-                {
-                    Text = "Rent to friend",
-                    CreditAccount = "100 (Bank account)",
-                    DebitAccount = "6000 (Friends debit)"
-                }
-            });
+        [
+            new { Text = "Open 1", CreditAccount = "990 (Carryforward)", DebitAccount = "100 (Bank account)" },
+            new { Text = "Open 2", CreditAccount = "5000 (Bank credit)", DebitAccount = "990 (Carryforward)" },
+            new { Text = "Salary", CreditAccount = string.Empty, DebitAccount = "100 (Bank account)" },
+            new { Text = "Salary1", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
+            new { Text = "Salary2", CreditAccount = "400 (Salary)", DebitAccount = string.Empty },
+            new { Text = "Credit rate", CreditAccount = "100 (Bank account)", DebitAccount = "5000 (Bank credit)" },
+            new { Text = "Shoes1", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+            new { Text = "Shoes2", CreditAccount = string.Empty, DebitAccount = "600 (Shoes)" },
+            new { Text = "Shoes", CreditAccount = "100 (Bank account)", DebitAccount = string.Empty },
+            new { Text = "Rent to friend", CreditAccount = "100 (Bank account)", DebitAccount = "6000 (Friends debit)" }
+        ]);
         sut.AccountJournal.Items.Should().BeEquivalentTo(
             new object[]
             {
@@ -337,18 +326,17 @@ public partial class ShellViewModelTests
 
         using var _ = new AssertionScope();
         sut.FullJournal.Items.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    Identifier = 4567,
-                    Date = new DateTime(DateTime.Now.Year, 4, 1, 0, 0, 0, DateTimeKind.Local),
-                    Text = "Init",
-                    Value = 0.42,
-                    CreditAccount = "990 (Carryforward)",
-                    DebitAccount = "100 (Bank account)"
-                }
-            });
+                Identifier = 4567,
+                Date = new DateTime(DateTime.Now.Year, 4, 1, 0, 0, 0, DateTimeKind.Local),
+                Text = "Init",
+                Value = 0.42,
+                CreditAccount = "990 (Carryforward)",
+                DebitAccount = "100 (Bank account)"
+            }
+        ]);
         fullJournalMonitor.Should().RaisePropertyChangeFor(x => x.SelectedItem);
         sut.FullJournal.SelectedItem.Should().BeEquivalentTo(new { Identifier = 4567 });
         sut.AccountJournal.Items.Should().BeEquivalentTo(

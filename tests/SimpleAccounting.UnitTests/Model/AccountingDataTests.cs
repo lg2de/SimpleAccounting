@@ -76,9 +76,8 @@ public class AccountingDataTests
         };
         sut.Should().BeEquivalentTo(
             expectation,
-            o => o.Excluding(
-                info => info.Path.EndsWith(
-                    nameof(AccountDefinitionImportMappingPattern.Regex), StringComparison.Ordinal)));
+            o => o.Excluding(info => info.Path.EndsWith(
+                nameof(AccountDefinitionImportMappingPattern.Regex), StringComparison.Ordinal)));
     }
 
     [Fact]
@@ -164,35 +163,29 @@ public class AccountingDataTests
         currentYear.Closed.Should().BeTrue();
         newYear.Closed.Should().BeFalse();
         newYear.Booking.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    ID = 1,
-                    Opening = true,
-                    Credit =
-                        new[] { new { Account = Samples.Carryforward, Text = "Opening value 1", Value = 65100 } },
-                    Debit =
-                        new[] { new { Account = Samples.BankAccount, Text = "Opening value 1", Value = 65100 } }
-                },
-                new
-                {
-                    ID = 2,
-                    Opening = true,
-                    Credit =
-                        new[] { new { Account = Samples.BankCredit, Text = "Opening value 2", Value = 260000 } },
-                    Debit =
-                        new[] { new { Account = Samples.Carryforward, Text = "Opening value 2", Value = 260000 } }
-                },
-                new
-                {
-                    ID = 3,
-                    Opening = true,
-                    Credit =
-                        new[] { new { Account = Samples.Carryforward, Text = "Opening value 3", Value = 9900 } },
-                    Debit = new[] { new { Account = Samples.FriendsDebit, Text = "Opening value 3", Value = 9900 } }
-                }
-            });
+                ID = 1,
+                Opening = true,
+                Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 1", Value = 65100 } },
+                Debit = new[] { new { Account = Samples.BankAccount, Text = "Opening value 1", Value = 65100 } }
+            },
+            new
+            {
+                ID = 2,
+                Opening = true,
+                Credit = new[] { new { Account = Samples.BankCredit, Text = "Opening value 2", Value = 260000 } },
+                Debit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 2", Value = 260000 } }
+            },
+            new
+            {
+                ID = 3,
+                Opening = true,
+                Credit = new[] { new { Account = Samples.Carryforward, Text = "Opening value 3", Value = 9900 } },
+                Debit = new[] { new { Account = Samples.FriendsDebit, Text = "Opening value 3", Value = 9900 } }
+            }
+        ]);
     }
 
     [CulturedFact(["de"])]
@@ -212,27 +205,26 @@ public class AccountingDataTests
         currentYear.Closed.Should().BeTrue();
         newYear.Closed.Should().BeFalse();
         newYear.Booking.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    ID = 1,
-                    Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 1" } },
-                    Debit = new[] { new { Account = 100, Text = "Eröffnungsbetrag 1" } }
-                },
-                new
-                {
-                    ID = 2,
-                    Credit = new[] { new { Account = 5000, Text = "Eröffnungsbetrag 2" } },
-                    Debit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 2" } }
-                },
-                new
-                {
-                    ID = 3,
-                    Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 3" } },
-                    Debit = new[] { new { Account = 6000, Text = "Eröffnungsbetrag 3" } }
-                }
-            });
+                ID = 1,
+                Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 1" } },
+                Debit = new[] { new { Account = 100, Text = "Eröffnungsbetrag 1" } }
+            },
+            new
+            {
+                ID = 2,
+                Credit = new[] { new { Account = 5000, Text = "Eröffnungsbetrag 2" } },
+                Debit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 2" } }
+            },
+            new
+            {
+                ID = 3,
+                Credit = new[] { new { Account = 990, Text = "Eröffnungsbetrag 3" } },
+                Debit = new[] { new { Account = 6000, Text = "Eröffnungsbetrag 3" } }
+            }
+        ]);
     }
 
     [CulturedFact(["fr"])]
@@ -252,27 +244,26 @@ public class AccountingDataTests
         currentYear.Closed.Should().BeTrue();
         newYear.Closed.Should().BeFalse();
         newYear.Booking.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    ID = 1,
-                    Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 1" } },
-                    Debit = new[] { new { Account = 100, Text = "Valeur d'ouverture 1" } }
-                },
-                new
-                {
-                    ID = 2,
-                    Credit = new[] { new { Account = 5000, Text = "Valeur d'ouverture 2" } },
-                    Debit = new[] { new { Account = 990, Text = "Valeur d'ouverture 2" } }
-                },
-                new
-                {
-                    ID = 3,
-                    Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 3" } },
-                    Debit = new[] { new { Account = 6000, Text = "Valeur d'ouverture 3" } }
-                }
-            });
+                ID = 1,
+                Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 1" } },
+                Debit = new[] { new { Account = 100, Text = "Valeur d'ouverture 1" } }
+            },
+            new
+            {
+                ID = 2,
+                Credit = new[] { new { Account = 5000, Text = "Valeur d'ouverture 2" } },
+                Debit = new[] { new { Account = 990, Text = "Valeur d'ouverture 2" } }
+            },
+            new
+            {
+                ID = 3,
+                Credit = new[] { new { Account = 990, Text = "Valeur d'ouverture 3" } },
+                Debit = new[] { new { Account = 6000, Text = "Valeur d'ouverture 3" } }
+            }
+        ]);
     }
 
     [CulturedFact(["en"])]
@@ -291,27 +282,26 @@ public class AccountingDataTests
         currentYear.Closed.Should().BeTrue();
         newYear.Closed.Should().BeFalse();
         newYear.Booking.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    ID = 1,
-                    Credit = new[] { new { Account = 990, Text = "Opening value Bank account" } },
-                    Debit = new[] { new { Account = 100, Text = "Opening value Bank account" } }
-                },
-                new
-                {
-                    ID = 2,
-                    Credit = new[] { new { Account = 5000, Text = "Opening value Bank credit" } },
-                    Debit = new[] { new { Account = 990, Text = "Opening value Bank credit" } }
-                },
-                new
-                {
-                    ID = 3,
-                    Credit = new[] { new { Account = 990, Text = "Opening value Friends debit" } },
-                    Debit = new[] { new { Account = 6000, Text = "Opening value Friends debit" } }
-                }
-            });
+                ID = 1,
+                Credit = new[] { new { Account = 990, Text = "Opening value Bank account" } },
+                Debit = new[] { new { Account = 100, Text = "Opening value Bank account" } }
+            },
+            new
+            {
+                ID = 2,
+                Credit = new[] { new { Account = 5000, Text = "Opening value Bank credit" } },
+                Debit = new[] { new { Account = 990, Text = "Opening value Bank credit" } }
+            },
+            new
+            {
+                ID = 3,
+                Credit = new[] { new { Account = 990, Text = "Opening value Friends debit" } },
+                Debit = new[] { new { Account = 6000, Text = "Opening value Friends debit" } }
+            }
+        ]);
     }
 
     [Fact]

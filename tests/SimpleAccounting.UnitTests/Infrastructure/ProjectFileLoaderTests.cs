@@ -60,7 +60,7 @@ public class ProjectFileLoaderTests
             Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
     }
 
-    [CulturedFact(["en"])]
+    [Fact]
     public async Task LoadAsync_ReservationForCurrentUserAndHost_ReturnsCompleted()
     {
         var dialogs = Substitute.For<IDialogs>();
