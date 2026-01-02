@@ -29,9 +29,9 @@ public class ProjectOptionsViewModel : Screen
         () => this.TryCloseAsync(this.OnSave()),
         () => !string.IsNullOrWhiteSpace(this.Currency));
 
-    protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
+    protected override async Task OnInitializedAsync(CancellationToken cancellationToken)
     {
-        await base.OnInitializeAsync(cancellationToken);
+        await base.OnInitializedAsync(cancellationToken);
 
         this.DisplayName = Resources.Header_ProjectOptions;
     }

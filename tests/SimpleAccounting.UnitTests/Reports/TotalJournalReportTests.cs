@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
 using System.Xml.Linq;
 using System.Xml.XPath;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;

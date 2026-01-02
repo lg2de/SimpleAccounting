@@ -11,8 +11,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
-using FluentAssertions;
-using FluentAssertions.Extensions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Presentation;

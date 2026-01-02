@@ -275,9 +275,9 @@ internal class EditBookingViewModel : Screen
             .ToList().ForEach(this.BindingTemplates.Add);
     }
 
-    protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
+    protected override async Task OnInitializedAsync(CancellationToken cancellationToken)
     {
-        await base.OnInitializeAsync(cancellationToken);
+        await base.OnInitializedAsync(cancellationToken);
 
         this.DisplayName = this.EditMode ? Resources.Header_EditBooking : Resources.Header_NewBooking;
 
