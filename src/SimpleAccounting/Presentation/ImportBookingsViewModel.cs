@@ -57,7 +57,6 @@ internal class ImportBookingsViewModel : Screen
     /// </summary>
     public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
         .Where(a => a.ImportMapping != null
-                 && a.ImportMapping.Columns != null
                  && a.ImportMapping.IsValid()
                  && a.Active);
     /// <summary>

@@ -289,6 +289,10 @@ public partial class AccountDefinitionImportMapping
     /// </summary>
     public bool IsValid()
     {
+        if (this.Columns == null)
+        {
+            return false;
+        }
         return
             this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
             && this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);

@@ -557,7 +557,6 @@ public class ImportBookingsViewModelTests
     {
         var clock = Substitute.For<IClock>();
         var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
-
         var validAccount = new AccountDefinition
         {
             ID = 1,
@@ -574,7 +573,6 @@ public class ImportBookingsViewModelTests
                 Patterns = new List<AccountDefinitionImportMappingPattern>()
             }
         };
-
         var inactiveAccount = new AccountDefinition
         {
             ID = 2,
@@ -588,7 +586,6 @@ public class ImportBookingsViewModelTests
             }
             }
         };
-
         var remoteInactiveAccount = new AccountDefinition
         {
             ID = 3,
@@ -596,7 +593,6 @@ public class ImportBookingsViewModelTests
             Active = true,
             ImportMapping = new AccountDefinitionImportMapping { Columns = new List<AccountDefinitionImportMappingColumn>() }
         };
-
         var dangerousAccount = new AccountDefinition
         {
             ID = 5,
@@ -604,7 +600,6 @@ public class ImportBookingsViewModelTests
             Active = true,
             ImportMapping = new AccountDefinitionImportMapping { Columns = null }
         };
-
         projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
     {
         new AccountingDataAccountGroup
@@ -612,8 +607,8 @@ public class ImportBookingsViewModelTests
             Account = new List<AccountDefinition> { validAccount, inactiveAccount, remoteInactiveAccount, dangerousAccount }
         }
     };
-
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
+
         var result = sut.ImportAccounts.ToList();
 
         result.Should().HaveCount(1, "because only active accounts with valid non-empty mappings should be included");
