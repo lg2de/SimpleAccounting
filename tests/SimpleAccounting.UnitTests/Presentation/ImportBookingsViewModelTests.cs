@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -550,42 +551,101 @@ public class ImportBookingsViewModelTests
             });
         projectDataMonitor.Should().Raise(nameof(projectData.JournalChanged)).Should().HaveCount(1);
     }
+
     [Fact]
-    public void ImportAccounts_InactiveAccountWithMapping_Excluded()
+    public void ImportAccounts_ShouldFilterOut_InactiveAccounts_And_EmptyMappings()
     {
         var clock = Substitute.For<IClock>();
         var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
 
-        var activeAccount = new AccountDefinition
+        var validAccount = new AccountDefinition
         {
-            ID = 101,
-            Name = "Active Bank",
+            ID = 1,
+            Name = "Valid Account",
             Active = true,
-            ImportMapping = Samples.SimpleImportConfiguration
+            ImportMapping = new AccountDefinitionImportMapping
+            {
+                Columns = new List<AccountDefinitionImportMappingColumn>
+            {
+                new AccountDefinitionImportMappingColumn
+                {
+                    Source = "DateCol",
+                    Target = AccountDefinitionImportMappingColumnTarget.Date
+                },
+                new AccountDefinitionImportMappingColumn
+                {
+                    Source = "ValueCol",
+                    Target = AccountDefinitionImportMappingColumnTarget.Value
+                },
+                new AccountDefinitionImportMappingColumn
+                {
+                    Source = "TextCol",
+                    Target = AccountDefinitionImportMappingColumnTarget.Text
+                }
+            },
+                Patterns = new List<AccountDefinitionImportMappingPattern>()
+            }
         };
 
         var inactiveAccount = new AccountDefinition
         {
-            ID = 102,
-            Name = "Old Bank (Inactive)",
-            Active = false, 
-            ImportMapping = Samples.SimpleImportConfiguration
+            ID = 2,
+            Name = "Inactive Local Account",
+            Active = false,
+            ImportMapping = new AccountDefinitionImportMapping 
+            {
+                Columns = new List<AccountDefinitionImportMappingColumn>
+            {
+                new AccountDefinitionImportMappingColumn { Source = "Col1", Target = AccountDefinitionImportMappingColumnTarget.Value }
+            }
+            }
         };
 
-        projectData.Storage.Accounts =
-        [
-            new AccountingDataAccountGroup
+        var remoteInactiveAccount = new AccountDefinition
+        {
+            ID = 3,
+            Name = "Remote Inactive Account",
+            Active = true, 
+            ImportMapping = new AccountDefinitionImportMapping
             {
-                Account = [activeAccount, inactiveAccount]
+                Columns = new List<AccountDefinitionImportMappingColumn>() 
             }
-        ];
+        };
+
+        var dangerousAccount = new AccountDefinition
+        {
+            ID = 5,
+            Name = "Dangerous Null Columns Account",
+            Active = true,
+            ImportMapping = new AccountDefinitionImportMapping
+            {
+                Columns = null 
+            }
+        };
+
+        var noMappingAccount = new AccountDefinition
+        {
+            ID = 4,
+            Name = "Account Without Mapping",
+            Active = true,
+            ImportMapping = null
+        };
+
+        projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
+    {
+        new AccountingDataAccountGroup
+        {
+            Account = new List<AccountDefinition> { validAccount, inactiveAccount, remoteInactiveAccount, noMappingAccount }
+        }
+    };
 
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
+        var result = sut.ImportAccounts.ToList();
 
-        sut.ImportAccounts.Should().HaveCount(1);
-
-        sut.ImportAccounts.Should().Contain(x => x.Name == "Active Bank");
-
-        sut.ImportAccounts.Should().NotContain(x => x.Name == "Old Bank (Inactive)");
+        result.Should().HaveCount(1, "because only active accounts with valid non-empty mappings should be included");
+        result.Should().ContainSingle(x => x.Name == "Valid Account");
+        result.Should().NotContain(x => x.Name == "Inactive Local Account");
+        result.Should().NotContain(x => x.Name == "Remote Inactive Account");
+        result.Should().NotContain(x => x.Name == "Account Without Mapping");
     }
 }

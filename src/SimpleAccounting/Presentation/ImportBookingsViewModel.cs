@@ -56,8 +56,10 @@ internal class ImportBookingsViewModel : Screen
     ///     Gets all accounts available for importing (mapping available).
     /// </summary>
     public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
-        .Where(a => a.ImportMapping != null && a.ImportMapping.IsValid() && a.Active);
-
+        .Where(a => a.ImportMapping != null
+                 && a.ImportMapping.Columns != null
+                 && a.ImportMapping.IsValid()
+                 && a.Active);
     /// <summary>
     ///     Gets a value indicating whether importing is currently possible.
     /// </summary>
