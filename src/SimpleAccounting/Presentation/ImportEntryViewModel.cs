@@ -5,6 +5,7 @@
 namespace lg2de.SimpleAccounting.Presentation;
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
@@ -19,7 +20,7 @@ public class ImportEntryViewModel : JournalItemBaseViewModel
 
     public ImportEntryViewModel(IEnumerable<AccountDefinition> accounts)
     {
-        this.Accounts = accounts;
+        this.Accounts = accounts.Where(a => a.Active);
     }
 
     public IEnumerable<AccountDefinition> Accounts { get; }

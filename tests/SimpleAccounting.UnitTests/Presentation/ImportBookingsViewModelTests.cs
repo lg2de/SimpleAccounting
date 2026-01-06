@@ -551,71 +551,91 @@ public class ImportBookingsViewModelTests
             });
         projectDataMonitor.Should().Raise(nameof(projectData.JournalChanged)).Should().HaveCount(1);
     }
-
     [Fact]
-    public void ImportAccounts_ShouldFilterOut_InactiveAccounts_And_EmptyMappings()
+    public void Ctor_InactiveAccountWithMapping_Excluded()
     {
         var clock = Substitute.For<IClock>();
         var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
-        var validAccount = new AccountDefinition
+
+        var activeAccount = new AccountDefinition
         {
-            ID = 1,
-            Name = "Valid Account",
+            ID = 101,
+            Name = "Active Bank",
             Active = true,
-            ImportMapping = new AccountDefinitionImportMapping
-            {
-                Columns = new List<AccountDefinitionImportMappingColumn>
-            {
-                new AccountDefinitionImportMappingColumn { Source = "DateCol", Target = AccountDefinitionImportMappingColumnTarget.Date },
-                new AccountDefinitionImportMappingColumn { Source = "ValueCol", Target = AccountDefinitionImportMappingColumnTarget.Value },
-                new AccountDefinitionImportMappingColumn { Source = "TextCol", Target = AccountDefinitionImportMappingColumnTarget.Text }
-            },
-                Patterns = new List<AccountDefinitionImportMappingPattern>()
-            }
+            ImportMapping = Samples.SimpleImportConfiguration
         };
         var inactiveAccount = new AccountDefinition
         {
-            ID = 2,
-            Name = "Inactive Local Account",
+            ID = 102,
+            Name = "Old Bank (Inactive)",
             Active = false,
-            ImportMapping = new AccountDefinitionImportMapping
-            {
-                Columns = new List<AccountDefinitionImportMappingColumn>
-            {
-                new AccountDefinitionImportMappingColumn { Source = "Col1", Target = AccountDefinitionImportMappingColumnTarget.Value }
-            }
-            }
+            ImportMapping = Samples.SimpleImportConfiguration
         };
-        var remoteInactiveAccount = new AccountDefinition
-        {
-            ID = 3,
-            Name = "Remote Inactive Account",
-            Active = true,
-            ImportMapping = new AccountDefinitionImportMapping { Columns = new List<AccountDefinitionImportMappingColumn>() }
-        };
-        var dangerousAccount = new AccountDefinition
-        {
-            ID = 5,
-            Name = "Dangerous Null Columns Account",
-            Active = true,
-            ImportMapping = new AccountDefinitionImportMapping { Columns = null }
-        };
-        projectData.Storage.Accounts = new List<AccountingDataAccountGroup>
-    {
-        new AccountingDataAccountGroup
-        {
-            Account = new List<AccountDefinition> { validAccount, inactiveAccount, remoteInactiveAccount, dangerousAccount }
-        }
-    };
+        projectData.Storage.Accounts =
+        [
+            new AccountingDataAccountGroup { Account = [activeAccount, inactiveAccount] }
+        ];
+
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
 
-        var result = sut.ImportAccounts.ToList();
-
-        result.Should().HaveCount(1, "because only active accounts with valid non-empty mappings should be included");
-        result.Should().ContainSingle(x => x.Name == "Valid Account");
-        result.Should().NotContain(x => x.Name == "Inactive Local Account");
-        result.Should().NotContain(x => x.Name == "Remote Inactive Account");
-        result.Should().NotContain(x => x.Name == "Dangerous Null Columns Account");
+        sut.ImportAccounts.Should().BeEquivalentTo(new[] { new { Name = "Active Bank" } });
     }
 
+    [Fact]
+    public void LoadData_RemoteAccountList_ContainsOnlyActiveAccounts()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
+        System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
+        var bankAccount = new AccountDefinition
+        {
+            ID = 100,
+            Name = "My Bank",
+            Active = true,
+            ImportMapping = Samples.SimpleImportConfiguration
+        };
+        var activeRemote = new AccountDefinition
+        {
+            ID = 601,
+            Name = "New Shoes (Active)",
+            Active = true,
+            ImportMapping = Samples.SimpleImportConfiguration
+        };
+        var inactiveRemote = new AccountDefinition
+        {
+            ID = 600,
+            Name = "Old Shoes (Inactive)",
+            Active = false,
+            ImportMapping = Samples.SimpleImportConfiguration
+        };
+        projectData.Storage.Accounts =
+        [
+            new AccountingDataAccountGroup
+        {
+            Account = [bankAccount, activeRemote, inactiveRemote]
+        }
+        ];
+        var dialogs = Substitute.For<IDialogs>();
+        dialogs.ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
+                .Returns((DialogResult.OK, "test.csv"));
+        var fileSystem = Substitute.For<IFileSystem>();
+        var sut = new ImportBookingsViewModel(dialogs, fileSystem, projectData)
+        {
+            SelectedAccount = bankAccount
+        };
+        sut.SelectedAccountNumber = 100;
+        var validDate = sut.RangeMin.AddDays(5).ToString("dd.MM.yyyy");
+        var csvContent = $"Datum;Text;Betrag\n{validDate};Test Booking;-100,00";
+        fileSystem.ReadAllBytesFromFile(Arg.Any<string>())
+                  .Returns(System.Text.Encoding.UTF8.GetBytes(csvContent));
+
+        sut.LoadDataCommand.Execute(null);
+
+        sut.LoadedData.Should().HaveCount(1);
+        var entry = sut.LoadedData.Single();
+        entry.Accounts.Should().Contain(a => a.ID == 601);
+        entry.Accounts.Should().NotContain(a => a.ID == 600);
+
+    }
 }
