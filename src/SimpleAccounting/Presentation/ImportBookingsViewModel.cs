@@ -56,8 +56,7 @@ internal class ImportBookingsViewModel : Screen
     ///     Gets all accounts available for importing (mapping available).
     /// </summary>
     public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
-        .Where(a => a.ImportMapping != null
-                 && a.ImportMapping.IsValid());
+        .Where(a => a.ImportMapping != null && a.ImportMapping.IsValid());
     /// <summary>
     ///     Gets a value indicating whether importing is currently possible.
     /// </summary>
@@ -221,7 +220,7 @@ internal class ImportBookingsViewModel : Screen
             // remote account may be null in case of split booking
             var remoteAccount = this.accounts.Find(x => x.ID == remoteIdentifier);
 
-            return new ImportEntryViewModel(this.accounts)
+            return new ImportEntryViewModel(this.accounts.Where(x => x.ID != this.SelectedAccountNumber))
             {
                 IsExisting = true,
                 Identifier = entry.ID,

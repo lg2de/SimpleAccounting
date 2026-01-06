@@ -5,9 +5,9 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using lg2de.SimpleAccounting.Abstractions;
@@ -33,6 +33,32 @@ public class ImportBookingsViewModelTests
         sut.ImportAccounts.Should().BeEquivalentTo([new { Name = "Bank account" }]);
     }
 
+    [Fact]
+    public void Ctor_InactiveAccountWithMapping_Excluded()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        var activeAccount = new AccountDefinition
+        {
+            ID = 101, Name = "Bank (Active)", Active = true, ImportMapping = Samples.SimpleImportConfiguration
+        };
+        var inactiveAccount = new AccountDefinition
+        {
+            ID = 102,
+            Name = "Old Bank (Inactive)",
+            Active = false,
+            ImportMapping = Samples.SimpleImportConfiguration
+        };
+        projectData.Storage.Accounts =
+        [
+            new AccountingDataAccountGroup { Account = [activeAccount, inactiveAccount] }
+        ];
+
+        var sut = new ImportBookingsViewModel(null!, null!, projectData);
+
+        sut.ImportAccounts.Should().BeEquivalentTo([new { Name = "Bank (Active)" }]);
+    }
+    
     [Fact]
     public void ImportStatus_NoImportAccount()
     {
@@ -195,6 +221,49 @@ public class ImportBookingsViewModelTests
         dialogs.Received(1).ShowOpenFileDialog(Arg.Any<string>(), Arg.Is<string>(x => x == "E:\\MySelectedFolder"));
     }
 
+    [CulturedFact(["de"])]
+    public void LoadDataCommand_RemoteAccountList_ContainsOnlyActiveAccounts()
+    {
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        var bankAccount = new AccountDefinition
+        {
+            ID = 100, Name = "My Bank", Active = true, ImportMapping = Samples.SimpleImportConfiguration
+        };
+        var activeRemote = new AccountDefinition
+        {
+            ID = 601, Name = "New Shoes (Active)", Active = true, ImportMapping = Samples.SimpleImportConfiguration
+        };
+        var inactiveRemote = new AccountDefinition
+        {
+            ID = 600,
+            Name = "Old Shoes (Inactive)",
+            Active = false,
+            ImportMapping = Samples.SimpleImportConfiguration
+        };
+        projectData.Storage.Accounts =
+        [
+            new AccountingDataAccountGroup { Account = [bankAccount, activeRemote, inactiveRemote] }
+        ];
+        var dialogs = Substitute.For<IDialogs>();
+        dialogs.ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
+            .Returns((DialogResult.OK, "test.csv"));
+        var fileSystem = Substitute.For<IFileSystem>();
+        var sut = new ImportBookingsViewModel(dialogs, fileSystem, projectData)
+        {
+            SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID
+        };
+        var validDate = sut.RangeMin.AddDays(5).ToString("dd.MM.yyyy", CultureInfo.CurrentUICulture);
+        var csvContent = $"Datum;Text;Betrag\n{validDate};Test Booking;-100,00";
+        fileSystem.ReadAllBytesFromFile(Arg.Any<string>())
+            .Returns(Encoding.UTF8.GetBytes(csvContent));
+
+        sut.LoadDataCommand.Execute(null);
+
+        sut.LoadedData.Should().ContainSingle()
+            .Which.Accounts.Should().BeEquivalentTo([new { ID = 601, Name = "New Shoes (Active)" }]);
+    }
+    
     [Fact]
     public void SetRemoteAccountsCommand_EntryNotMapped_CanExecute()
     {
@@ -265,8 +334,7 @@ public class ImportBookingsViewModelTests
             .BeEquivalentTo(
                 new object[]
                 {
-                    new { RemoteAccount = new { Name = "Bank account" } },
-                    new { RemoteAccount = (object)null },
+                    new { RemoteAccount = new { Name = "Bank account" } }, new { RemoteAccount = (object)null },
                     new { RemoteAccount = new { Name = "Shoes" } },
                     new { RemoteAccount = new { Name = "Friends debit" } }
                 });
@@ -623,92 +691,5 @@ public class ImportBookingsViewModelTests
                 }
             });
         projectDataMonitor.Should().Raise(nameof(projectData.JournalChanged)).Should().HaveCount(1);
-    }
-    [Fact]
-    public void Ctor_InactiveAccountWithMapping_Excluded()
-    {
-        var clock = Substitute.For<IClock>();
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
-
-        var activeAccount = new AccountDefinition
-        {
-            ID = 101,
-            Name = "Active Bank",
-            Active = true,
-            ImportMapping = Samples.SimpleImportConfiguration
-        };
-        var inactiveAccount = new AccountDefinition
-        {
-            ID = 102,
-            Name = "Old Bank (Inactive)",
-            Active = false,
-            ImportMapping = Samples.SimpleImportConfiguration
-        };
-        projectData.Storage.Accounts =
-        [
-            new AccountingDataAccountGroup { Account = [activeAccount, inactiveAccount] }
-        ];
-
-        var sut = new ImportBookingsViewModel(null!, null!, projectData);
-
-        sut.ImportAccounts.Should().BeEquivalentTo(new[] { new { Name = "Active Bank" } });
-    }
-
-    [Fact]
-    public void LoadData_RemoteAccountList_ContainsOnlyActiveAccounts()
-    {
-        var clock = Substitute.For<IClock>();
-        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
-        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
-        System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
-        var bankAccount = new AccountDefinition
-        {
-            ID = 100,
-            Name = "My Bank",
-            Active = true,
-            ImportMapping = Samples.SimpleImportConfiguration
-        };
-        var activeRemote = new AccountDefinition
-        {
-            ID = 601,
-            Name = "New Shoes (Active)",
-            Active = true,
-            ImportMapping = Samples.SimpleImportConfiguration
-        };
-        var inactiveRemote = new AccountDefinition
-        {
-            ID = 600,
-            Name = "Old Shoes (Inactive)",
-            Active = false,
-            ImportMapping = Samples.SimpleImportConfiguration
-        };
-        projectData.Storage.Accounts =
-        [
-            new AccountingDataAccountGroup
-        {
-            Account = [bankAccount, activeRemote, inactiveRemote]
-        }
-        ];
-        var dialogs = Substitute.For<IDialogs>();
-        dialogs.ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
-                .Returns((DialogResult.OK, "test.csv"));
-        var fileSystem = Substitute.For<IFileSystem>();
-        var sut = new ImportBookingsViewModel(dialogs, fileSystem, projectData)
-        {
-            SelectedAccount = bankAccount
-        };
-        sut.SelectedAccountNumber = 100;
-        var validDate = sut.RangeMin.AddDays(5).ToString("dd.MM.yyyy");
-        var csvContent = $"Datum;Text;Betrag\n{validDate};Test Booking;-100,00";
-        fileSystem.ReadAllBytesFromFile(Arg.Any<string>())
-                  .Returns(System.Text.Encoding.UTF8.GetBytes(csvContent));
-
-        sut.LoadDataCommand.Execute(null);
-
-        sut.LoadedData.Should().HaveCount(1);
-        var entry = sut.LoadedData.Single();
-        entry.Accounts.Should().Contain(a => a.ID == 601);
-        entry.Accounts.Should().NotContain(a => a.ID == 600);
-
     }
 }

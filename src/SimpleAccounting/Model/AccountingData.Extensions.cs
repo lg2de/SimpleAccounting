@@ -117,11 +117,10 @@ public partial class AccountingData
         ulong bookingId = 1;
 
         // Asset Accounts (Bestandskonten), Credit and Debit Accounts
-        var accounts = this.AllAccounts.Where(
-            a =>
-                a.Type == AccountDefinitionType.Asset
-                || a.Type == AccountDefinitionType.Credit
-                || a.Type == AccountDefinitionType.Debit);
+        var accounts = this.AllAccounts.Where(a =>
+            a.Type == AccountDefinitionType.Asset
+            || a.Type == AccountDefinitionType.Credit
+            || a.Type == AccountDefinitionType.Debit);
         foreach (var account in accounts)
         {
             if (currentModelJournal.Booking == null)
@@ -293,6 +292,7 @@ public partial class AccountDefinitionImportMapping
         {
             return false;
         }
+
         return
             this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
             && this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
