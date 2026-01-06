@@ -7,7 +7,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports;
 using System;
 using System.Xml;
 using System.Xml.Linq;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Reports;
@@ -32,7 +31,7 @@ public class ReportBaseTests
         }
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void PreparePrintDocument_SampleXml_PlaceholdersUpdates()
     {
         var printer = Substitute.For<IXmlPrinter>();

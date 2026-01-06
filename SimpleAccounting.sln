@@ -10,7 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
 		global.json = global.json
-		.sonarlint\lg2de_simpleaccountingcsharp.ruleset = .sonarlint\lg2de_simpleaccountingcsharp.ruleset
 		LICENSE = LICENSE
 		nuget.config = nuget.config
 		PatchVersion.ps1 = PatchVersion.ps1
@@ -40,9 +39,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{88F13815-196
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BF2618D8-BC1B-4127-8DCF-85A493C04BF8}"
-	ProjectSection(SolutionItems) = preProject
-		tests\Directory.Build.props = tests\Directory.Build.props
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3355B5D5-5674-4583-91F7-0FB77A701227}"
 	ProjectSection(SolutionItems) = preProject

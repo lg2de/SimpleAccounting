@@ -11,8 +11,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
-using FluentAssertions;
-using FluentAssertions.Extensions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Presentation;
@@ -23,7 +21,7 @@ using Xunit;
 
 public class ApplicationUpdateTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task StartUpdateProcess_UpdateProcessFailed_UpdateAborted()
     {
         var dialogs = Substitute.For<IDialogs>();
@@ -213,5 +211,8 @@ public class ApplicationUpdateTests
         fileSystem.Received(1).WriteAllTextIntoFile(
             Arg.Is<string>(x => x.Contains(Path.GetTempPath(), StringComparison.InvariantCulture)), Arg.Any<string>());
         processApi.Received(1).Start(Arg.Is<ProcessStartInfo>(i => i.FileName.EndsWith("powershell.exe")));
+        processApi.Received(1).Start(
+            Arg.Is<ProcessStartInfo>(i =>
+                i.Arguments.Contains("-File \"") && i.Arguments.Contains("-targetFolder \"")));
     }
 }

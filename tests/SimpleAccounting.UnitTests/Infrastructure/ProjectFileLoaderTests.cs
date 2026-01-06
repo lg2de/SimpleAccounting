@@ -8,8 +8,6 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
-using FluentAssertions;
-using FluentAssertions.Extensions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
@@ -34,7 +32,7 @@ public class ProjectFileLoaderTests
         result.Subject.Should().Be(OperationResult.Failed);
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task LoadAsync_UserDoesNotWantToOpenReservedProject_ReturnsAborted()
     {
         var dialogs = Substitute.For<IDialogs>();
@@ -62,7 +60,7 @@ public class ProjectFileLoaderTests
             Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
     }
 
-    [CulturedFact("en")]
+    [Fact]
     public async Task LoadAsync_ReservationForCurrentUserAndHost_ReturnsCompleted()
     {
         var dialogs = Substitute.For<IDialogs>();

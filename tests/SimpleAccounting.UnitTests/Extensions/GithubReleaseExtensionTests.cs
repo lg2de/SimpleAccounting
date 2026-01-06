@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions;
 
 using System;
 using System.Collections.Generic;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Extensions;
 using Octokit;
 using Xunit;

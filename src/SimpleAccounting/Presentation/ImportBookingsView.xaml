@@ -80,6 +80,12 @@
         Grid.Row="3"
         Orientation="Horizontal">
         <Button
+          Width="180"
+          Content="{x:Static properties:Resources.Action_SetRemoteAccounts}"
+          ToolTip="{x:Static properties:Resources.Tooltip_SetRemoteAccounts}"
+          Command="{Binding SetRemoteAccountsCommand}" />
+        <Rectangle Width="20" />
+        <Button
           Width="100"
           Content="{x:Static properties:Resources.Action_BookPartially}"
           ToolTip="{x:Static properties:Resources.Tooltip_BookPartially}"

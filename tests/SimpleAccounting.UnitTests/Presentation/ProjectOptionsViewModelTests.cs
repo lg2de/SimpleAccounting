@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
 using Xunit;
@@ -19,7 +18,7 @@ public class ProjectOptionsViewModelTests
         var data = new AccountingData();
         var sut = new ProjectOptionsViewModel(data);
 
-        await sut.As<IActivate>().ActivateAsync();
+        await sut.As<IActivate>().ActivateAsync(TestContext.Current.CancellationToken);
 
         sut.DisplayName.Should().NotBe(sut.GetType().FullName);
     }

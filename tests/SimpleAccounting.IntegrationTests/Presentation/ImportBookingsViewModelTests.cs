@@ -7,7 +7,6 @@ namespace lg2de.SimpleAccounting.IntegrationTests.Presentation;
 using System;
 using System.Linq;
 using System.Windows;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
@@ -52,65 +51,63 @@ public class ImportBookingsViewModelTests
             Arg.Any<MessageBoxOptions>());
         sut.LoadedData.Should().NotContain(x => x.Name == "Shopping Mall", "entry is already imported");
         sut.LoadedData.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name1",
-                    Text = "Text1 with German Ü and Copyright ©",
-                    Value = 12.34
-                },
-                new
-                {
-                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name2",
-                    Text = "Text2",
-                    Value = 23.45
-                },
-                new
-                {
-                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name3",
-                    Text = "Text3",
-                    Value = 23.46
-                },
-                new
-                {
-                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name4",
-                    Text = "Text4",
-                    Value = -42.42
-                }
-            }, o => o.WithStrictOrdering());
+                Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name1",
+                Text = "Text1 with German Ü and Copyright ©",
+                Value = 12.34
+            },
+            new
+            {
+                Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name2",
+                Text = "Text2",
+                Value = 23.45
+            },
+            new
+            {
+                Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name3",
+                Text = "Text3",
+                Value = 23.46
+            },
+            new
+            {
+                Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name4",
+                Text = "Text4",
+                Value = -42.42
+            }
+        ], o => o.WithStrictOrdering());
         sut.ImportDataFiltered.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    Identifier = 2,
-                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name2",
-                    Text = "Text2",
-                    Value = 23.45
-                },
-                new
-                {
-                    Identifier = 3,
-                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name3",
-                    Text = "Text3",
-                    Value = 23.46
-                },
-                new
-                {
-                    Identifier = 4,
-                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name4",
-                    Text = "Text4",
-                    Value = -42.42
-                }
-            }, o => o.WithStrictOrdering());
+                Identifier = 2,
+                Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name2",
+                Text = "Text2",
+                Value = 23.45
+            },
+            new
+            {
+                Identifier = 3,
+                Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name3",
+                Text = "Text3",
+                Value = 23.46
+            },
+            new
+            {
+                Identifier = 4,
+                Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name4",
+                Text = "Text4",
+                Value = -42.42
+            }
+        ], o => o.WithStrictOrdering());
 
         // set start date to year begin to import data skipped before
         sut.StartDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
@@ -258,65 +255,63 @@ public class ImportBookingsViewModelTests
             Arg.Any<MessageBoxOptions>());
         sut.LoadedData.Should().NotContain(x => x.Name == "Shopping Mall", "entry is already imported");
         sut.LoadedData.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name4",
-                    Text = "Text4",
-                    Value = -42.42
-                },
-                new
-                {
-                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name3",
-                    Text = "Text3",
-                    Value = 23.46
-                },
-                new
-                {
-                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name2",
-                    Text = "Text2",
-                    Value = 23.45
-                },
-                new
-                {
-                    Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name1",
-                    Text = "Text1 with German Ü and Copyright ©",
-                    Value = 12.34
-                },
-            }, o => o.WithStrictOrdering());
+                Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name4",
+                Text = "Text4",
+                Value = -42.42
+            },
+            new
+            {
+                Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name3",
+                Text = "Text3",
+                Value = 23.46
+            },
+            new
+            {
+                Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name2",
+                Text = "Text2",
+                Value = 23.45
+            },
+            new
+            {
+                Date = new DateTime(2000, 1, 10, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name1",
+                Text = "Text1 with German Ü and Copyright ©",
+                Value = 12.34
+            }
+        ], o => o.WithStrictOrdering());
         sut.ImportDataFiltered.Should().BeEquivalentTo(
-            new[]
+        [
+            new
             {
-                new
-                {
-                    Identifier = 2,
-                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name3",
-                    Text = "Text3",
-                    Value = 23.46
-                },
-                new
-                {
-                    Identifier = 3,
-                    Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name2",
-                    Text = "Text2",
-                    Value = 23.45
-                },
-                new
-                {
-                    Identifier = 4,
-                    Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
-                    Name = "Name4",
-                    Text = "Text4",
-                    Value = -42.42
-                }
-            }, o => o.WithStrictOrdering());
+                Identifier = 2,
+                Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name3",
+                Text = "Text3",
+                Value = 23.46
+            },
+            new
+            {
+                Identifier = 3,
+                Date = new DateTime(2000, 12, 1, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name2",
+                Text = "Text2",
+                Value = 23.45
+            },
+            new
+            {
+                Identifier = 4,
+                Date = new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local),
+                Name = "Name4",
+                Text = "Text4",
+                Value = -42.42
+            }
+        ], o => o.WithStrictOrdering());
 
         // set start date to year begin to import data skipped before
         sut.StartDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Local);

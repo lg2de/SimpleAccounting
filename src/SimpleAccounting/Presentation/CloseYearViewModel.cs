@@ -48,9 +48,9 @@ public class CloseYearViewModel : Screen
         () => this.TryCloseAsync(true),
         () => this.RemoteAccount != null);
 
-    protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
+    protected override async Task OnInitializedAsync(CancellationToken cancellationToken)
     {
-        await base.OnInitializeAsync(cancellationToken);
+        await base.OnInitializedAsync(cancellationToken);
 
         this.DisplayName = Resources.Header_CloseYear;
         this.InstructionText = string.Format(

@@ -5,21 +5,20 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System.Diagnostics.CodeAnalysis;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
 using Xunit;
 
 public class AccountViewModelTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void Types_DefaultCulture_NoFallbackValue()
     {
         AccountViewModel.ResetTypesLazy();
         AccountViewModel.Types.Values.Should().NotContain(x => x.StartsWith('<'));
     }
 
-    [CulturedFact("de")]
+    [CulturedFact(["de"])]
     [SuppressMessage("ReSharper", "StringLiteralTypo", Justification = "german test text")]
     public void TypeName_GermanCulture_CorrectlyInitialized()
     {

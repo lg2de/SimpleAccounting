@@ -8,8 +8,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using FluentAssertions;
-using FluentAssertions.Extensions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Infrastructure;
 using NSubstitute;

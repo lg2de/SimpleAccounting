@@ -12,9 +12,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using Caliburn.Micro;
-using FluentAssertions;
-using FluentAssertions.Execution;
-using FluentAssertions.Extensions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Infrastructure;
 using lg2de.SimpleAccounting.Model;
@@ -27,7 +24,7 @@ using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 public class ProjectDataTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task LoadFromFileAsync_UserWantsAutoSaveFile_AutoSaveFileLoaded()
     {
         var windowManager = Substitute.For<IWindowManager>();
@@ -60,7 +57,7 @@ public class ProjectDataTests
         fileSystem.Received(1).ReadAllTextFromFile("the.fileName~");
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task LoadFromFileAsync_UserDoesNotWantAutoSaveFileExists_ProjectFileLoaded()
     {
         var windowManager = Substitute.For<IWindowManager>();
@@ -130,7 +127,7 @@ public class ProjectDataTests
         fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
     }
 
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public async Task LoadFromFileAsync_UserDoesNotWantSaveCurrentProject_LoadingAborted()
     {
         var windowManager = Substitute.For<IWindowManager>();

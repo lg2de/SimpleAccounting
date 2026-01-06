@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
-using FluentAssertions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Presentation;
 using NSubstitute;

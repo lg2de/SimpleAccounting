@@ -6,8 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
 using System.Xml.Linq;
 using System.Xml.XPath;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
@@ -16,7 +14,7 @@ using Xunit;
 
 public class AnnualBalanceReportTests
 {
-    [CulturedFact("en")]
+    [CulturedFact(["en"])]
     public void CreateReport_SampleData_Converted()
     {
         var projectData = Samples.SampleProjectData;

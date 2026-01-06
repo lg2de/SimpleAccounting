@@ -6,7 +6,6 @@ namespace lg2de.SimpleAccounting.UnitTests.Extensions;
 
 using System;
 using System.Drawing;
-using FluentAssertions;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
 using NSubstitute;
@@ -76,6 +75,23 @@ public sealed class StringExtensionsTests : IDisposable
         graphics.MeasureString(Arg.Any<string>(), Arg.Any<Font>())
             .Returns(call => new SizeF(call.Arg<string>().Length, 0));
         var result = input.Wrap(10, this.testFont, graphics);
+        
+        result.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(null, null, 0)]
+    [InlineData(null, "", 0)]
+    [InlineData("", "", 0)]
+    [InlineData("", "A", 1)]
+    [InlineData("A", "", 1)]
+    [InlineData("A", "A", 0)]
+    [InlineData("A", "AA", 1)]
+    [InlineData("A", "B", 1)]
+    [InlineData("A", "BB", 2)]
+    public void LevenshteinDistance_Samples_ResultValidated(string input, string other, int expected)
+    {
+        var result = input.LevenshteinDistance(other);
         
         result.Should().Be(expected);
     }

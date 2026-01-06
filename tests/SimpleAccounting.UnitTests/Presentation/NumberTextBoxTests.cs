@@ -5,8 +5,6 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System.Globalization;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using lg2de.SimpleAccounting.Presentation;
 using Xunit;
 

@@ -649,4 +649,10 @@ ou
  vous adresser à d'autres professionnels en transmettant les informations détaillées par e-mail ou par d'autres canaux (presse-papiers).
 Texte d'erreur:</value>
   </data>
+    <data name="Action_SetRemoteAccounts" xml:space="preserve">
+      <value>Attribuer des comptes distants</value>
+    </data>
+    <data name="Tooltip_SetRemoteAccounts" xml:space="preserve">
+      <value>Toutes les entrées sans compte distant défini seront mises à jour avec un compte dont le nom est aussi proche que possible de celui de la réservation.</value>
+    </data>
 </root>

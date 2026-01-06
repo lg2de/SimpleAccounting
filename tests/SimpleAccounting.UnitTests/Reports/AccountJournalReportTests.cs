@@ -9,8 +9,6 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
@@ -19,7 +17,7 @@ using Xunit;
 
 public class AccountJournalReportTests
 {
-    [CulturedTheory("en")]
+    [CulturedTheory(["en"])]
     [InlineData(true)]
     [InlineData(false)]
     public void CreateReport_SampleData_Converted(bool pageBreakBetweenAccounts)
