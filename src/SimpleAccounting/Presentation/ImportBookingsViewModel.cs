@@ -41,7 +41,7 @@ internal class ImportBookingsViewModel : Screen
         this.dialogs = dialogs;
         this.fileSystem = fileSystem;
         this.ProjectData = projectData;
-        this.accounts = projectData.Storage.AllAccounts.ToList();
+        this.accounts = projectData.Storage.AllAccounts.Where(a => a.Active).ToList();
         this.FirstBookingNumber = projectData.MaxBookIdent + 1;
 
         this.RangeMin = this.ProjectData.CurrentYear.DateStart.ToDateTime();
@@ -57,7 +57,6 @@ internal class ImportBookingsViewModel : Screen
     /// </summary>
     public IEnumerable<AccountDefinition> ImportAccounts => this.accounts
         .Where(a => a.ImportMapping != null && a.ImportMapping.IsValid());
-
     /// <summary>
     ///     Gets a value indicating whether importing is currently possible.
     /// </summary>
@@ -221,7 +220,7 @@ internal class ImportBookingsViewModel : Screen
             // remote account may be null in case of split booking
             var remoteAccount = this.accounts.Find(x => x.ID == remoteIdentifier);
 
-            return new ImportEntryViewModel(this.accounts)
+            return new ImportEntryViewModel(this.accounts.Where(x => x.ID != this.SelectedAccountNumber))
             {
                 IsExisting = true,
                 Identifier = entry.ID,
