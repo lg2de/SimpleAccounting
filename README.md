@@ -1,4 +1,4 @@
-# SimpleAccounting - Simple Accounting Software
+# SimpleAccounting – Simple Accounting Software
 
 ![Build status](https://github.com/lg2de/SimpleAccounting/actions/workflows/dotnetcore.yml/badge.svg?branch=main)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=coverage)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
@@ -9,12 +9,12 @@
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=lg2de_SimpleAccounting&metric=security_rating)](https://sonarcloud.io/dashboard?id=lg2de_SimpleAccounting)
 
-**SimpleAccounting** is a simple software for accounting.
-It supports double-entry accounting including split bookings and several reports.
-Bookings can be imported from text files (CSV), e.g. provided by your bank account web access.
+**SimpleAccounting** is a simple program for accounting.
+It supports double-entry accounting, including split bookings and several reports.
+Bookings can be imported from text files (CSV), e.g., provided by your bank account web access.
 
 I started `SimpleAccounting` around 2005, only for my personal use to manage accounts and balances of a small club.
-In 2019, I met a colleague from another small club who was looking for a simple solution to get an overview of the balances of several logical and real accounts.
+In 2019, I met a colleague from a different small club who was looking for an easy way to see the balances of several accounts, both real and logical.
 
 So, I decided to rework my solution to make it usable for others and open source.
 
@@ -22,9 +22,9 @@ So, I decided to rework my solution to make it usable for others and open source
 
 The name says it all. The software is as simple as possible. 
 
-It probably does not follow all rules and laws of double-entry accounting, e.g. the software does not protect accounting
-entries from changes.
-Instead it is explicitly possible to change existing entries.
+It probably does not follow all rules and laws of double-entry accounting, e.g.,
+the software does not protect accounting entries from changes.
+Instead, it is explicitly possible to change existing entries.
 The data is stored in readable XML format and can be changed manually.
 An XSD document is available online and linked from the XML document which supports editing with code completion support.
 
@@ -35,12 +35,12 @@ The software focuses on journal and balance sheet reporting.
 * Data management for double-entry accounting, stored as XML (see [example](./samples/sample.acml)) and defined using [XSD](./docs/AccountingData.xsd)
 * User interface (English, German, and French) for the management of accounts, the creation and modification of entries,
   the listing of account journals
-* Support for split booking entries, either on credit or debit side
+* Support for split booking entries, either on the credit or debit side
 * Import of booking entries from your bank account using CSV files incl. semi-automatic assignment of offsetting accounts
 * Printable reports for full journal, account journal, accounts and balances, and annual financial statements
 * Semi-automatic update of the application
 
-Some screenshots for first impression:
+Some screenshots for the first impression:
 
 | Main view                                                        | Split booking                                                            | Totals and balances report                                                                       |
 |------------------------------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
@@ -48,15 +48,16 @@ Some screenshots for first impression:
 
 ## Getting started
 
-The application is based on [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
+The application is based on [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).
 There is
-a [self-contained package](https://github.com/lg2de/SimpleAccounting/releases/download/2.4.1/SimpleAccounting-self-contained.zip)
-available. Using this package you do not need to install the .NET 8 runtime. I'll update this package with security
-fixes if needed.
-There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.4.1/SimpleAccounting.zip)
-available which requires .NET runtime to be installed.
+a [self-contained package](https://github.com/lg2de/SimpleAccounting/releases/download/2.5.0/SimpleAccounting-self-contained.zip)
+available.
+Using this package, you do not need to install the .NET 10 runtime.
+I'll update this package with security fixes if needed.
+There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.5.0/SimpleAccounting.zip)
+available that requires .NET runtime to be installed.
 Please download and install the Runtime in
-version [8.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.10-windows-x64-installer)
+version [10.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.1-windows-x64-installer)
 or above.
 
 Download one of the `SimpleAccounting` packages from
@@ -83,7 +84,7 @@ Perhaps you would like to help with better naming?
 ## Roadmap
 
 The public releases are [available](https://github.com/lg2de/SimpleAccounting/releases).
-Please download, test and send feedback.
+Please download, test, and send feedback.
 
 The roadmap is defined by issues and milestones.
 
