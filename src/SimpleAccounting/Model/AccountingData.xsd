@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
 <!--suppress XmlDefaultAttributeValue -->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -30,7 +30,7 @@
                   <xs:sequence>
                     <xs:element name="AccountJournalReport" minOccurs="0" maxOccurs="1">
                       <xs:complexType>
-                        <xs:attribute name="PageBreakBetweenAccounts" type="xs:boolean" default="false" />
+                        <xs:attribute name="PageBreakBetweenAccounts" default="false" type="xs:boolean" />
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="TotalsAndBalancesReport" minOccurs="0" maxOccurs="1">
@@ -58,10 +58,10 @@
         <xs:element name="Accounts">
           <xs:complexType>
             <xs:sequence>
-              <xs:element maxOccurs="unbounded" name="AccountGroup">
+              <xs:element name="AccountGroup" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element maxOccurs="unbounded" name="Account" type="AccountDefinition" />
+                    <xs:element name="Account" type="AccountDefinition" maxOccurs="unbounded" />
                   </xs:sequence>
                   <xs:attribute name="Name" type="xs:string" use="required" />
                 </xs:complexType>
@@ -73,12 +73,12 @@
           <!-- obsolete, merged into journal -->
           <xs:complexType>
             <xs:sequence>
-              <xs:element maxOccurs="unbounded" name="Year">
+              <xs:element name="Year" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:attribute name="Name" type="xs:unsignedShort" use="required" />
                   <xs:attribute name="DateStart" type="xs:unsignedInt" use="required" />
                   <xs:attribute name="DateEnd" type="xs:unsignedInt" use="required" />
-                  <xs:attribute name="Closed" type="xs:boolean" use="optional" default="false" />
+                  <xs:attribute name="Closed" default="false" type="xs:boolean" use="optional" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
@@ -87,7 +87,7 @@
         <xs:element name="Journal" maxOccurs="unbounded">
           <xs:complexType>
             <xs:sequence>
-              <xs:element maxOccurs="unbounded" name="Booking">
+              <xs:element name="Booking" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="Debit" type="BookingValue" minOccurs="1" maxOccurs="unbounded" />
@@ -95,15 +95,15 @@
                   </xs:sequence>
                   <xs:attribute name="Date" type="xs:unsignedInt" use="required" />
                   <xs:attribute name="ID" type="xs:unsignedLong" use="required" />
-                  <xs:attribute name="Followup" type="xs:boolean" use="optional" default="false" />
-                  <xs:attribute name="Opening" type="xs:boolean" use="optional" default="false" />
+                  <xs:attribute name="Followup" default="false" type="xs:boolean" use="optional" />
+                  <xs:attribute name="Opening" default="false" type="xs:boolean" use="optional" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
             <xs:attribute name="Year" type="xs:string" use="required" />
             <xs:attribute name="DateStart" type="xs:unsignedInt" use="required" />
             <xs:attribute name="DateEnd" type="xs:unsignedInt" use="required" />
-            <xs:attribute name="Closed" type="xs:boolean" use="optional" default="false" />
+            <xs:attribute name="Closed" default="false" type="xs:boolean" use="optional" />
           </xs:complexType>
         </xs:element>
         <xs:element name="OpenIssues" minOccurs="0" maxOccurs="1">
@@ -123,6 +123,7 @@
           </xs:complexType>
         </xs:element>
       </xs:sequence>
+      <xs:attribute name="ProgramVersion" type="xs:string" />
     </xs:complexType>
   </xs:element>
   <xs:complexType name="AccountDefinition">
@@ -145,7 +146,7 @@
                           </xs:restriction>
                         </xs:simpleType>
                       </xs:attribute>
-                      <xs:attribute name="Source" use="required" type="xs:string" />
+                      <xs:attribute name="Source" type="xs:string" use="required" />
                       <xs:attribute name="IgnorePattern" type="xs:string" use="optional" />
                     </xs:complexType>
                   </xs:element>
@@ -183,7 +184,7 @@
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
-    <xs:attribute name="Active" type="xs:boolean" default="true" />
+    <xs:attribute name="Active" default="true" type="xs:boolean" />
   </xs:complexType>
   <xs:complexType name="BookingValue">
     <xs:attribute name="Value" type="xs:long" use="required" />

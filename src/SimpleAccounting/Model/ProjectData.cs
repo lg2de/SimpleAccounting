@@ -164,6 +164,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
                 this.fileSystem.FileMove(this.FileName, backupFileName);
             }
 
+            this.Storage.ProgramVersion = this.GetType().GetInformationalVersion();
             this.fileSystem.WriteAllTextIntoFile(this.FileName, this.Storage.Serialize());
             this.IsModified = false;
 
