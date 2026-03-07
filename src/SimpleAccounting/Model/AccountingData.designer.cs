@@ -33,6 +33,8 @@ namespace lg2de.SimpleAccounting.Model {
         
         private List<AccountingDataEntry> openIssuesField;
         
+        private string programVersionField;
+        
         private static System.Xml.Serialization.XmlSerializer serializer;
         
         public AccountingDataSetup Setup {
@@ -81,6 +83,16 @@ namespace lg2de.SimpleAccounting.Model {
             }
             set {
                 this.openIssuesField = value;
+            }
+        }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string ProgramVersion {
+            get {
+                return this.programVersionField;
+            }
+            set {
+                this.programVersionField = value;
             }
         }
         
