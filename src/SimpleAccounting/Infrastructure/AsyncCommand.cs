@@ -106,9 +106,13 @@ public class AsyncCommand : IAsyncCommand
     /// <inheritdoc />
     public async Task ExecuteAsync(object? parameter)
     {
-        if (this.busy != null)
+        // There may be multiple commands chained together.
+        // Save the current state and restore it after the commands have been executed.
+        var oldBusy = this.busy?.IsBusy ?? false;
+
+        if (!oldBusy)
         {
-            this.busy.IsBusy = true;
+            this.busy?.IsBusy = true;
         }
 
         RaiseCanExecuteChanged();
@@ -123,9 +127,9 @@ public class AsyncCommand : IAsyncCommand
             await this.asyncCommand2(parameter);
         }
 
-        if (this.busy != null)
+        if (!oldBusy)
         {
-            this.busy.IsBusy = false;
+            this.busy?.IsBusy = false;
         }
 
         RaiseCanExecuteChanged();
