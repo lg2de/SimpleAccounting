@@ -13,7 +13,7 @@
     <!-- license is apache 2.0 -->
     <PackageReference Include="AwesomeAssertions" Version="9.5.0" />
     <!-- license is MIT -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <!-- license is BSD-3-Clause -->
     <PackageReference Include="NSubstitute" Version="6.2.0" />
     <!-- license is apache 2.0 -->
