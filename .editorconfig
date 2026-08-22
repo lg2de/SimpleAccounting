@@ -199,6 +199,12 @@ dotnet_naming_style.begins_with_i.capitalization=pascal_case
 # ReSharper properties
 resharper_csharp_insert_final_newline=true
 
+# AwesomeAssertions enforcement
+dotnet_diagnostic.FAA0001.severity = error
+dotnet_diagnostic.FAA0002.severity = error
+dotnet_diagnostic.FAA0003.severity = error
+dotnet_diagnostic.FAA0004.severity = error
+
 # XAML files
 [*.xaml]
 

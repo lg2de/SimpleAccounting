@@ -690,6 +690,6 @@ public class ImportBookingsViewModelTests
                     DebitAccount = "600 (Shoes)"
                 }
             });
-        projectDataMonitor.Should().Raise(nameof(projectData.JournalChanged)).Should().HaveCount(1);
+        projectDataMonitor.Should().Raise(nameof(projectData.JournalChanged)).Should().ContainSingle();
     }
 }

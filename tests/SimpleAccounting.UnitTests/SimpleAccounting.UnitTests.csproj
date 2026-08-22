@@ -3,6 +3,7 @@
   <PropertyGroup Label="Globals">
     <TargetFramework>net10.0-windows</TargetFramework>
     <RootNamespace>lg2de.SimpleAccounting.UnitTests</RootNamespace>
+    <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +13,10 @@
   <ItemGroup>
     <!-- license is apache 2.0 -->
     <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
+    <PackageReference Include="AwesomeAssertions.Analyzers" Version="9.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <!-- license is MIT -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <!-- license is BSD-3-Clause -->
