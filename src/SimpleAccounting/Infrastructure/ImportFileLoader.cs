@@ -80,7 +80,7 @@ internal sealed partial class ImportFileLoader : IDisposable
         }
 
         csv.ReadHeader();
-        if (csv.HeaderRecord.Length <= 1)
+        if (csv.HeaderRecord is not { Length: > 1 })
         {
             throw new InvalidOperationException("Missing or incomplete file header.");
         }
@@ -103,9 +103,9 @@ internal sealed partial class ImportFileLoader : IDisposable
         csv.TryGetField<double>(valueField, out var value);
 
         // name and text may be empty
-        csv.TryGetField(nameField, out string name);
+        csv.TryGetField(nameField, out string? name);
 
-        string text = string.Empty;
+        string? text = string.Empty;
         if (textField != null)
         {
             csv.TryGetField(textField.Source, out text);
@@ -119,7 +119,7 @@ internal sealed partial class ImportFileLoader : IDisposable
             text = this.duplicateSpaceExpression.Replace(text, " ");
         }
 
-        var item = new ImportEntryViewModel(this.accounts) { Date = date, Name = name, Text = text, Value = value };
+        var item = new ImportEntryViewModel(this.accounts) { Date = date, Name = name ?? string.Empty, Text = text, Value = value };
 
         var modelValue = value.ToModelValue();
         var patterns = this.importMapping.Patterns ?? Enumerable.Empty<AccountDefinitionImportMappingPattern>();

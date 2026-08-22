@@ -101,7 +101,7 @@ public class EditBookingAccountControlTests
 
         sut.SplitCommand.Execute(null);
 
-        sut.SplitEntries.Should().HaveCount(1);
+        sut.SplitEntries.Should().ContainSingle();
         monitor.Should().RaisePropertyChangeFor(x => x.SingleRowVisibility);
         sut.SingleRowVisibility.Should().NotBe(Visibility.Visible);
         monitor.Should().RaisePropertyChangeFor(x => x.SplitRowsVisibility);
@@ -150,7 +150,7 @@ public class EditBookingAccountControlTests
 
         sut.RemoveSplitEntryCommand.Execute(sut.SplitEntries.Single());
 
-        sut.SplitEntries.Should().HaveCount(0);
+        sut.SplitEntries.Should().BeEmpty();
         monitor.Should().RaisePropertyChangeFor(x => x.SingleRowVisibility);
         sut.SingleRowVisibility.Should().Be(Visibility.Visible);
         monitor.Should().RaisePropertyChangeFor(x => x.SplitRowsVisibility);

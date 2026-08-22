@@ -26,7 +26,9 @@ public class AnnualBalanceReportTests
 
         using var _ = new AssertionScope();
 
+#pragma warning disable FAA0001 // false-positive
         sut.DocumentForTests.XPathSelectElement("//text[@ID='saldo']")?.Value.Should().Be("150.00");
+#pragma warning restore FAA0001
 
         var expected = @"
 <data target=""income"">

@@ -173,9 +173,11 @@ public class TotalsAndBalancesReportTests
 
         sut.CreateReport(reportName);
 
+#pragma warning disable FAA0001 // false-positive
         var expectedText = $"- {reportName} {DateTime.Today.Year} -";
         sut.DocumentForTests.XPathSelectElement("//text[@ID='page-header']")?.Value.Should().Be(expectedText);
         expectedText = $"{reportName} {DateTime.Today.Year}";
         sut.DocumentForTests.XPathSelectElement("//text[@ID='report-header']")?.Value.Should().Be(expectedText);
+#pragma warning restore FAA0001
     }
 }

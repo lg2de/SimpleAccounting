@@ -3,6 +3,7 @@
   <PropertyGroup Label="Globals">
     <TargetFramework>net10.0-windows</TargetFramework>
     <RootNamespace>lg2de.SimpleAccounting.UnitTests</RootNamespace>
+    <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
