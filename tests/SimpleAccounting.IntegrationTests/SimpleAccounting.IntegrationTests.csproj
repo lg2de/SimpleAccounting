@@ -15,7 +15,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <!-- license is MIT -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
     <!-- license is BSD-3-Clause -->
     <PackageReference Include="NSubstitute" Version="6.2.0"/>
     <!-- license is apache 2.0 -->
