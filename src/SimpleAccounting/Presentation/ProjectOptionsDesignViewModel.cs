@@ -23,8 +23,41 @@ public class ProjectOptionsDesignViewModel : ProjectOptionsViewModel
             {
                 Name = "My Club",
                 Location = "Hometown",
-                Reports = { TotalsAndBalancesReport = ["Treasurer", "Auditor 1", "Auditor 2"] }
-            }
+                Reports = { TotalsAndBalancesReport = ["Treasurer", "Auditor 1", "Auditor 2"] },
+                BookingTemplates = new AccountingDataSetupBookingTemplates
+                {
+                    Template =
+                    [
+                        new AccountingDataSetupBookingTemplatesTemplate
+                        {
+                            Text = "Membership fee",
+                            Value = 5000,
+                            ValueSpecified = true,
+                            Debit = 100,
+                            DebitSpecified = true,
+                            Credit = 400,
+                            CreditSpecified = true
+                        },
+                        new AccountingDataSetupBookingTemplatesTemplate
+                        {
+                            Text = "Bank fee", Debit = 600, DebitSpecified = true, Credit = 100, CreditSpecified = true
+                        }
+                    ]
+                }
+            },
+            Accounts =
+            [
+                new AccountingDataAccountGroup
+                {
+                    Name = "Default",
+                    Account =
+                    [
+                        new AccountDefinition { ID = 100, Name = "Bank account", Type = AccountDefinitionType.Asset },
+                        new AccountDefinition { ID = 400, Name = "Fees", Type = AccountDefinitionType.Income },
+                        new AccountDefinition { ID = 600, Name = "Bank fees", Type = AccountDefinitionType.Expense }
+                    ]
+                }
+            ]
         };
         return data;
     }

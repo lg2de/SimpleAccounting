@@ -685,4 +685,16 @@ Error message:</value>
   <data name="ProjectOptions_MoveDown" xml:space="preserve">
     <value>Move down</value>
   </data>
+  <data name="ProjectOptions_TabBookingTemplates" xml:space="preserve">
+    <value>Booking templates</value>
+  </data>
+  <data name="ProjectOptions_NoAccount" xml:space="preserve">
+    <value>(none)</value>
+  </data>
+  <data name="ProjectOptions_TemplateTextRequired" xml:space="preserve">
+    <value>The booking text must not be empty.</value>
+  </data>
+  <data name="ProjectOptions_TemplateSameAccounts" xml:space="preserve">
+    <value>Debit and credit account must be different.</value>
+  </data>
 </root>

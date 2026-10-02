@@ -292,7 +292,7 @@ Les noms de destinataires importés et les textes de transaction peuvent être m
     <value>Sauter</value>
   </data>
     <data name="Word_Value" xml:space="preserve">
-    <value>Évaluer</value>
+    <value>Montant</value>
   </data>
     <data name="Word_RemoteAccount" xml:space="preserve">
     <value>Compte distant</value>
@@ -681,5 +681,17 @@ Texte d'erreur:</value>
     </data>
     <data name="ProjectOptions_MoveDown" xml:space="preserve">
       <value>Descendre</value>
+    </data>
+    <data name="ProjectOptions_TabBookingTemplates" xml:space="preserve">
+      <value>Modèles d'écriture</value>
+    </data>
+    <data name="ProjectOptions_NoAccount" xml:space="preserve">
+      <value>(aucun)</value>
+    </data>
+    <data name="ProjectOptions_TemplateTextRequired" xml:space="preserve">
+      <value>Le texte de l'écriture ne doit pas être vide.</value>
+    </data>
+    <data name="ProjectOptions_TemplateSameAccounts" xml:space="preserve">
+      <value>Les comptes de débit et de crédit doivent être différents.</value>
     </data>
 </root>

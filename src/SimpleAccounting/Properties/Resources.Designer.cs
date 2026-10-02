@@ -912,7 +912,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Menu_Reports_TotalsAndBalances", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Organization and location are shown in the header and in the date line of all reports..
         /// </summary>
@@ -921,7 +921,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_GeneralHint", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Move down.
         /// </summary>
@@ -930,7 +930,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_MoveDown", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Move up.
         /// </summary>
@@ -939,7 +939,16 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_MoveUp", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (none).
+        /// </summary>
+        public static string ProjectOptions_NoAccount {
+            get {
+                return ResourceManager.GetString("ProjectOptions_NoAccount", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Page break between accounts.
         /// </summary>
@@ -948,7 +957,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_PageBreakBetweenAccounts", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Signatures.
         /// </summary>
@@ -957,7 +966,16 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_Signatures", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Booking templates.
+        /// </summary>
+        public static string ProjectOptions_TabBookingTemplates {
+            get {
+                return ResourceManager.GetString("ProjectOptions_TabBookingTemplates", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to General.
         /// </summary>
@@ -966,7 +984,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_TabGeneral", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Reports.
         /// </summary>
@@ -975,7 +993,25 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_TabReports", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Debit and credit account must be different..
+        /// </summary>
+        public static string ProjectOptions_TemplateSameAccounts {
+            get {
+                return ResourceManager.GetString("ProjectOptions_TemplateSameAccounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The booking text must not be empty..
+        /// </summary>
+        public static string ProjectOptions_TemplateTextRequired {
+            get {
+                return ResourceManager.GetString("ProjectOptions_TemplateTextRequired", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Do you want to close the year {0}?.
         /// </summary>
@@ -1513,7 +1549,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Word_Liabilities", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Location.
         /// </summary>
@@ -1522,7 +1558,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Word_Location", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
@@ -1576,7 +1612,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Word_OpeningBooking", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Organization.
         /// </summary>
@@ -1585,7 +1621,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Word_Organization", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Page.
         /// </summary>

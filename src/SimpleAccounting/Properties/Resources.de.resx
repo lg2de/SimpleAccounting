@@ -670,4 +670,16 @@ Fehlertext:</value>
   <data name="ProjectOptions_MoveDown" xml:space="preserve">
     <value>Nach unten</value>
   </data>
+  <data name="ProjectOptions_TabBookingTemplates" xml:space="preserve">
+    <value>Buchungsvorlagen</value>
+  </data>
+  <data name="ProjectOptions_NoAccount" xml:space="preserve">
+    <value>(keins)</value>
+  </data>
+  <data name="ProjectOptions_TemplateTextRequired" xml:space="preserve">
+    <value>Der Buchungstext darf nicht leer sein.</value>
+  </data>
+  <data name="ProjectOptions_TemplateSameAccounts" xml:space="preserve">
+    <value>Soll- und Habenkonto müssen sich unterscheiden.</value>
+  </data>
 </root>

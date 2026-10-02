@@ -35,6 +35,61 @@ public class ProjectOptionsViewModelTests
         return data;
     }
 
+    private static AccountingData CreateTemplateData()
+    {
+        var data = new AccountingData
+        {
+            Setup =
+            {
+                BookingTemplates = new AccountingDataSetupBookingTemplates
+                {
+                    Template =
+                    [
+                        new AccountingDataSetupBookingTemplatesTemplate
+                        {
+                            Text = "Fee",
+                            Value = 5000,
+                            ValueSpecified = true,
+                            Debit = 100,
+                            DebitSpecified = true,
+                            Credit = 400,
+                            CreditSpecified = true
+                        },
+                        new AccountingDataSetupBookingTemplatesTemplate
+                        {
+                            Text = "Old", Credit = 900, CreditSpecified = true
+                        }
+                    ]
+                }
+            },
+            Accounts =
+            [
+                new AccountingDataAccountGroup
+                {
+                    Name = "Default",
+                    Account =
+                    [
+                        new AccountDefinition { ID = 100, Name = "Bank", Type = AccountDefinitionType.Asset },
+                        new AccountDefinition { ID = 400, Name = "Fees", Type = AccountDefinitionType.Income },
+                        new AccountDefinition
+                        {
+                            ID = 800, Name = "Unused inactive", Type = AccountDefinitionType.Expense, Active = false
+                        },
+                        new AccountDefinition
+                        {
+                            ID = 900, Name = "Used inactive", Type = AccountDefinitionType.Expense, Active = false
+                        },
+                        new AccountDefinition
+                        {
+                            ID = 990, Name = "Carryforward", Type = AccountDefinitionType.Carryforward
+                        }
+                    ]
+                }
+            ]
+        };
+        return data;
+    }
+
     [Fact]
     public async Task Activate_TitleSet()
     {
@@ -233,5 +288,122 @@ public class ProjectOptionsViewModelTests
         sut.MoveSignatureDownCommand.Execute(null);
 
         sut.Signatures.Select(x => x.Text).Should().Equal("Treasurer", "Auditor");
+    }
+
+    [Fact]
+    public void Ctor_BookingTemplates_TemplatesLoaded()
+    {
+        var sut = new ProjectOptionsViewModel(CreateTemplateData());
+
+        sut.BookingTemplates.Should().BeEquivalentTo(
+            new object[]
+            {
+                new { Text = "Fee", Value = 50.0, DebitAccount = new { ID = 100 }, CreditAccount = new { ID = 400 } },
+                new { Text = "Old", Value = (double?)null, DebitAccount = new { ID = 0 }, CreditAccount = new { ID = 900 } }
+            });
+    }
+
+    [Fact]
+    public void Ctor_BookingTemplates_ActiveAndReferencedAccountsAvailable()
+    {
+        var sut = new ProjectOptionsViewModel(CreateTemplateData());
+
+        sut.TemplateAccounts.Select(x => x.ID).Should().Equal(0UL, 100UL, 400UL, 900UL);
+    }
+
+    [Fact]
+    public void OnSave_BookingTemplatesUnchanged_ReturnsFalse()
+    {
+        var sut = new ProjectOptionsViewModel(CreateTemplateData());
+
+        sut.OnSave().Should().BeFalse();
+    }
+
+    [Fact]
+    public void OnSave_BookingTemplateAdded_TemplateStored()
+    {
+        var data = CreateTemplateData();
+        var sut = new ProjectOptionsViewModel(data);
+        sut.BookingTemplates.Add(
+            new BookingTemplateViewModel
+            {
+                Text = " New ", Value = 12.34, DebitAccount = sut.TemplateAccounts.Single(x => x.ID == 400)
+            });
+
+        sut.OnSave().Should().BeTrue();
+
+        data.Setup.BookingTemplates.Template[^1].Should().BeEquivalentTo(
+            new
+            {
+                Text = "New",
+                Value = 1234,
+                ValueSpecified = true,
+                Debit = 400,
+                DebitSpecified = true,
+                Credit = 0,
+                CreditSpecified = false
+            });
+    }
+
+    [Fact]
+    public void OnSave_BookingTemplateValueRemoved_ValueNotSpecified()
+    {
+        var data = CreateTemplateData();
+        var sut = new ProjectOptionsViewModel(data);
+        sut.BookingTemplates[0].Value = null;
+
+        sut.OnSave().Should().BeTrue();
+
+        data.Setup.BookingTemplates.Template[0].ValueSpecified.Should().BeFalse();
+    }
+
+    [Fact]
+    public void OnSave_AllBookingTemplatesRemoved_TemplatesRemoved()
+    {
+        var data = CreateTemplateData();
+        var sut = new ProjectOptionsViewModel(data);
+        sut.BookingTemplates.Clear();
+
+        sut.OnSave().Should().BeTrue();
+
+        data.Setup.BookingTemplates.Should().BeNull();
+    }
+
+    [Fact]
+    public void SaveCommand_BookingTemplateWithoutText_CannotExecute()
+    {
+        var sut = new ProjectOptionsViewModel(CreateTemplateData());
+        sut.BookingTemplates.Add(new BookingTemplateViewModel { Text = " " });
+
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void SaveCommand_BookingTemplateWithSameAccounts_CannotExecute()
+    {
+        var sut = new ProjectOptionsViewModel(CreateTemplateData());
+        sut.BookingTemplates[0].CreditAccount = sut.BookingTemplates[0].DebitAccount;
+
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void MoveTemplateUpCommand_SecondTemplate_Moved()
+    {
+        var sut = new ProjectOptionsViewModel(CreateTemplateData());
+
+        sut.MoveTemplateUpCommand.Execute(sut.BookingTemplates[1]);
+
+        sut.BookingTemplates.Select(x => x.Text).Should().Equal("Old", "Fee");
+    }
+
+    [Fact]
+    public void MoveTemplateDownCommand_LastTemplate_Unchanged()
+    {
+        var sut = new ProjectOptionsViewModel(CreateTemplateData());
+
+        sut.MoveTemplateDownCommand.Execute(sut.BookingTemplates[^1]);
+
+        sut.BookingTemplates.Select(x => x.Text).Should().Equal("Fee", "Old");
     }
 }

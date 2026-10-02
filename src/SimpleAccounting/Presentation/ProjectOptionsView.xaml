@@ -8,7 +8,7 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
-  Width="450" Height="400"
+  Width="650" Height="400"
   d:Background="Azure"
   d:DataContext="{d:DesignInstance Type=local:ProjectOptionsDesignViewModel, IsDesignTimeCreatable=True}">
   <DockPanel>
@@ -129,6 +129,109 @@
               </DataGrid>
             </DockPanel>
           </GroupBox>
+        </DockPanel>
+      </TabItem>
+
+      <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabBookingTemplates}">
+        <DockPanel>
+          <StackPanel
+            DockPanel.Dock="Right"
+            Orientation="Vertical">
+            <Button
+              Content="▲" MinWidth="30" Margin="5"
+              ToolTip="{x:Static properties:Resources.ProjectOptions_MoveUp}"
+              Command="{Binding MoveTemplateUpCommand}"
+              CommandParameter="{Binding SelectedItem, ElementName=TemplatesGrid}" />
+            <Button
+              Content="▼" MinWidth="30" Margin="5 0 5 5"
+              ToolTip="{x:Static properties:Resources.ProjectOptions_MoveDown}"
+              Command="{Binding MoveTemplateDownCommand}"
+              CommandParameter="{Binding SelectedItem, ElementName=TemplatesGrid}" />
+          </StackPanel>
+          <DataGrid
+            x:Name="TemplatesGrid"
+            Margin="5"
+            AutoGenerateColumns="False"
+            CanUserAddRows="True" CanUserDeleteRows="True"
+            CanUserReorderColumns="False" CanUserSortColumns="False"
+            ItemsSource="{Binding BookingTemplates}">
+            <DataGrid.Resources>
+              <local:NullableValueConverter x:Key="NullableValueConverter" />
+              <DataTemplate x:Key="TemplateAccountTemplate">
+                <TextBlock x:Name="AccountText" Margin="2" VerticalAlignment="Center">
+                  <Run Text="{Binding Name, Mode=OneWay}" />
+                  <Run x:Name="AccountId" Text="{Binding ID, Mode=OneWay, StringFormat=({0})}" />
+                </TextBlock>
+                <DataTemplate.Triggers>
+                  <DataTrigger Binding="{Binding ID}" Value="0">
+                    <Setter TargetName="AccountId" Property="Text" Value="" />
+                    <Setter TargetName="AccountText" Property="FontStyle" Value="Italic" />
+                  </DataTrigger>
+                </DataTemplate.Triggers>
+              </DataTemplate>
+              <Style x:Key="ErrorStyle" TargetType="{x:Type FrameworkElement}">
+                <Style.Triggers>
+                  <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip">
+                      <Setter.Value>
+                        <Binding
+                          RelativeSource="{RelativeSource Self}"
+                          Path="(Validation.Errors)[0].ErrorContent" />
+                      </Setter.Value>
+                    </Setter>
+                  </Trigger>
+                </Style.Triggers>
+              </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_BookingText}" Width="*" MinWidth="120"
+                ElementStyle="{StaticResource ErrorStyle}">
+                <DataGridTextColumn.Binding>
+                  <Binding Path="Text" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" />
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_Value}" MinWidth="70">
+                <DataGridTextColumn.ElementStyle>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                  </Style>
+                </DataGridTextColumn.ElementStyle>
+                <DataGridTextColumn.Binding>
+                  <Binding Path="Value" Converter="{StaticResource NullableValueConverter}" StringFormat="0.00" />
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
+              <DataGridTemplateColumn
+                Header="{x:Static properties:Resources.Word_DebitAccount}" MinWidth="150">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate DataType="{x:Type local:BookingTemplateViewModel}">
+                    <ComboBox
+                      Margin="0" Height="Auto"
+                      Style="{StaticResource ErrorStyle}"
+                      SelectedItem="{Binding DebitAccount, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                      ItemTemplate="{StaticResource TemplateAccountTemplate}"
+                      TextSearch.TextPath="Name"
+                      ItemsSource="{Binding DataContext.TemplateAccounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ProjectOptionsView}}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn
+                Header="{x:Static properties:Resources.Word_CreditAccount}" MinWidth="150">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate DataType="{x:Type local:BookingTemplateViewModel}">
+                    <ComboBox
+                      Margin="0" Height="Auto"
+                      Style="{StaticResource ErrorStyle}"
+                      SelectedItem="{Binding CreditAccount, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                      ItemTemplate="{StaticResource TemplateAccountTemplate}"
+                      TextSearch.TextPath="Name"
+                      ItemsSource="{Binding DataContext.TemplateAccounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ProjectOptionsView}}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
         </DockPanel>
       </TabItem>
     </TabControl>
