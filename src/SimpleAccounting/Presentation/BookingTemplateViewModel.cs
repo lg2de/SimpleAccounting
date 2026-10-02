@@ -15,7 +15,7 @@ using lg2de.SimpleAccounting.Properties;
 /// <remarks>
 ///     The accounts are optional. An unset account is represented by <see cref="NoAccount"/>.
 /// </remarks>
-public class BookingTemplateViewModel : PropertyChangedBase, IDataErrorInfo
+public sealed class BookingTemplateViewModel : PropertyChangedBase, IDataErrorInfo
 {
     public static readonly AccountDefinition NoAccount = new() { ID = 0, Name = Resources.ProjectOptions_NoAccount };
 

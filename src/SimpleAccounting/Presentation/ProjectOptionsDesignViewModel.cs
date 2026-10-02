@@ -4,11 +4,15 @@
 
 namespace lg2de.SimpleAccounting.Presentation;
 
+using System.Diagnostics.CodeAnalysis;
 using lg2de.SimpleAccounting.Model;
 
 /// <summary>
 ///     Implements the designer view model for <see cref="ProjectOptionsViewModel"/>.
 /// </summary>
+[SuppressMessage(
+    "SonarLint", "S4055: Literals should not be passed as localized parameters",
+    Justification = "Does not apply to the designer view model")]
 public class ProjectOptionsDesignViewModel : ProjectOptionsViewModel
 {
     public ProjectOptionsDesignViewModel() : base(CreateDesignData())
@@ -40,7 +44,11 @@ public class ProjectOptionsDesignViewModel : ProjectOptionsViewModel
                         },
                         new AccountingDataSetupBookingTemplatesTemplate
                         {
-                            Text = "Bank fee", Debit = 600, DebitSpecified = true, Credit = 100, CreditSpecified = true
+                            Text = "Bank fee",
+                            Debit = 600,
+                            DebitSpecified = true,
+                            Credit = 100,
+                            CreditSpecified = true
                         }
                     ]
                 }
