@@ -244,6 +244,15 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
                         b.Debit.ForEach(
                             d => UpdateAccount(d, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
                     }));
+            this.projectData.Storage.Setup.BookingTemplates?.Template?.ForEach(
+                t => UpdateTemplate(t, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
+            this.UpdateImportPatterns(selectedAccountViewModel.Identifier, clonedViewModel.Identifier);
+
+            var behavior = this.projectData.Storage.Setup.Behavior;
+            if (behavior != null && behavior.LastCarryForward == selectedAccountViewModel.Identifier)
+            {
+                behavior.LastCarryForward = clonedViewModel.Identifier;
+            }
         }
 
         if (selectedAccountViewModel.Group != clonedViewModel.Group)
@@ -278,6 +287,41 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             {
                 entry.Account = newIdentifier;
             }
+        }
+
+        static void UpdateTemplate(
+            AccountingDataSetupBookingTemplatesTemplate template, ulong oldIdentifier, ulong newIdentifier)
+        {
+            if (template.Debit == oldIdentifier)
+            {
+                template.Debit = newIdentifier;
+            }
+
+            if (template.Credit == oldIdentifier)
+            {
+                template.Credit = newIdentifier;
+            }
+        }
+    }
+
+    private void UpdateImportPatterns(ulong oldIdentifier, ulong newIdentifier)
+    {
+        // update the database
+        var patterns = this.projectData.Storage.AllAccounts
+            .SelectMany(x => x.ImportMapping?.Patterns ?? [])
+            .Where(x => x.AccountID == oldIdentifier);
+        foreach (var pattern in patterns)
+        {
+            pattern.AccountID = newIdentifier;
+        }
+
+        // update the view models, they are used to save the configuration on next editing
+        var patternViewModels = this.allAccounts
+            .SelectMany(x => x.ImportPatterns)
+            .Where(x => x.AccountId == oldIdentifier);
+        foreach (var pattern in patternViewModels)
+        {
+            pattern.AccountId = newIdentifier;
         }
     }
 
