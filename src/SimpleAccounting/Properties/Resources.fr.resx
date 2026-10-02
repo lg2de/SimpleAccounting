@@ -655,4 +655,31 @@ Texte d'erreur:</value>
     <data name="Tooltip_SetRemoteAccounts" xml:space="preserve">
       <value>Toutes les entrées sans compte distant défini seront mises à jour avec un compte dont le nom est aussi proche que possible de celui de la réservation.</value>
     </data>
+    <data name="ProjectOptions_TabGeneral" xml:space="preserve">
+      <value>Général</value>
+    </data>
+    <data name="ProjectOptions_TabReports" xml:space="preserve">
+      <value>Rapports</value>
+    </data>
+    <data name="Word_Organization" xml:space="preserve">
+      <value>Organisation</value>
+    </data>
+    <data name="Word_Location" xml:space="preserve">
+      <value>Lieu</value>
+    </data>
+    <data name="ProjectOptions_GeneralHint" xml:space="preserve">
+      <value>L'organisation et le lieu apparaissent dans l'en-tête et dans la ligne de date de tous les rapports.</value>
+    </data>
+    <data name="ProjectOptions_PageBreakBetweenAccounts" xml:space="preserve">
+      <value>Saut de page entre les comptes</value>
+    </data>
+    <data name="ProjectOptions_Signatures" xml:space="preserve">
+      <value>Signatures</value>
+    </data>
+    <data name="ProjectOptions_MoveUp" xml:space="preserve">
+      <value>Monter</value>
+    </data>
+    <data name="ProjectOptions_MoveDown" xml:space="preserve">
+      <value>Descendre</value>
+    </data>
 </root>

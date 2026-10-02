@@ -912,7 +912,70 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Menu_Reports_TotalsAndBalances", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Organization and location are shown in the header and in the date line of all reports..
+        /// </summary>
+        public static string ProjectOptions_GeneralHint {
+            get {
+                return ResourceManager.GetString("ProjectOptions_GeneralHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Move down.
+        /// </summary>
+        public static string ProjectOptions_MoveDown {
+            get {
+                return ResourceManager.GetString("ProjectOptions_MoveDown", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Move up.
+        /// </summary>
+        public static string ProjectOptions_MoveUp {
+            get {
+                return ResourceManager.GetString("ProjectOptions_MoveUp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Page break between accounts.
+        /// </summary>
+        public static string ProjectOptions_PageBreakBetweenAccounts {
+            get {
+                return ResourceManager.GetString("ProjectOptions_PageBreakBetweenAccounts", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Signatures.
+        /// </summary>
+        public static string ProjectOptions_Signatures {
+            get {
+                return ResourceManager.GetString("ProjectOptions_Signatures", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to General.
+        /// </summary>
+        public static string ProjectOptions_TabGeneral {
+            get {
+                return ResourceManager.GetString("ProjectOptions_TabGeneral", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reports.
+        /// </summary>
+        public static string ProjectOptions_TabReports {
+            get {
+                return ResourceManager.GetString("ProjectOptions_TabReports", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Do you want to close the year {0}?.
         /// </summary>
@@ -1450,7 +1513,16 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Word_Liabilities", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Location.
+        /// </summary>
+        public static string Word_Location {
+            get {
+                return ResourceManager.GetString("Word_Location", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
@@ -1504,7 +1576,16 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Word_OpeningBooking", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Organization.
+        /// </summary>
+        public static string Word_Organization {
+            get {
+                return ResourceManager.GetString("Word_Organization", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Page.
         /// </summary>

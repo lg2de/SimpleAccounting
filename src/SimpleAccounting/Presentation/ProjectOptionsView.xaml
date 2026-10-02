@@ -1,4 +1,4 @@
-﻿<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
+<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
 <UserControl
   x:Class="lg2de.SimpleAccounting.Presentation.ProjectOptionsView"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -8,7 +8,7 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
-  MinWidth="300" MinHeight="200"
+  Width="450" Height="400"
   d:Background="Azure"
   d:DataContext="{d:DesignInstance Type=local:ProjectOptionsDesignViewModel, IsDesignTimeCreatable=True}">
   <DockPanel>
@@ -21,10 +21,8 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
       </Style>
-      <Style TargetType="local:NumberTextBox">
+      <Style TargetType="CheckBox">
         <Setter Property="Margin" Value="5" />
-        <Setter Property="Height" Value="30" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
       </Style>
     </DockPanel.Resources>
 
@@ -36,23 +34,103 @@
       <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
     </StackPanel>
 
-    <Grid DockPanel.Dock="Top">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
+    <TabControl>
+      <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabGeneral}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" MinWidth="200" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
 
-      <TextBlock
-        Grid.Column="0" Grid.Row="0"
-        VerticalAlignment="Center"
-        Text="{x:Static properties:Resources.Word_Currency}" />
-      <TextBox
-        Grid.Column="1" Grid.Row="0"
-        Width="100" HorizontalContentAlignment="Right"
-        Text="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" />
-    </Grid>
+          <TextBlock
+            Grid.Column="0" Grid.Row="0"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_Organization}" />
+          <TextBox
+            Grid.Column="1" Grid.Row="0"
+            Text="{Binding Organization, UpdateSourceTrigger=PropertyChanged}" />
+
+          <TextBlock
+            Grid.Column="0" Grid.Row="1"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_Location}" />
+          <TextBox
+            Grid.Column="1" Grid.Row="1"
+            Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}" />
+
+          <TextBlock
+            Grid.Column="0" Grid.Row="2"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_Currency}" />
+          <TextBox
+            Grid.Column="1" Grid.Row="2"
+            Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"
+            Text="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" />
+
+          <TextBlock
+            Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3"
+            Margin="5 20 5 5"
+            TextWrapping="Wrap" FontStyle="Italic"
+            Text="{x:Static properties:Resources.ProjectOptions_GeneralHint}" />
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabReports}">
+        <DockPanel>
+          <GroupBox
+            DockPanel.Dock="Top"
+            Margin="5"
+            Header="{x:Static properties:Resources.Header_AccountSheets}">
+            <CheckBox
+              Content="{x:Static properties:Resources.ProjectOptions_PageBreakBetweenAccounts}"
+              IsChecked="{Binding PageBreakBetweenAccounts}" />
+          </GroupBox>
+
+          <GroupBox
+            Margin="5"
+            Header="{x:Static properties:Resources.Header_TotalsAndBalances}">
+            <DockPanel>
+              <TextBlock
+                DockPanel.Dock="Top"
+                Text="{x:Static properties:Resources.ProjectOptions_Signatures}" />
+              <StackPanel
+                DockPanel.Dock="Right"
+                Orientation="Vertical">
+                <Button
+                  Content="▲" MinWidth="30" Margin="5 0 5 5"
+                  ToolTip="{x:Static properties:Resources.ProjectOptions_MoveUp}"
+                  Command="{Binding MoveSignatureUpCommand}"
+                  CommandParameter="{Binding SelectedItem, ElementName=SignaturesGrid}" />
+                <Button
+                  Content="▼" MinWidth="30" Margin="5 0 5 5"
+                  ToolTip="{x:Static properties:Resources.ProjectOptions_MoveDown}"
+                  Command="{Binding MoveSignatureDownCommand}"
+                  CommandParameter="{Binding SelectedItem, ElementName=SignaturesGrid}" />
+              </StackPanel>
+              <DataGrid
+                x:Name="SignaturesGrid"
+                Margin="5 0 0 5"
+                AutoGenerateColumns="False"
+                HeadersVisibility="None"
+                CanUserAddRows="True" CanUserDeleteRows="True"
+                CanUserReorderColumns="False" CanUserSortColumns="False"
+                ItemsSource="{Binding Signatures}">
+                <DataGrid.Columns>
+                  <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+              </DataGrid>
+            </DockPanel>
+          </GroupBox>
+        </DockPanel>
+      </TabItem>
+    </TabControl>
   </DockPanel>
 </UserControl>
