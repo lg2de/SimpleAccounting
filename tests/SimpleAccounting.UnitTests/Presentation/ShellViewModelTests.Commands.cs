@@ -299,6 +299,53 @@ public partial class ShellViewModelTests
         sut.Menu.AddBookingsCommand.CanExecute(null).Should().BeTrue();
     }
 
+    [CulturedFact(["en"])]
+    public void BookingYearCommand_AccountSelected_SelectedAccountKeptAndJournalUpdated()
+    {
+        var sut = CreateSut();
+        var project = Samples.SampleProject;
+        project.Journal[0].Booking.Add(
+            new AccountingDataJournalBooking
+            {
+                ID = 1,
+                Date = 2000_0115,
+                Credit = [new BookingValue { Account = Samples.Salary, Text = "Old salary", Value = 4200 }],
+                Debit = [new BookingValue { Account = Samples.BankAccount, Text = "Old salary", Value = 4200 }]
+            });
+        project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        sut.ProjectData.LoadData(project);
+        sut.Accounts.AccountSelectionCommand.Execute(
+            sut.Accounts.AccountList.Single(x => x.Identifier == Samples.Salary));
+
+        sut.Menu.BookingYears[0].Command.Execute(null);
+
+        using var _ = new AssertionScope();
+        sut.Accounts.SelectedAccount.Should().BeEquivalentTo(new { Identifier = Samples.Salary });
+        sut.AccountJournal.Items.Should().BeEquivalentTo(
+        [
+            new { Text = "Old salary", RemoteAccount = "100 (Bank account)", CreditValue = 42, DebitValue = 0 },
+            new { Text = "Total", RemoteAccount = string.Empty, CreditValue = 42, DebitValue = 0 },
+            new { Text = "Balance", RemoteAccount = string.Empty, CreditValue = 42, DebitValue = 0 }
+        ]);
+    }
+
+    [Fact]
+    public void LoadData_AccountSelectedBefore_FirstAccountSelected()
+    {
+        var sut = CreateSut();
+        var project = Samples.SampleProject;
+        project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        sut.ProjectData.LoadData(project);
+        sut.Accounts.AccountSelectionCommand.Execute(
+            sut.Accounts.AccountList.Single(x => x.Identifier == Samples.Salary));
+
+        project = Samples.SampleProject;
+        project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
+        sut.ProjectData.LoadData(project);
+
+        sut.Accounts.SelectedAccount.Should().BeEquivalentTo(new { Identifier = Samples.BankAccount });
+    }
+
     [Fact]
     public void AddBookingsCommand_HappyPath_DataTodayFromClock()
     {

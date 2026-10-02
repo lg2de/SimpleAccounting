@@ -77,7 +77,16 @@ internal class ShellViewModel : Screen
         {
             this.UpdateDisplayName();
             this.FullJournal.Rebuild();
-            this.Accounts.SelectFirstAccount();
+            if (this.Accounts.SelectedAccount != null
+                && this.Accounts.AccountList.Contains(this.Accounts.SelectedAccount))
+            {
+                // Restore the journal for the selected account for the new year.
+                this.AccountJournal.Rebuild(this.Accounts.SelectedAccount.Identifier);
+            }
+            else
+            {
+                this.Accounts.SelectFirstAccount();
+            }
         };
         this.ProjectData.JournalChanged += (_, args) =>
         {
