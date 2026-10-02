@@ -143,7 +143,7 @@ public class AccountsViewModelTests
         await sut.OnEditAccountAsync(accountViewModel);
 
 #pragma warning disable FAA0001 // false-positive
-        updatedViewModel?.ImportRemoteAccounts.Should().BeEquivalentTo(new[] { new { ID = 2 } });
+        updatedViewModel?.ImportRemoteAccounts.Should().BeEquivalentTo([new { ID = 2 }]);
 #pragma warning restore FAA0001
     }
 
@@ -182,7 +182,6 @@ public class AccountsViewModelTests
     {
         var windowManager = Substitute.For<IWindowManager>();
         var clock = Substitute.For<IClock>();
-        windowManager.ShowDialogAsync(Arg.Do<object>(o => ((AccountViewModel)o).Identifier = 5)).Returns(true);
         var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
@@ -192,8 +191,8 @@ public class AccountsViewModelTests
                 Name = "Group",
                 Account =
                 [
-                    new AccountDefinition { ID = 1, Name = "Asset", Type = AccountDefinitionType.Asset },
-                    new AccountDefinition { ID = 2, Name = "Income", Type = AccountDefinitionType.Income }
+                    new AccountDefinition { ID = 100, Name = "Asset", Type = AccountDefinitionType.Asset },
+                    new AccountDefinition { ID = 200, Name = "Income", Type = AccountDefinitionType.Income }
                 ]
             }
         ];
@@ -201,21 +200,24 @@ public class AccountsViewModelTests
         {
             Template =
             [
-                new AccountingDataSetupBookingTemplatesTemplate { Text = "Debit", Debit = 2, Credit = 1 },
-                new AccountingDataSetupBookingTemplatesTemplate { Text = "Credit", Debit = 1, Credit = 2 },
-                new AccountingDataSetupBookingTemplatesTemplate { Text = "Other", Debit = 1 }
+                new AccountingDataSetupBookingTemplatesTemplate { Text = "Debit", Debit = 200, Credit = 100 },
+                new AccountingDataSetupBookingTemplatesTemplate { Text = "Credit", Debit = 100, Credit = 200 },
+                new AccountingDataSetupBookingTemplatesTemplate { Text = "Other", Debit = 100 }
             ]
         };
         sut.OnDataLoaded();
+        windowManager
+            .ShowDialogAsync(Arg.Do<object>(o => ((AccountViewModel)o).Identifier = 101))
+            .Returns(true);
 
-        await sut.OnEditAccountAsync(sut.AccountList.Single(x => x.Identifier == 2));
+        await sut.OnEditAccountAsync(sut.AccountList.Single(x => x.Identifier == 100));
 
         projectData.Storage.Setup.BookingTemplates.Template.Should().BeEquivalentTo(
             new object[]
             {
-                new { Text = "Debit", Debit = 5, Credit = 1 },
-                new { Text = "Credit", Debit = 1, Credit = 5 },
-                new { Text = "Other", Debit = 1, Credit = 0 }
+                new { Text = "Debit", Debit = 200, Credit = 101 },
+                new { Text = "Credit", Debit = 101, Credit = 200 },
+                new { Text = "Other", Debit = 101, Credit = 0 }
             }, o => o.WithStrictOrdering());
     }
 
@@ -375,7 +377,7 @@ public class AccountsViewModelTests
         await sut.OnEditAccountAsync(accountViewModel);
 
         using var _ = new AssertionScope();
-        projectData.Storage.Accounts[0].Account.Should().BeEquivalentTo(new[] { new { ID = 1 } });
-        projectData.Storage.Accounts[1].Account.Should().BeEquivalentTo(new[] { new { ID = 2 }, new { ID = 3 } });
+        projectData.Storage.Accounts[0].Account.Should().BeEquivalentTo([new { ID = 1 }]);
+        projectData.Storage.Accounts[1].Account.Should().BeEquivalentTo([new { ID = 2 }, new { ID = 3 }]);
     }
 }
