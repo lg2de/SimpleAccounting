@@ -44,14 +44,13 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         }
     }
 
-    public ICommand AccountSelectionCommand => new AsyncCommand(
-        o =>
+    public ICommand AccountSelectionCommand => new AsyncCommand(o =>
+    {
+        if (o is AccountViewModel account)
         {
-            if (o is AccountViewModel account)
-            {
-                this.SelectedAccount = account;
-            }
-        });
+            this.SelectedAccount = account;
+        }
+    });
 
     public bool ShowInactiveAccounts
     {
@@ -98,20 +97,20 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             }
 
             accountModel.IsImportActive = true;
-            var dateColumn = account.ImportMapping.Columns?.Find(
-                x => x.Target == AccountDefinitionImportMappingColumnTarget.Date);
+            var dateColumn =
+                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date);
             accountModel.ImportDateSource = dateColumn?.Source;
             accountModel.ImportDateIgnorePattern = dateColumn?.IgnorePattern;
-            var nameColumn = account.ImportMapping.Columns?.Find(
-                x => x.Target == AccountDefinitionImportMappingColumnTarget.Name);
+            var nameColumn =
+                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name);
             accountModel.ImportNameSource = nameColumn?.Source;
             accountModel.ImportNameIgnorePattern = nameColumn?.IgnorePattern;
-            var textColumn = account.ImportMapping.Columns?.Find(
-                x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
+            var textColumn =
+                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
             accountModel.ImportTextSource = textColumn?.Source;
             accountModel.ImportTextIgnorePattern = textColumn?.IgnorePattern;
-            var valueColumn = account.ImportMapping.Columns?.Find(
-                x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
+            var valueColumn =
+                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
             accountModel.ImportValueSource = valueColumn?.Source;
             accountModel.ImportValueIgnorePattern = valueColumn?.IgnorePattern;
 
@@ -121,13 +120,12 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             }
 
             accountModel.ImportPatterns = new ObservableCollection<ImportPatternViewModel>(
-                account.ImportMapping.Patterns.Select(
-                    x => new ImportPatternViewModel
-                    {
-                        Expression = x.Expression,
-                        AccountId = x.AccountID,
-                        Value = x.ValueSpecified ? x.Value.ToViewModel() : null
-                    }));
+                account.ImportMapping.Patterns.Select(x => new ImportPatternViewModel
+                {
+                    Expression = x.Expression,
+                    AccountId = x.AccountID,
+                    Value = x.ValueSpecified ? x.Value.ToViewModel() : null
+                }));
 
             return accountModel;
         }
@@ -235,17 +233,14 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             clonedViewModel.Group!.Account =
                 clonedViewModel.Group.Account.OrderBy(x => x.ID).ToList();
 
-            this.projectData.Storage.Journal.ForEach(
-                j => j.Booking?.ForEach(
-                    b =>
-                    {
-                        b.Credit.ForEach(
-                            c => UpdateAccount(c, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
-                        b.Debit.ForEach(
-                            d => UpdateAccount(d, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
-                    }));
-            this.projectData.Storage.Setup.BookingTemplates?.Template?.ForEach(
-                t => UpdateTemplate(t, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
+            this.projectData.Storage.Journal.ForEach(j => j.Booking?.ForEach(b =>
+            {
+                b.Credit.ForEach(c => UpdateAccount(
+                    c, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
+                b.Debit.ForEach(d => UpdateAccount(d, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
+            }));
+            this.projectData.Storage.Setup.BookingTemplates?.Template?.ForEach(t => UpdateTemplate(
+                t, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
             this.UpdateImportPatterns(selectedAccountViewModel.Identifier, clonedViewModel.Identifier);
 
             var behavior = this.projectData.Storage.Setup.Behavior;
@@ -394,8 +389,8 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             return;
         }
 
-        accountDefinition.ImportMapping.Patterns = viewModel.ImportPatterns.Select(
-            x => new AccountDefinitionImportMappingPattern
+        accountDefinition.ImportMapping.Patterns = viewModel.ImportPatterns.Select(x =>
+            new AccountDefinitionImportMappingPattern
             {
                 Expression = x.Expression,
                 Value = x.Value?.ToModelValue() ?? 0,
