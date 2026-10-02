@@ -80,7 +80,7 @@ internal class ShellViewModel : Screen
             if (this.Accounts.SelectedAccount != null
                 && this.Accounts.AccountList.Contains(this.Accounts.SelectedAccount))
             {
-                // keep the selected account and update its journal for the new year
+                // Restore the journal for the selected account for the new year.
                 this.AccountJournal.Rebuild(this.Accounts.SelectedAccount.Identifier);
             }
             else

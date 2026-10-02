@@ -65,7 +65,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
 
     public void OnDataLoaded()
     {
-        // the selection refers to the previous project
+        // Reset the selection which currently refers to the previous project.
         this.SelectedAccount = null;
         this.allAccounts.Clear();
         foreach (var accountGroup in this.projectData.Storage.Accounts)
