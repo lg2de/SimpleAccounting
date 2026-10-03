@@ -58,7 +58,7 @@ internal interface IProjectData
     /// </summary>
     /// <param name="page">The page to be shown initially.</param>
     /// <returns><c>true</c> if the options have been changed, otherwise <c>false</c>.</returns>
-    Task<bool> EditProjectOptionsAsync(ProjectOptionsPage page = ProjectOptionsPage.General);
+    Task<bool> EditProjectOptionsAsync(ProjectOptionsPage page);
 
     Task ShowAddBookingDialogAsync(DateTime today, bool showInactiveAccounts);
 

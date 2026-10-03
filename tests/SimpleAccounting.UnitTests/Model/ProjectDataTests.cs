@@ -677,7 +677,7 @@ public class ProjectDataTests
         sut.NewProject();
         windowManager.ShowDialogAsync(Arg.Any<ProjectOptionsViewModel>()).Returns(true);
 
-        var result = await sut.EditProjectOptionsAsync();
+        var result = await sut.EditProjectOptionsAsync(ProjectOptionsPage.General);
 
         using var _ = new AssertionScope();
         result.Should().BeTrue();
@@ -716,7 +716,7 @@ public class ProjectDataTests
         sut.NewProject();
         windowManager.ShowDialogAsync(Arg.Any<ProjectOptionsViewModel>()).Returns(false);
 
-        var result = await sut.EditProjectOptionsAsync();
+        var result = await sut.EditProjectOptionsAsync(ProjectOptionsPage.General);
 
         using var _ = new AssertionScope();
         result.Should().BeFalse();

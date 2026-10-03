@@ -22,7 +22,12 @@ public class ProjectOptionsViewModel : Screen
     private readonly AccountingData data;
     private bool isRevalidatingGroups;
 
-    public ProjectOptionsViewModel(AccountingData data, ProjectOptionsPage page = ProjectOptionsPage.General)
+    public ProjectOptionsViewModel(AccountingData data)
+        : this(data, ProjectOptionsPage.General)
+    {
+    }
+
+    public ProjectOptionsViewModel(AccountingData data, ProjectOptionsPage page)
     {
         this.data = data ?? throw new ArgumentNullException(nameof(data));
         this.SelectedPageIndex = (int)page;

@@ -235,7 +235,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         return true;
     }
 
-    public async Task<bool> EditProjectOptionsAsync(ProjectOptionsPage page = ProjectOptionsPage.General)
+    public async Task<bool> EditProjectOptionsAsync(ProjectOptionsPage page)
     {
         var vm = new ProjectOptionsViewModel(this.Storage, page);
         if (await this.windowManager.ShowDialogAsync(vm) != true)

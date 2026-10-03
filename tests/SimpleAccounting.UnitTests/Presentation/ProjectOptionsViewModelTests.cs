@@ -4,6 +4,7 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
@@ -24,10 +25,7 @@ public class ProjectOptionsViewModelTests
                 Reports =
                 {
                     AccountJournalReport =
-                        new AccountingDataSetupReportsAccountJournalReport
-                        {
-                            PageBreakBetweenAccounts = true
-                        },
+                        new AccountingDataSetupReportsAccountJournalReport { PageBreakBetweenAccounts = true },
                     TotalsAndBalancesReport = ["Treasurer", "Auditor"]
                 }
             }
@@ -319,8 +317,20 @@ public class ProjectOptionsViewModelTests
         sut.BookingTemplates.Should().BeEquivalentTo(
             new object[]
             {
-                new { Text = "Fee", Value = 50.0, DebitAccount = new { ID = 100 }, CreditAccount = new { ID = 400 } },
-                new { Text = "Old", Value = (double?)null, DebitAccount = new { ID = 0 }, CreditAccount = new { ID = 900 } }
+                new
+                {
+                    Text = "Fee",
+                    Value = 50.0,
+                    DebitAccount = new { ID = 100 },
+                    CreditAccount = new { ID = 400 }
+                },
+                new
+                {
+                    Text = "Old",
+                    Value = (double?)null,
+                    DebitAccount = new { ID = 0 },
+                    CreditAccount = new { ID = 900 }
+                }
             });
     }
 
@@ -487,7 +497,11 @@ public class ProjectOptionsViewModelTests
         sut.OnSave().Should().BeTrue();
 
         data.Accounts.Should().BeEquivalentTo(
-            new object[] { new { Name = "Assets" }, new { Name = "Empty" }, new { Name = "New", Account = new object[0] } },
+            new object[]
+            {
+                new { Name = "Assets" }, new { Name = "Empty" },
+                new { Name = "New", Account = Array.Empty<object>() }
+            },
             o => o.WithStrictOrdering());
     }
 
