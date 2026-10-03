@@ -292,7 +292,7 @@ Les noms de destinataires importés et les textes de transaction peuvent être m
     <value>Sauter</value>
   </data>
     <data name="Word_Value" xml:space="preserve">
-    <value>Évaluer</value>
+    <value>Montant</value>
   </data>
     <data name="Word_RemoteAccount" xml:space="preserve">
     <value>Compte distant</value>
@@ -654,5 +654,44 @@ Texte d'erreur:</value>
     </data>
     <data name="Tooltip_SetRemoteAccounts" xml:space="preserve">
       <value>Toutes les entrées sans compte distant défini seront mises à jour avec un compte dont le nom est aussi proche que possible de celui de la réservation.</value>
+    </data>
+    <data name="ProjectOptions_TabGeneral" xml:space="preserve">
+      <value>Général</value>
+    </data>
+    <data name="ProjectOptions_TabReports" xml:space="preserve">
+      <value>Rapports</value>
+    </data>
+    <data name="Word_Organization" xml:space="preserve">
+      <value>Organisation</value>
+    </data>
+    <data name="Word_Location" xml:space="preserve">
+      <value>Lieu</value>
+    </data>
+    <data name="ProjectOptions_GeneralHint" xml:space="preserve">
+      <value>L'organisation et le lieu apparaissent dans l'en-tête et dans la ligne de date de tous les rapports.</value>
+    </data>
+    <data name="ProjectOptions_PageBreakBetweenAccounts" xml:space="preserve">
+      <value>Saut de page entre les comptes</value>
+    </data>
+    <data name="ProjectOptions_Signatures" xml:space="preserve">
+      <value>Signatures</value>
+    </data>
+    <data name="ProjectOptions_MoveUp" xml:space="preserve">
+      <value>Monter</value>
+    </data>
+    <data name="ProjectOptions_MoveDown" xml:space="preserve">
+      <value>Descendre</value>
+    </data>
+    <data name="ProjectOptions_TabBookingTemplates" xml:space="preserve">
+      <value>Modèles d'écriture</value>
+    </data>
+    <data name="ProjectOptions_NoAccount" xml:space="preserve">
+      <value>(aucun)</value>
+    </data>
+    <data name="ProjectOptions_TemplateTextRequired" xml:space="preserve">
+      <value>Le texte de l'écriture ne doit pas être vide.</value>
+    </data>
+    <data name="ProjectOptions_TemplateSameAccounts" xml:space="preserve">
+      <value>Les comptes de débit et de crédit doivent être différents.</value>
     </data>
 </root>

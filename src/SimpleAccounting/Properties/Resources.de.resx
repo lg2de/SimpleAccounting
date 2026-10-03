@@ -643,4 +643,43 @@ Fehlertext:</value>
   <data name="Tooltip_SetRemoteAccounts" xml:space="preserve">
     <value>Alle Einträge ohne ausgewähltes Gegenkonto werden aktualisiert und ein Konto ausgewählt, welches so gut wie möglich mit dem Buchungsnamen übereinstimmt.</value>
   </data>
+  <data name="ProjectOptions_TabGeneral" xml:space="preserve">
+    <value>Allgemein</value>
+  </data>
+  <data name="ProjectOptions_TabReports" xml:space="preserve">
+    <value>Berichte</value>
+  </data>
+  <data name="Word_Organization" xml:space="preserve">
+    <value>Organisation</value>
+  </data>
+  <data name="Word_Location" xml:space="preserve">
+    <value>Ort</value>
+  </data>
+  <data name="ProjectOptions_GeneralHint" xml:space="preserve">
+    <value>Organisation und Ort erscheinen im Kopf und in der Datumszeile aller Berichte.</value>
+  </data>
+  <data name="ProjectOptions_PageBreakBetweenAccounts" xml:space="preserve">
+    <value>Seitenumbruch zwischen den Konten</value>
+  </data>
+  <data name="ProjectOptions_Signatures" xml:space="preserve">
+    <value>Unterschriften</value>
+  </data>
+  <data name="ProjectOptions_MoveUp" xml:space="preserve">
+    <value>Nach oben</value>
+  </data>
+  <data name="ProjectOptions_MoveDown" xml:space="preserve">
+    <value>Nach unten</value>
+  </data>
+  <data name="ProjectOptions_TabBookingTemplates" xml:space="preserve">
+    <value>Buchungsvorlagen</value>
+  </data>
+  <data name="ProjectOptions_NoAccount" xml:space="preserve">
+    <value>(keins)</value>
+  </data>
+  <data name="ProjectOptions_TemplateTextRequired" xml:space="preserve">
+    <value>Der Buchungstext darf nicht leer sein.</value>
+  </data>
+  <data name="ProjectOptions_TemplateSameAccounts" xml:space="preserve">
+    <value>Soll- und Habenkonto müssen sich unterscheiden.</value>
+  </data>
 </root>

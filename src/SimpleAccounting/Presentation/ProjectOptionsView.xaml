@@ -8,7 +8,7 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
-  MinWidth="300" MinHeight="200"
+  Width="650" Height="400"
   d:Background="Azure"
   d:DataContext="{d:DesignInstance Type=local:ProjectOptionsDesignViewModel, IsDesignTimeCreatable=True}">
   <DockPanel>
@@ -18,13 +18,12 @@
       </Style>
       <Style TargetType="TextBox">
         <Setter Property="Margin" Value="5" />
+        <Setter Property="Padding" Value="5" />
         <Setter Property="Height" Value="30" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
       </Style>
-      <Style TargetType="local:NumberTextBox">
+      <Style TargetType="CheckBox">
         <Setter Property="Margin" Value="5" />
-        <Setter Property="Height" Value="30" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
       </Style>
     </DockPanel.Resources>
 
@@ -36,23 +35,207 @@
       <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
     </StackPanel>
 
-    <Grid DockPanel.Dock="Top">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
+    <TabControl>
+      <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabGeneral}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" MinWidth="200" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
 
-      <TextBlock
-        Grid.Column="0" Grid.Row="0"
-        VerticalAlignment="Center"
-        Text="{x:Static properties:Resources.Word_Currency}" />
-      <TextBox
-        Grid.Column="1" Grid.Row="0"
-        Width="100" HorizontalContentAlignment="Right"
-        Text="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" />
-    </Grid>
+          <TextBlock
+            Grid.Column="0" Grid.Row="0"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_Organization}" />
+          <TextBox
+            Grid.Column="1" Grid.Row="0"
+            Text="{Binding Organization, UpdateSourceTrigger=PropertyChanged}" />
+
+          <TextBlock
+            Grid.Column="0" Grid.Row="1"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_Location}" />
+          <TextBox
+            Grid.Column="1" Grid.Row="1"
+            Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}" />
+
+          <TextBlock
+            Grid.Column="0" Grid.Row="2"
+            VerticalAlignment="Center"
+            Text="{x:Static properties:Resources.Word_Currency}" />
+          <TextBox
+            Grid.Column="1" Grid.Row="2"
+            Width="100" HorizontalAlignment="Left"
+            Text="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" />
+
+          <TextBlock
+            Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3"
+            Margin="5 20 5 5"
+            TextWrapping="Wrap" FontStyle="Italic"
+            Text="{x:Static properties:Resources.ProjectOptions_GeneralHint}" />
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabReports}">
+        <DockPanel>
+          <GroupBox
+            DockPanel.Dock="Top"
+            Margin="5"
+            Header="{x:Static properties:Resources.Header_AccountSheets}">
+            <CheckBox
+              Content="{x:Static properties:Resources.ProjectOptions_PageBreakBetweenAccounts}"
+              IsChecked="{Binding PageBreakBetweenAccounts}" />
+          </GroupBox>
+
+          <GroupBox
+            Margin="5"
+            Header="{x:Static properties:Resources.Header_AssetBalances}">
+            <DockPanel>
+              <TextBlock
+                DockPanel.Dock="Top"
+                Text="{x:Static properties:Resources.ProjectOptions_Signatures}" />
+              <StackPanel
+                DockPanel.Dock="Right"
+                Orientation="Vertical">
+                <Button
+                  Content="▲" MinWidth="30" Margin="5 0 5 5"
+                  ToolTip="{x:Static properties:Resources.ProjectOptions_MoveUp}"
+                  Command="{Binding MoveSignatureUpCommand}"
+                  CommandParameter="{Binding SelectedItem, ElementName=SignaturesGrid}" />
+                <Button
+                  Content="▼" MinWidth="30" Margin="5 0 5 5"
+                  ToolTip="{x:Static properties:Resources.ProjectOptions_MoveDown}"
+                  Command="{Binding MoveSignatureDownCommand}"
+                  CommandParameter="{Binding SelectedItem, ElementName=SignaturesGrid}" />
+              </StackPanel>
+              <DataGrid
+                x:Name="SignaturesGrid"
+                Margin="5 0 0 5"
+                AutoGenerateColumns="False"
+                HeadersVisibility="None"
+                CanUserAddRows="True" CanUserDeleteRows="True"
+                CanUserReorderColumns="False" CanUserSortColumns="False"
+                ItemsSource="{Binding Signatures}">
+                <DataGrid.Columns>
+                  <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+              </DataGrid>
+            </DockPanel>
+          </GroupBox>
+        </DockPanel>
+      </TabItem>
+
+      <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabBookingTemplates}">
+        <DockPanel>
+          <StackPanel
+            DockPanel.Dock="Right"
+            Orientation="Vertical">
+            <Button
+              Content="▲" MinWidth="30" Margin="5"
+              ToolTip="{x:Static properties:Resources.ProjectOptions_MoveUp}"
+              Command="{Binding MoveTemplateUpCommand}"
+              CommandParameter="{Binding SelectedItem, ElementName=TemplatesGrid}" />
+            <Button
+              Content="▼" MinWidth="30" Margin="5 0 5 5"
+              ToolTip="{x:Static properties:Resources.ProjectOptions_MoveDown}"
+              Command="{Binding MoveTemplateDownCommand}"
+              CommandParameter="{Binding SelectedItem, ElementName=TemplatesGrid}" />
+          </StackPanel>
+          <DataGrid
+            x:Name="TemplatesGrid"
+            Margin="5"
+            AutoGenerateColumns="False"
+            CanUserAddRows="True" CanUserDeleteRows="True"
+            CanUserReorderColumns="False" CanUserSortColumns="False"
+            ItemsSource="{Binding BookingTemplates}">
+            <DataGrid.Resources>
+              <local:NullableValueConverter x:Key="NullableValueConverter" />
+              <DataTemplate x:Key="TemplateAccountTemplate">
+                <TextBlock x:Name="AccountText" Margin="2" VerticalAlignment="Center">
+                  <Run Text="{Binding Name, Mode=OneWay}" />
+                  <Run x:Name="AccountId" Text="{Binding ID, Mode=OneWay, StringFormat=({0})}" />
+                </TextBlock>
+                <DataTemplate.Triggers>
+                  <DataTrigger Binding="{Binding ID}" Value="0">
+                    <Setter TargetName="AccountId" Property="Text" Value="" />
+                    <Setter TargetName="AccountText" Property="FontStyle" Value="Italic" />
+                  </DataTrigger>
+                </DataTemplate.Triggers>
+              </DataTemplate>
+              <Style x:Key="ErrorStyle" TargetType="{x:Type FrameworkElement}">
+                <Setter Property="Margin" Value="5" />
+                <Style.Triggers>
+                  <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip">
+                      <Setter.Value>
+                        <Binding
+                          RelativeSource="{RelativeSource Self}"
+                          Path="(Validation.Errors)[0].ErrorContent" />
+                      </Setter.Value>
+                    </Setter>
+                  </Trigger>
+                </Style.Triggers>
+              </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_BookingText}" Width="*" MinWidth="120"
+                ElementStyle="{StaticResource ErrorStyle}">
+                <DataGridTextColumn.Binding>
+                  <Binding Path="Text" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" />
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_Value}" MinWidth="70">
+                <DataGridTextColumn.ElementStyle>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                  </Style>
+                </DataGridTextColumn.ElementStyle>
+                <DataGridTextColumn.Binding>
+                  <Binding Path="Value" Converter="{StaticResource NullableValueConverter}" StringFormat="0.00" />
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
+              <DataGridTemplateColumn
+                Header="{x:Static properties:Resources.Word_DebitAccount}" MinWidth="150">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate DataType="{x:Type local:BookingTemplateViewModel}">
+                    <ComboBox
+                      Margin="0" Height="Auto"
+                      Style="{StaticResource ErrorStyle}"
+                      SelectedItem="{Binding DebitAccount, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                      ItemTemplate="{StaticResource TemplateAccountTemplate}"
+                      TextSearch.TextPath="Name"
+                      ItemsSource="{Binding DataContext.TemplateAccounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ProjectOptionsView}}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn
+                Header="{x:Static properties:Resources.Word_CreditAccount}" MinWidth="150">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate DataType="{x:Type local:BookingTemplateViewModel}">
+                    <ComboBox
+                      Margin="0" Height="Auto"
+                      Style="{StaticResource ErrorStyle}"
+                      SelectedItem="{Binding CreditAccount, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                      ItemTemplate="{StaticResource TemplateAccountTemplate}"
+                      TextSearch.TextPath="Name"
+                      ItemsSource="{Binding DataContext.TemplateAccounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ProjectOptionsView}}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </TabItem>
+    </TabControl>
   </DockPanel>
 </UserControl>

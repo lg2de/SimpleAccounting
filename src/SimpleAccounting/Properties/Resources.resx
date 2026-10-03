@@ -658,4 +658,43 @@ Error message:</value>
   <data name="Tooltip_SetRemoteAccounts" xml:space="preserve">
     <value>All entries without set remote account will be updated with an account which is as close as possible to the name of the booking.</value>
   </data>
+  <data name="ProjectOptions_TabGeneral" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="ProjectOptions_TabReports" xml:space="preserve">
+    <value>Reports</value>
+  </data>
+  <data name="Word_Organization" xml:space="preserve">
+    <value>Organization</value>
+  </data>
+  <data name="Word_Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="ProjectOptions_GeneralHint" xml:space="preserve">
+    <value>Organization and location are shown in the header and in the date line of all reports.</value>
+  </data>
+  <data name="ProjectOptions_PageBreakBetweenAccounts" xml:space="preserve">
+    <value>Page break between accounts</value>
+  </data>
+  <data name="ProjectOptions_Signatures" xml:space="preserve">
+    <value>Signatures</value>
+  </data>
+  <data name="ProjectOptions_MoveUp" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="ProjectOptions_MoveDown" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="ProjectOptions_TabBookingTemplates" xml:space="preserve">
+    <value>Booking templates</value>
+  </data>
+  <data name="ProjectOptions_NoAccount" xml:space="preserve">
+    <value>(none)</value>
+  </data>
+  <data name="ProjectOptions_TemplateTextRequired" xml:space="preserve">
+    <value>The booking text must not be empty.</value>
+  </data>
+  <data name="ProjectOptions_TemplateSameAccounts" xml:space="preserve">
+    <value>Debit and credit account must be different.</value>
+  </data>
 </root>
