@@ -94,6 +94,15 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("AccountsContextMenu_EditAccount", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Edit account groups....
+        /// </summary>
+        public static string AccountsContextMenu_EditAccountGroups {
+            get {
+                return ResourceManager.GetString("AccountsContextMenu_EditAccountGroups", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Create account.
@@ -912,6 +921,24 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Menu_Reports_TotalsAndBalances", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The order defines the structure of the reports. New accounts are assigned to the first group..
+        /// </summary>
+        public static string ProjectOptions_AccountGroupsHint {
+            get {
+                return ResourceManager.GetString("ProjectOptions_AccountGroupsHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Add account group.
+        /// </summary>
+        public static string ProjectOptions_AddAccountGroup {
+            get {
+                return ResourceManager.GetString("ProjectOptions_AddAccountGroup", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Organization and location are shown in the header and in the date line of all reports..
@@ -919,6 +946,24 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string ProjectOptions_GeneralHint {
             get {
                 return ResourceManager.GetString("ProjectOptions_GeneralHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The name is already used by another account group..
+        /// </summary>
+        public static string ProjectOptions_GroupNameDuplicated {
+            get {
+                return ResourceManager.GetString("ProjectOptions_GroupNameDuplicated", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The name must not be empty..
+        /// </summary>
+        public static string ProjectOptions_GroupNameRequired {
+            get {
+                return ResourceManager.GetString("ProjectOptions_GroupNameRequired", resourceCulture);
             }
         }
         
@@ -957,6 +1002,15 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_PageBreakBetweenAccounts", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remove account group (only possible without accounts).
+        /// </summary>
+        public static string ProjectOptions_RemoveAccountGroup {
+            get {
+                return ResourceManager.GetString("ProjectOptions_RemoveAccountGroup", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Signatures.
@@ -964,6 +1018,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string ProjectOptions_Signatures {
             get {
                 return ResourceManager.GetString("ProjectOptions_Signatures", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Account groups.
+        /// </summary>
+        public static string ProjectOptions_TabAccountGroups {
+            get {
+                return ResourceManager.GetString("ProjectOptions_TabAccountGroups", resourceCulture);
             }
         }
         

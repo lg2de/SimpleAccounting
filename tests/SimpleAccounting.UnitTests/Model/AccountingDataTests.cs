@@ -91,6 +91,16 @@ public class AccountingDataTests
     }
 
     [Fact]
+    public void Deserialize_EmptyAccountGroup_AccountListEmpty()
+    {
+        var original = new AccountingData { Accounts = [new AccountingDataAccountGroup { Name = "Empty", Account = [] }] };
+
+        var sut = AccountingData.Deserialize(original.Serialize());
+
+        sut.Accounts.Should().BeEquivalentTo([new { Name = "Empty", Account = Array.Empty<object>() }]);
+    }
+
+    [Fact]
     public void Migrate_EmptyYears_YearsNodeRemoved()
     {
         var sut = new AccountingData { Years = [] };
@@ -154,7 +164,7 @@ public class AccountingDataTests
         var currentYear = sut.Journal[^1];
         currentYear.Booking.AddRange(Samples.SampleBookings);
         var carryforwardAccount =
-            sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+            sut.AllAccounts.First(x => x is { Active: true, Type: AccountDefinitionType.Carryforward });
 
         sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
 
@@ -196,7 +206,7 @@ public class AccountingDataTests
         var currentYear = sut.Journal[^1];
         currentYear.Booking.AddRange(Samples.SampleBookings);
         var carryforwardAccount =
-            sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+            sut.AllAccounts.First(x => x is { Active: true, Type: AccountDefinitionType.Carryforward });
 
         sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
 
@@ -235,7 +245,7 @@ public class AccountingDataTests
         var currentYear = sut.Journal[^1];
         currentYear.Booking.AddRange(Samples.SampleBookings);
         var carryforwardAccount =
-            sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+            sut.AllAccounts.First(x => x is { Active: true, Type: AccountDefinitionType.Carryforward });
 
         sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.Numbered);
 
@@ -273,7 +283,7 @@ public class AccountingDataTests
         var currentYear = sut.Journal[^1];
         currentYear.Booking.AddRange(Samples.SampleBookings);
         var carryforwardAccount =
-            sut.AllAccounts.First(x => x.Active && x.Type == AccountDefinitionType.Carryforward);
+            sut.AllAccounts.First(x => x is { Active: true, Type: AccountDefinitionType.Carryforward });
 
         sut.CloseYear(currentYear, carryforwardAccount, OpeningTextOption.AccountName);
 

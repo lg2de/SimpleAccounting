@@ -278,6 +278,49 @@ public partial class ShellViewModelTests
     }
 
     [Fact]
+    public void ProjectOptionsCommand_AccountGroupRenamed_AccountsRefreshed()
+    {
+        var sut = CreateSut(out IWindowManager windowManager);
+        ProjectOptionsViewModel viewModel = null;
+        windowManager.ShowDialogAsync(
+            Arg.Do<object>(o =>
+            {
+                viewModel = (ProjectOptionsViewModel)o;
+                viewModel.AccountGroups[0].Name = "Renamed";
+                viewModel.OnSave();
+            })).Returns(true);
+        sut.ProjectData.LoadData(Samples.SampleProject);
+        var account = sut.Accounts.AccountList[0];
+        using var monitor = account.Monitor();
+
+        sut.ProjectOptionsCommand.Execute(ProjectOptionsPage.AccountGroups);
+
+        using var _ = new AssertionScope();
+        viewModel.SelectedPageIndex.Should().Be((int)ProjectOptionsPage.AccountGroups);
+        account.Group!.Name.Should().Be("Renamed");
+        monitor.Should().Raise(nameof(account.PropertyChanged));
+        sut.ProjectData.IsModified.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ProjectOptionsCommand_Aborted_AccountsNotRefreshed()
+    {
+        var sut = CreateSut(out IWindowManager windowManager);
+        ProjectOptionsViewModel viewModel = null;
+        windowManager.ShowDialogAsync(Arg.Do<object>(o => viewModel = (ProjectOptionsViewModel)o)).Returns(false);
+        sut.ProjectData.LoadData(Samples.SampleProject);
+        var account = sut.Accounts.AccountList[0];
+        using var monitor = account.Monitor();
+
+        sut.ProjectOptionsCommand.Execute(null);
+
+        using var _ = new AssertionScope();
+        viewModel.SelectedPageIndex.Should().Be((int)ProjectOptionsPage.General);
+        monitor.Should().NotRaise(nameof(account.PropertyChanged));
+        sut.ProjectData.IsModified.Should().BeFalse();
+    }
+
+    [Fact]
     public void AddBookingsCommand_ClosedYear_CannotExecute()
     {
         var sut = CreateSut();

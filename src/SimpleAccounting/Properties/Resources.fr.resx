@@ -694,4 +694,25 @@ Texte d'erreur:</value>
     <data name="ProjectOptions_TemplateSameAccounts" xml:space="preserve">
       <value>Les comptes de débit et de crédit doivent être différents.</value>
     </data>
+    <data name="ProjectOptions_TabAccountGroups" xml:space="preserve">
+      <value>Groupes de comptes</value>
+    </data>
+    <data name="ProjectOptions_AccountGroupsHint" xml:space="preserve">
+      <value>L'ordre définit la structure des rapports. Les nouveaux comptes sont affectés au premier groupe.</value>
+    </data>
+    <data name="ProjectOptions_AddAccountGroup" xml:space="preserve">
+      <value>Ajouter un groupe de comptes</value>
+    </data>
+    <data name="ProjectOptions_RemoveAccountGroup" xml:space="preserve">
+      <value>Supprimer le groupe de comptes (uniquement sans comptes)</value>
+    </data>
+    <data name="ProjectOptions_GroupNameRequired" xml:space="preserve">
+      <value>Le nom ne doit pas être vide.</value>
+    </data>
+    <data name="ProjectOptions_GroupNameDuplicated" xml:space="preserve">
+      <value>Le nom est déjà utilisé par un autre groupe de comptes.</value>
+    </data>
+    <data name="AccountsContextMenu_EditAccountGroups" xml:space="preserve">
+      <value>Modifier les groupes de comptes...</value>
+    </data>
 </root>

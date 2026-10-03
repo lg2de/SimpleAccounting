@@ -64,7 +64,8 @@ public class ProjectOptionsDesignViewModel : ProjectOptionsViewModel
                         new AccountDefinition { ID = 400, Name = "Fees", Type = AccountDefinitionType.Income },
                         new AccountDefinition { ID = 600, Name = "Bank fees", Type = AccountDefinitionType.Expense }
                     ]
-                }
+                },
+                new AccountingDataAccountGroup { Name = "Reserves", Account = [] }
             ]
         };
         return data;

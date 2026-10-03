@@ -677,9 +677,30 @@ public class ProjectDataTests
         sut.NewProject();
         windowManager.ShowDialogAsync(Arg.Any<ProjectOptionsViewModel>()).Returns(true);
 
-        await sut.EditProjectOptionsAsync();
+        var result = await sut.EditProjectOptionsAsync(ProjectOptionsPage.General);
 
+        using var _ = new AssertionScope();
+        result.Should().BeTrue();
         sut.IsModified.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task EditProjectOptions_PageSpecified_PageSelected()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
+        sut.NewProject();
+        ProjectOptionsViewModel viewModel = null;
+        windowManager.ShowDialogAsync(Arg.Do<ProjectOptionsViewModel>(x => viewModel = x)).Returns(false);
+
+        await sut.EditProjectOptionsAsync(ProjectOptionsPage.AccountGroups);
+
+        viewModel.SelectedPageIndex.Should().Be((int)ProjectOptionsPage.AccountGroups);
     }
 
     [Fact]
@@ -695,8 +716,10 @@ public class ProjectDataTests
         sut.NewProject();
         windowManager.ShowDialogAsync(Arg.Any<ProjectOptionsViewModel>()).Returns(false);
 
-        await sut.EditProjectOptionsAsync();
+        var result = await sut.EditProjectOptionsAsync(ProjectOptionsPage.General);
 
+        using var _ = new AssertionScope();
+        result.Should().BeFalse();
         sut.IsModified.Should().BeFalse();
     }
 

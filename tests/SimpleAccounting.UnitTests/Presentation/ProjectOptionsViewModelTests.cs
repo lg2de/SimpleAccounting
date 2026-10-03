@@ -4,11 +4,14 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
+using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
+using lg2de.SimpleAccounting.Properties;
 using Xunit;
 
 public class ProjectOptionsViewModelTests
@@ -24,10 +27,7 @@ public class ProjectOptionsViewModelTests
                 Reports =
                 {
                     AccountJournalReport =
-                        new AccountingDataSetupReportsAccountJournalReport
-                        {
-                            PageBreakBetweenAccounts = true
-                        },
+                        new AccountingDataSetupReportsAccountJournalReport { PageBreakBetweenAccounts = true },
                     TotalsAndBalancesReport = ["Treasurer", "Auditor"]
                 }
             }
@@ -85,6 +85,27 @@ public class ProjectOptionsViewModelTests
                         }
                     ]
                 }
+            ]
+        };
+        return data;
+    }
+
+    private static AccountingData CreateGroupData()
+    {
+        var data = new AccountingData
+        {
+            Accounts =
+            [
+                new AccountingDataAccountGroup
+                {
+                    Name = "Assets",
+                    Account =
+                    [
+                        new AccountDefinition { ID = 100, Name = "Bank", Type = AccountDefinitionType.Asset },
+                        new AccountDefinition { ID = 200, Name = "Cash", Type = AccountDefinitionType.Asset }
+                    ]
+                },
+                new AccountingDataAccountGroup { Name = "Empty", Account = [] }
             ]
         };
         return data;
@@ -298,8 +319,20 @@ public class ProjectOptionsViewModelTests
         sut.BookingTemplates.Should().BeEquivalentTo(
             new object[]
             {
-                new { Text = "Fee", Value = 50.0, DebitAccount = new { ID = 100 }, CreditAccount = new { ID = 400 } },
-                new { Text = "Old", Value = (double?)null, DebitAccount = new { ID = 0 }, CreditAccount = new { ID = 900 } }
+                new
+                {
+                    Text = "Fee",
+                    Value = 50.0,
+                    DebitAccount = new { ID = 100 },
+                    CreditAccount = new { ID = 400 }
+                },
+                new
+                {
+                    Text = "Old",
+                    Value = (double?)null,
+                    DebitAccount = new { ID = 0 },
+                    CreditAccount = new { ID = 900 }
+                }
             });
     }
 
@@ -405,5 +438,193 @@ public class ProjectOptionsViewModelTests
         sut.MoveTemplateDownCommand.Execute(sut.BookingTemplates[^1]);
 
         sut.BookingTemplates.Select(x => x.Text).Should().Equal("Fee", "Old");
+    }
+
+    [Fact]
+    public void Ctor_PageSpecified_PageSelected()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData(), ProjectOptionsPage.AccountGroups);
+
+        sut.SelectedPageIndex.Should().Be(1);
+    }
+
+    [Fact]
+    public void Ctor_AccountGroups_GroupsLoaded()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+
+        using var _ = new AssertionScope();
+        sut.SelectedPageIndex.Should().Be(0);
+        sut.AccountGroups.Should().BeEquivalentTo(
+            [
+                new { Name = "Assets", AccountCount = 2, IsValid = true },
+                new { Name = "Empty", AccountCount = 0, IsValid = true }
+            ],
+            o => o.WithStrictOrdering());
+    }
+
+    [Fact]
+    public void OnSave_AccountGroupsUnchanged_ReturnsFalse()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+
+        sut.OnSave().Should().BeFalse();
+    }
+
+    [Fact]
+    public void OnSave_AccountGroupRenamed_GroupUpdatedInPlace()
+    {
+        var data = CreateGroupData();
+        var groups = data.Accounts;
+        var assets = groups[0];
+        var sut = new ProjectOptionsViewModel(data);
+        sut.AccountGroups[0].Name = " Wealth ";
+
+        sut.OnSave().Should().BeTrue();
+
+        using var _ = new AssertionScope();
+        data.Accounts.Should().BeSameAs(groups);
+        data.Accounts[0].Should().BeSameAs(assets);
+        assets.Name.Should().Be("Wealth");
+    }
+
+    [Fact]
+    public void OnSave_AccountGroupAdded_GroupAppendedWithEmptyAccounts()
+    {
+        var data = CreateGroupData();
+        var sut = new ProjectOptionsViewModel(data);
+        sut.AddAccountGroupCommand.Execute(null);
+        sut.SelectedAccountGroup!.Name = "New";
+
+        sut.OnSave().Should().BeTrue();
+
+        data.Accounts.Should().BeEquivalentTo(
+            new object[]
+            {
+                new { Name = "Assets" }, new { Name = "Empty" },
+                new { Name = "New", Account = Array.Empty<object>() }
+            },
+            o => o.WithStrictOrdering());
+    }
+
+    [Fact]
+    public void OnSave_AccountGroupsReordered_ListReorderedInPlace()
+    {
+        var data = CreateGroupData();
+        var groups = data.Accounts;
+        var sut = new ProjectOptionsViewModel(data);
+
+        sut.MoveAccountGroupDownCommand.Execute(sut.AccountGroups[0]);
+
+        sut.OnSave().Should().BeTrue();
+        using var _ = new AssertionScope();
+        data.Accounts.Should().BeSameAs(groups);
+        data.Accounts.Select(x => x.Name).Should().Equal("Empty", "Assets");
+    }
+
+    [Fact]
+    public void AddAccountGroupCommand_NewGroupSelectedButInvalid()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+
+        sut.AddAccountGroupCommand.Execute(null);
+
+        using var _ = new AssertionScope();
+        sut.SelectedAccountGroup.Should().BeSameAs(sut.AccountGroups[^1]);
+        sut.SelectedAccountGroup!.IsValid.Should().BeFalse("the name is empty");
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void RemoveAccountGroupCommand_EmptyGroup_GroupRemoved()
+    {
+        var data = CreateGroupData();
+        var sut = new ProjectOptionsViewModel(data);
+        sut.SelectedAccountGroup = sut.AccountGroups[1];
+        sut.RemoveAccountGroupCommand.CanExecute(null).Should().BeTrue();
+
+        sut.RemoveAccountGroupCommand.Execute(null);
+
+        sut.OnSave().Should().BeTrue();
+        using var _ = new AssertionScope();
+        sut.SelectedAccountGroup.Should().BeNull();
+        data.Accounts.Select(x => x.Name).Should().Equal("Assets");
+    }
+
+    [Fact]
+    public void RemoveAccountGroupCommand_GroupWithAccounts_NotRemoved()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+        sut.SelectedAccountGroup = sut.AccountGroups[0];
+
+        sut.RemoveAccountGroupCommand.CanExecute(null).Should().BeFalse();
+        sut.RemoveAccountGroupCommand.Execute(null);
+
+        sut.AccountGroups.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void RemoveAccountGroupCommand_LastGroup_CannotExecute()
+    {
+        var data = new AccountingData { Accounts = [new AccountingDataAccountGroup { Name = "Only", Account = [] }] };
+        var sut = new ProjectOptionsViewModel(data);
+        sut.SelectedAccountGroup = sut.AccountGroups[0];
+
+        sut.RemoveAccountGroupCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void RemoveAccountGroupCommand_NoSelection_CannotExecute()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+
+        sut.RemoveAccountGroupCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void SaveCommand_DuplicatedAccountGroupName_CannotExecute()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+
+        sut.AccountGroups[1].Name = " ASSETS ";
+
+        using var _ = new AssertionScope();
+        sut.AccountGroups.Should().AllSatisfy(
+            x => ((IDataErrorInfo)x)[nameof(x.Name)].Should().Be(Resources.ProjectOptions_GroupNameDuplicated));
+        sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void SaveCommand_DuplicatedAccountGroupNameResolved_CanExecute()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+        sut.AccountGroups[1].Name = "Assets";
+
+        sut.AccountGroups[1].Name = "Reserves";
+
+        using var _ = new AssertionScope();
+        sut.AccountGroups.Should().AllSatisfy(x => (x as IDataErrorInfo).Error.Should().BeEmpty());
+        sut.SaveCommand.CanExecute(null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void AccountGroupName_Changed_OtherGroupsRevalidated()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+        using var monitor = sut.AccountGroups[0].Monitor();
+
+        sut.AccountGroups[1].Name = "Assets";
+
+        monitor.Should().RaisePropertyChangeFor(x => x.Name);
+    }
+
+    [Fact]
+    public void MoveAccountGroupUpCommand_FirstGroup_Unchanged()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+
+        sut.MoveAccountGroupUpCommand.Execute(sut.AccountGroups[0]);
+
+        sut.AccountGroups.Select(x => x.Name).Should().Equal("Assets", "Empty");
     }
 }

@@ -697,4 +697,25 @@ Error message:</value>
   <data name="ProjectOptions_TemplateSameAccounts" xml:space="preserve">
     <value>Debit and credit account must be different.</value>
   </data>
+  <data name="ProjectOptions_TabAccountGroups" xml:space="preserve">
+    <value>Account groups</value>
+  </data>
+  <data name="ProjectOptions_AccountGroupsHint" xml:space="preserve">
+    <value>The order defines the structure of the reports. New accounts are assigned to the first group.</value>
+  </data>
+  <data name="ProjectOptions_AddAccountGroup" xml:space="preserve">
+    <value>Add account group</value>
+  </data>
+  <data name="ProjectOptions_RemoveAccountGroup" xml:space="preserve">
+    <value>Remove account group (only possible without accounts)</value>
+  </data>
+  <data name="ProjectOptions_GroupNameRequired" xml:space="preserve">
+    <value>The name must not be empty.</value>
+  </data>
+  <data name="ProjectOptions_GroupNameDuplicated" xml:space="preserve">
+    <value>The name is already used by another account group.</value>
+  </data>
+  <data name="AccountsContextMenu_EditAccountGroups" xml:space="preserve">
+    <value>Edit account groups...</value>
+  </data>
 </root>

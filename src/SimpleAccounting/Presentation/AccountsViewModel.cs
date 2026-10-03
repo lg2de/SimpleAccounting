@@ -153,6 +153,12 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         }
     }
 
+    public void RefreshAccounts()
+    {
+        // the account groups do not support change notification, so we refresh all bindings
+        this.allAccounts.ForEach(x => x.Refresh());
+    }
+
     public async Task ShowNewAccountDialogAsync()
     {
         // setup new view model for the new account

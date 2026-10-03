@@ -235,15 +235,16 @@ internal sealed class ProjectData : IProjectData, IDisposable
         return true;
     }
 
-    public async Task EditProjectOptionsAsync()
+    public async Task<bool> EditProjectOptionsAsync(ProjectOptionsPage page)
     {
-        var vm = new ProjectOptionsViewModel(this.Storage);
+        var vm = new ProjectOptionsViewModel(this.Storage, page);
         if (await this.windowManager.ShowDialogAsync(vm) != true)
         {
-            return;
+            return false;
         }
 
         this.IsModified = true;
+        return true;
     }
 
     public void AddBooking(AccountingDataJournalBooking booking, bool updateJournal)

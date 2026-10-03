@@ -17,7 +17,6 @@ internal interface IMenuViewModel : INotifyPropertyChanged
     ICommand NewProjectCommand { get; }
     ICommand OpenProjectCommand { get; }
     IAsyncCommand SaveProjectCommand { get; }
-    ICommand ProjectOptionsCommand { get; }
 
     ObservableCollection<MenuItemViewModel> RecentProjects { get; }
 
