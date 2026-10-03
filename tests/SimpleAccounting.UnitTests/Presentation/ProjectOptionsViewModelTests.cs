@@ -5,11 +5,13 @@
 namespace lg2de.SimpleAccounting.UnitTests.Presentation;
 
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
+using lg2de.SimpleAccounting.Properties;
 using Xunit;
 
 public class ProjectOptionsViewModelTests
@@ -587,8 +589,22 @@ public class ProjectOptionsViewModelTests
         sut.AccountGroups[1].Name = " ASSETS ";
 
         using var _ = new AssertionScope();
-        sut.AccountGroups.Should().AllSatisfy(x => x.IsValid.Should().BeFalse());
+        sut.AccountGroups.Should().AllSatisfy(
+            x => ((IDataErrorInfo)x)[nameof(x.Name)].Should().Be(Resources.ProjectOptions_GroupNameDuplicated));
         sut.SaveCommand.CanExecute(null).Should().BeFalse();
+    }
+
+    [Fact]
+    public void SaveCommand_DuplicatedAccountGroupNameResolved_CanExecute()
+    {
+        var sut = new ProjectOptionsViewModel(CreateGroupData());
+        sut.AccountGroups[1].Name = "Assets";
+
+        sut.AccountGroups[1].Name = "Reserves";
+
+        using var _ = new AssertionScope();
+        sut.AccountGroups.Should().AllSatisfy(x => (x as IDataErrorInfo).Error.Should().BeEmpty());
+        sut.SaveCommand.CanExecute(null).Should().BeTrue();
     }
 
     [Fact]
