@@ -20,10 +20,12 @@ using lg2de.SimpleAccounting.Properties;
 public class ProjectOptionsViewModel : Screen
 {
     private readonly AccountingData data;
+    private bool isRevalidatingGroups;
 
-    public ProjectOptionsViewModel(AccountingData data)
+    public ProjectOptionsViewModel(AccountingData data, ProjectOptionsPage page = ProjectOptionsPage.General)
     {
         this.data = data ?? throw new ArgumentNullException(nameof(data));
+        this.SelectedPageIndex = (int)page;
         this.Organization = data.Setup.Name ?? string.Empty;
         this.Location = data.Setup.Location ?? string.Empty;
         this.Currency = data.Setup.Currency;
@@ -51,7 +53,12 @@ public class ProjectOptionsViewModel : Screen
                     DebitAccount = this.FindTemplateAccount(GetDebit(x)),
                     CreditAccount = this.FindTemplateAccount(GetCredit(x))
                 }));
+
+        this.AccountGroups = new ObservableCollection<AccountGroupViewModel>(
+            (data.Accounts ?? []).Select(this.CreateAccountGroup));
     }
+
+    public int SelectedPageIndex { get; set; }
 
     public string Organization { get; set; }
 
@@ -67,9 +74,51 @@ public class ProjectOptionsViewModel : Screen
 
     public ObservableCollection<BookingTemplateViewModel> BookingTemplates { get; }
 
+    public ObservableCollection<AccountGroupViewModel> AccountGroups { get; }
+
+    public AccountGroupViewModel? SelectedAccountGroup
+    {
+        get;
+        set
+        {
+            field = value;
+            this.NotifyOfPropertyChange();
+        }
+    }
+
     public ICommand SaveCommand => new AsyncCommand(
         () => this.TryCloseAsync(this.OnSave()),
-        () => !string.IsNullOrWhiteSpace(this.Currency) && this.BookingTemplates.All(x => x.IsValid));
+        () => !string.IsNullOrWhiteSpace(this.Currency)
+              && this.AccountGroups.All(x => x.IsValid)
+              && this.BookingTemplates.All(x => x.IsValid));
+
+    public ICommand AddAccountGroupCommand => new AsyncCommand(
+        () =>
+        {
+            var group = this.CreateAccountGroup(null);
+            this.AccountGroups.Add(group);
+            this.SelectedAccountGroup = group;
+            this.RevalidateAccountGroups(null);
+        });
+
+    public ICommand RemoveAccountGroupCommand => new AsyncCommand(
+        () =>
+        {
+            // The command can be executed without checking CanExecute.
+            if (!this.CanRemoveAccountGroup())
+            {
+                return;
+            }
+
+            this.AccountGroups.Remove(this.SelectedAccountGroup!);
+            this.SelectedAccountGroup = null;
+            this.RevalidateAccountGroups(null);
+        },
+        this.CanRemoveAccountGroup);
+
+    public ICommand MoveAccountGroupUpCommand => new AsyncCommand(o => Move(this.AccountGroups, o, -1));
+
+    public ICommand MoveAccountGroupDownCommand => new AsyncCommand(o => Move(this.AccountGroups, o, +1));
 
     public ICommand MoveSignatureUpCommand => new AsyncCommand(o => Move(this.Signatures, o, -1));
 
@@ -116,6 +165,7 @@ public class ProjectOptionsViewModel : Screen
         changed |= this.SaveAccountJournalReport(setup.Reports);
         changed |= this.SaveTotalsAndBalancesReport(setup.Reports);
         changed |= this.SaveBookingTemplates(setup);
+        changed |= this.SaveAccountGroups();
 
         return changed;
     }
@@ -145,6 +195,55 @@ public class ProjectOptionsViewModel : Screen
         }
 
         items.Move(index, newIndex);
+    }
+
+    private AccountGroupViewModel CreateAccountGroup(AccountingDataAccountGroup? model)
+    {
+        var group = new AccountGroupViewModel(model, this.IsAccountGroupNameUnique);
+        group.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(AccountGroupViewModel.Name))
+            {
+                this.RevalidateAccountGroups(sender);
+            }
+        };
+        return group;
+    }
+
+    private bool IsAccountGroupNameUnique(AccountGroupViewModel group)
+    {
+        string name = group.Name.Trim();
+        return this.AccountGroups.All(
+            x => x == group || !string.Equals(x.Name.Trim(), name, StringComparison.CurrentCultureIgnoreCase));
+    }
+
+    private void RevalidateAccountGroups(object? changedGroup)
+    {
+        // A changed name may fix or cause duplicates of other groups.
+        // Revalidation raises property changed of the name again, so we need to avoid recursion.
+        if (this.isRevalidatingGroups)
+        {
+            return;
+        }
+
+        this.isRevalidatingGroups = true;
+        try
+        {
+            foreach (var group in this.AccountGroups.Where(x => x != changedGroup))
+            {
+                group.RevalidateName();
+            }
+        }
+        finally
+        {
+            this.isRevalidatingGroups = false;
+        }
+    }
+
+    private bool CanRemoveAccountGroup()
+    {
+        // the last group cannot be removed, the default group for new accounts is required
+        return this.SelectedAccountGroup is { AccountCount: 0 } && this.AccountGroups.Count > 1;
     }
 
     private AccountDefinition FindTemplateAccount(ulong accountId)
@@ -210,6 +309,37 @@ public class ProjectOptionsViewModel : Screen
                         CreditSpecified = x.Credit > 0
                     }).ToList()
             };
+        return true;
+    }
+
+    private bool SaveAccountGroups()
+    {
+        // The existing group objects are referenced by the account view models.
+        // So they must be updated in place, the list must not be replaced.
+        this.data.Accounts ??= [];
+        var groups = this.data.Accounts;
+        var newGroups = this.AccountGroups
+            .Select(x => (ViewModel: x, Model: x.Model ?? new AccountingDataAccountGroup { Account = [] }))
+            .ToList();
+
+        bool changed = !groups.SequenceEqual(newGroups.Select(x => x.Model));
+        foreach (var (viewModel, model) in newGroups)
+        {
+            string name = viewModel.Name.Trim();
+            if (model.Name != name)
+            {
+                model.Name = name;
+                changed = true;
+            }
+        }
+
+        if (!changed)
+        {
+            return false;
+        }
+
+        groups.Clear();
+        groups.AddRange(newGroups.Select(x => x.Model));
         return true;
     }
 }

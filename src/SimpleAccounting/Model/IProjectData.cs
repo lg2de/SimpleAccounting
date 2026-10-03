@@ -53,7 +53,12 @@ internal interface IProjectData
 
     Task<bool> TryCloseAsync();
 
-    Task EditProjectOptionsAsync();
+    /// <summary>
+    ///     Shows the dialog to edit the project options.
+    /// </summary>
+    /// <param name="page">The page to be shown initially.</param>
+    /// <returns><c>true</c> if the options have been changed, otherwise <c>false</c>.</returns>
+    Task<bool> EditProjectOptionsAsync(ProjectOptionsPage page = ProjectOptionsPage.General);
 
     Task ShowAddBookingDialogAsync(DateTime today, bool showInactiveAccounts);
 

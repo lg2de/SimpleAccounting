@@ -61,4 +61,15 @@
     </None>
   </ItemGroup>
 
+  <!--
+    The schema is published by GitHub Pages from the docs folder (referenced by the project files).
+    Keep the published copy in sync for local builds. It is skipped in CI to let the unit test detect missing commits.
+  -->
+  <Target Name="CopySchemaToDocs" AfterTargets="Build" Condition="'$(CI)' != 'true'">
+    <Copy
+      SourceFiles="$(MSBuildProjectDirectory)\Model\AccountingData.xsd"
+      DestinationFolder="$(MSBuildProjectDirectory)\..\..\docs"
+      SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>

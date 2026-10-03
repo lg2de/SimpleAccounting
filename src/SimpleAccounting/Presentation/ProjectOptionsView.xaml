@@ -35,7 +35,7 @@
       <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
     </StackPanel>
 
-    <TabControl>
+    <TabControl SelectedIndex="{Binding SelectedPageIndex}">
       <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabGeneral}">
         <Grid>
           <Grid.ColumnDefinitions>
@@ -82,54 +82,78 @@
         </Grid>
       </TabItem>
 
-      <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabReports}">
+      <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabAccountGroups}">
         <DockPanel>
-          <GroupBox
-            DockPanel.Dock="Top"
+          <TextBlock
+            DockPanel.Dock="Bottom"
+            TextWrapping="Wrap" FontStyle="Italic"
+            Text="{x:Static properties:Resources.ProjectOptions_AccountGroupsHint}" />
+          <StackPanel
+            DockPanel.Dock="Right"
+            Orientation="Vertical">
+            <Button
+              Content="+" MinWidth="30" Margin="5"
+              ToolTip="{x:Static properties:Resources.ProjectOptions_AddAccountGroup}"
+              Command="{Binding AddAccountGroupCommand}" />
+            <Button
+              Content="✕" MinWidth="30" Margin="5 0 5 5"
+              ToolTip="{x:Static properties:Resources.ProjectOptions_RemoveAccountGroup}"
+              ToolTipService.ShowOnDisabled="True"
+              Command="{Binding RemoveAccountGroupCommand}" />
+            <Button
+              Content="▲" MinWidth="30" Margin="5 0 5 5"
+              ToolTip="{x:Static properties:Resources.ProjectOptions_MoveUp}"
+              Command="{Binding MoveAccountGroupUpCommand}"
+              CommandParameter="{Binding SelectedItem, ElementName=AccountGroupsGrid}" />
+            <Button
+              Content="▼" MinWidth="30" Margin="5 0 5 5"
+              ToolTip="{x:Static properties:Resources.ProjectOptions_MoveDown}"
+              Command="{Binding MoveAccountGroupDownCommand}"
+              CommandParameter="{Binding SelectedItem, ElementName=AccountGroupsGrid}" />
+          </StackPanel>
+          <DataGrid
+            x:Name="AccountGroupsGrid"
             Margin="5"
-            Header="{x:Static properties:Resources.Header_AccountSheets}">
-            <CheckBox
-              Content="{x:Static properties:Resources.ProjectOptions_PageBreakBetweenAccounts}"
-              IsChecked="{Binding PageBreakBetweenAccounts}" />
-          </GroupBox>
-
-          <GroupBox
-            Margin="5"
-            Header="{x:Static properties:Resources.Header_AssetBalances}">
-            <DockPanel>
-              <TextBlock
-                DockPanel.Dock="Top"
-                Text="{x:Static properties:Resources.ProjectOptions_Signatures}" />
-              <StackPanel
-                DockPanel.Dock="Right"
-                Orientation="Vertical">
-                <Button
-                  Content="▲" MinWidth="30" Margin="5 0 5 5"
-                  ToolTip="{x:Static properties:Resources.ProjectOptions_MoveUp}"
-                  Command="{Binding MoveSignatureUpCommand}"
-                  CommandParameter="{Binding SelectedItem, ElementName=SignaturesGrid}" />
-                <Button
-                  Content="▼" MinWidth="30" Margin="5 0 5 5"
-                  ToolTip="{x:Static properties:Resources.ProjectOptions_MoveDown}"
-                  Command="{Binding MoveSignatureDownCommand}"
-                  CommandParameter="{Binding SelectedItem, ElementName=SignaturesGrid}" />
-              </StackPanel>
-              <DataGrid
-                x:Name="SignaturesGrid"
-                Margin="5 0 0 5"
-                AutoGenerateColumns="False"
-                HeadersVisibility="None"
-                CanUserAddRows="True" CanUserDeleteRows="True"
-                CanUserReorderColumns="False" CanUserSortColumns="False"
-                ItemsSource="{Binding Signatures}">
-                <DataGrid.Columns>
-                  <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
-                </DataGrid.Columns>
-              </DataGrid>
-            </DockPanel>
-          </GroupBox>
+            AutoGenerateColumns="False"
+            SelectionMode="Single"
+            CanUserAddRows="False" CanUserDeleteRows="False"
+            CanUserReorderColumns="False" CanUserSortColumns="False"
+            ItemsSource="{Binding AccountGroups}"
+            SelectedItem="{Binding SelectedAccountGroup}">
+            <DataGrid.Columns>
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_Name}" Width="*">
+                <DataGridTextColumn.ElementStyle>
+                  <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                      <Trigger Property="Validation.HasError" Value="True">
+                        <Setter Property="ToolTip">
+                          <Setter.Value>
+                            <Binding
+                              RelativeSource="{RelativeSource Self}"
+                              Path="(Validation.Errors)[0].ErrorContent" />
+                          </Setter.Value>
+                        </Setter>
+                      </Trigger>
+                    </Style.Triggers>
+                  </Style>
+                </DataGridTextColumn.ElementStyle>
+                <DataGridTextColumn.Binding>
+                  <Binding Path="Name" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" />
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
+              <DataGridTextColumn
+                Header="{x:Static properties:Resources.Word_Accounts}" MinWidth="70"
+                IsReadOnly="True"
+                Binding="{Binding AccountCount, Mode=OneWay}">
+                <DataGridTextColumn.ElementStyle>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                  </Style>
+                </DataGridTextColumn.ElementStyle>
+              </DataGridTextColumn>
+            </DataGrid.Columns>
+          </DataGrid>
         </DockPanel>
       </TabItem>
 
@@ -234,6 +258,57 @@
               </DataGridTemplateColumn>
             </DataGrid.Columns>
           </DataGrid>
+        </DockPanel>
+      </TabItem>
+
+      <TabItem Header="{x:Static properties:Resources.ProjectOptions_TabReports}">
+        <DockPanel>
+          <GroupBox
+            DockPanel.Dock="Top"
+            Margin="5"
+            Header="{x:Static properties:Resources.Header_AccountSheets}">
+            <CheckBox
+              Content="{x:Static properties:Resources.ProjectOptions_PageBreakBetweenAccounts}"
+              IsChecked="{Binding PageBreakBetweenAccounts}" />
+          </GroupBox>
+
+          <GroupBox
+            Margin="5"
+            Header="{x:Static properties:Resources.Header_AssetBalances}">
+            <DockPanel>
+              <TextBlock
+                DockPanel.Dock="Top"
+                Text="{x:Static properties:Resources.ProjectOptions_Signatures}" />
+              <StackPanel
+                DockPanel.Dock="Right"
+                Orientation="Vertical">
+                <Button
+                  Content="▲" MinWidth="30" Margin="5 0 5 5"
+                  ToolTip="{x:Static properties:Resources.ProjectOptions_MoveUp}"
+                  Command="{Binding MoveSignatureUpCommand}"
+                  CommandParameter="{Binding SelectedItem, ElementName=SignaturesGrid}" />
+                <Button
+                  Content="▼" MinWidth="30" Margin="5 0 5 5"
+                  ToolTip="{x:Static properties:Resources.ProjectOptions_MoveDown}"
+                  Command="{Binding MoveSignatureDownCommand}"
+                  CommandParameter="{Binding SelectedItem, ElementName=SignaturesGrid}" />
+              </StackPanel>
+              <DataGrid
+                x:Name="SignaturesGrid"
+                Margin="5 0 0 5"
+                AutoGenerateColumns="False"
+                HeadersVisibility="None"
+                CanUserAddRows="True" CanUserDeleteRows="True"
+                CanUserReorderColumns="False" CanUserSortColumns="False"
+                ItemsSource="{Binding Signatures}">
+                <DataGrid.Columns>
+                  <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
+                </DataGrid.Columns>
+              </DataGrid>
+            </DockPanel>
+          </GroupBox>
         </DockPanel>
       </TabItem>
     </TabControl>

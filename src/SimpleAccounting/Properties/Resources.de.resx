@@ -682,4 +682,25 @@ Fehlertext:</value>
   <data name="ProjectOptions_TemplateSameAccounts" xml:space="preserve">
     <value>Soll- und Habenkonto müssen sich unterscheiden.</value>
   </data>
+  <data name="ProjectOptions_TabAccountGroups" xml:space="preserve">
+    <value>Kontengruppen</value>
+  </data>
+  <data name="ProjectOptions_AccountGroupsHint" xml:space="preserve">
+    <value>Die Reihenfolge bestimmt die Gliederung der Berichte. Neue Konten werden der ersten Gruppe zugeordnet.</value>
+  </data>
+  <data name="ProjectOptions_AddAccountGroup" xml:space="preserve">
+    <value>Kontengruppe hinzufügen</value>
+  </data>
+  <data name="ProjectOptions_RemoveAccountGroup" xml:space="preserve">
+    <value>Kontengruppe entfernen (nur ohne Konten möglich)</value>
+  </data>
+  <data name="ProjectOptions_GroupNameRequired" xml:space="preserve">
+    <value>Der Name darf nicht leer sein.</value>
+  </data>
+  <data name="ProjectOptions_GroupNameDuplicated" xml:space="preserve">
+    <value>Der Name wird bereits von einer anderen Kontengruppe verwendet.</value>
+  </data>
+  <data name="AccountsContextMenu_EditAccountGroups" xml:space="preserve">
+    <value>Kontengruppen bearbeiten...</value>
+  </data>
 </root>

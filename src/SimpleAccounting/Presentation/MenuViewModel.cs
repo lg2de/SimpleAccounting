@@ -66,9 +66,6 @@ internal class MenuViewModel : Screen, IMenuViewModel
         this.OnSaveProjectAsync,
         () => this.projectData.IsModified);
 
-    public ICommand ProjectOptionsCommand => new AsyncCommand(
-        this.projectData.EditProjectOptionsAsync);
-
     public ICommand SwitchCultureCommand => new AsyncCommand(
         cultureName =>
         {

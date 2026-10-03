@@ -28,4 +28,9 @@ internal interface IAccountsViewModel : INotifyPropertyChanged
 
     void SelectFirstAccount();
     void OnDataLoaded();
+
+    /// <summary>
+    ///     Updates the presentation of all accounts, e.g. after changing the account groups.
+    /// </summary>
+    void RefreshAccounts();
 }

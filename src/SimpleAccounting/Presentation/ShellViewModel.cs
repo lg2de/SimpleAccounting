@@ -137,6 +137,9 @@ internal class ShellViewModel : Screen
 
     public ICommand EditAccountCommand => new AsyncCommand(x => this.Accounts.OnEditAccountAsync(x));
 
+    public ICommand ProjectOptionsCommand => new AsyncCommand(
+        x => this.EditProjectOptionsAsync(x is ProjectOptionsPage page ? page : ProjectOptionsPage.General));
+
     internal IProjectData ProjectData { get; }
 
     internal Task LoadingTask { get; private set; } = Task.CompletedTask;
@@ -231,6 +234,17 @@ internal class ShellViewModel : Screen
         this.ProjectData.Settings.Save();
 
         await base.OnDeactivateAsync(close, cancellationToken);
+    }
+
+    private async Task EditProjectOptionsAsync(ProjectOptionsPage page)
+    {
+        if (!await this.ProjectData.EditProjectOptionsAsync(page))
+        {
+            return;
+        }
+
+        // e.g. names of account groups may have been changed
+        this.Accounts.RefreshAccounts();
     }
 
     private async Task CheckForUpdateAfterStartAsync()

@@ -126,22 +126,6 @@ public class MenuViewModelTests
     }
 
     [Fact]
-    public void ProjectOptionsCommand_Invoked_ProjectOptionEditorStarted()
-    {
-        var projectData = Substitute.For<IProjectData>();
-        var busy = Substitute.For<IBusy>();
-        var reportFactory = Substitute.For<IReportFactory>();
-        var clock = Substitute.For<IClock>();
-        var processApi = Substitute.For<IProcess>();
-        var dialogs = Substitute.For<IDialogs>();
-        var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs);
-
-        sut.ProjectOptionsCommand.Execute(null);
-
-        projectData.Received(1).EditProjectOptionsAsync();
-    }
-
-    [Fact]
     public void CloseYearCommand_ActionAborted_YearsUnchanged()
     {
         var sut = CreateSut(out ProjectData projectData, out IDialogs dialogs, out _);

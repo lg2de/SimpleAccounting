@@ -50,7 +50,7 @@
           <Separator />
           <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings}">
             <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings_ProjectOptions}"
-                      Command="{Binding Menu.ProjectOptionsCommand}"/>
+                      Command="{Binding ProjectOptionsCommand}"/>
             <Separator />
             <MenuItem Header="Deutsch" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="de"
                       IsCheckable="True" IsChecked="{Binding Menu.IsGermanCulture, Mode=OneWay}" />
@@ -293,6 +293,10 @@
                 <MenuItem
                   Header="{x:Static properties:Resources.AccountsContextMenu_NewAccount}"
                   Command="{Binding NewAccountCommand}" />
+                <MenuItem
+                  Header="{x:Static properties:Resources.AccountsContextMenu_EditAccountGroups}"
+                  Command="{Binding ProjectOptionsCommand}"
+                  CommandParameter="{x:Static local:ProjectOptionsPage.AccountGroups}" />
                 <Separator />
                 <MenuItem
                   Header="{x:Static properties:Resources.AccountsContextMenu_ShowInactiveAccounts}"
