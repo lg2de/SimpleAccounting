@@ -1,4 +1,4 @@
-<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
+﻿<!-- Copyright (c) Lukas Grützmacher. All rights reserved. -->
 <UserControl
   x:Class="lg2de.SimpleAccounting.Presentation.ProjectOptionsView"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -18,6 +18,7 @@
       </Style>
       <Style TargetType="TextBox">
         <Setter Property="Margin" Value="5" />
+        <Setter Property="Padding" Value="5" />
         <Setter Property="Height" Value="30" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
       </Style>
@@ -70,7 +71,7 @@
             Text="{x:Static properties:Resources.Word_Currency}" />
           <TextBox
             Grid.Column="1" Grid.Row="2"
-            Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"
+            Width="100" HorizontalAlignment="Left"
             Text="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" />
 
           <TextBlock
@@ -94,7 +95,7 @@
 
           <GroupBox
             Margin="5"
-            Header="{x:Static properties:Resources.Header_TotalsAndBalances}">
+            Header="{x:Static properties:Resources.Header_AssetBalances}">
             <DockPanel>
               <TextBlock
                 DockPanel.Dock="Top"
@@ -170,6 +171,7 @@
                 </DataTemplate.Triggers>
               </DataTemplate>
               <Style x:Key="ErrorStyle" TargetType="{x:Type FrameworkElement}">
+                <Setter Property="Margin" Value="5" />
                 <Style.Triggers>
                   <Trigger Property="Validation.HasError" Value="True">
                     <Setter Property="ToolTip">
