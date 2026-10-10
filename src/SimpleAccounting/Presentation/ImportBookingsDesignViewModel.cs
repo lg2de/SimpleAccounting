@@ -22,12 +22,10 @@ using lg2de.SimpleAccounting.Properties;
 [SuppressMessage(
     "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
     Justification = "Design view model defines useful values")]
-[SuppressMessage(
-    "Major Code Smell",
-    "S6354:Use a testable date/time provider",
-    Justification = "Is ok for design view model.")]
 internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
 {
+    private static readonly SystemClock Clock = new();
+
     // define some accounts
     private static readonly List<AccountDefinition> SampleAccounts =
     [
@@ -61,13 +59,13 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
         [
             new AccountingDataJournal
             {
-                DateStart = (uint)(DateTime.Today.Year * 10000 + 101),
-                DateEnd = (uint)(DateTime.Today.Year * 10000 + 1231),
+                DateStart = (uint)(Clock.Now().Year * 10000 + 101),
+                DateEnd = (uint)(Clock.Now().Year * 10000 + 1231),
                 Booking =
                 [
                     new AccountingDataJournalBooking
                     {
-                        Date = (uint)(DateTime.Today.Year * 10000 + 1231),
+                        Date = (uint)(Clock.Now().Year * 10000 + 1231),
                         ID = 999,
                         Credit = [new BookingValue { Account = 100, Text = "End of year", Value = 1234 }],
                         Debit = [new BookingValue { Account = 990, Text = "End of year", Value = 1234 }]
@@ -79,16 +77,16 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     };
 
     public ImportBookingsDesignViewModel()
-        : base(null!, null!, new ProjectData(new Settings(), null!, null!, null!, new SystemClock(), null!))
+        : base(null!, null!, new ProjectData(new Settings(), null!, null!, null!, Clock, null!))
     {
         this.ProjectData.LoadData(SampleData);
         this.SelectedAccountNumber = 100;
-        this.StartDate = DateTime.Today;
+        this.StartDate = Clock.Now().Date;
 
         this.LoadedData.Add(
             new ImportEntryViewModel(SampleAccounts)
             {
-                Date = DateTime.Now - TimeSpan.FromDays(1),
+                Date = Clock.Now() - TimeSpan.FromDays(1),
                 Name = "Should not be visible!",
                 Text = "Should not be visible!",
                 RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
@@ -97,7 +95,7 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
         this.LoadedData.Add(
             new ImportEntryViewModel(SampleAccounts)
             {
-                Date = DateTime.Now,
+                Date = Clock.Now(),
                 Name = "McX",
                 Text = "Shoes",
                 RemoteAccount = SampleAccounts.Single(x => x.ID == 600),
@@ -107,7 +105,7 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
         this.LoadedData.Add(
             new ImportEntryViewModel(SampleAccounts)
             {
-                Date = DateTime.Now + TimeSpan.FromDays(1),
+                Date = Clock.Now() + TimeSpan.FromDays(1),
                 Name = "McY",
                 Text = "More Shoes",
                 Value = 159.95,

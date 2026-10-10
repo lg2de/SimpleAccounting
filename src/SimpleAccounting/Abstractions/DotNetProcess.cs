@@ -17,7 +17,7 @@ using JetBrains.Annotations;
 [ExcludeFromCodeCoverage(
     Justification = "The abstraction is for unit testing only. This is the simple implementation.")]
 [UsedImplicitly]
-internal class DotNetProcess : IProcess
+internal partial class DotNetProcess : IProcess
 {
     public Process? GetProcessByName(string processName)
     {
@@ -74,7 +74,7 @@ internal class DotNetProcess : IProcess
 
     [ExcludeFromCodeCoverage(Justification = "The WinAPI cannot be tested.")]
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Names are following external API.")]
-    private static class WinApi
+    private static partial class WinApi
     {
         private const int SW_MINIMIZE = 6;
         private const int SW_RESTORE = 9;
@@ -96,13 +96,16 @@ internal class DotNetProcess : IProcess
             ShowWindow(handle, SW_MINIMIZE);
         }
 
-        [DllImport("User32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr handle);
+        [LibraryImport("User32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool SetForegroundWindow(IntPtr handle);
 
-        [DllImport("User32.dll")]
-        private static extern bool ShowWindow(IntPtr handle, int nCmdShow);
+        [LibraryImport("User32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool ShowWindow(IntPtr handle, int nCmdShow);
 
-        [DllImport("User32.dll")]
-        private static extern bool IsIconic(IntPtr handle);
+        [LibraryImport("User32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool IsIconic(IntPtr handle);
     }
 }

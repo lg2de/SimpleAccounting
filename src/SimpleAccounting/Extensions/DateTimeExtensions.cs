@@ -17,17 +17,22 @@ internal static class DateTimeExtensions
     public static DateTime ToDateTime(this uint date)
     {
         // converts from date format yyyymmdd (as uint) into Date(Time) instance
-        return new DateTime(
-            (int)date / YearFactor,
-            (int)(date / MonthFactor) % MonthFactor,
-            (int)date % MonthFactor,
-            0, 0, 0,
-            DateTimeKind.Local);
+        return new DateOnly(
+                (int)date / YearFactor,
+                (int)(date / MonthFactor) % MonthFactor,
+                (int)date % MonthFactor)
+            .ToDateTime(TimeOnly.MinValue, DateTimeKind.Local);
     }
 
     public static uint ToAccountingDate(this DateTime date)
     {
         // converts from Date(Time) instance into date formatted as yyyymmdd (uint)
+        return DateOnly.FromDateTime(date).ToAccountingDate();
+    }
+
+    public static uint ToAccountingDate(this DateOnly date)
+    {
+        // converts from Date instance into date formatted as yyyymmdd (uint)
         return (uint)(date.Year * YearFactor + date.Month * MonthFactor + date.Day);
     }
 }
