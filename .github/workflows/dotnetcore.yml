@@ -38,6 +38,20 @@ jobs:
 
     - name: Restore packages
       run: dotnet restore --configfile nuget.config --verbosity normal
+    - name: Check generated model is up to date
+      # The generation is skipped in CI builds, so it is enforced here.
+      # The file is removed first, because all files have the same timestamp after checkout.
+      run: |
+        $generatedFile = "src\SimpleAccounting\Model\AccountingData.designer.cs"
+        Remove-Item $generatedFile
+        dotnet msbuild src\SimpleAccounting -t:GenerateModel -p:CI=false
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        git diff --exit-code -- $generatedFile
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "::error file=$generatedFile::The generated model is outdated. Build locally and commit the file."
+          exit 1
+        }
+      shell: pwsh
     - name: Publish Small Release
       run: dotnet publish --configuration Release
       working-directory: src\SimpleAccounting

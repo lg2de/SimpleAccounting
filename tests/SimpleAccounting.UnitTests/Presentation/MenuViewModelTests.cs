@@ -236,11 +236,11 @@ public class MenuViewModelTests
         var assetBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
         reportFactory.CreateTotalsAndBalances(
                 projectData,
-                Arg.Any<IEnumerable<AccountingDataAccountGroup>>())
+                Arg.Any<IEnumerable<AccountingDataAccountsAccountGroup>>())
             .Returns(assetBalancesReport);
         var project = Samples.SampleProject;
         project.Accounts.Add(
-            new AccountingDataAccountGroup { Name = "EMPTY", Account = [] });
+            new AccountingDataAccountsAccountGroup { Name = "EMPTY", Account = [] });
         projectData.LoadData(project);
 
         sut.AssetBalancesReportCommand.Execute(null);
@@ -250,7 +250,7 @@ public class MenuViewModelTests
             .ShowPreview(Arg.Is<string>(document => !string.IsNullOrEmpty(document)));
         reportFactory.Received(1).CreateTotalsAndBalances(
             projectData,
-            Arg.Is<IEnumerable<AccountingDataAccountGroup>>(x => x.All(y => y.Name != "EMPTY")));
+            Arg.Is<IEnumerable<AccountingDataAccountsAccountGroup>>(x => x.All(y => y.Name != "EMPTY")));
     }
 
     [Fact]
@@ -308,7 +308,7 @@ public class MenuViewModelTests
         var totalsAndBalancesReport = Substitute.For<ITotalsAndBalancesReport>();
         reportFactory.CreateTotalsAndBalances(
                 projectData,
-                Arg.Any<IEnumerable<AccountingDataAccountGroup>>())
+                Arg.Any<IEnumerable<AccountingDataAccountsAccountGroup>>())
             .Returns(totalsAndBalancesReport);
         projectData.LoadData(Samples.SampleProject);
 

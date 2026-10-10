@@ -62,6 +62,27 @@
   </ItemGroup>
 
   <!--
+    The model classes are generated from the schema by XmlSchemaClassGenerator (local dotnet tool, see dotnet-tools.json).
+    The generation runs for local builds if the schema (or this project file) has been changed.
+    It is skipped in CI to build exactly the committed code.
+    Relative paths are used because the command line is written into the generated file.
+  -->
+  <Target
+    Name="GenerateModel"
+    BeforeTargets="BeforeBuild"
+    Condition="'$(CI)' != 'true'"
+    Inputs="Model\AccountingData.xsd;$(MSBuildProjectFullPath)"
+    Outputs="Model\AccountingData.designer.cs">
+    <Exec Command="dotnet tool restore" WorkingDirectory="$(MSBuildProjectDirectory)" StandardOutputImportance="low" />
+    <Exec
+      Command="dotnet xscgen -n lg2de.SimpleAccounting.Model -o obj\xscgen --ct System.Collections.Generic.List`1 --csm PublicWithoutConstructorInitialization --cc- --namingScheme=Direct Model\AccountingData.xsd"
+      WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Copy
+      SourceFiles="obj\xscgen\lg2de.SimpleAccounting.Model.cs"
+      DestinationFiles="Model\AccountingData.designer.cs" />
+  </Target>
+
+  <!--
     The schema is published by GitHub Pages from the docs folder (referenced by the project files).
     Keep the published copy in sync for local builds. It is skipped in CI to let the unit test detect missing commits.
   -->

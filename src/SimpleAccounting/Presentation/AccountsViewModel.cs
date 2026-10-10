@@ -79,7 +79,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         this.RefreshAccountList();
 
         AccountViewModel CreateViewModel(
-            AccountDefinition account, AccountingDataAccountGroup accountGroup)
+            AccountDefinition account, AccountingDataAccountsAccountGroup accountGroup)
         {
             var accountModel = new AccountViewModel
             {
@@ -98,19 +98,19 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
 
             accountModel.IsImportActive = true;
             var dateColumn =
-                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date);
+                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Date);
             accountModel.ImportDateSource = dateColumn?.Source;
             accountModel.ImportDateIgnorePattern = dateColumn?.IgnorePattern;
             var nameColumn =
-                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name);
+                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Name);
             accountModel.ImportNameSource = nameColumn?.Source;
             accountModel.ImportNameIgnorePattern = nameColumn?.IgnorePattern;
             var textColumn =
-                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
+                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Text);
             accountModel.ImportTextSource = textColumn?.Source;
             accountModel.ImportTextIgnorePattern = textColumn?.IgnorePattern;
             var valueColumn =
-                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
+                account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Value);
             accountModel.ImportValueSource = valueColumn?.Source;
             accountModel.ImportValueIgnorePattern = valueColumn?.IgnorePattern;
 
@@ -245,7 +245,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
                     c, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
                 b.Debit.ForEach(d => UpdateAccount(d, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
             }));
-            this.projectData.Storage.Setup.BookingTemplates?.Template?.ForEach(t => UpdateTemplate(
+            this.projectData.Storage.Setup.BookingTemplates?.ForEach(t => UpdateTemplate(
                 t, selectedAccountViewModel.Identifier, clonedViewModel.Identifier));
             this.UpdateImportPatterns(selectedAccountViewModel.Identifier, clonedViewModel.Identifier);
 
@@ -352,15 +352,15 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         {
             Columns =
             [
-                new AccountDefinitionImportMappingColumn
+                new AccountDefinitionImportMappingColumnsColumn
                 {
-                    Target = AccountDefinitionImportMappingColumnTarget.Date,
+                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Date,
                     Source = viewModel.ImportDateSource,
                     IgnorePattern = viewModel.ImportDateIgnorePattern
                 },
-                new AccountDefinitionImportMappingColumn
+                new AccountDefinitionImportMappingColumnsColumn
                 {
-                    Target = AccountDefinitionImportMappingColumnTarget.Value,
+                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Value,
                     Source = viewModel.ImportValueSource,
                     IgnorePattern = viewModel.ImportValueIgnorePattern
                 }
@@ -371,9 +371,9 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         if (!string.IsNullOrWhiteSpace(viewModel.ImportTextSource))
         {
             accountDefinition.ImportMapping.Columns.Add(
-                new AccountDefinitionImportMappingColumn
+                new AccountDefinitionImportMappingColumnsColumn
                 {
-                    Target = AccountDefinitionImportMappingColumnTarget.Text,
+                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Text,
                     Source = viewModel.ImportTextSource,
                     IgnorePattern = viewModel.ImportTextIgnorePattern
                 });
@@ -382,9 +382,9 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         if (!string.IsNullOrWhiteSpace(viewModel.ImportNameSource))
         {
             accountDefinition.ImportMapping.Columns.Add(
-                new AccountDefinitionImportMappingColumn
+                new AccountDefinitionImportMappingColumnsColumn
                 {
-                    Target = AccountDefinitionImportMappingColumnTarget.Name,
+                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Name,
                     Source = viewModel.ImportNameSource,
                     IgnorePattern = viewModel.ImportNameIgnorePattern
                 });
@@ -396,7 +396,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         }
 
         accountDefinition.ImportMapping.Patterns = viewModel.ImportPatterns.Select(x =>
-            new AccountDefinitionImportMappingPattern
+            new AccountDefinitionImportMappingPatternsPattern
             {
                 Expression = x.Expression,
                 Value = x.Value?.ToModelValue() ?? 0,

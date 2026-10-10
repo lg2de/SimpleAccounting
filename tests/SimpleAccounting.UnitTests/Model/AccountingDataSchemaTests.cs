@@ -23,7 +23,7 @@ public class AccountingDataSchemaTests
             "the schema in folder 'docs' is published by GitHub Pages and must be updated (by local build)");
     }
 
-    private static string FindRepositoryRoot()
+    internal static string FindRepositoryRoot()
     {
         var folder = new DirectoryInfo(AppContext.BaseDirectory);
         while (folder != null && !File.Exists(Path.Combine(folder.FullName, "docs", "AccountingData.xsd")))

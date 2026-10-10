@@ -49,7 +49,7 @@ internal class ShellDesignViewModel : ShellViewModel
     {
         this.ProjectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Bestandskonten",
                 Account = [new AccountDefinition { ID = 100, Name = "Kasse", Type = AccountDefinitionType.Asset }]

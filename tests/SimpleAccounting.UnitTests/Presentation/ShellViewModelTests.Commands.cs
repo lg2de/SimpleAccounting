@@ -453,23 +453,20 @@ public partial class ShellViewModelTests
             Arg.Do<object>(model => vm = model as EditBookingViewModel), Arg.Any<object>(),
             Arg.Any<IDictionary<string, object>>());
         sut.ProjectData.LoadData(Samples.SampleProject);
-        sut.ProjectData.Storage.Setup.BookingTemplates = new AccountingDataSetupBookingTemplates
-        {
-            Template =
-            [
-                new AccountingDataSetupBookingTemplatesTemplate { Text = "Template1" },
-                new AccountingDataSetupBookingTemplatesTemplate
-                {
-                    Text = "Template2",
-                    Credit = 1,
-                    Debit = 2,
-                    Value = 3,
-                    CreditSpecified = true,
-                    DebitSpecified = true,
-                    ValueSpecified = true
-                }
-            ]
-        };
+        sut.ProjectData.Storage.Setup.BookingTemplates =
+        [
+            new AccountingDataSetupBookingTemplatesTemplate { Text = "Template1" },
+            new AccountingDataSetupBookingTemplatesTemplate
+            {
+                Text = "Template2",
+                Credit = 1,
+                Debit = 2,
+                Value = 3,
+                CreditSpecified = true,
+                DebitSpecified = true,
+                ValueSpecified = true
+            }
+        ];
 
         sut.Menu.AddBookingsCommand.Execute(null);
 

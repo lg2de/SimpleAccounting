@@ -29,7 +29,7 @@ public class AccountGroupViewModelTests
     [Fact]
     public void Ctor_ExistingGroup_ValuesTakenFromModel()
     {
-        var model = new AccountingDataAccountGroup
+        var model = new AccountingDataAccountsAccountGroup
         {
             Name = "Assets", Account = [new AccountDefinition { ID = 1 }, new AccountDefinition { ID = 2 }]
         };

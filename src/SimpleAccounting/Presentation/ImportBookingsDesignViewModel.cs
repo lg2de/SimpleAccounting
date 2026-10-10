@@ -31,7 +31,7 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
     // define some accounts
     private static readonly List<AccountDefinition> SampleAccounts =
     [
-        new AccountDefinition
+        new()
         {
             ID = 100,
             Name = "Cash",
@@ -39,19 +39,19 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
             {
                 Columns =
                 [
-                    new AccountDefinitionImportMappingColumn
+                    new AccountDefinitionImportMappingColumnsColumn
                     {
-                        Source = "A", Target = AccountDefinitionImportMappingColumnTarget.Date
+                        Source = "A", Target = AccountDefinitionImportMappingColumnsColumnTarget.Date
                     },
-                    new AccountDefinitionImportMappingColumn
+                    new AccountDefinitionImportMappingColumnsColumn
                     {
-                        Source = "B", Target = AccountDefinitionImportMappingColumnTarget.Value
+                        Source = "B", Target = AccountDefinitionImportMappingColumnsColumnTarget.Value
                     }
                 ]
             }
         },
-        new AccountDefinition { ID = 600, Name = "Shopping" },
-        new AccountDefinition { ID = 990, Name = "Carryforward" }
+        new() { ID = 600, Name = "Shopping" },
+        new() { ID = 990, Name = "Carryforward" }
     ];
 
     // build sample project with journal entries
@@ -75,7 +75,7 @@ internal class ImportBookingsDesignViewModel : ImportBookingsViewModel
                 ]
             }
         ],
-        Accounts = [new AccountingDataAccountGroup { Account = SampleAccounts }]
+        Accounts = [new AccountingDataAccountsAccountGroup { Account = SampleAccounts }]
     };
 
     public ImportBookingsDesignViewModel()

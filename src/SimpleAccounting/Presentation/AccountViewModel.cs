@@ -33,10 +33,9 @@ internal class AccountViewModel : Screen
 
     public string Name { get; set; } = string.Empty;
 
-    public IEnumerable<AccountingDataAccountGroup> Groups { get; set; }
-        = Enumerable.Empty<AccountingDataAccountGroup>();
+    public IEnumerable<AccountingDataAccountsAccountGroup> Groups { get; init; } = [];
 
-    public AccountingDataAccountGroup? Group { get; set; }
+    public AccountingDataAccountsAccountGroup? Group { get; set; }
 
     public AccountDefinitionType Type { get; set; }
 

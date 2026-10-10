@@ -17,7 +17,6 @@
             <Column Target="Text" Source="Text" />
             <Column Target="Value" Source="Value" />
           </Columns>
-          <Patterns />
         </ImportMapping>
       </Account>
       <Account ID="400" Name="Salary" Type="Income" />
@@ -42,5 +41,4 @@
       <Credit Value="15000" Account="400" Text="Annual extra salary" />
     </Booking>
   </Journal>
-  <OpenIssues />
 </AccountingData>

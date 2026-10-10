@@ -32,12 +32,12 @@ public class ImportFileLoaderTests
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
         bankAccount.ImportMapping.Patterns =
         [
-            new AccountDefinitionImportMappingPattern
+            new AccountDefinitionImportMappingPatternsPattern
             {
                 // correct expression, but wrong value 
                 Expression = "Text1", AccountID = Samples.Carryforward, ValueSpecified = true, Value = 999
             },
-            new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = Samples.Shoes }
+            new AccountDefinitionImportMappingPatternsPattern { Expression = "Text1", AccountID = Samples.Shoes }
         ];
         bankAccount.ImportMapping.Columns.Single(x => x.Source == "Text").IgnorePattern = "ignore.*this";
         var input = encoding.GetBytes(
@@ -90,12 +90,12 @@ public class ImportFileLoaderTests
         var bankAccount = accounts.Single(x => x.Name == "Bank account");
         bankAccount.ImportMapping.Patterns =
         [
-            new AccountDefinitionImportMappingPattern
+            new AccountDefinitionImportMappingPatternsPattern
             {
                 // correct expression, but wrong value 
                 Expression = "Text1", AccountID = Samples.Carryforward, ValueSpecified = true, Value = 999
             },
-            new AccountDefinitionImportMappingPattern { Expression = "Text1", AccountID = Samples.Shoes }
+            new AccountDefinitionImportMappingPatternsPattern { Expression = "Text1", AccountID = Samples.Shoes }
         ];
         bankAccount.ImportMapping.Columns.Single(x => x.Source == "Text").IgnorePattern = "ignore.*this";
         var bytes = Encoding.UTF8.GetBytes(input);

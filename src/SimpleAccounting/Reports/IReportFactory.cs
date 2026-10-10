@@ -19,5 +19,5 @@ internal interface IReportFactory
     IAnnualBalanceReport CreateAnnualBalance(IProjectData projectData);
 
     ITotalsAndBalancesReport CreateTotalsAndBalances(
-        IProjectData projectData, IEnumerable<AccountingDataAccountGroup> accounts);
+        IProjectData projectData, IEnumerable<AccountingDataAccountsAccountGroup> accounts);
 }

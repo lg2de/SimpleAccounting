@@ -22,7 +22,7 @@ public class AccountingDataTests
         {
             Accounts =
             [
-                new AccountingDataAccountGroup
+                new AccountingDataAccountsAccountGroup
                 {
                     Account =
                     [
@@ -39,8 +39,11 @@ public class AccountingDataTests
                             Name = "4",
                             ImportMapping = new AccountDefinitionImportMapping
                             {
-                                Columns = [new AccountDefinitionImportMappingColumn { Source = "A" }],
-                                Patterns = [new AccountDefinitionImportMappingPattern { Expression = "A" }]
+                                Columns = [new AccountDefinitionImportMappingColumnsColumn { Source = "A" }],
+                                Patterns =
+                                [
+                                    new AccountDefinitionImportMappingPatternsPattern { Expression = "A" }
+                                ]
                             }
                         }
                     ]
@@ -54,7 +57,7 @@ public class AccountingDataTests
         {
             Accounts =
             [
-                new AccountingDataAccountGroup
+                new AccountingDataAccountsAccountGroup
                 {
                     Account =
                     [
@@ -66,8 +69,11 @@ public class AccountingDataTests
                             Name = "4",
                             ImportMapping = new AccountDefinitionImportMapping
                             {
-                                Columns = [new AccountDefinitionImportMappingColumn { Source = "A" }],
-                                Patterns = [new AccountDefinitionImportMappingPattern { Expression = "A" }]
+                                Columns = [new AccountDefinitionImportMappingColumnsColumn { Source = "A" }],
+                                Patterns =
+                                [
+                                    new AccountDefinitionImportMappingPatternsPattern { Expression = "A" }
+                                ]
                             }
                         }
                     ]
@@ -77,7 +83,7 @@ public class AccountingDataTests
         sut.Should().BeEquivalentTo(
             expectation,
             o => o.Excluding(info => info.Path.EndsWith(
-                nameof(AccountDefinitionImportMappingPattern.Regex), StringComparison.Ordinal)));
+                nameof(AccountDefinitionImportMappingPatternsPattern.Regex), StringComparison.Ordinal)));
     }
 
     [Fact]
@@ -93,7 +99,10 @@ public class AccountingDataTests
     [Fact]
     public void Deserialize_EmptyAccountGroup_AccountListEmpty()
     {
-        var original = new AccountingData { Accounts = [new AccountingDataAccountGroup { Name = "Empty", Account = [] }] };
+        var original = new AccountingData
+        {
+            Accounts = [new AccountingDataAccountsAccountGroup { Name = "Empty", Account = [] }]
+        };
 
         var sut = AccountingData.Deserialize(original.Serialize());
 
@@ -159,9 +168,9 @@ public class AccountingDataTests
         {
             Years =
             [
-                new AccountingDataYear { Name = 2001, DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true },
+                new AccountingDataYearsYear { Name = 2001, DateStart = 2001_0101, DateEnd = 2001_1231, Closed = true },
 
-                new AccountingDataYear { Name = 2002, DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false }
+                new AccountingDataYearsYear { Name = 2002, DateStart = 2002_0101, DateEnd = 2002_1231, Closed = false }
             ]
         };
 
@@ -362,7 +371,7 @@ public class AccountingDataTests
         {
             Accounts =
             [
-                new AccountingDataAccountGroup
+                new AccountingDataAccountsAccountGroup
                 {
                     Account =
                     [

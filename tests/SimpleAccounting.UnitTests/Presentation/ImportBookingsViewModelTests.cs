@@ -51,14 +51,14 @@ public class ImportBookingsViewModelTests
         };
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup { Account = [activeAccount, inactiveAccount] }
+            new AccountingDataAccountsAccountGroup { Account = [activeAccount, inactiveAccount] }
         ];
 
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
 
         sut.ImportAccounts.Should().BeEquivalentTo([new { Name = "Bank (Active)" }]);
     }
-    
+
     [Fact]
     public void ImportStatus_NoImportAccount()
     {
@@ -66,7 +66,7 @@ public class ImportBookingsViewModelTests
         var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup { Account = [new AccountDefinition { ID = 100, Name = "Bank" }] }
+            new AccountingDataAccountsAccountGroup { Account = [new AccountDefinition { ID = 100, Name = "Bank" }] }
         ];
         var sut = new ImportBookingsViewModel(null!, null!, projectData);
 
@@ -81,7 +81,7 @@ public class ImportBookingsViewModelTests
         var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Account =
                 [
@@ -243,7 +243,7 @@ public class ImportBookingsViewModelTests
         };
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup { Account = [bankAccount, activeRemote, inactiveRemote] }
+            new AccountingDataAccountsAccountGroup { Account = [bankAccount, activeRemote, inactiveRemote] }
         ];
         var dialogs = Substitute.For<IDialogs>();
         dialogs.ShowOpenFileDialog(Arg.Any<string>(), Arg.Any<string>())
@@ -263,7 +263,7 @@ public class ImportBookingsViewModelTests
         sut.LoadedData.Should().ContainSingle()
             .Which.Accounts.Should().BeEquivalentTo([new { ID = 601, Name = "New Shoes (Active)" }]);
     }
-    
+
     [Fact]
     public void SetRemoteAccountsCommand_EntryNotMapped_CanExecute()
     {

@@ -28,34 +28,31 @@ public class ProjectOptionsDesignViewModel : ProjectOptionsViewModel
                 Name = "My Club",
                 Location = "Hometown",
                 Reports = { TotalsAndBalancesReport = ["Treasurer", "Auditor 1", "Auditor 2"] },
-                BookingTemplates = new AccountingDataSetupBookingTemplates
-                {
-                    Template =
-                    [
-                        new AccountingDataSetupBookingTemplatesTemplate
-                        {
-                            Text = "Membership fee",
-                            Value = 5000,
-                            ValueSpecified = true,
-                            Debit = 100,
-                            DebitSpecified = true,
-                            Credit = 400,
-                            CreditSpecified = true
-                        },
-                        new AccountingDataSetupBookingTemplatesTemplate
-                        {
-                            Text = "Bank fee",
-                            Debit = 600,
-                            DebitSpecified = true,
-                            Credit = 100,
-                            CreditSpecified = true
-                        }
-                    ]
-                }
+                BookingTemplates =
+                [
+                    new AccountingDataSetupBookingTemplatesTemplate
+                    {
+                        Text = "Membership fee",
+                        Value = 5000,
+                        ValueSpecified = true,
+                        Debit = 100,
+                        DebitSpecified = true,
+                        Credit = 400,
+                        CreditSpecified = true
+                    },
+                    new AccountingDataSetupBookingTemplatesTemplate
+                    {
+                        Text = "Bank fee",
+                        Debit = 600,
+                        DebitSpecified = true,
+                        Credit = 100,
+                        CreditSpecified = true
+                    }
+                ]
             },
             Accounts =
             [
-                new AccountingDataAccountGroup
+                new AccountingDataAccountsAccountGroup
                 {
                     Name = "Default",
                     Account =
@@ -65,7 +62,7 @@ public class ProjectOptionsDesignViewModel : ProjectOptionsViewModel
                         new AccountDefinition { ID = 600, Name = "Bank fees", Type = AccountDefinitionType.Expense }
                     ]
                 },
-                new AccountingDataAccountGroup { Name = "Reserves", Account = [] }
+                new AccountingDataAccountsAccountGroup { Name = "Reserves", Account = [] }
             ]
         };
         return data;
