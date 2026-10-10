@@ -78,7 +78,7 @@ public partial class AccountingData
         };
         return new AccountingData
         {
-            Setup = new AccountingDataSetup { Currency = "€" },
+            Setup = new AccountingDataSetup(),
             Accounts = [new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }],
             Journal = [accountJournal]
         };
@@ -216,9 +216,10 @@ public partial class AccountingData
 
     private bool IntroduceCurrency()
     {
-        if (string.IsNullOrWhiteSpace(this.Setup.Currency))
+        if (string.IsNullOrWhiteSpace(this.Setup.Currency?.Value))
         {
-            this.Setup.Currency = "€";
+            this.Setup.Currency ??= new AccountingDataSetupCurrency();
+            this.Setup.Currency.Value = AccountingDataSetupCurrency.DefaultValue;
             return true;
         }
 
@@ -263,8 +264,18 @@ public partial class AccountingDataSetup
     {
         this.behaviorField = new AccountingDataSetupBehavior();
         this.reportsField = new AccountingDataSetupReports();
-        this.Currency = "€";
+        this.currencyField = new AccountingDataSetupCurrency { Value = AccountingDataSetupCurrency.DefaultValue };
     }
+}
+
+public partial class AccountingDataSetupCurrency
+{
+    internal const string DefaultValue = "€";
+
+    /// <summary>
+    ///     Gets the currency symbol to be shown at the values, or <c>null</c> if the currency should not be shown.
+    /// </summary>
+    internal string? DisplaySymbol => this.Show ? this.Value : null;
 }
 
 public partial class AccountingDataSetupBehavior

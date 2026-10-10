@@ -96,14 +96,14 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
 
             groupLineNode.AddTableNode(string.Empty);
 
-            groupLineNode.AddTableNode(FormatValue(this.groupOpeningDebit));
-            groupLineNode.AddTableNode(FormatValue(this.groupOpeningCredit));
+            groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningDebit));
+            groupLineNode.AddTableNode(this.FormatValue(this.groupOpeningCredit));
 
-            groupLineNode.AddTableNode(FormatValue(this.groupTotalDebit));
-            groupLineNode.AddTableNode(FormatValue(this.groupTotalCredit));
+            groupLineNode.AddTableNode(this.FormatValue(this.groupTotalDebit));
+            groupLineNode.AddTableNode(this.FormatValue(this.groupTotalCredit));
 
-            groupLineNode.AddTableNode(FormatValue(this.groupBalanceDebit));
-            groupLineNode.AddTableNode(FormatValue(this.groupBalanceCredit));
+            groupLineNode.AddTableNode(this.FormatValue(this.groupBalanceDebit));
+            groupLineNode.AddTableNode(this.FormatValue(this.groupBalanceCredit));
 
             dataNode.AppendChild(groupLineNode);
         }
@@ -117,14 +117,14 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
 
         totalLineNode.AddTableNode(string.Empty);
 
-        totalLineNode.AddTableNode(FormatValue(this.overallOpeningDebit));
-        totalLineNode.AddTableNode(FormatValue(this.overallOpeningCredit));
+        totalLineNode.AddTableNode(this.FormatValue(this.overallOpeningDebit));
+        totalLineNode.AddTableNode(this.FormatValue(this.overallOpeningCredit));
 
-        totalLineNode.AddTableNode(FormatValue(this.overallTotalDebit));
-        totalLineNode.AddTableNode(FormatValue(this.overallTotalCredit));
+        totalLineNode.AddTableNode(this.FormatValue(this.overallTotalDebit));
+        totalLineNode.AddTableNode(this.FormatValue(this.overallTotalCredit));
 
-        totalLineNode.AddTableNode(FormatValue(this.overallBalanceDebit));
-        totalLineNode.AddTableNode(FormatValue(this.overallBalanceCredit));
+        totalLineNode.AddTableNode(this.FormatValue(this.overallBalanceDebit));
+        totalLineNode.AddTableNode(this.FormatValue(this.overallBalanceCredit));
 
         dataNode.AppendChild(totalLineNode);
 
@@ -148,14 +148,14 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
         signatures.ParentNode!.RemoveChild(signatures);
     }
 
-    private static string FormatValue(long value)
+    private string FormatValue(long value)
     {
         if (value <= 0)
         {
             return string.Empty;
         }
 
-        return value.FormatCurrency();
+        return this.FormatCurrency(value);
     }
 
     private void ProcessAccount(XmlNode dataNode, AccountDefinition account)
@@ -226,14 +226,14 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
 
         dataLineNode.AddTableNode(lastBookingDate.ToDateTime().ToString("d", CultureInfo.CurrentCulture));
 
-        dataLineNode.AddTableNode(FormatValue(openingDebit));
-        dataLineNode.AddTableNode(FormatValue(openingCredit));
+        dataLineNode.AddTableNode(this.FormatValue(openingDebit));
+        dataLineNode.AddTableNode(this.FormatValue(openingCredit));
 
-        dataLineNode.AddTableNode(FormatValue(totalDebit));
-        dataLineNode.AddTableNode(FormatValue(totalCredit));
+        dataLineNode.AddTableNode(this.FormatValue(totalDebit));
+        dataLineNode.AddTableNode(this.FormatValue(totalCredit));
 
-        dataLineNode.AddTableNode(FormatValue(balanceDebit));
-        dataLineNode.AddTableNode(FormatValue(balanceCredit));
+        dataLineNode.AddTableNode(this.FormatValue(balanceDebit));
+        dataLineNode.AddTableNode(this.FormatValue(balanceCredit));
 
         dataNode.AppendChild(dataLineNode);
 

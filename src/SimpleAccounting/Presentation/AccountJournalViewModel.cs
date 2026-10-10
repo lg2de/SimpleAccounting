@@ -36,6 +36,13 @@ internal class AccountJournalViewModel : Screen, IAccountJournalViewModel
         }
     }
 
+    public string? DisplayCurrency => this.projectData.Storage.Setup.Currency.DisplaySymbol;
+
+    public void RefreshCurrency()
+    {
+        this.NotifyOfPropertyChange(nameof(this.DisplayCurrency));
+    }
+
     public void Rebuild(ulong accountNumber)
     {
         this.Items.Clear();

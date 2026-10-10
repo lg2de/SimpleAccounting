@@ -4,9 +4,11 @@
 
 namespace lg2de.SimpleAccounting.UnitTests.Reports;
 
+using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using lg2de.SimpleAccounting.Abstractions;
+using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
 using NSubstitute;
@@ -132,5 +134,21 @@ public class TotalJournalReportTests
 </data>";
         sut.DocumentForTests.XPathSelectElement("//table/data")
             .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
+    }
+
+    [CulturedFact(["de"])]
+    public void CreateReport_CurrencyShown_ValuesWithCurrency()
+    {
+        var projectData = Samples.SampleProjectData;
+        projectData.Storage.Setup.Currency = new AccountingDataSetupCurrency { Value = "€", Show = true };
+        projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
+        var clock = Substitute.For<IClock>();
+        var sut = new TotalJournalReport(new XmlPrinter(), projectData, clock);
+
+        sut.CreateReport();
+
+        var firstLine = sut.DocumentForTests.XPathSelectElement("//table/data/tr")!;
+        firstLine.Elements("td").Select(x => x.Value).Should().HaveElementAt(4, "1.000,00 €")
+            .And.HaveElementAt(6, "1.000,00 €");
     }
 }

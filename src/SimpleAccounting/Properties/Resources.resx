@@ -676,6 +676,9 @@ Error message:</value>
   <data name="ProjectOptions_PageBreakBetweenAccounts" xml:space="preserve">
     <value>Page break between accounts</value>
   </data>
+  <data name="ProjectOptions_ShowCurrency" xml:space="preserve">
+    <value>Show currency with values</value>
+  </data>
   <data name="ProjectOptions_Signatures" xml:space="preserve">
     <value>Signatures</value>
   </data>

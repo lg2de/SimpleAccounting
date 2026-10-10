@@ -35,6 +35,13 @@ internal class FullJournalViewModel : Screen, IFullJournalViewModel
         }
     }
 
+    public string? DisplayCurrency => this.projectData.Storage.Setup.Currency.DisplaySymbol;
+
+    public void RefreshCurrency()
+    {
+        this.NotifyOfPropertyChange(nameof(this.DisplayCurrency));
+    }
+
     public void Rebuild()
     {
         this.Items.Clear();

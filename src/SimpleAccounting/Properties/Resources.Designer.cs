@@ -1011,7 +1011,16 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_RemoveAccountGroup", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show currency with values.
+        /// </summary>
+        public static string ProjectOptions_ShowCurrency {
+            get {
+                return ResourceManager.GetString("ProjectOptions_ShowCurrency", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Signatures.
         /// </summary>

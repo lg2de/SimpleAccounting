@@ -22,6 +22,17 @@ internal static class NumberExtensions
         return (value / ConversionFactor).FormatCurrency();
     }
 
+    /// <summary>
+    ///     Formats the specified value as currency including the specified currency symbol.
+    ///     The position of the symbol is defined by the specified culture.
+    /// </summary>
+    public static string FormatCurrency(this double value, string currencySymbol, CultureInfo culture)
+    {
+        var format = (NumberFormatInfo)culture.NumberFormat.Clone();
+        format.CurrencySymbol = currencySymbol;
+        return value.ToString("C2", format);
+    }
+
     public static long ToModelValue(this double value)
     {
         return (long)Math.Round(value * ConversionFactor);

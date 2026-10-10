@@ -10,6 +10,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using lg2de.SimpleAccounting.Abstractions;
+using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
 using NSubstitute;
@@ -311,5 +312,31 @@ public class AccountJournalReportTests
                 XDocument.Parse(expectedFriendsDebit).Root,
                 "friends debit table should match");
         }
+    }
+
+    [CulturedFact(["de"])]
+    public void CreateReport_CurrencyShown_ValuesWithCurrency()
+    {
+        var projectData = Samples.SampleProjectData;
+        projectData.Storage.Setup.Currency = new AccountingDataSetupCurrency { Value = "€", Show = true };
+        projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
+        var clock = Substitute.For<IClock>();
+        var sut = new AccountJournalReport(new XmlPrinter(), projectData, clock);
+
+        sut.CreateReport();
+
+        // bank account: debit and credit values of bookings, total and balance
+        var bankAccountValues = sut.DocumentForTests.XPathSelectElements("//table/data").First()
+            .Elements("tr")
+            .Select(x => x.Elements("td").ToArray())
+            .Select(x => (Debit: x[3].Value, Credit: x[4].Value));
+        bankAccountValues.Should().Equal(
+            ("1.000,00 €", ""),
+            ("200,00 €", ""),
+            ("", "400,00 €"),
+            ("", "50,00 €"),
+            ("", "99,00 €"),
+            ("1.200,00 €", "549,00 €"),
+            ("651,00 €", ""));
     }
 }

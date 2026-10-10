@@ -101,6 +101,47 @@ public class AccountingDataTests
     }
 
     [Fact]
+    public void Deserialize_CurrencyWithoutShow_ShowDisabled()
+    {
+        var original = new AccountingData();
+        string xml = original.Serialize();
+
+        var sut = AccountingData.Deserialize(xml);
+
+        using var _ = new AssertionScope();
+        xml.Should().Contain("<Currency>€</Currency>", "the default value is not serialized");
+        sut.Setup.Currency.Value.Should().Be("€");
+        sut.Setup.Currency.Show.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Deserialize_CurrencyWithShow_ShowEnabled()
+    {
+        var original = new AccountingData
+        {
+            Setup = { Currency = new AccountingDataSetupCurrency { Value = "$", Show = true } }
+        };
+        string xml = original.Serialize();
+
+        var sut = AccountingData.Deserialize(xml);
+
+        using var _ = new AssertionScope();
+        xml.Should().Contain("<Currency Show=\"true\">$</Currency>");
+        sut.Setup.Currency.Value.Should().Be("$");
+        sut.Setup.Currency.Show.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Migrate_EmptyCurrency_DefaultCurrencySet()
+    {
+        var sut = new AccountingData { Setup = { Currency = new AccountingDataSetupCurrency { Show = true } } };
+
+        sut.Migrate().Should().BeTrue();
+
+        sut.Setup.Currency.Should().BeEquivalentTo(new { Value = "€", Show = true });
+    }
+
+    [Fact]
     public void Migrate_EmptyYears_YearsNodeRemoved()
     {
         var sut = new AccountingData { Years = [] };

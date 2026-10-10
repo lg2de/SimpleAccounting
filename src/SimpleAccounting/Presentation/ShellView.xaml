@@ -17,6 +17,7 @@
       <Setter Property="Margin" Value="5" />
     </Style>
     <local:DateConverter x:Key="DateConverter" />
+    <local:CurrencyValueConverter x:Key="CurrencyValueConverter" />
   </Window.Resources>
   <Window.InputBindings>
     <KeyBinding Key="B" Modifiers="Control" Command="{Binding Menu.AddBookingsCommand}" />
@@ -165,8 +166,16 @@
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200"
                                   Binding="{Binding Text}" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_Value}" Width="70"
-                                  Binding="{Binding Value, StringFormat=\{0:0.00\}}"
-                                  ElementStyle="{StaticResource ValueGridStyle}" />
+                                  SortMemberPath="Value"
+                                  ElementStyle="{StaticResource ValueGridStyle}">
+                <DataGridTextColumn.Binding>
+                  <MultiBinding Converter="{StaticResource CurrencyValueConverter}">
+                    <Binding Path="Value" />
+                    <Binding Path="DataContext.FullJournal.DisplayCurrency"
+                             RelativeSource="{RelativeSource AncestorType=DataGrid}" />
+                  </MultiBinding>
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitAccount}" Width="100"
                                   Binding="{Binding DebitAccount}" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditAccount}" Width="100"
@@ -214,11 +223,29 @@
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200"
                                   Binding="{Binding Text}" />
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitValue}" Width="80"
-                                  Binding="{Binding DebitValue, StringFormat=\{0:0.00;;#\}}"
-                                  ElementStyle="{StaticResource ValueGridStyle}" />
+                                  SortMemberPath="DebitValue"
+                                  ElementStyle="{StaticResource ValueGridStyle}">
+                <DataGridTextColumn.Binding>
+                  <MultiBinding Converter="{StaticResource CurrencyValueConverter}"
+                                ConverterParameter="{x:Static local:CurrencyValueConverter.HideZeroParameter}">
+                    <Binding Path="DebitValue" />
+                    <Binding Path="DataContext.AccountJournal.DisplayCurrency"
+                             RelativeSource="{RelativeSource AncestorType=DataGrid}" />
+                  </MultiBinding>
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditValue}" Width="80"
-                                  Binding="{Binding CreditValue, StringFormat=\{0:0.00;;#\}}"
-                                  ElementStyle="{StaticResource ValueGridStyle}" />
+                                  SortMemberPath="CreditValue"
+                                  ElementStyle="{StaticResource ValueGridStyle}">
+                <DataGridTextColumn.Binding>
+                  <MultiBinding Converter="{StaticResource CurrencyValueConverter}"
+                                ConverterParameter="{x:Static local:CurrencyValueConverter.HideZeroParameter}">
+                    <Binding Path="CreditValue" />
+                    <Binding Path="DataContext.AccountJournal.DisplayCurrency"
+                             RelativeSource="{RelativeSource AncestorType=DataGrid}" />
+                  </MultiBinding>
+                </DataGridTextColumn.Binding>
+              </DataGridTextColumn>
               <DataGridTextColumn Header="{x:Static properties:Resources.Word_RemoteAccount}" Width="100"
                                   Binding="{Binding RemoteAccount}" />
             </DataGrid.Columns>

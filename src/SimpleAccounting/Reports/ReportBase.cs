@@ -58,6 +58,23 @@ internal class ReportBase
             "CurrentDate", this.setup.Location + ", " + this.printingDate.ToString("D", CultureInfo.CurrentCulture));
     }
 
+    /// <summary>
+    ///     Formats the specified value with the currency symbol, if configured to be shown.
+    /// </summary>
+    protected string FormatCurrency(double value)
+    {
+        string? currencySymbol = this.setup.Currency.DisplaySymbol;
+        return currencySymbol == null
+            ? value.FormatCurrency()
+            : value.FormatCurrency(currencySymbol, CultureInfo.CurrentCulture);
+    }
+
+    /// <inheritdoc cref="FormatCurrency(double)" />
+    protected string FormatCurrency(long value)
+    {
+        return this.FormatCurrency(value.ToViewModel());
+    }
+
     protected void UpdatePlaceholder(string name, string value)
     {
         string placeholder = $"#{name}#";

@@ -65,6 +65,29 @@ public class AccountJournalViewModelTests
             }, config: o => o.WithStrictOrdering());
     }
 
+    [Theory]
+    [InlineData(false, null)]
+    [InlineData(true, "$")]
+    public void DisplayCurrency_ShowCurrencyVariations_ProvidedCorrectly(bool show, string expected)
+    {
+        var projectData = Samples.SampleProjectData;
+        projectData.Storage.Setup.Currency = new AccountingDataSetupCurrency { Value = "$", Show = show };
+        var sut = new AccountJournalViewModel(projectData);
+
+        sut.DisplayCurrency.Should().Be(expected);
+    }
+
+    [Fact]
+    public void RefreshCurrency_PropertyChangedRaised()
+    {
+        var sut = new AccountJournalViewModel(Samples.SampleProjectData);
+        using var monitor = sut.Monitor();
+
+        sut.RefreshCurrency();
+
+        monitor.Should().RaisePropertyChangeFor(x => x.DisplayCurrency);
+    }
+
     private static AccountingDataJournalBooking CreateBooking(
         uint date, ulong identifier, int creditCount, int debitCount, bool followup)
     {

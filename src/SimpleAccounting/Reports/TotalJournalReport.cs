@@ -48,10 +48,10 @@ internal class TotalJournalReport : ReportBase, ITotalJournalReport
                 dataLineNode.AddTableNode(debit.Text);
                 string strAccountNumber = debit.Account.ToString(CultureInfo.InvariantCulture);
                 dataLineNode.AddTableNode(strAccountNumber);
-                dataLineNode.AddTableNode(debit.Value.FormatCurrency());
+                dataLineNode.AddTableNode(this.FormatCurrency(debit.Value));
                 strAccountNumber = credit.Account.ToString(CultureInfo.InvariantCulture);
                 dataLineNode.AddTableNode(strAccountNumber);
-                dataLineNode.AddTableNode(credit.Value.FormatCurrency());
+                dataLineNode.AddTableNode(this.FormatCurrency(credit.Value));
                 dataNode.AppendChild(dataLineNode);
                 continue;
             }
@@ -61,7 +61,7 @@ internal class TotalJournalReport : ReportBase, ITotalJournalReport
                 dataLineNode.AddTableNode(debitEntry.Text);
                 string strAccountNumber = debitEntry.Account.ToString(CultureInfo.InvariantCulture);
                 dataLineNode.AddTableNode(strAccountNumber);
-                dataLineNode.AddTableNode(debitEntry.Value.FormatCurrency());
+                dataLineNode.AddTableNode(this.FormatCurrency(debitEntry.Value));
                 dataLineNode.AddTableNode(string.Empty);
                 dataLineNode.AddTableNode(string.Empty);
                 dataNode.AppendChild(dataLineNode);
@@ -78,7 +78,7 @@ internal class TotalJournalReport : ReportBase, ITotalJournalReport
                 dataLineNode.AddTableNode(string.Empty);
                 string strAccountNumber = creditEntry.Account.ToString(CultureInfo.InvariantCulture);
                 dataLineNode.AddTableNode(strAccountNumber);
-                dataLineNode.AddTableNode(creditEntry.Value.FormatCurrency());
+                dataLineNode.AddTableNode(this.FormatCurrency(creditEntry.Value));
                 dataNode.AppendChild(dataLineNode);
 
                 dataLineNode = this.PrintDocument.CreateElement("tr");

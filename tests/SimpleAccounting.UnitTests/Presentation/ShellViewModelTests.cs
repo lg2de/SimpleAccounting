@@ -199,7 +199,7 @@ public partial class ShellViewModelTests
         project.Journal[^1].Booking.AddRange(Samples.SampleBookings);
         sut.ProjectData.LoadData(project);
 
-        await ((IActivate)sut).ActivateAsync();
+        await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
 
         using var _ = new AssertionScope();
         sut.Accounts.AccountList.Select(x => x.Name).Should().Equal(

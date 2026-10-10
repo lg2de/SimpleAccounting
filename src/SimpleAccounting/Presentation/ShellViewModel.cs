@@ -72,6 +72,8 @@ internal class ShellViewModel : Screen
         {
             this.Accounts.OnDataLoaded();
             this.Menu.OnDataLoaded();
+            this.FullJournal.RefreshCurrency();
+            this.AccountJournal.RefreshCurrency();
         };
         this.ProjectData.YearChanged += (_, _) =>
         {
@@ -245,6 +247,10 @@ internal class ShellViewModel : Screen
 
         // e.g. names of account groups may have been changed
         this.Accounts.RefreshAccounts();
+
+        // e.g. the currency shown at the values may have been changed
+        this.FullJournal.RefreshCurrency();
+        this.AccountJournal.RefreshCurrency();
     }
 
     private async Task CheckForUpdateAfterStartAsync()

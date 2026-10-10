@@ -661,6 +661,9 @@ Fehlertext:</value>
   <data name="ProjectOptions_PageBreakBetweenAccounts" xml:space="preserve">
     <value>Seitenumbruch zwischen den Konten</value>
   </data>
+  <data name="ProjectOptions_ShowCurrency" xml:space="preserve">
+    <value>Währung bei Beträgen anzeigen</value>
+  </data>
   <data name="ProjectOptions_Signatures" xml:space="preserve">
     <value>Unterschriften</value>
   </data>

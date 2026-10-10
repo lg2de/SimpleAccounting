@@ -94,8 +94,8 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
                 totalLineNode.AddTableNode(Resources.Word_Total).SetAttribute("align", "right");
                 totalLineNode.AddTableNode(string.Empty); // id
                 totalLineNode.AddTableNode(string.Empty); // text
-                totalLineNode.AddTableNode(this.debitTotal.FormatCurrency());
-                totalLineNode.AddTableNode(this.creditTotal.FormatCurrency());
+                totalLineNode.AddTableNode(this.FormatCurrency(this.debitTotal));
+                totalLineNode.AddTableNode(this.FormatCurrency(this.creditTotal));
                 totalLineNode.AddTableNode(string.Empty); // remote
             }
 
@@ -108,13 +108,13 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             balanceLineNode.AddTableNode(string.Empty); // text
             if (this.debitTotal > this.creditTotal)
             {
-                balanceLineNode.AddTableNode((this.debitTotal - this.creditTotal).FormatCurrency());
+                balanceLineNode.AddTableNode(this.FormatCurrency(this.debitTotal - this.creditTotal));
                 balanceLineNode.AddTableNode(string.Empty);
             }
             else
             {
                 balanceLineNode.AddTableNode(string.Empty);
-                balanceLineNode.AddTableNode((this.creditTotal - this.debitTotal).FormatCurrency());
+                balanceLineNode.AddTableNode(this.FormatCurrency(this.creditTotal - this.debitTotal));
             }
 
             // empty remote account column
@@ -160,7 +160,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             var lineNode = lineTemplate.Clone();
             lineNode.AddTableNode(debitEntry.Text);
             double debitValue = Convert.ToDouble(debitEntry.Value) / 100;
-            lineNode.AddTableNode(debitValue.FormatCurrency());
+            lineNode.AddTableNode(this.FormatCurrency(debitValue));
             this.debitTotal += debitValue;
             lineNode.AddTableNode(string.Empty);
             lineNode.AddTableNode(
@@ -177,7 +177,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             lineNode.AddTableNode(creditEntry.Text);
             lineNode.AddTableNode(string.Empty);
             double creditValue = Convert.ToDouble(creditEntry.Value) / 100;
-            lineNode.AddTableNode(creditValue.FormatCurrency());
+            lineNode.AddTableNode(this.FormatCurrency(creditValue));
             this.creditTotal += creditValue;
             lineNode.AddTableNode(
                 entry.Debit.Count == 1

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using lg2de.SimpleAccounting.Abstractions;
+using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Reports;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
 using NSubstitute;
@@ -146,6 +147,31 @@ public class TotalsAndBalancesReportTests
             .Should().BeEquivalentTo(XDocument.Parse(expected).Root);
     }
 
+    [CulturedFact(["de"])]
+    public void CreateReport_CurrencyShown_ValuesWithCurrency()
+    {
+        var projectData = Samples.SampleProjectData;
+        projectData.Storage.Setup.Currency = new AccountingDataSetupCurrency { Value = "€", Show = true };
+        projectData.CurrentYear.Booking.AddRange(Samples.SampleBookings);
+        var clock = Substitute.For<IClock>();
+        var sut = new TotalsAndBalancesReport(
+            new XmlPrinter(), projectData, clock, projectData.Storage.Accounts);
+
+        sut.CreateReport("-TotalsAndBalances-");
+
+        // The value columns start at the fourth cell. Zero values stay empty.
+        var rows = sut.DocumentForTests.XPathSelectElements("//table/data/tr")
+            .Select(x => x.Elements("td").Skip(3).Select(y => y.Value).ToArray())
+            .ToArray();
+        using var _ = new AssertionScope();
+        rows[0].Should().Equal(
+            ["1.000,00 €", "", "200,00 €", "549,00 €", "651,00 €", ""], "bank account");
+        rows[4].Should().Equal(
+            ["3.000,00 €", "", "250,00 €", "749,00 €", "2.701,00 €", "200,00 €"], "group total");
+        rows[^1].Should().Equal(
+            ["3.000,00 €", "3.000,00 €", "749,00 €", "749,00 €", "2.800,00 €", "2.800,00 €"], "overall total");
+    }
+
     [Fact]
     public void CreateReport_SampleWithSignature_SignatureLinesCreated()
     {
@@ -173,11 +199,9 @@ public class TotalsAndBalancesReportTests
 
         sut.CreateReport(reportName);
 
-#pragma warning disable FAA0001 // false-positive
         var expectedText = $"- {reportName} {DateTime.Today.Year} -";
-        sut.DocumentForTests.XPathSelectElement("//text[@ID='page-header']")?.Value.Should().Be(expectedText);
+        sut.DocumentForTests.XPathSelectElement("//text[@ID='page-header']")!.Value.Should().Be(expectedText);
         expectedText = $"{reportName} {DateTime.Today.Year}";
-        sut.DocumentForTests.XPathSelectElement("//text[@ID='report-header']")?.Value.Should().Be(expectedText);
-#pragma warning restore FAA0001
+        sut.DocumentForTests.XPathSelectElement("//text[@ID='report-header']")!.Value.Should().Be(expectedText);
     }
 }
