@@ -142,9 +142,8 @@ public class AccountsViewModelTests
         accountViewModel.ImportRemoteAccounts.Should().BeEmpty();
         await sut.OnEditAccountAsync(accountViewModel);
 
-#pragma warning disable FAA0001 // false-positive
-        updatedViewModel?.ImportRemoteAccounts.Should().BeEquivalentTo([new { ID = 2 }]);
-#pragma warning restore FAA0001
+        updatedViewModel.Should().NotBeNull();
+        updatedViewModel.ImportRemoteAccounts.Should().BeEquivalentTo([new { ID = 2 }]);
     }
 
     [Fact]

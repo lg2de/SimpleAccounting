@@ -39,7 +39,7 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
         this.ProcessExpenses(out var totalExpense);
 
         var balanceNode = this.PrintDocument.SelectSingleNode("//text[@ID=\"balance\"]")!;
-        balanceNode.InnerText = (totalIncome + totalExpense).FormatCurrency();
+        balanceNode.InnerText = this.FormatCurrency(totalIncome + totalExpense);
 
         // receivables / Forderungen
         // liabilities / Verbindlichkeiten
@@ -69,7 +69,7 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
         }
 
         var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression)!;
-        balanceElement.InnerText = totalIncome.FormatCurrency();
+        balanceElement.InnerText = this.FormatCurrency(totalIncome);
     }
 
     private void ProcessExpenses(out long totalExpense)
@@ -92,7 +92,7 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
         }
 
         var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression)!;
-        balanceElement.InnerText = totalExpense.FormatCurrency();
+        balanceElement.InnerText = this.FormatCurrency(totalExpense);
     }
 
     private void ProcessReceivablesAndLiabilities(out long totalReceivable, out long totalLiability)
@@ -126,9 +126,9 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
         }
 
         var balanceElement = receivableNode.SelectSingleNode(FourthColumnExpression)!;
-        balanceElement.InnerText = totalReceivable.FormatCurrency();
+        balanceElement.InnerText = this.FormatCurrency(totalReceivable);
         balanceElement = liabilityNode.SelectSingleNode(FourthColumnExpression)!;
-        balanceElement.InnerText = totalLiability.FormatCurrency();
+        balanceElement.InnerText = this.FormatCurrency(totalLiability);
     }
 
     private void ProcessAssets(long totalReceivable, long totalLiability)
@@ -162,7 +162,7 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
         }
 
         var balanceElement = dataNode.SelectSingleNode(FourthColumnExpression)!;
-        balanceElement.InnerText = totalAccount.FormatCurrency();
+        balanceElement.InnerText = this.FormatCurrency(totalAccount);
     }
 
     private long GetAccountBalance(AccountDefinition account, bool creditFromDebit)
@@ -201,7 +201,7 @@ internal class AnnualBalanceReport : ReportBase, IAnnualBalanceReport
         dataLineNode.AppendChild(dataItemNode);
 
         dataItemNode = dataItemNode.Clone();
-        dataItemNode.InnerText = balance.FormatCurrency();
+        dataItemNode.InnerText = this.FormatCurrency(balance);
         dataLineNode.AppendChild(dataItemNode);
 
         return dataLineNode;

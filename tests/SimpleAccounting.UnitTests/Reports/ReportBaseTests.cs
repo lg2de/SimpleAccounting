@@ -29,6 +29,41 @@ public class ReportBaseTests
         {
             base.PreparePrintDocument();
         }
+
+        public new string FormatCurrency(long value)
+        {
+            return base.FormatCurrency(value);
+        }
+    }
+
+    [CulturedFact(["en"])]
+    public void FormatCurrency_CurrencyHidden_ValueOnly()
+    {
+        var projectData = Samples.SampleProjectData;
+        projectData.Storage.Setup.Currency = new AccountingDataSetupCurrency { Value = "€", Show = false };
+        var sut = new TestReport(Substitute.For<IXmlPrinter>(), projectData, Substitute.For<IClock>());
+
+        sut.FormatCurrency(123456).Should().Be("1234.56");
+    }
+
+    [CulturedFact(["en"])]
+    public void FormatCurrency_CurrencyShownEnglish_SymbolBeforeValue()
+    {
+        var projectData = Samples.SampleProjectData;
+        projectData.Storage.Setup.Currency = new AccountingDataSetupCurrency { Value = "€", Show = true };
+        var sut = new TestReport(Substitute.For<IXmlPrinter>(), projectData, Substitute.For<IClock>());
+
+        sut.FormatCurrency(123456).Should().Be("€1,234.56");
+    }
+
+    [CulturedFact(["de"])]
+    public void FormatCurrency_CurrencyShownGerman_SymbolAfterValue()
+    {
+        var projectData = Samples.SampleProjectData;
+        projectData.Storage.Setup.Currency = new AccountingDataSetupCurrency { Value = "€", Show = true };
+        var sut = new TestReport(Substitute.For<IXmlPrinter>(), projectData, Substitute.For<IClock>());
+
+        sut.FormatCurrency(-123456).Should().Be("-1.234,56 €");
     }
 
     [CulturedFact(["en"])]
