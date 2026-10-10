@@ -41,7 +41,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
     private Task autoSaveTask = Task.CompletedTask;
     private CancellationTokenSource? cancellationTokenSource;
     private IDisposable? fileMonitoringHandle;
-    private DateTime lastNotification = DateTime.MinValue;
+    private DateTime lastNotification;
     private TaskCompletionSource? savingCompleted;
     private AccountingData storage;
 

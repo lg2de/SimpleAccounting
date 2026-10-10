@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.Presentation;
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Model;
@@ -19,15 +18,13 @@ using lg2de.SimpleAccounting.Properties;
 [SuppressMessage(
     "Major Code Smell", "S4055:Literals should not be passed as localized parameters",
     Justification = "Design view model defines useful values")]
-[SuppressMessage(
-    "Major Code Smell",
-    "S6354:Use a testable date/time provider",
-    Justification = "Is ok for design view model.")]
 internal class EditBookingDesignViewModel : EditBookingViewModel
 {
+    private static readonly IClock Clock = new SystemClock();
+
     public EditBookingDesignViewModel()
         : base(
-            new ProjectData(new Settings(), null!, null!, null!, new SystemClock(), null!), DateTime.Now,
+            new ProjectData(new Settings(), null!, null!, null!, Clock, null!), Clock.Now(),
             editMode: false)
     {
         this.BookingIdentifier = 42;

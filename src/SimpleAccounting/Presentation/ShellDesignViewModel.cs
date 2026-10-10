@@ -58,17 +58,13 @@ internal class ShellDesignViewModel : ShellViewModel
         this.Accounts.OnDataLoaded();
     }
 
-    [SuppressMessage(
-        "Major Code Smell",
-        "S6354:Use a testable date/time provider",
-        Justification = "Ok for testing code")]
     private void LoadJournal()
     {
         int index = 0;
         var journalItem = new FullJournalItemViewModel(index++)
         {
             Identifier = 41,
-            Date = DateTime.Now,
+            Date = Clock.Now(),
             Text = "Booking 1",
             Value = 123.4,
             CreditAccount = "100",
@@ -78,7 +74,7 @@ internal class ShellDesignViewModel : ShellViewModel
         journalItem = new FullJournalItemViewModel(index++)
         {
             Identifier = 42,
-            Date = DateTime.Now,
+            Date = Clock.Now(),
             Text = "Booking 2",
             Value = 1.444,
             CreditAccount = "101",
@@ -89,7 +85,7 @@ internal class ShellDesignViewModel : ShellViewModel
         journalItem = new FullJournalItemViewModel(index++)
         {
             Identifier = 43,
-            Date = DateTime.Now,
+            Date = Clock.Now(),
             Text = "Booking 3",
             Value = 99,
             CreditAccount = "101",
@@ -99,7 +95,7 @@ internal class ShellDesignViewModel : ShellViewModel
         journalItem = new FullJournalItemViewModel(index)
         {
             Identifier = 44,
-            Date = DateTime.Now,
+            Date = Clock.Now(),
             Text = "Booking 4",
             Value = -99,
             CreditAccount = "101",
@@ -112,7 +108,7 @@ internal class ShellDesignViewModel : ShellViewModel
         var accountJournalItem = new AccountJournalItemViewModel(index++)
         {
             Identifier = 42,
-            Date = DateTime.Now,
+            Date = Clock.Now(),
             Text = "Booking 2",
             CreditValue = 123.4,
             RemoteAccount = "Div.",
@@ -122,7 +118,7 @@ internal class ShellDesignViewModel : ShellViewModel
         accountJournalItem = new AccountJournalItemViewModel(index++)
         {
             Identifier = 44,
-            Date = DateTime.Now,
+            Date = Clock.Now(),
             Text = "Booking 4",
             CreditValue = 1.222,
             RemoteAccount = "Div."
