@@ -20,17 +20,23 @@ using lg2de.SimpleAccounting.Extensions;
 /// </remarks>
 public class CurrencyValueConverter : IMultiValueConverter
 {
-    public const string HideZeroParameter = "HideZero";
+    public static string HideZeroParameter => "HideZero";
 
     public object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
+        ArgumentNullException.ThrowIfNull(values);
+
         if (values.Length == 0 || values[0] is not double value)
         {
+            // The value is not available yet, e.g. DependencyProperty.UnsetValue while the binding is initialized.
+            // An empty cell is shown instead of failing the binding.
             return string.Empty;
         }
 
         if (value == 0 && HideZeroParameter.Equals(parameter))
         {
+            // Each row of the account journal has either a debit or a credit value.
+            // Zero means "no value on this side", so the cell is left empty (like the former format "0.00;;#").
             return string.Empty;
         }
 

@@ -10,7 +10,6 @@ using System.Globalization;
 using System.Linq;
 using System.Xml;
 using lg2de.SimpleAccounting.Abstractions;
-using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Properties;
 
