@@ -7,11 +7,12 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
-  d:Background="Azure"
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
   d:DataContext="{d:DesignInstance Type=local:UpdateOptionsDesignViewModel, IsDesignTimeCreatable=True}">
   <StackPanel Orientation="Vertical">
     <StackPanel.Resources>
-      <Style TargetType="Button">
+      <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="Margin" Value="5" />
         <Setter Property="Padding" Value="10" />
       </Style>

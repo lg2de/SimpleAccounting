@@ -9,10 +9,12 @@
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
   MinWidth="400" MinHeight="400"
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
   d:DesignWidth="1200" d:DesignHeight="450"
   d:DataContext="{d:DesignInstance Type=local:ShellDesignViewModel, IsDesignTimeCreatable=True}">
   <Window.Resources>
-    <Style TargetType="TextBlock">
+    <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
       <Setter Property="FontSize" Value="15" />
       <Setter Property="Margin" Value="5" />
     </Style>
@@ -51,16 +53,30 @@
           <Separator />
           <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings}">
             <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings_ProjectOptions}"
-                      Command="{Binding ProjectOptionsCommand}"/>
+                      Command="{Binding ProjectOptionsCommand}" />
             <Separator />
-            <MenuItem Header="Deutsch" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="de"
-                      IsCheckable="True" IsChecked="{Binding Menu.IsGermanCulture, Mode=OneWay}" />
-            <MenuItem Header="English" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="en"
-                      IsCheckable="True" IsChecked="{Binding Menu.IsEnglishCulture, Mode=OneWay}" />
-            <MenuItem Header="Français" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="fr"
-                      IsCheckable="True" IsChecked="{Binding Menu.IsFrenchCulture, Mode=OneWay}" />
-            <MenuItem Header="&lt;System&gt;" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter=""
-                      IsCheckable="True" IsChecked="{Binding Menu.IsSystemCulture, Mode=OneWay}" />
+            <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings_Language}">
+              <MenuItem Header="Deutsch" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="de"
+                        IsCheckable="True" IsChecked="{Binding Menu.IsGermanCulture, Mode=OneWay}" />
+              <MenuItem Header="English" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="en"
+                        IsCheckable="True" IsChecked="{Binding Menu.IsEnglishCulture, Mode=OneWay}" />
+              <MenuItem Header="Français" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter="fr"
+                        IsCheckable="True" IsChecked="{Binding Menu.IsFrenchCulture, Mode=OneWay}" />
+              <MenuItem Header="&lt;System&gt;" Command="{Binding Menu.SwitchCultureCommand}" CommandParameter=""
+                        IsCheckable="True" IsChecked="{Binding Menu.IsSystemCulture, Mode=OneWay}" />
+            </MenuItem>
+            <Separator />
+            <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings_Theme}">
+              <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings_ThemeLight}"
+                        Command="{Binding Menu.SwitchThemeCommand}" CommandParameter="Light"
+                        IsCheckable="True" IsChecked="{Binding Menu.IsLightTheme, Mode=OneWay}" />
+              <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings_ThemeDark}"
+                        Command="{Binding Menu.SwitchThemeCommand}" CommandParameter="Dark"
+                        IsCheckable="True" IsChecked="{Binding Menu.IsDarkTheme, Mode=OneWay}" />
+              <MenuItem Header="{x:Static properties:Resources.Menu_Project_Settings_ThemeSystem}"
+                        Command="{Binding Menu.SwitchThemeCommand}" CommandParameter=""
+                        IsCheckable="True" IsChecked="{Binding Menu.IsSystemTheme, Mode=OneWay}" />
+            </MenuItem>
           </MenuItem>
           <MenuItem Header="{x:Static properties:Resources.Menu_Project_Exit}"
                     Command="{Binding CloseApplicationCommand}" />
@@ -101,7 +117,7 @@
                     Command="{Binding HelpCheckForUpdateCommand}" />
           <MenuItem Header="TEST UPDATE"
                     Command="{Binding HelpSimulateUpdate}"
-                    Visibility="{Binding HelpSimulateUpdateVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    Visibility="{Binding HelpSimulateUpdateVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
         </MenuItem>
       </Menu>
       <Grid>
@@ -116,56 +132,99 @@
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.Resources>
-          <SolidColorBrush
-            x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
-            Color="DarkGray" />
-          <SolidColorBrush
-            x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
-            Color="White" />
-          <Style x:Key="GridRowStyle" TargetType="{x:Type DataGridRow}">
-            <Setter Property="FontSize" Value="11" />
+          <!--
+            Fluent does not define implicit styles for DataGridRow and DataGridCell.
+            The Fluent DataGrid style assigns these named styles explicitly instead.
+          -->
+          <Style x:Key="GridRowStyle" TargetType="{x:Type DataGridRow}"
+                 BasedOn="{StaticResource DefaultDataGridRowStyle}">
+            <!--
+              Same as the Fluent template, but the Fluent template ignores the Background property.
+              The selection is drawn by the cells, so it stays visible on colored rows.
+            -->
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="{x:Type DataGridRow}">
+                  <Border
+                    x:Name="DGR_Border"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    Background="{TemplateBinding Background}"
+                    SnapsToDevicePixels="True">
+                    <SelectiveScrollingGrid>
+                      <SelectiveScrollingGrid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                      </SelectiveScrollingGrid.ColumnDefinitions>
+                      <SelectiveScrollingGrid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                      </SelectiveScrollingGrid.RowDefinitions>
+                      <DataGridCellsPresenter
+                        Grid.Column="1"
+                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                      <DataGridDetailsPresenter
+                        Grid.Column="1" Grid.Row="1"
+                        SelectiveScrollingGrid.SelectiveScrollingOrientation="Both"
+                        Visibility="{TemplateBinding DetailsVisibility}" />
+                      <DataGridRowHeader
+                        Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
+                        SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical" />
+                    </SelectiveScrollingGrid>
+                  </Border>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
             <Style.Triggers>
+              <!-- neutral banding of the bookings, independent of accent color and window backdrop -->
               <DataTrigger Binding="{Binding IsEvenRow}" Value="True">
-                <Setter Property="Background" Value="#FFD0EED0" />
+                <Setter Property="Background" Value="{DynamicResource ControlAltFillColorQuarternaryBrush}" />
               </DataTrigger>
               <DataTrigger Binding="{Binding IsFollowup}" Value="True">
-                <Setter Property="Background" Value="LightPink" />
+                <Setter Property="Background" Value="{DynamicResource SystemFillColorCriticalBackgroundBrush}" />
               </DataTrigger>
             </Style.Triggers>
           </Style>
-          <Style TargetType="DataGridCell">
+          <Style x:Key="ToolTipCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DataGridCellStyle}">
             <Setter Property="ToolTip"
                     Value="{Binding RelativeSource={RelativeSource Self},Path=Content.Text}" />
           </Style>
-          <Style x:Key="SummaryGridStyle" TargetType="DataGridCell">
+          <Style x:Key="SummaryGridStyle" TargetType="DataGridCell" BasedOn="{StaticResource ToolTipCellStyle}">
             <Style.Triggers>
               <DataTrigger Binding="{Binding IsSummary}" Value="True">
-                <Setter Property="Foreground" Value="LightGray" />
+                <Setter Property="Foreground" Value="{DynamicResource TextFillColorTertiaryBrush}" />
               </DataTrigger>
             </Style.Triggers>
+          </Style>
+          <Style x:Key="SectionHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="8 8 8 4" />
           </Style>
         </Grid.Resources>
         <DockPanel Grid.Column="0">
           <TextBlock
             DockPanel.Dock="Top"
+            Style="{StaticResource SectionHeaderStyle}"
             Text="{x:Static properties:Resources.Header_AnnualJournal}" />
           <DataGrid
             DockPanel.Dock="Bottom"
             ItemsSource="{Binding FullJournal.Items}"
             SelectedItem="{Binding FullJournal.SelectedItem}"
-            RowStyle="{StaticResource GridRowStyle}" GridLinesVisibility="Vertical"
+            RowStyle="{StaticResource GridRowStyle}" CellStyle="{StaticResource ToolTipCellStyle}"
+            GridLinesVisibility="Vertical"
             AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
             ClipboardCopyMode="IncludeHeader"
             SelectionChanged="OnGridSelectionChanged"
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_Date}" Width="60"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_Date}" Width="90"
                                   Binding="{Binding Date, StringFormat=\{0:d\}}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="75"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="100"
                                   Binding="{Binding Identifier}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="300"
                                   Binding="{Binding Text}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_Value}" Width="70"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_Value}" Width="100"
                                   SortMemberPath="Value"
                                   ElementStyle="{StaticResource ValueGridStyle}">
                 <DataGridTextColumn.Binding>
@@ -176,9 +235,9 @@
                   </MultiBinding>
                 </DataGridTextColumn.Binding>
               </DataGridTextColumn>
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitAccount}" Width="100"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitAccount}" Width="170"
                                   Binding="{Binding DebitAccount}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditAccount}" Width="100"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditAccount}" Width="170"
                                   Binding="{Binding CreditAccount}" />
             </DataGrid.Columns>
             <DataGrid.InputBindings>
@@ -190,10 +249,10 @@
             <DataGrid.ContextMenu>
               <ContextMenu>
                 <MenuItem Header="{x:Static properties:Resources.JournalContextMenu_Edit}"
-                          Command="{Binding Menu.EditBookingCommand}" 
+                          Command="{Binding Menu.EditBookingCommand}"
                           CommandParameter="{Binding FullJournal.Items/}" />
                 <MenuItem Header="{x:Static properties:Resources.JournalContextMenu_Duplicate}"
-                          Command="{Binding Menu.DuplicateBookingsCommand}" 
+                          Command="{Binding Menu.DuplicateBookingsCommand}"
                           CommandParameter="{Binding FullJournal.Items/}" />
               </ContextMenu>
             </DataGrid.ContextMenu>
@@ -202,11 +261,13 @@
         <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" />
         <DockPanel Grid.Row="0" Grid.Column="2">
           <TextBlock DockPanel.Dock="Top"
+                     Style="{StaticResource SectionHeaderStyle}"
                      Text="{Binding Accounts.SelectedAccount.Name, StringFormat={x:Static properties:Resources.Header_AccountJournalX}}" />
           <DataGrid
             DockPanel.Dock="Bottom"
             ItemsSource="{Binding AccountJournal.Items}"
             SelectedItem="{Binding AccountJournal.SelectedItem}"
+            CellStyle="{StaticResource ToolTipCellStyle}"
             GridLinesVisibility="Vertical"
             AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
             ClipboardCopyMode="IncludeHeader"
@@ -214,15 +275,15 @@
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
               <DataGridTextColumn
-                Header="{x:Static properties:Resources.Word_Date}" Width="60"
+                Header="{x:Static properties:Resources.Word_Date}" Width="90"
                 Binding="{Binding Date, Converter={StaticResource DateConverter}}"
                 CellStyle="{StaticResource SummaryGridStyle}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="75"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingNumber_Short}" Width="100"
                                   Binding="{Binding IdentifierText}"
                                   CellStyle="{StaticResource SummaryGridStyle}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="200"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_BookingText}" Width="300"
                                   Binding="{Binding Text}" />
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitValue}" Width="80"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_DebitValue}" Width="100"
                                   SortMemberPath="DebitValue"
                                   ElementStyle="{StaticResource ValueGridStyle}">
                 <DataGridTextColumn.Binding>
@@ -234,7 +295,7 @@
                   </MultiBinding>
                 </DataGridTextColumn.Binding>
               </DataGridTextColumn>
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditValue}" Width="80"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_CreditValue}" Width="100"
                                   SortMemberPath="CreditValue"
                                   ElementStyle="{StaticResource ValueGridStyle}">
                 <DataGridTextColumn.Binding>
@@ -246,14 +307,14 @@
                   </MultiBinding>
                 </DataGridTextColumn.Binding>
               </DataGridTextColumn>
-              <DataGridTextColumn Header="{x:Static properties:Resources.Word_RemoteAccount}" Width="100"
+              <DataGridTextColumn Header="{x:Static properties:Resources.Word_RemoteAccount}" Width="170"
                                   Binding="{Binding RemoteAccount}" />
             </DataGrid.Columns>
             <DataGrid.RowStyle>
               <Style BasedOn="{StaticResource GridRowStyle}" TargetType="{x:Type DataGridRow}">
                 <Style.Triggers>
                   <DataTrigger Binding="{Binding IsSummary}" Value="True">
-                    <Setter Property="Background" Value="LightGray" />
+                    <Setter Property="Background" Value="{DynamicResource SystemFillColorSolidNeutralBackgroundBrush}" />
                   </DataTrigger>
                 </Style.Triggers>
               </Style>
@@ -272,6 +333,7 @@
         <DockPanel Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2">
           <TextBlock
             DockPanel.Dock="Left"
+            Style="{StaticResource SectionHeaderStyle}"
             Text="{x:Static properties:Resources.Word_Accounts}"
             VerticalAlignment="Center">
             <TextBlock.LayoutTransform>
@@ -281,6 +343,7 @@
           <DataGrid
             DockPanel.Dock="Right"
             ItemsSource="{Binding Accounts.AccountList}"
+            CellStyle="{StaticResource ToolTipCellStyle}"
             AutoGenerateColumns="False"
             CanUserAddRows="False"
             IsReadOnly="True"
@@ -288,16 +351,16 @@
             IsSynchronizedWithCurrentItem="True">
             <DataGrid.Columns>
               <DataGridTextColumn
-                Header="{x:Static properties:Resources.Word_Number}"
+                Header="{x:Static properties:Resources.Word_Number}" Width="80"
                 Binding="{Binding Identifier}" />
               <DataGridTextColumn
-                Header="{x:Static properties:Resources.Word_AccountName}"
+                Header="{x:Static properties:Resources.Word_AccountName}" Width="300"
                 Binding="{Binding Name}" />
               <DataGridTextColumn
-                Header="{x:Static properties:Resources.Word_AccountGroup}"
+                Header="{x:Static properties:Resources.Word_AccountGroup}" Width="150"
                 Binding="{Binding Group.Name}" />
               <DataGridTextColumn
-                Header="{x:Static properties:Resources.Word_AccountType}"
+                Header="{x:Static properties:Resources.Word_AccountType}" Width="150"
                 Binding="{Binding TypeName}" />
             </DataGrid.Columns>
             <DataGrid.InputBindings>

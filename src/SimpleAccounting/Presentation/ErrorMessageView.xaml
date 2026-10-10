@@ -8,13 +8,15 @@
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   xmlns:draw="clr-namespace:System.Drawing;assembly=System.Drawing.Common"
   mc:Ignorable="d"
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
   d:DataContext="{d:DesignInstance Type=local:ErrorMessageDesignViewModel, IsDesignTimeCreatable=True}">
   <UserControl.Resources>
     <local:IconToImageSourceConverter x:Key="IconToImageSourceConverter" />
   </UserControl.Resources>
   <Grid>
     <Grid.Resources>
-      <Style TargetType="{x:Type Button}">
+      <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="Margin" Value="5" />
         <Setter Property="Padding" Value="10" />
       </Style>

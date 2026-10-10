@@ -26,6 +26,11 @@ internal interface IMenuViewModel : INotifyPropertyChanged
     bool IsFrenchCulture { get; }
     bool IsSystemCulture { get; }
 
+    ICommand SwitchThemeCommand { get; }
+    bool IsLightTheme { get; }
+    bool IsDarkTheme { get; }
+    bool IsSystemTheme { get; }
+
     ICommand AddBookingsCommand { get; }
     ICommand DuplicateBookingsCommand { get; }
     ICommand EditBookingCommand { get; }

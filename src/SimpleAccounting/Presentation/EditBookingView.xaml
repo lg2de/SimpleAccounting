@@ -8,8 +8,10 @@
   xmlns:local="clr-namespace:lg2de.SimpleAccounting.Presentation"
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
-  d:DesignWidth="600" d:DesignHeight="500"
-  d:Background="Azure"
+  MinWidth="700"
+  d:DesignWidth="700" d:DesignHeight="500"
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
   d:DataContext="{d:DesignInstance Type=local:EditBookingDesignViewModel, IsDesignTimeCreatable=True}">
   <UserControl.InputBindings>
     <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding DefaultCommand, Mode=OneWay}" />
@@ -29,25 +31,8 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <Grid.Resources>
-      <Style TargetType="TextBlock">
+      <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Margin" Value="5" />
-      </Style>
-      <Style TargetType="TextBox">
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="Height" Value="30" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-      </Style>
-      <Style TargetType="local:NumberTextBox">
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="Height" Value="30" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-      </Style>
-      <Style TargetType="DatePicker">
-        <Setter Property="Margin" Value="5" />
-      </Style>
-      <Style TargetType="DatePickerTextBox">
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Padding" Value="2" />
       </Style>
     </Grid.Resources>
     <DatePicker
@@ -78,8 +63,8 @@
       Text="{Binding ValueLabel}" />
     <local:NumberTextBox
       Grid.Column="3" Grid.Row="1"
-      Width="100" Height="30"
-      HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+      Width="100"
+      HorizontalContentAlignment="Right"
       Scale="2"
       Text="{Binding BookingValue, StringFormat='#0.00', UpdateSourceTrigger=PropertyChanged}" />
 
@@ -215,12 +200,14 @@
       Margin="0 30 0 0"
       Orientation="Horizontal" HorizontalAlignment="Right">
       <Button
-        Width="140" Content="{x:Static properties:Resources.Action_Book}" Command="{Binding AddCommand}"
+        MinWidth="140" Content="{x:Static properties:Resources.Action_Book}" Command="{Binding AddCommand}"
+        Style="{StaticResource PrimaryButtonStyle}"
         Visibility="{Binding NewMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
       <Button
-        Width="140" Content="{x:Static properties:Resources.Action_Save}" Command="{Binding SaveCommand}"
+        MinWidth="140" Content="{x:Static properties:Resources.Action_Save}" Command="{Binding SaveCommand}"
+        Style="{StaticResource PrimaryButtonStyle}"
         Visibility="{Binding EditMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
-      <Button Width="140" Content="{x:Static properties:Resources.Action_Close}" IsCancel="True" />
+      <Button MinWidth="140" Content="{x:Static properties:Resources.Action_Close}" IsCancel="True" />
     </StackPanel>
   </Grid>
 </UserControl>

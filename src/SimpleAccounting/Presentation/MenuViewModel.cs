@@ -32,12 +32,14 @@ internal class MenuViewModel : Screen, IMenuViewModel
     private readonly IClock clock;
     private readonly IProcess processApi;
     private readonly IDialogs dialogs;
+    private readonly IApplicationTheme applicationTheme;
 
     public MenuViewModel(
         IProjectData projectData,
         IBusy busy, IReportFactory reportFactory,
         IClock clock,
-        IProcess processApi, IDialogs dialogs)
+        IProcess processApi, IDialogs dialogs,
+        IApplicationTheme applicationTheme)
     {
         this.projectData = projectData;
         this.busy = busy;
@@ -45,6 +47,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
         this.clock = clock;
         this.processApi = processApi;
         this.dialogs = dialogs;
+        this.applicationTheme = applicationTheme;
     }
 
     public ICommand NewProjectCommand => new AsyncCommand(
@@ -86,6 +89,23 @@ internal class MenuViewModel : Screen, IMenuViewModel
     public bool IsEnglishCulture => this.projectData.Settings.Culture == "en";
     public bool IsFrenchCulture => this.projectData.Settings.Culture == "fr";
     public bool IsSystemCulture => this.projectData.Settings.Culture == string.Empty;
+
+    public ICommand SwitchThemeCommand => new AsyncCommand(
+        themeName =>
+        {
+            ArgumentNullException.ThrowIfNull(themeName);
+
+            string theme = themeName.ToString() ?? ApplicationThemes.System;
+            this.projectData.Settings.Theme = theme;
+            this.applicationTheme.Apply(theme);
+            this.NotifyOfPropertyChange(nameof(this.IsLightTheme));
+            this.NotifyOfPropertyChange(nameof(this.IsDarkTheme));
+            this.NotifyOfPropertyChange(nameof(this.IsSystemTheme));
+        });
+
+    public bool IsLightTheme => this.projectData.Settings.Theme == ApplicationThemes.Light;
+    public bool IsDarkTheme => this.projectData.Settings.Theme == ApplicationThemes.Dark;
+    public bool IsSystemTheme => this.projectData.Settings.Theme == ApplicationThemes.System;
 
     public ObservableCollection<MenuItemViewModel> RecentProjects { get; } = [];
 

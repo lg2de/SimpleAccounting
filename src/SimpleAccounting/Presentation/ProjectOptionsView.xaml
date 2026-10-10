@@ -9,20 +9,12 @@
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
   Width="650" Height="400"
-  d:Background="Azure"
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
   d:DataContext="{d:DesignInstance Type=local:ProjectOptionsDesignViewModel, IsDesignTimeCreatable=True}">
   <DockPanel>
     <DockPanel.Resources>
-      <Style TargetType="TextBlock">
-        <Setter Property="Margin" Value="5" />
-      </Style>
-      <Style TargetType="TextBox">
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="Padding" Value="5" />
-        <Setter Property="Height" Value="30" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-      </Style>
-      <Style TargetType="CheckBox">
+      <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Margin" Value="5" />
       </Style>
     </DockPanel.Resources>
@@ -31,7 +23,8 @@
       DockPanel.Dock="Bottom"
       Margin="0 30 0 0"
       Orientation="Horizontal" HorizontalAlignment="Right">
-      <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding SaveCommand}" IsDefault="True" />
+      <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding SaveCommand}" IsDefault="True"
+              Style="{StaticResource PrimaryButtonStyle}" />
       <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
     </StackPanel>
 
@@ -201,8 +194,22 @@
                   </DataTrigger>
                 </DataTemplate.Triggers>
               </DataTemplate>
-              <Style x:Key="ErrorStyle" TargetType="{x:Type FrameworkElement}">
+              <Style x:Key="ErrorStyle" TargetType="{x:Type TextBlock}">
                 <Setter Property="Margin" Value="5" />
+                <Style.Triggers>
+                  <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip">
+                      <Setter.Value>
+                        <Binding
+                          RelativeSource="{RelativeSource Self}"
+                          Path="(Validation.Errors)[0].ErrorContent" />
+                      </Setter.Value>
+                    </Setter>
+                  </Trigger>
+                </Style.Triggers>
+              </Style>
+              <Style x:Key="ErrorComboBoxStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+                <Setter Property="Margin" Value="0" />
                 <Style.Triggers>
                   <Trigger Property="Validation.HasError" Value="True">
                     <Setter Property="ToolTip">
@@ -240,8 +247,8 @@
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate DataType="{x:Type local:BookingTemplateViewModel}">
                     <ComboBox
-                      Margin="0" Height="Auto"
-                      Style="{StaticResource ErrorStyle}"
+                      Height="Auto"
+                      Style="{StaticResource ErrorComboBoxStyle}"
                       SelectedItem="{Binding DebitAccount, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                       ItemTemplate="{StaticResource TemplateAccountTemplate}"
                       TextSearch.TextPath="Name"
@@ -254,8 +261,8 @@
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate DataType="{x:Type local:BookingTemplateViewModel}">
                     <ComboBox
-                      Margin="0" Height="Auto"
-                      Style="{StaticResource ErrorStyle}"
+                      Height="Auto"
+                      Style="{StaticResource ErrorComboBoxStyle}"
                       SelectedItem="{Binding CreditAccount, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                       ItemTemplate="{StaticResource TemplateAccountTemplate}"
                       TextSearch.TextPath="Name"
