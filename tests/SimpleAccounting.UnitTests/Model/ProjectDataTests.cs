@@ -7,7 +7,9 @@ namespace lg2de.SimpleAccounting.UnitTests.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
@@ -35,8 +37,8 @@ public class ProjectDataTests
         var settings = new Settings { SecuredDrives = ["K:\\"] };
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         dialogs.ShowMessageBox(
-                Arg.Is<string>(
-                    s => s.Contains("automatically generated backup file for project", StringComparison.Ordinal)),
+                Arg.Is<string>(s => s.Contains(
+                    "automatically generated backup file for project", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, MessageBoxImage.Question,
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -68,8 +70,8 @@ public class ProjectDataTests
         var settings = new Settings { SecuredDrives = ["K:\\"] };
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         dialogs.ShowMessageBox(
-                Arg.Is<string>(
-                    s => s.Contains("automatically generated backup file for project", StringComparison.Ordinal)),
+                Arg.Is<string>(s => s.Contains(
+                    "automatically generated backup file for project", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, MessageBoxImage.Question,
                 Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
@@ -106,13 +108,12 @@ public class ProjectDataTests
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
         fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
-        fileSystem.GetDrives().Returns(
-            _ =>
-            {
-                var func1 = new Func<string>(() => "Normal");
-                var func2 = new Func<string>(() => cryptoDriveIdentifier);
-                return new[] { (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2) };
-            });
+        fileSystem.GetDrives().Returns(_ =>
+        {
+            var func1 = new Func<string>(() => "Normal");
+            var func2 = new Func<string>(() => cryptoDriveIdentifier);
+            return new[] { (FilePath: "C:\\", GetFormat: func1), (FilePath: "K:\\", GetFormat: func2) };
+        });
 
         (await sut.Awaiting(x => x.LoadFromFileAsync("K:\\the.fileName")).Should()
                 .CompleteWithinAsync(10.Seconds()))
@@ -303,12 +304,11 @@ public class ProjectDataTests
                 Arg.Is<string>(s => s.Contains("cryptomator.exe", StringComparison.InvariantCultureIgnoreCase)))
             .Returns(true);
         Process cryptomator = null;
-        processApi.Start(Arg.Any<ProcessStartInfo>()).Returns(
-            _ =>
-            {
-                cryptomator = new Process();
-                return cryptomator;
-            });
+        processApi.Start(Arg.Any<ProcessStartInfo>()).Returns(_ =>
+        {
+            cryptomator = new Process();
+            return cryptomator;
+        });
         processApi.IsProcessWindowVisible(Arg.Any<Process>()).Returns(true);
         processApi.GetProcessByName(Arg.Any<string>()).Returns(cryptomator);
         processApi.When(x => x.BringProcessToFront(Arg.Any<Process>())).Do(_ => securedFileAvailable = true);
@@ -742,12 +742,11 @@ public class ProjectDataTests
         CloseYearViewModel invokedViewModel = null;
         windowManager
             .ShowDialogAsync(Arg.Any<CloseYearViewModel>(), Arg.Any<object>(), Arg.Any<IDictionary<string, object>>())
-            .Returns(
-                info =>
-                {
-                    invokedViewModel = info.Arg<CloseYearViewModel>();
-                    return false;
-                });
+            .Returns(info =>
+            {
+                invokedViewModel = info.Arg<CloseYearViewModel>();
+                return false;
+            });
 
         var result = await sut.Awaiting(x => x.CloseYearAsync()).Should().CompleteWithinAsync(1.Seconds());
         result.Subject.Should().BeFalse();
@@ -789,5 +788,49 @@ public class ProjectDataTests
         sut.CrashSave();
 
         fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task CrashSave_AutoSaveRunning_AutoSaveFileWritten()
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        var dialogs = Substitute.For<IDialogs>();
+        var fileSystem = Substitute.For<IFileSystem>();
+        var clock = Substitute.For<IClock>();
+        var processApi = Substitute.For<IProcess>();
+        var settings = new Settings();
+        var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi)
+        {
+            AutoSaveInterval = TimeSpan.FromMilliseconds(10)
+        };
+        fileSystem.FileExists("the.fileName").Returns(true);
+        fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(Samples.SampleProject.Serialize());
+        using var autoSaveStarted = new ManualResetEventSlim();
+        using var autoSaveRelease = new ManualResetEventSlim();
+        fileSystem
+            .When(x => x.WriteAllTextIntoFile("the.fileName~", Arg.Any<string>()))
+            .Do(_ =>
+            {
+                if (autoSaveStarted.IsSet)
+                {
+                    // the crash save itself
+                    return;
+                }
+
+                // block the auto-save to simulate it being still in progress
+                autoSaveStarted.Set();
+                autoSaveRelease.Wait(TimeSpan.FromSeconds(5));
+            });
+        await sut.LoadFromFileAsync("the.fileName");
+        sut.IsModified = true;
+        autoSaveStarted.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken).Should()
+            .BeTrue("auto-save should be started");
+
+        _ = Task.Delay(100, TestContext.Current.CancellationToken)
+            .ContinueWith(_ => autoSaveRelease.Set(), TaskScheduler.Default);
+        sut.Invoking(x => x.CrashSave()).Should().NotThrow();
+
+        fileSystem.Received(2).WriteAllTextIntoFile("the.fileName~", Arg.Any<string>());
     }
 }
