@@ -126,7 +126,7 @@ internal static class Samples
                 ]
             };
             accountingData.Accounts[^1].Account.AddRange(
-                Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>().Select(
+                Enum.GetValues<AccountDefinitionType>().Select(
                     type => new AccountDefinition
                     {
                         ID = (ulong)(9000 + type), Name = $"Active empty {type}", Type = type, Active = true

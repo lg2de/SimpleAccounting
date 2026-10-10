@@ -24,8 +24,6 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
     private readonly IProjectData projectData;
     private readonly IWindowManager windowManager;
 
-    private AccountViewModel? selectedAccount;
-
     public AccountsViewModel(IWindowManager windowManager, IProjectData projectData)
     {
         this.windowManager = windowManager;
@@ -36,10 +34,10 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
 
     public AccountViewModel? SelectedAccount
     {
-        get => this.selectedAccount;
+        get;
         set
         {
-            this.selectedAccount = value;
+            field = value;
             this.NotifyOfPropertyChange();
         }
     }
@@ -206,6 +204,72 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         return this.ShowEditAccountDialogAsync(account);
     }
 
+    private static void SaveImportConfiguration(AccountViewModel viewModel, AccountDefinition accountDefinition)
+    {
+        if (!viewModel.IsImportActive)
+        {
+            accountDefinition.ImportMapping = null;
+            return;
+        }
+
+        // save required items
+        accountDefinition.ImportMapping = new AccountDefinitionImportMapping
+        {
+            Columns =
+            [
+                new AccountDefinitionImportMappingColumnsColumn
+                {
+                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Date,
+                    Source = viewModel.ImportDateSource,
+                    IgnorePattern = viewModel.ImportDateIgnorePattern
+                },
+                new AccountDefinitionImportMappingColumnsColumn
+                {
+                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Value,
+                    Source = viewModel.ImportValueSource,
+                    IgnorePattern = viewModel.ImportValueIgnorePattern
+                }
+            ]
+        };
+
+        // save optional items
+        if (!string.IsNullOrWhiteSpace(viewModel.ImportTextSource))
+        {
+            accountDefinition.ImportMapping.Columns.Add(
+                new AccountDefinitionImportMappingColumnsColumn
+                {
+                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Text,
+                    Source = viewModel.ImportTextSource,
+                    IgnorePattern = viewModel.ImportTextIgnorePattern
+                });
+        }
+
+        if (!string.IsNullOrWhiteSpace(viewModel.ImportNameSource))
+        {
+            accountDefinition.ImportMapping.Columns.Add(
+                new AccountDefinitionImportMappingColumnsColumn
+                {
+                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Name,
+                    Source = viewModel.ImportNameSource,
+                    IgnorePattern = viewModel.ImportNameIgnorePattern
+                });
+        }
+
+        if (!viewModel.ImportPatterns.Any())
+        {
+            return;
+        }
+
+        accountDefinition.ImportMapping.Patterns = viewModel.ImportPatterns.Select(x =>
+            new AccountDefinitionImportMappingPatternsPattern
+            {
+                Expression = x.Expression,
+                Value = x.Value?.ToModelValue() ?? 0,
+                ValueSpecified = x.Value.HasValue,
+                AccountID = x.Account?.ID ?? 0
+            }).ToList();
+    }
+
     private async Task ShowEditAccountDialogAsync(AccountViewModel selectedAccountViewModel)
     {
         // clone view model for easy rollback
@@ -263,11 +327,10 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             clonedViewModel.Group!.Account.Add(accountData);
 
             // reorder the accounts in the new group
-            clonedViewModel.Group!.Account =
-                clonedViewModel.Group.Account.OrderBy(x => x.ID).ToList();
+            clonedViewModel.Group.Account = clonedViewModel.Group.Account.OrderBy(x => x.ID).ToList();
         }
 
-        this.SaveImportConfiguration(clonedViewModel, accountData);
+        SaveImportConfiguration(clonedViewModel, accountData);
 
         // update view model
         selectedAccountViewModel.Name = clonedViewModel.Name;
@@ -337,72 +400,6 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
             importPattern.Account =
                 accountViewModel.ImportRemoteAccounts.FirstOrDefault(x => x.ID == importPattern.AccountId);
         }
-    }
-
-    private void SaveImportConfiguration(AccountViewModel viewModel, AccountDefinition accountDefinition)
-    {
-        if (!viewModel.IsImportActive)
-        {
-            accountDefinition.ImportMapping = null;
-            return;
-        }
-
-        // save required items
-        accountDefinition.ImportMapping = new AccountDefinitionImportMapping
-        {
-            Columns =
-            [
-                new AccountDefinitionImportMappingColumnsColumn
-                {
-                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Date,
-                    Source = viewModel.ImportDateSource,
-                    IgnorePattern = viewModel.ImportDateIgnorePattern
-                },
-                new AccountDefinitionImportMappingColumnsColumn
-                {
-                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Value,
-                    Source = viewModel.ImportValueSource,
-                    IgnorePattern = viewModel.ImportValueIgnorePattern
-                }
-            ]
-        };
-
-        // save optional items
-        if (!string.IsNullOrWhiteSpace(viewModel.ImportTextSource))
-        {
-            accountDefinition.ImportMapping.Columns.Add(
-                new AccountDefinitionImportMappingColumnsColumn
-                {
-                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Text,
-                    Source = viewModel.ImportTextSource,
-                    IgnorePattern = viewModel.ImportTextIgnorePattern
-                });
-        }
-
-        if (!string.IsNullOrWhiteSpace(viewModel.ImportNameSource))
-        {
-            accountDefinition.ImportMapping.Columns.Add(
-                new AccountDefinitionImportMappingColumnsColumn
-                {
-                    Target = AccountDefinitionImportMappingColumnsColumnTarget.Name,
-                    Source = viewModel.ImportNameSource,
-                    IgnorePattern = viewModel.ImportNameIgnorePattern
-                });
-        }
-
-        if (!viewModel.ImportPatterns.Any())
-        {
-            return;
-        }
-
-        accountDefinition.ImportMapping.Patterns = viewModel.ImportPatterns.Select(x =>
-            new AccountDefinitionImportMappingPatternsPattern
-            {
-                Expression = x.Expression,
-                Value = x.Value?.ToModelValue() ?? 0,
-                ValueSpecified = x.Value.HasValue,
-                AccountID = x.Account?.ID ?? 0
-            }).ToList();
     }
 
     private void RefreshAccountList()

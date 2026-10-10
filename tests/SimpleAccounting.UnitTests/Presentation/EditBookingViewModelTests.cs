@@ -505,7 +505,7 @@ public class EditBookingViewModelTests
         var processApi = Substitute.For<IProcess>();
         var projectData = new ProjectData(new Settings(), windowManager, dialogs, fileSystem, clock, processApi);
         var sut = new EditBookingViewModel(projectData, YearBegin, editMode: false);
-        foreach (AccountDefinitionType type in Enum.GetValues(typeof(AccountDefinitionType)))
+        foreach (AccountDefinitionType type in Enum.GetValues<AccountDefinitionType>())
         {
             sut.Accounts.Add(new AccountDefinition { Name = type.ToString(), Type = type });
         }

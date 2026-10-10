@@ -118,7 +118,7 @@ internal class AccountViewModel : Screen
     internal static void ResetTypesLazy()
     {
         Types.Clear();
-        foreach (var type in Enum.GetValues(typeof(AccountDefinitionType)).Cast<AccountDefinitionType>())
+        foreach (var type in Enum.GetValues<AccountDefinitionType>())
         {
             var localizedType = Resources.ResourceManager.GetString($"AccountType_{type}") ?? $"<{type}>";
             Types[type] = localizedType;
