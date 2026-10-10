@@ -20,7 +20,7 @@ using lg2de.SimpleAccounting.Properties;
     Justification = "Design view model defines useful values")]
 internal class EditBookingDesignViewModel : EditBookingViewModel
 {
-    private static readonly IClock Clock = new SystemClock();
+    private static readonly SystemClock Clock = new();
 
     public EditBookingDesignViewModel()
         : base(

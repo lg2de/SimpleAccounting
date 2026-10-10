@@ -4,7 +4,6 @@
 
 namespace lg2de.SimpleAccounting.Presentation;
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
@@ -23,7 +22,7 @@ using lg2de.SimpleAccounting.Properties;
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 internal class ShellDesignViewModel : ShellViewModel
 {
-    private static readonly IClock Clock = new SystemClock();
+    private static readonly SystemClock Clock = new();
     private static readonly ProjectData DesignProject = new(new Settings(), null!, null!, null!, Clock, null!);
 
     public ShellDesignViewModel()
