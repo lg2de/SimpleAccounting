@@ -24,6 +24,7 @@
         Text="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}" />
       <ComboBox
         Grid.Column="1" Grid.Row="0"
+        MinWidth="250"
         Grid.ColumnSpan="{Binding AccountSelectionSpan, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
         ItemsSource="{Binding Accounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
         SelectedValue="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
@@ -43,7 +44,7 @@
       HorizontalContentAlignment="Stretch"
       KeyboardNavigation.TabNavigation="Continue">
       <ListView.ItemContainerStyle>
-        <Style TargetType="ListViewItem">
+        <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
           <Setter Property="Focusable" Value="false" />
         </Style>
       </ListView.ItemContainerStyle>
@@ -68,16 +69,15 @@
               </Grid.ColumnDefinitions>
               <Border
                 Grid.Column="0"
-                BorderBrush="Red" BorderThickness="{Binding IsBookingTextErrorThickness}">
+                BorderBrush="{DynamicResource SystemFillColorCriticalBrush}" BorderThickness="{Binding IsBookingTextErrorThickness}">
                 <TextBox
-                  Height="30"
                   Text="{Binding BookingText, UpdateSourceTrigger=PropertyChanged}"
                   ToolTip="{x:Static properties:Resources.Word_BookingText}" />
               </Border>
               <local:NumberTextBox
                 Grid.Column="1"
-                Width="100" Height="30"
-                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+                Width="100"
+                HorizontalContentAlignment="Right"
                 Scale="2"
                 Text="{Binding BookingValue, StringFormat='#0.00', UpdateSourceTrigger=PropertyChanged}"
                 ToolTip="{x:Static properties:Resources.Tooltip_SplitBookingValue}" />
@@ -88,6 +88,7 @@
               Text="{Binding AccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <ComboBox
               Grid.Column="1" Grid.Row="1"
+              MinWidth="250"
               ItemsSource="{Binding Accounts, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
               SelectedValue="{Binding AccountNumber, Mode=TwoWay}"
               SelectedIndex="{Binding AccountIndex, Mode=OneWayToSource}"
@@ -95,12 +96,12 @@
               TextSearch.TextPath="Name" />
             <Button
               Grid.Column="2" Grid.Row="1"
-              Content="+" Width="35" Padding="0" Margin="0" VerticalAlignment="Center"
+              Content="+" Width="35" MinWidth="0" Padding="0" Margin="0" VerticalAlignment="Center"
               Command="{Binding AddSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
               CommandParameter="{Binding .}" />
             <Button
               Grid.Column="3" Grid.Row="1"
-              Content="-" Width="35" Padding="0" Margin="0" VerticalAlignment="Center"
+              Content="-" Width="35" MinWidth="0" Padding="0" Margin="0" VerticalAlignment="Center"
               Command="{Binding RemoveSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
               CommandParameter="{Binding .}" />
           </Grid>

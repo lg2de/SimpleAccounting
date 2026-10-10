@@ -9,7 +9,8 @@
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
   d:DataContext="{d:DesignInstance Type=local:CloseYearDesignViewModel, IsDesignTimeCreatable=True}"
-  d:Background="Azure">
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -18,7 +19,7 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <Grid.Resources>
-      <Style TargetType="TextBlock">
+      <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Margin" Value="5" />
       </Style>
     </Grid.Resources>
@@ -27,39 +28,44 @@
       Padding="10" HorizontalAlignment="Center"
       Text="{Binding InstructionText}" />
 
-    <StackPanel
-      Grid.Row="1"
-      Orientation="Horizontal">
-      <TextBlock Padding="5">
+    <Grid Grid.Row="1" Grid.RowSpan="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" MinWidth="300" />
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">
         <Run Text="{x:Static properties:Resources.Word_CarriedForwardAccount}" />
         <Run Text=":" />
       </TextBlock>
       <ComboBox
-        Width="200" HorizontalAlignment="Right"
+        Grid.Column="1" Grid.Row="0"
         ItemsSource="{Binding Accounts}"
         SelectedItem="{Binding RemoteAccount, Mode=TwoWay}"
         ItemTemplate="{StaticResource AccountSelectionTemplate}"
         TextSearch.TextPath="Name" />
-    </StackPanel>
 
-    <DockPanel Grid.Row="2">
-      <TextBlock
-        Padding="5">
+      <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">
         <Run Text="{x:Static properties:Resources.CloseYear_TextOptionDescription}" />
         <Run Text=":" />
       </TextBlock>
       <ComboBox
+        Grid.Column="1" Grid.Row="1"
         ItemsSource="{Binding TextOptions}"
         SelectedItem="{Binding TextOption, Mode=TwoWay}"
         DisplayMemberPath="Name" />
-    </DockPanel>
+    </Grid>
 
     <StackPanel
       Grid.Row="3"
       Grid.Column="0"
       Margin="0 30 0 0"
       Orientation="Horizontal" HorizontalAlignment="Right">
-      <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding CloseYearCommand}" />
+      <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding CloseYearCommand}"
+              Style="{StaticResource PrimaryButtonStyle}" />
       <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
     </StackPanel>
   </Grid>

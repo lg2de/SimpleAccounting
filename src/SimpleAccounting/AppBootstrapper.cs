@@ -46,6 +46,7 @@ public class AppBootstrapper : BootstrapperBase
         this.container.PerRequest<IHttpClient, DotNetHttpClient>();
         this.container.Singleton<IClock, SystemClock>();
         this.container.Singleton<IClipboard, WindowsClipboard>();
+        this.container.Singleton<IApplicationTheme, WpfApplicationTheme>();
         this.container.PerRequest<ShellViewModel>();
     }
 
