@@ -33,7 +33,8 @@ public class ProjectOptionsViewModel : Screen
         this.SelectedPageIndex = (int)page;
         this.Organization = data.Setup.Name ?? string.Empty;
         this.Location = data.Setup.Location ?? string.Empty;
-        this.Currency = data.Setup.Currency;
+        this.Currency = data.Setup.Currency.Value;
+        this.ShowCurrency = data.Setup.Currency.Show;
         this.PageBreakBetweenAccounts =
             data.Setup.Reports?.AccountJournalReport?.PageBreakBetweenAccounts ?? false;
         this.Signatures = new ObservableCollection<SignatureViewModel>(
@@ -70,6 +71,8 @@ public class ProjectOptionsViewModel : Screen
     public string Location { get; set; }
 
     public string Currency { get; set; }
+
+    public bool ShowCurrency { get; set; }
 
     public bool PageBreakBetweenAccounts { get; set; }
 
@@ -160,9 +163,15 @@ public class ProjectOptionsViewModel : Screen
         }
 
         string currency = this.Currency.Trim();
-        if (setup.Currency != currency)
+        if (setup.Currency.Value != currency)
         {
-            setup.Currency = currency;
+            setup.Currency.Value = currency;
+            changed = true;
+        }
+
+        if (setup.Currency.Show != this.ShowCurrency)
+        {
+            setup.Currency.Show = this.ShowCurrency;
             changed = true;
         }
 

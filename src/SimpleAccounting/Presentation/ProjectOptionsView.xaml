@@ -69,10 +69,17 @@
             Grid.Column="0" Grid.Row="2"
             VerticalAlignment="Center"
             Text="{x:Static properties:Resources.Word_Currency}" />
-          <TextBox
+          <StackPanel
             Grid.Column="1" Grid.Row="2"
-            Width="100" HorizontalAlignment="Left"
-            Text="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" />
+            Orientation="Horizontal">
+            <TextBox
+              Width="100"
+              Text="{Binding Currency, UpdateSourceTrigger=PropertyChanged}" />
+            <CheckBox
+              VerticalAlignment="Center"
+              Content="{x:Static properties:Resources.ProjectOptions_ShowCurrency}"
+              IsChecked="{Binding ShowCurrency}" />
+          </StackPanel>
 
           <TextBlock
             Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3"

@@ -673,6 +673,9 @@ Texte d'erreur:</value>
     <data name="ProjectOptions_PageBreakBetweenAccounts" xml:space="preserve">
       <value>Saut de page entre les comptes</value>
     </data>
+    <data name="ProjectOptions_ShowCurrency" xml:space="preserve">
+      <value>Afficher la devise avec les montants</value>
+    </data>
     <data name="ProjectOptions_Signatures" xml:space="preserve">
       <value>Signatures</value>
     </data>

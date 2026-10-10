@@ -16,6 +16,10 @@ internal interface IAccountJournalViewModel : INotifyPropertyChanged
 
     AccountJournalItemViewModel? SelectedItem { get; set; }
 
+    string? DisplayCurrency { get; }
+
+    void RefreshCurrency();
+
     void Rebuild(ulong accountNumber);
 
     void Select(ulong bookingId);

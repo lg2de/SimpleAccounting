@@ -15,7 +15,11 @@ internal interface IFullJournalViewModel : INotifyPropertyChanged
     ObservableCollection<FullJournalItemViewModel> Items { get; }
         
     FullJournalItemViewModel? SelectedItem { get; set; }
-        
+
+    string? DisplayCurrency { get; }
+
+    void RefreshCurrency();
+
     void Rebuild();
         
     void Select(ulong bookingId);

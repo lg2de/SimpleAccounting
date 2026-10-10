@@ -37,7 +37,7 @@ internal class EditBookingViewModel : Screen
         this.BookingIdentifier = this.projectData.MaxBookIdent + 1;
         this.ValueLabel = string.Format(
             CultureInfo.CurrentUICulture,
-            Resources.Label_ValueWithCurrencyX, this.projectData.Storage.Setup.Currency);
+            Resources.Label_ValueWithCurrencyX, this.projectData.Storage.Setup.Currency.Value);
 
         if (this.Date > this.DateEnd)
         {

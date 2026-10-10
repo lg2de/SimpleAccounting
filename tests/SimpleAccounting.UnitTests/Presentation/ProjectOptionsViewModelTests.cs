@@ -24,6 +24,7 @@ public class ProjectOptionsViewModelTests
             {
                 Name = "My Club",
                 Location = "Hometown",
+                Currency = new AccountingDataSetupCurrency { Value = "€", Show = true },
                 Reports =
                 {
                     AccountJournalReport =
@@ -147,7 +148,8 @@ public class ProjectOptionsViewModelTests
         var sut = new ProjectOptionsViewModel(data);
 
         sut.OnSave().Should().BeFalse();
-        data.Setup.Currency.Should().Be("€");
+        data.Setup.Currency.Value.Should().Be("€");
+        data.Setup.Currency.Show.Should().BeFalse();
     }
 
     [Fact]
@@ -157,7 +159,17 @@ public class ProjectOptionsViewModelTests
         var sut = new ProjectOptionsViewModel(data) { Currency = "$" };
 
         sut.OnSave().Should().BeTrue();
-        data.Setup.Currency.Should().Be("$");
+        data.Setup.Currency.Value.Should().Be("$");
+    }
+
+    [Fact]
+    public void OnSave_ShowCurrencyChanged_ReturnsTrue()
+    {
+        var data = new AccountingData();
+        var sut = new ProjectOptionsViewModel(data) { ShowCurrency = true };
+
+        sut.OnSave().Should().BeTrue();
+        data.Setup.Currency.Show.Should().BeTrue();
     }
 
     [Fact]
@@ -171,6 +183,7 @@ public class ProjectOptionsViewModelTests
         sut.Organization.Should().Be("My Club");
         sut.Location.Should().Be("Hometown");
         sut.Currency.Should().Be("€");
+        sut.ShowCurrency.Should().BeTrue();
         sut.PageBreakBetweenAccounts.Should().BeTrue();
         sut.Signatures.Select(x => x.Text).Should().Equal("Treasurer", "Auditor");
     }
