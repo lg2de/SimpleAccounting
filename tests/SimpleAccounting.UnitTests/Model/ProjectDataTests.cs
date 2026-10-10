@@ -271,7 +271,7 @@ public class ProjectDataTests
         var processApi = Substitute.For<IProcess>();
         var settings = new Settings { SecuredDrives = ["K:\\"] };
         var sut = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
-        var accountingData = new AccountingData { Years = [new AccountingDataYear { Name = 2020 }] };
+        var accountingData = new AccountingData { Years = [new AccountingDataYearsYear { Name = 2020 }] };
         fileSystem.FileExists("the.fileName").Returns(true);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(accountingData.Serialize());
 

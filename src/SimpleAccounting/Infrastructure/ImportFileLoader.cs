@@ -59,18 +59,18 @@ internal sealed partial class ImportFileLoader : IDisposable
     {
         var dateField =
             this.importMapping.Columns
-                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)?.Source
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Date)?.Source
             ?? "date";
         var nameField =
             this.importMapping.Columns
-                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Name)?.Source
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Name)?.Source
             ?? "name";
         var textField =
             this.importMapping.Columns
-                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Text);
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Text);
         var valueField =
             this.importMapping.Columns
-                .Find(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value)?.Source
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Value)?.Source
             ?? "value";
 
         using var csv = new CsvReader(reader, configuration);
@@ -95,7 +95,7 @@ internal sealed partial class ImportFileLoader : IDisposable
         CsvReader csv,
         string dateField,
         string nameField,
-        AccountDefinitionImportMappingColumn? textField,
+        AccountDefinitionImportMappingColumnsColumn? textField,
         string valueField)
     {
         // date and value are required
@@ -119,16 +119,19 @@ internal sealed partial class ImportFileLoader : IDisposable
             text = this.duplicateSpaceExpression.Replace(text, " ");
         }
 
-        var item = new ImportEntryViewModel(this.accounts) { Date = date, Name = name ?? string.Empty, Text = text, Value = value };
+        var item = new ImportEntryViewModel(this.accounts)
+        {
+            Date = date, Name = name ?? string.Empty, Text = text, Value = value
+        };
 
         var modelValue = value.ToModelValue();
-        var patterns = this.importMapping.Patterns ?? Enumerable.Empty<AccountDefinitionImportMappingPattern>();
+        var patterns = this.importMapping.Patterns ?? Enumerable.Empty<AccountDefinitionImportMappingPatternsPattern>();
         var matchedPattern = patterns.FirstOrDefault(PatternPredicate);
         item.RemoteAccount = this.accounts.SingleOrDefault(a => a.ID == matchedPattern?.AccountID);
 
         return item;
 
-        bool PatternPredicate(AccountDefinitionImportMappingPattern pattern)
+        bool PatternPredicate(AccountDefinitionImportMappingPatternsPattern pattern)
         {
             if (!pattern.Regex.IsMatch(text))
             {

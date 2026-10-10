@@ -164,7 +164,7 @@ public class ImportBookingsViewModelTests
         {
             Accounts =
             [
-                new AccountingDataAccountGroup
+                new AccountingDataAccountsAccountGroup
                 {
                     Name = "Default",
                     Account =
@@ -178,21 +178,25 @@ public class ImportBookingsViewModelTests
                             {
                                 Columns =
                                 [
-                                    new AccountDefinitionImportMappingColumn
+                                    new AccountDefinitionImportMappingColumnsColumn
                                     {
-                                        Source = "Date", Target = AccountDefinitionImportMappingColumnTarget.Date
+                                        Source = "Date",
+                                        Target = AccountDefinitionImportMappingColumnsColumnTarget.Date
                                     },
-                                    new AccountDefinitionImportMappingColumn
+                                    new AccountDefinitionImportMappingColumnsColumn
                                     {
-                                        Source = "Name", Target = AccountDefinitionImportMappingColumnTarget.Name
+                                        Source = "Name",
+                                        Target = AccountDefinitionImportMappingColumnsColumnTarget.Name
                                     },
-                                    new AccountDefinitionImportMappingColumn
+                                    new AccountDefinitionImportMappingColumnsColumn
                                     {
-                                        Source = "Text", Target = AccountDefinitionImportMappingColumnTarget.Text
+                                        Source = "Text",
+                                        Target = AccountDefinitionImportMappingColumnsColumnTarget.Text
                                     },
-                                    new AccountDefinitionImportMappingColumn
+                                    new AccountDefinitionImportMappingColumnsColumn
                                     {
-                                        Source = "Value", Target = AccountDefinitionImportMappingColumnTarget.Value
+                                        Source = "Value",
+                                        Target = AccountDefinitionImportMappingColumnsColumnTarget.Value
                                     }
                                 ]
                             }

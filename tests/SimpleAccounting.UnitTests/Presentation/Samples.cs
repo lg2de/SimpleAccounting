@@ -34,7 +34,7 @@ internal static class Samples
             {
                 Accounts =
                 [
-                    new AccountingDataAccountGroup
+                    new AccountingDataAccountsAccountGroup
                     {
                         Name = "Default",
                         Account =
@@ -48,32 +48,32 @@ internal static class Samples
                                 {
                                     Columns =
                                     [
-                                        new AccountDefinitionImportMappingColumn
+                                        new AccountDefinitionImportMappingColumnsColumn
                                         {
                                             Source = "Date",
                                             Target =
-                                                AccountDefinitionImportMappingColumnTarget
+                                                AccountDefinitionImportMappingColumnsColumnTarget
                                                     .Date
                                         },
-                                        new AccountDefinitionImportMappingColumn
+                                        new AccountDefinitionImportMappingColumnsColumn
                                         {
                                             Source = "Name",
                                             Target =
-                                                AccountDefinitionImportMappingColumnTarget
+                                                AccountDefinitionImportMappingColumnsColumnTarget
                                                     .Name
                                         },
-                                        new AccountDefinitionImportMappingColumn
+                                        new AccountDefinitionImportMappingColumnsColumn
                                         {
                                             Source = "Text",
                                             Target =
-                                                AccountDefinitionImportMappingColumnTarget
+                                                AccountDefinitionImportMappingColumnsColumnTarget
                                                     .Text
                                         },
-                                        new AccountDefinitionImportMappingColumn
+                                        new AccountDefinitionImportMappingColumnsColumn
                                         {
                                             Source = "Value",
                                             Target =
-                                                AccountDefinitionImportMappingColumnTarget
+                                                AccountDefinitionImportMappingColumnsColumnTarget
                                                     .Value
                                         }
                                     ]
@@ -87,7 +87,7 @@ internal static class Samples
                             }
                         ]
                     },
-                    new AccountingDataAccountGroup
+                    new AccountingDataAccountsAccountGroup
                     {
                         Name = "Second",
                         Account =
@@ -158,14 +158,14 @@ internal static class Samples
             {
                 Columns =
                 [
-                    new AccountDefinitionImportMappingColumn
+                    new AccountDefinitionImportMappingColumnsColumn
                     {
-                        Target = AccountDefinitionImportMappingColumnTarget.Date, Source = "Date"
+                        Target = AccountDefinitionImportMappingColumnsColumnTarget.Date, Source = "Date"
                     },
 
-                    new AccountDefinitionImportMappingColumn
+                    new AccountDefinitionImportMappingColumnsColumn
                     {
-                        Target = AccountDefinitionImportMappingColumnTarget.Value, Source = "Value"
+                        Target = AccountDefinitionImportMappingColumnsColumnTarget.Value, Source = "Value"
                     }
                 ]
             };

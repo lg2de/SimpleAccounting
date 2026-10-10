@@ -264,9 +264,9 @@ internal class EditBookingViewModel : Screen
         return newBooking;
     }
 
-    public void AddTemplates(AccountingDataSetupBookingTemplates bookingTemplates)
+    public void AddTemplates(IEnumerable<AccountingDataSetupBookingTemplatesTemplate> bookingTemplates)
     {
-        bookingTemplates.Template
+        bookingTemplates
             .Select(
                 t => new BookingTemplate
                 {

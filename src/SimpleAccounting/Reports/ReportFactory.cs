@@ -41,7 +41,7 @@ internal class ReportFactory : IReportFactory
 
     public ITotalsAndBalancesReport CreateTotalsAndBalances(
         IProjectData projectData,
-        IEnumerable<AccountingDataAccountGroup> accounts)
+        IEnumerable<AccountingDataAccountsAccountGroup> accounts)
     {
         return new TotalsAndBalancesReport(new XmlPrinter(), projectData, this.clock, accounts);
     }

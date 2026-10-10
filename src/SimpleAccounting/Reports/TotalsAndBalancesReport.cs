@@ -17,7 +17,7 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
 {
     public const string ResourceName = "TotalsAndBalances.xml";
 
-    private readonly List<AccountingDataAccountGroup> accountGroups;
+    private readonly List<AccountingDataAccountsAccountGroup> accountGroups;
     private int accountsPerGroup;
     private long groupOpeningCredit;
     private long groupOpeningDebit;
@@ -43,7 +43,7 @@ internal class TotalsAndBalancesReport : ReportBase, ITotalsAndBalancesReport
         IXmlPrinter printer,
         IProjectData projectData,
         IClock clock,
-        IEnumerable<AccountingDataAccountGroup> accountGroups)
+        IEnumerable<AccountingDataAccountsAccountGroup> accountGroups)
         : base(ResourceName, printer, projectData, clock)
     {
         this.accountGroups = accountGroups.ToList();

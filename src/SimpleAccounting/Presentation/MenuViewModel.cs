@@ -275,7 +275,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
 
     private void OnAssetBalancesReport()
     {
-        var accountGroups = new List<AccountingDataAccountGroup>();
+        var accountGroups = new List<AccountingDataAccountsAccountGroup>();
         foreach (var group in this.projectData.Storage.Accounts)
         {
             var assertAccounts = group.Account
@@ -286,7 +286,7 @@ internal class MenuViewModel : Screen, IMenuViewModel
                 continue;
             }
 
-            accountGroups.Add(new AccountingDataAccountGroup { Name = group.Name, Account = assertAccounts });
+            accountGroups.Add(new AccountingDataAccountsAccountGroup { Name = group.Name, Account = assertAccounts });
         }
 
         var report = this.reportFactory.CreateTotalsAndBalances(this.projectData, accountGroups);

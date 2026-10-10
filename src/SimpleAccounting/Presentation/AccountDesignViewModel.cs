@@ -27,7 +27,7 @@ internal class AccountDesignViewModel : AccountViewModel
         this.Type = AccountDefinitionType.Credit;
         this.IsActivated = true;
 
-        this.Groups = new List<AccountingDataAccountGroup> { new() { Name = "MyGroup" } };
+        this.Groups = new List<AccountingDataAccountsAccountGroup> { new() { Name = "MyGroup" } };
         this.Group = this.Groups.First();
 
         this.IsImportActive = true;

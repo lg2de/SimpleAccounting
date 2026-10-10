@@ -42,30 +42,27 @@ public class ProjectOptionsViewModelTests
         {
             Setup =
             {
-                BookingTemplates = new AccountingDataSetupBookingTemplates
-                {
-                    Template =
-                    [
-                        new AccountingDataSetupBookingTemplatesTemplate
-                        {
-                            Text = "Fee",
-                            Value = 5000,
-                            ValueSpecified = true,
-                            Debit = 100,
-                            DebitSpecified = true,
-                            Credit = 400,
-                            CreditSpecified = true
-                        },
-                        new AccountingDataSetupBookingTemplatesTemplate
-                        {
-                            Text = "Old", Credit = 900, CreditSpecified = true
-                        }
-                    ]
-                }
+                BookingTemplates =
+                [
+                    new AccountingDataSetupBookingTemplatesTemplate
+                    {
+                        Text = "Fee",
+                        Value = 5000,
+                        ValueSpecified = true,
+                        Debit = 100,
+                        DebitSpecified = true,
+                        Credit = 400,
+                        CreditSpecified = true
+                    },
+                    new AccountingDataSetupBookingTemplatesTemplate
+                    {
+                        Text = "Old", Credit = 900, CreditSpecified = true
+                    }
+                ]
             },
             Accounts =
             [
-                new AccountingDataAccountGroup
+                new AccountingDataAccountsAccountGroup
                 {
                     Name = "Default",
                     Account =
@@ -97,7 +94,7 @@ public class ProjectOptionsViewModelTests
         {
             Accounts =
             [
-                new AccountingDataAccountGroup
+                new AccountingDataAccountsAccountGroup
                 {
                     Name = "Assets",
                     Account =
@@ -106,7 +103,7 @@ public class ProjectOptionsViewModelTests
                         new AccountDefinition { ID = 200, Name = "Cash", Type = AccountDefinitionType.Asset }
                     ]
                 },
-                new AccountingDataAccountGroup { Name = "Empty", Account = [] }
+                new AccountingDataAccountsAccountGroup { Name = "Empty", Account = [] }
             ]
         };
         return data;
@@ -378,7 +375,7 @@ public class ProjectOptionsViewModelTests
 
         sut.OnSave().Should().BeTrue();
 
-        data.Setup.BookingTemplates.Template[^1].Should().BeEquivalentTo(
+        data.Setup.BookingTemplates[^1].Should().BeEquivalentTo(
             new
             {
                 Text = "New",
@@ -400,7 +397,7 @@ public class ProjectOptionsViewModelTests
 
         sut.OnSave().Should().BeTrue();
 
-        data.Setup.BookingTemplates.Template[0].ValueSpecified.Should().BeFalse();
+        data.Setup.BookingTemplates[0].ValueSpecified.Should().BeFalse();
     }
 
     [Fact]
@@ -579,7 +576,10 @@ public class ProjectOptionsViewModelTests
     [Fact]
     public void RemoveAccountGroupCommand_LastGroup_CannotExecute()
     {
-        var data = new AccountingData { Accounts = [new AccountingDataAccountGroup { Name = "Only", Account = [] }] };
+        var data = new AccountingData
+        {
+            Accounts = [new AccountingDataAccountsAccountGroup { Name = "Only", Account = [] }]
+        };
         var sut = new ProjectOptionsViewModel(data);
         sut.SelectedAccountGroup = sut.AccountGroups[0];
 
@@ -602,8 +602,8 @@ public class ProjectOptionsViewModelTests
         sut.AccountGroups[1].Name = " ASSETS ";
 
         using var _ = new AssertionScope();
-        sut.AccountGroups.Should().AllSatisfy(
-            x => ((IDataErrorInfo)x)[nameof(x.Name)].Should().Be(Resources.ProjectOptions_GroupNameDuplicated));
+        sut.AccountGroups.Should().AllSatisfy(x =>
+            ((IDataErrorInfo)x)[nameof(x.Name)].Should().Be(Resources.ProjectOptions_GroupNameDuplicated));
         sut.SaveCommand.CanExecute(null).Should().BeFalse();
     }
 

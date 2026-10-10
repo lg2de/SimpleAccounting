@@ -15,7 +15,7 @@ using lg2de.SimpleAccounting.Properties;
 /// </summary>
 public sealed class AccountGroupViewModel : PropertyChangedBase, IDataErrorInfo
 {
-    public AccountGroupViewModel(AccountingDataAccountGroup? model, Func<AccountGroupViewModel, bool> isNameUnique)
+    public AccountGroupViewModel(AccountingDataAccountsAccountGroup? model, Func<AccountGroupViewModel, bool> isNameUnique)
     {
         this.Model = model;
         this.IsNameUnique = isNameUnique;
@@ -40,7 +40,7 @@ public sealed class AccountGroupViewModel : PropertyChangedBase, IDataErrorInfo
     /// <summary>
     ///     Gets the existing group in the project, or <c>null</c> for a new group.
     /// </summary>
-    internal AccountingDataAccountGroup? Model { get; }
+    internal AccountingDataAccountsAccountGroup? Model { get; }
 
     private Func<AccountGroupViewModel, bool> IsNameUnique { get; }
 

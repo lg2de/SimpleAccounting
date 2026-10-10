@@ -40,7 +40,7 @@ public class ProjectOptionsViewModel : Screen
         this.Signatures = new ObservableCollection<SignatureViewModel>(
             (data.Setup.Reports?.TotalsAndBalancesReport ?? []).Select(x => new SignatureViewModel { Text = x }));
 
-        var templates = data.Setup.BookingTemplates?.Template ?? [];
+        var templates = data.Setup.BookingTemplates ?? [];
         var referencedAccounts = templates.SelectMany(x => new[] { GetDebit(x), GetCredit(x) }).ToHashSet();
         this.TemplateAccounts =
         [
@@ -211,7 +211,7 @@ public class ProjectOptionsViewModel : Screen
         items.Move(index, newIndex);
     }
 
-    private AccountGroupViewModel CreateAccountGroup(AccountingDataAccountGroup? model)
+    private AccountGroupViewModel CreateAccountGroup(AccountingDataAccountsAccountGroup? model)
     {
         var group = new AccountGroupViewModel(model, this.IsAccountGroupNameUnique);
         group.PropertyChanged += (sender, args) =>
@@ -295,7 +295,7 @@ public class ProjectOptionsViewModel : Screen
 
     private bool SaveBookingTemplates(AccountingDataSetup setup)
     {
-        var oldTemplates = (setup.BookingTemplates?.Template ?? [])
+        var oldTemplates = (setup.BookingTemplates ?? [])
             .Select(x => (x.Text, Value: GetValue(x), Debit: GetDebit(x), Credit: GetCredit(x)));
         var newTemplates = this.BookingTemplates
             .Select(x => (Text: x.Text.Trim(), Value: x.Value?.ToModelValue(), Debit: x.DebitAccount.ID,
@@ -306,23 +306,19 @@ public class ProjectOptionsViewModel : Screen
             return false;
         }
 
-        // avoid empty XML element
         setup.BookingTemplates = newTemplates.Count == 0
             ? null
-            : new AccountingDataSetupBookingTemplates
-            {
-                Template = newTemplates.Select(
-                    x => new AccountingDataSetupBookingTemplatesTemplate
-                    {
-                        Text = x.Text,
-                        Value = x.Value ?? 0,
-                        ValueSpecified = x.Value.HasValue,
-                        Debit = x.Debit,
-                        DebitSpecified = x.Debit > 0,
-                        Credit = x.Credit,
-                        CreditSpecified = x.Credit > 0
-                    }).ToList()
-            };
+            : newTemplates.Select(
+                x => new AccountingDataSetupBookingTemplatesTemplate
+                {
+                    Text = x.Text,
+                    Value = x.Value ?? 0,
+                    ValueSpecified = x.Value.HasValue,
+                    Debit = x.Debit,
+                    DebitSpecified = x.Debit > 0,
+                    Credit = x.Credit,
+                    CreditSpecified = x.Credit > 0
+                }).ToList();
         return true;
     }
 
@@ -333,7 +329,7 @@ public class ProjectOptionsViewModel : Screen
         this.data.Accounts ??= [];
         var groups = this.data.Accounts;
         var newGroups = this.AccountGroups
-            .Select(x => (ViewModel: x, Model: x.Model ?? new AccountingDataAccountGroup { Account = [] }))
+            .Select(x => (ViewModel: x, Model: x.Model ?? new AccountingDataAccountsAccountGroup { Account = [] }))
             .ToList();
 
         bool changed = !groups.SequenceEqual(newGroups.Select(x => x.Model));

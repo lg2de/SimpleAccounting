@@ -8,8 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Serialization;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Infrastructure;
@@ -24,6 +26,8 @@ public partial class AccountingData
 
     private const string DefaultSchemaNamespace = "https://lg2.de/SimpleAccounting/AccountingSchema";
     private const string DefaultSchemaLocation = "https://lg2de.github.io/SimpleAccounting/AccountingData.xsd";
+
+    private static readonly XmlSerializer Serializer = new(typeof(AccountingData));
 
     private string schema = DefaultXsiSchemaLocation;
 
@@ -57,6 +61,28 @@ public partial class AccountingData
         this.Accounts?.SelectMany(g => g.Account) ?? Enumerable.Empty<AccountDefinition>();
 
     /// <summary>
+    ///     Deserializes the project from the specified XML.
+    /// </summary>
+    public static AccountingData Deserialize(string xml)
+    {
+        using var stringReader = new StringReader(xml);
+        using var xmlReader = XmlReader.Create(stringReader);
+        return (AccountingData)Serializer.Deserialize(xmlReader)!;
+    }
+
+    /// <summary>
+    ///     Serializes the project into XML.
+    /// </summary>
+    public string Serialize()
+    {
+        using var memoryStream = new MemoryStream();
+        Serializer.Serialize(memoryStream, this);
+        memoryStream.Seek(0, SeekOrigin.Begin);
+        using var streamReader = new StreamReader(memoryStream);
+        return streamReader.ReadToEnd();
+    }
+
+    /// <summary>
     ///     Creates new project with some template data.
     /// </summary>
     /// <param name="currentYear">The current year number to create initial booking year.</param>
@@ -79,7 +105,7 @@ public partial class AccountingData
         return new AccountingData
         {
             Setup = new AccountingDataSetup(),
-            Accounts = [new AccountingDataAccountGroup { Name = "Default", Account = defaultAccounts }],
+            Accounts = [new AccountingDataAccountsAccountGroup { Name = "Default", Account = defaultAccounts }],
             Journal = [accountJournal]
         };
     }
@@ -262,9 +288,9 @@ public partial class AccountingDataSetup
 {
     public AccountingDataSetup()
     {
-        this.behaviorField = new AccountingDataSetupBehavior();
-        this.reportsField = new AccountingDataSetupReports();
-        this.currencyField = new AccountingDataSetupCurrency { Value = AccountingDataSetupCurrency.DefaultValue };
+        this.Behavior = new AccountingDataSetupBehavior();
+        this.Reports = new AccountingDataSetupReports();
+        this.Currency = new AccountingDataSetupCurrency { Value = AccountingDataSetupCurrency.DefaultValue };
     }
 }
 
@@ -305,8 +331,8 @@ public partial class AccountDefinitionImportMapping
         }
 
         return
-            this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnTarget.Date)
-            && this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnTarget.Value);
+            this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Date)
+            && this.Columns.Exists(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Value);
     }
 }
 
@@ -362,7 +388,7 @@ public partial class AccountDefinition
 /// <summary>
 ///     Implements a single pattern of an account definition for semi-automatic import.
 /// </summary>
-public partial class AccountDefinitionImportMappingPattern
+public partial class AccountDefinitionImportMappingPatternsPattern
 {
     private Regex? regex;
     internal Regex Regex => this.regex ??= new Regex(this.Expression, RegexOptions.Compiled, TimeSpan.FromSeconds(1));

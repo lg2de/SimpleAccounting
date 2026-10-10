@@ -91,7 +91,10 @@ public partial class ShellViewModelTests
         {
             Accounts =
             [
-                new AccountingDataAccountGroup { Account = [new AccountDefinition { ID = 1, Name = "TheAccount" }] }
+                new AccountingDataAccountsAccountGroup
+                {
+                    Account = [new AccountDefinition { ID = 1, Name = "TheAccount" }]
+                }
             ]
         };
         fileSystem.FileExists("recent.project").Returns(true);
@@ -126,7 +129,10 @@ public partial class ShellViewModelTests
         {
             Accounts =
             [
-                new AccountingDataAccountGroup { Account = [new AccountDefinition { ID = 1, Name = "TheAccount" }] }
+                new AccountingDataAccountsAccountGroup
+                {
+                    Account = [new AccountDefinition { ID = 1, Name = "TheAccount" }]
+                }
             ]
         };
         fileSystem.FileExists("recent.project").Returns(true);

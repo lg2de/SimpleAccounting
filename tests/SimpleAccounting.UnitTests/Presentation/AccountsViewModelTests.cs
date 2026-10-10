@@ -25,7 +25,7 @@ public class AccountsViewModelTests
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Group",
                 Account =
@@ -52,13 +52,13 @@ public class AccountsViewModelTests
         ];
         projectData.Storage.Accounts[^1].Account[^1].ImportMapping.Patterns =
         [
-            new AccountDefinitionImportMappingPattern { Expression = "OnlyAccount", AccountID = 1 },
-            new AccountDefinitionImportMappingPattern
+            new AccountDefinitionImportMappingPatternsPattern { Expression = "OnlyAccount", AccountID = 1 },
+            new AccountDefinitionImportMappingPatternsPattern
             {
                 Expression = "ValueSpecified", ValueSpecified = true, AccountID = 2
             },
 
-            new AccountDefinitionImportMappingPattern
+            new AccountDefinitionImportMappingPatternsPattern
             {
                 Expression = "ValueSet", Value = 5, ValueSpecified = true, AccountID = 3
             }
@@ -121,7 +121,7 @@ public class AccountsViewModelTests
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Group",
                 Account =
@@ -134,7 +134,10 @@ public class AccountsViewModelTests
         ];
         projectData.Storage.Accounts[0].Account[0].ImportMapping = new AccountDefinitionImportMapping
         {
-            Patterns = [new AccountDefinitionImportMappingPattern { Expression = "Expression", AccountID = 2 }]
+            Patterns =
+            [
+                new AccountDefinitionImportMappingPatternsPattern { Expression = "Expression", AccountID = 2 }
+            ]
         };
         sut.OnDataLoaded();
 
@@ -156,7 +159,7 @@ public class AccountsViewModelTests
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Group",
                 Account =
@@ -185,7 +188,7 @@ public class AccountsViewModelTests
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Group",
                 Account =
@@ -195,15 +198,12 @@ public class AccountsViewModelTests
                 ]
             }
         ];
-        projectData.Storage.Setup.BookingTemplates = new AccountingDataSetupBookingTemplates
-        {
-            Template =
-            [
-                new AccountingDataSetupBookingTemplatesTemplate { Text = "Debit", Debit = 200, Credit = 100 },
-                new AccountingDataSetupBookingTemplatesTemplate { Text = "Credit", Debit = 100, Credit = 200 },
-                new AccountingDataSetupBookingTemplatesTemplate { Text = "Other", Debit = 100 }
-            ]
-        };
+        projectData.Storage.Setup.BookingTemplates =
+        [
+            new AccountingDataSetupBookingTemplatesTemplate { Text = "Debit", Debit = 200, Credit = 100 },
+            new AccountingDataSetupBookingTemplatesTemplate { Text = "Credit", Debit = 100, Credit = 200 },
+            new AccountingDataSetupBookingTemplatesTemplate { Text = "Other", Debit = 100 }
+        ];
         sut.OnDataLoaded();
         windowManager
             .ShowDialogAsync(Arg.Do<object>(o => ((AccountViewModel)o).Identifier = 101))
@@ -211,12 +211,11 @@ public class AccountsViewModelTests
 
         await sut.OnEditAccountAsync(sut.AccountList.Single(x => x.Identifier == 100));
 
-        projectData.Storage.Setup.BookingTemplates.Template.Should().BeEquivalentTo(
+        projectData.Storage.Setup.BookingTemplates.Should().BeEquivalentTo(
             new object[]
             {
                 new { Text = "Debit", Debit = 200, Credit = 101 },
-                new { Text = "Credit", Debit = 101, Credit = 200 },
-                new { Text = "Other", Debit = 101, Credit = 0 }
+                new { Text = "Credit", Debit = 101, Credit = 200 }, new { Text = "Other", Debit = 101, Credit = 0 }
             }, o => o.WithStrictOrdering());
     }
 
@@ -239,7 +238,7 @@ public class AccountsViewModelTests
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Group",
                 Account =
@@ -258,8 +257,8 @@ public class AccountsViewModelTests
         ];
         projectData.Storage.Accounts[0].Account[0].ImportMapping.Patterns =
         [
-            new AccountDefinitionImportMappingPattern { Expression = "Salary", AccountID = 2 },
-            new AccountDefinitionImportMappingPattern { Expression = "Shop", AccountID = 3 }
+            new AccountDefinitionImportMappingPatternsPattern { Expression = "Salary", AccountID = 2 },
+            new AccountDefinitionImportMappingPatternsPattern { Expression = "Shop", AccountID = 3 }
         ];
         sut.OnDataLoaded();
 
@@ -288,7 +287,7 @@ public class AccountsViewModelTests
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Group",
                 Account =
@@ -317,7 +316,7 @@ public class AccountsViewModelTests
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Group",
                 Account =
@@ -342,17 +341,16 @@ public class AccountsViewModelTests
         var windowManager = Substitute.For<IWindowManager>();
         var clock = Substitute.For<IClock>();
         windowManager.ShowDialogAsync(
-            Arg.Do<object>(
-                o =>
-                {
-                    var vm = ((AccountViewModel)o);
-                    vm.Group = vm.Groups.ToArray()[1];
-                })).Returns(true);
+            Arg.Do<object>(o =>
+            {
+                var vm = ((AccountViewModel)o);
+                vm.Group = vm.Groups.ToArray()[1];
+            })).Returns(true);
         var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
         var sut = new AccountsViewModel(windowManager, projectData);
         projectData.Storage.Accounts =
         [
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Group1",
                 Account =
@@ -361,7 +359,7 @@ public class AccountsViewModelTests
                     new AccountDefinition { ID = 2, Name = "Income", Type = AccountDefinitionType.Income }
                 ]
             },
-            new AccountingDataAccountGroup
+            new AccountingDataAccountsAccountGroup
             {
                 Name = "Group2",
                 Account =
