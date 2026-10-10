@@ -67,7 +67,7 @@
 
     <ComboBox
       Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
-      MinWidth="200" IsEditable="True"
+      MinWidth="200" IsEditable="True" IsTextSearchEnabled="False"
       Text="{Binding BookingText}"
       ItemsSource="{Binding BindingTemplates}"
       SelectedItem="{Binding SelectedTemplate}"
