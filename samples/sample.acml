@@ -41,5 +41,4 @@
       <Credit Value="15000" Account="400" Text="Annual extra salary" />
     </Booking>
   </Journal>
-  <OpenIssues />
 </AccountingData>
