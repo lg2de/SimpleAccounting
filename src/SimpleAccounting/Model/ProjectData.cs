@@ -123,7 +123,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         }
 
         var loader = new ProjectFileLoader(this.Settings, this.dialogs, this.fileSystem, this.processApi);
-        var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName));
+        var loadResult = await Task.Run(() => loader.LoadAsync(projectFileName), CancellationToken.None);
         if (loadResult != OperationResult.Completed)
         {
             return loadResult;
@@ -155,7 +155,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         this.savingCompleted = new TaskCompletionSource();
         try
         {
-            await this.saveSynchronization.WaitAsync();
+            await this.saveSynchronization.WaitAsync(CancellationToken.None);
 
             var fileDate = this.fileSystem.GetLastWriteTime(this.FileName);
             var backupFileName = $"{this.FileName}.{fileDate:yyyyMMddHHmmss}";
@@ -177,7 +177,8 @@ internal sealed class ProjectData : IProjectData, IDisposable
         }
         finally
         {
-            await Task.WhenAny(this.savingCompleted.Task, Task.Delay(TimeSpan.FromSeconds(1)));
+            await Task.WhenAny(
+                this.savingCompleted.Task, Task.Delay(TimeSpan.FromSeconds(1), CancellationToken.None));
             this.savingCompleted = null;
             this.saveSynchronization.Release();
         }
@@ -198,7 +199,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
         }
 
         this.cancellationTokenSource?.Cancel();
-        this.autoSaveTask.Wait(TimeSpan.FromSeconds(2));
+        this.autoSaveTask.Wait(TimeSpan.FromSeconds(2), CancellationToken.None);
         this.fileSystem.WriteAllTextIntoFile(this.AutoSaveFileName, this.Storage.Serialize());
     }
 
@@ -338,8 +339,8 @@ internal sealed class ProjectData : IProjectData, IDisposable
             .ToList().ForEach(viewModel.Accounts.Add);
 
         // restore project options
-        var textOption = viewModel.TextOptions.Single(
-            x => x.Option == this.Storage.Setup.Behavior.ParsedOpeningTextPattern);
+        var textOption =
+            viewModel.TextOptions.Single(x => x.Option == this.Storage.Setup.Behavior.ParsedOpeningTextPattern);
         viewModel.TextOption = textOption;
         var remoteAccount =
             viewModel.Accounts.FirstOrDefault(x => x.ID == this.Storage.Setup.Behavior.LastCarryForward);
@@ -431,7 +432,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
                     this.IsModified = false;
                     this.NewProject();
                 }
-            });
+            }, CancellationToken.None);
     }
 
     private async Task AutoSaveAsync(CancellationToken cancellationToken)
