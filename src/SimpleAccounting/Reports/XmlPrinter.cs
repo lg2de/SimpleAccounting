@@ -249,6 +249,7 @@ internal class XmlPrinter : IXmlPrinter
                 XmlNode transformingNode = nextNode;
                 nextNode = nextNode.NextSibling;
 
+                bool skipNode = false;
                 switch (transformingNode.Name)
                 {
                 case MoveNode:
@@ -259,6 +260,7 @@ internal class XmlPrinter : IXmlPrinter
                     break;
                 case TableNode:
                     this.TransformTable(transformingNode, referenceGraphics);
+                    skipNode = true;
                     break;
                 case PageTextsNode:
                     this.pageTextsNode = transformingNode;
@@ -276,7 +278,10 @@ internal class XmlPrinter : IXmlPrinter
                     break;
                 }
 
-                TransformNodes(transformingNode.FirstChild!);
+                if (!skipNode)
+                {
+                    TransformNodes(transformingNode.FirstChild!);
+                }
 
                 if (nextNode != null
                     && this.CursorY >= this.DocumentHeight - this.DocumentBottomMargin)
