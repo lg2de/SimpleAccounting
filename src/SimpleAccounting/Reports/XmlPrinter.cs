@@ -249,7 +249,6 @@ internal class XmlPrinter : IXmlPrinter
                 XmlNode transformingNode = nextNode;
                 nextNode = nextNode.NextSibling;
 
-                bool skipNode = false;
                 switch (transformingNode.Name)
                 {
                 case MoveNode:
@@ -260,8 +259,8 @@ internal class XmlPrinter : IXmlPrinter
                     break;
                 case TableNode:
                     this.TransformTable(transformingNode, referenceGraphics);
-                    skipNode = true;
-                    break;
+                    InsertPageBreakIfRequired(nextNode);
+                    continue;
                 case PageTextsNode:
                     this.pageTextsNode = transformingNode;
                     this.InsertPageTexts(transformingNode, 1);
@@ -272,26 +271,30 @@ internal class XmlPrinter : IXmlPrinter
                     break;
                 case FontNode:
                     this.ProcessFontNode(transformingNode, () => TransformNodes(transformingNode.FirstChild!));
+                    InsertPageBreakIfRequired(nextNode);
                     continue;
                 default:
                     // nothing to do
                     break;
                 }
 
-                if (!skipNode)
-                {
-                    TransformNodes(transformingNode.FirstChild!);
-                }
-
-                if (nextNode != null
-                    && this.CursorY >= this.DocumentHeight - this.DocumentBottomMargin)
-                {
-                    XmlNode newPage = this.Document.CreateElement(NewPageNode);
-                    nextNode.ParentNode!.InsertBefore(newPage, nextNode);
-
-                    this.ProcessNewPage();
-                }
+                TransformNodes(transformingNode.FirstChild!);
+                InsertPageBreakIfRequired(nextNode);
             }
+        }
+
+        void InsertPageBreakIfRequired(XmlNode? nextNode)
+        {
+            if (nextNode == null
+                || this.CursorY < this.DocumentHeight - this.DocumentBottomMargin)
+            {
+                return;
+            }
+
+            XmlNode newPage = this.Document.CreateElement(NewPageNode);
+            nextNode.ParentNode!.InsertBefore(newPage, nextNode);
+
+            this.ProcessNewPage();
         }
     }
 

@@ -782,6 +782,74 @@ public class XmlPrinterTests
     }
 
     [Fact]
+    public void TransformDocument_TableEndsAtBottom_NewPageAfterTable()
+    {
+        var sut = new XmlPrinter { DocumentHeight = 12 };
+        sut.LoadXml(
+            "<root>"
+            + "<table><columns>"
+            + "<column width=\"10\">C1</column>"
+            + "</columns><data>"
+            + "<tr><td>1</td></tr>"
+            + "<tr><td>2</td></tr>"
+            + "</data></table>"
+            + "<text>after</text>"
+            + "</root>");
+
+        var graphics = Substitute.For<IGraphics>();
+        sut.TransformDocument(graphics);
+
+        XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+            XDocument.Parse(
+                "<root>"
+                + "<text relX=\"0\">C1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">2</text>"
+                + "<move relY=\"4\" />"
+                + "<newPage />"
+                + "<text>after</text>"
+                + "</root>"));
+    }
+
+    [Fact]
+    public void TransformDocument_TableWithFontEndsAtBottom_NewPageAfterFont()
+    {
+        var sut = new XmlPrinter { DocumentHeight = 12 };
+        sut.LoadXml(
+            "<root>"
+            + "<font size=\"20\">"
+            + "<table><columns>"
+            + "<column width=\"10\">C1</column>"
+            + "</columns><data>"
+            + "<tr><td>1</td></tr>"
+            + "<tr><td>2</td></tr>"
+            + "</data></table>"
+            + "</font>"
+            + "<text>after</text>"
+            + "</root>");
+
+        var graphics = Substitute.For<IGraphics>();
+        sut.TransformDocument(graphics);
+
+        XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+            XDocument.Parse(
+                "<root>"
+                + "<font size=\"20\">"
+                + "<text relX=\"0\">C1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">2</text>"
+                + "<move relY=\"4\" />"
+                + "</font>"
+                + "<newPage />"
+                + "<text>after</text>"
+                + "</root>"));
+    }
+
+    [Fact]
     public void TransformDocument_TableTopLine_ConvertedToTexts()
     {
         var sut = new XmlPrinter { DocumentHeight = 100 };
