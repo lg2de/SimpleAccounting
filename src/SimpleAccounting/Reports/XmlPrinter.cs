@@ -49,6 +49,7 @@ internal class XmlPrinter : IXmlPrinter
     private const string TextNode = "text";
     private const string LineNode = "line";
     private const string FontNode = "font";
+    private const string SpaceCheckNode = "spaceCheck";
 
     private const string RelativeXNode = "relX";
     private const string RelativeYNode = "relY";
@@ -173,8 +174,8 @@ internal class XmlPrinter : IXmlPrinter
 
         this.printFactor = DefaultPrintFactor;
         var documentPaperSize = this.Document.DocumentElement.GetAttribute<string>(PaperSizeNode, "A4");
-        var paperSize = paperSizes.FirstOrDefault(
-            s => s.PaperName.StartsWith(documentPaperSize, StringComparison.CurrentCultureIgnoreCase));
+        var paperSize = paperSizes.FirstOrDefault(s => s.PaperName.StartsWith(
+            documentPaperSize, StringComparison.CurrentCultureIgnoreCase));
         if (paperSize != null)
         {
             printDocument.DefaultPageSettings.PaperSize = paperSize;
@@ -273,6 +274,17 @@ internal class XmlPrinter : IXmlPrinter
                     this.ProcessFontNode(transformingNode, () => TransformNodes(transformingNode.FirstChild!));
                     InsertPageBreakIfRequired(nextNode);
                     continue;
+                case SpaceCheckNode:
+                    if (int.TryParse(transformingNode.Attributes?["height"]?.Value, out var height)
+                        && this.CursorY + height > this.DocumentHeight - this.DocumentBottomMargin)
+                    {
+                        XmlNode newPage = this.Document.CreateElement(NewPageNode);
+                        transformingNode.ParentNode!.InsertBefore(newPage, transformingNode);
+                        this.ProcessNewPage();
+                    }
+
+                    transformingNode.ParentNode!.RemoveChild(transformingNode);
+                    break;
                 default:
                     // nothing to do
                     break;

@@ -38,7 +38,9 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
     {
         this.PreparePrintDocument();
 
-        XmlNode tableNode = this.PrintDocument.SelectSingleNode("//table")!;
+        XmlNode accountTemplate = this.PrintDocument.SelectSingleNode("//accountTemplate")!;
+        var insertPoint = accountTemplate.NextSibling;
+        accountTemplate.ParentNode!.RemoveChild(accountTemplate);
 
         this.firstAccount = true;
 
@@ -57,32 +59,31 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
                 continue;
             }
 
-            this.AddAccountSeparator(tableNode);
+            XmlNode? separatorNode = this.CreateSeparator();
+            if (separatorNode != null)
+            {
+                insertPoint!.ParentNode!.InsertBefore(separatorNode, insertPoint);
+            }
 
-            var titleFont = this.PrintDocument.CreateElement("font");
-            titleFont.SetAttribute("size", TitleSize);
-            titleFont.SetAttribute("bold", 1);
-            tableNode.ParentNode!.InsertBefore(titleFont, tableNode);
-
-            var titleNode = this.PrintDocument.CreateElement("text");
-            titleNode.InnerText = account.FormatName();
-            titleFont.AppendChild(titleNode);
-
-            var moveNode = this.PrintDocument.CreateElement("move");
-            moveNode.SetAttribute("relY", "5");
-            tableNode.ParentNode.InsertBefore(moveNode, tableNode);
-
-            var newTable = tableNode.CloneNode(deep: true);
-            tableNode.ParentNode.InsertBefore(newTable, tableNode);
-
-            var dataNode = newTable.SelectSingleNode("data")!;
+            XmlNode? dataNode = null;
+            foreach (XmlNode childNode in accountTemplate.ChildNodes)
+            {
+                var clone = childNode.CloneNode(deep: true);
+                insertPoint!.ParentNode!.InsertBefore(clone, insertPoint);
+                if (clone.Name == "table")
+                {
+                    dataNode = clone.SelectSingleNode("data");
+                }
+            }
+            
+            this.UpdatePlaceholder("AccountName", account.FormatName());
 
             this.creditTotal = 0;
             this.debitTotal = 0;
 
             foreach (var entry in accountEntries)
             {
-                this.AddBookingEntries(entry, account.ID, dataNode);
+                this.AddBookingEntries(entry, account.ID, dataNode!);
             }
 
             // sum
@@ -90,7 +91,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             {
                 XmlNode totalLineNode = this.PrintDocument.CreateElement("tr");
                 totalLineNode.SetAttribute("topLine", true);
-                dataNode.AppendChild(totalLineNode);
+                dataNode!.AppendChild(totalLineNode);
                 totalLineNode.AddTableNode(Resources.Word_Total).SetAttribute("align", "right");
                 totalLineNode.AddTableNode(string.Empty); // id
                 totalLineNode.AddTableNode(string.Empty); // text
@@ -102,7 +103,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             // balance
             XmlNode balanceLineNode = this.PrintDocument.CreateElement("tr");
             balanceLineNode.SetAttribute("topLine", true);
-            dataNode.AppendChild(balanceLineNode);
+            dataNode!.AppendChild(balanceLineNode);
             balanceLineNode.AddTableNode(Resources.Word_Balance).SetAttribute("align", "right");
             balanceLineNode.AddTableNode(string.Empty); // id
             balanceLineNode.AddTableNode(string.Empty); // text
@@ -120,17 +121,15 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             // empty remote account column
             balanceLineNode.AddTableNode(string.Empty);
         }
-
-        tableNode.ParentNode!.RemoveChild(tableNode);
     }
 
-    private void AddAccountSeparator(XmlNode tableNode)
+    private XmlNode? CreateSeparator()
     {
         if (this.firstAccount)
         {
             // skip separator for (before) first account
             this.firstAccount = false;
-            return;
+            return null;
         }
 
         XmlNode separatorNode;
@@ -143,8 +142,8 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             separatorNode = this.PrintDocument.CreateElement("move");
             separatorNode.SetAttribute("relY", "5");
         }
-
-        tableNode.ParentNode!.InsertBefore(separatorNode, tableNode);
+        
+        return separatorNode;
     }
 
     private void AddBookingEntries(AccountingDataJournalBooking entry, ulong accountIdentifier, XmlNode dataNode)
