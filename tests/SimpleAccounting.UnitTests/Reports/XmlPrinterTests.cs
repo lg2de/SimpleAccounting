@@ -17,7 +17,7 @@ using Xunit;
 public class XmlPrinterTests
 {
     private static readonly List<PaperSize> PaperSizes =
-        [new PaperSize("A4", (int)(210 / 0.254), (int)(297 / 0.254))];
+        [new("A4", (int)(210 / 0.254), (int)(297 / 0.254))];
 
     [Fact]
     public void LoadDocument_AccountJournalReport_Loaded()
@@ -782,6 +782,74 @@ public class XmlPrinterTests
     }
 
     [Fact]
+    public void TransformDocument_TableEndsAtBottom_NewPageAfterTable()
+    {
+        var sut = new XmlPrinter { DocumentHeight = 12 };
+        sut.LoadXml(
+            "<root>"
+            + "<table><columns>"
+            + "<column width=\"10\">C1</column>"
+            + "</columns><data>"
+            + "<tr><td>1</td></tr>"
+            + "<tr><td>2</td></tr>"
+            + "</data></table>"
+            + "<text>after</text>"
+            + "</root>");
+
+        var graphics = Substitute.For<IGraphics>();
+        sut.TransformDocument(graphics);
+
+        XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+            XDocument.Parse(
+                "<root>"
+                + "<text relX=\"0\">C1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">2</text>"
+                + "<move relY=\"4\" />"
+                + "<newPage />"
+                + "<text>after</text>"
+                + "</root>"));
+    }
+
+    [Fact]
+    public void TransformDocument_TableWithFontEndsAtBottom_NewPageAfterFont()
+    {
+        var sut = new XmlPrinter { DocumentHeight = 12 };
+        sut.LoadXml(
+            "<root>"
+            + "<font size=\"20\">"
+            + "<table><columns>"
+            + "<column width=\"10\">C1</column>"
+            + "</columns><data>"
+            + "<tr><td>1</td></tr>"
+            + "<tr><td>2</td></tr>"
+            + "</data></table>"
+            + "</font>"
+            + "<text>after</text>"
+            + "</root>");
+
+        var graphics = Substitute.For<IGraphics>();
+        sut.TransformDocument(graphics);
+
+        XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+            XDocument.Parse(
+                "<root>"
+                + "<font size=\"20\">"
+                + "<text relX=\"0\">C1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">1</text>"
+                + "<move relY=\"4\" />"
+                + "<text relX=\"0\">2</text>"
+                + "<move relY=\"4\" />"
+                + "</font>"
+                + "<newPage />"
+                + "<text>after</text>"
+                + "</root>"));
+    }
+
+    [Fact]
     public void TransformDocument_TableTopLine_ConvertedToTexts()
     {
         var sut = new XmlPrinter { DocumentHeight = 100 };
@@ -844,5 +912,87 @@ public class XmlPrinterTests
                 + "<text relX=\"0\">2</text>"
                 + "<move relY=\"20\" />"
                 + "</root>"));
+    }
+
+    [Fact]
+    public void TransformDocument_RequireSpaceNoHeight_NoAction()
+    {
+        var sut = new XmlPrinter();
+        sut.LoadXml("<root><requireSpace /></root>");
+        var graphics = Substitute.For<IGraphics>();
+        var document = new PrintDocument();
+        sut.SetupDocument(document, PaperSizes);
+
+        sut.TransformDocument(graphics);
+
+        using (new AssertionScope())
+        {
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse("<root />"));
+            sut.CursorX.Should().Be(0);
+            sut.CursorY.Should().Be(0);
+        }
+    }
+
+    [Fact]
+    public void TransformDocument_RequireSpaceSpaceRemaining_NoAction()
+    {
+        var sut = new XmlPrinter();
+        sut.LoadXml("<root><requireSpace height=\"10\" /></root>");
+        var graphics = Substitute.For<IGraphics>();
+        var document = new PrintDocument();
+        sut.SetupDocument(document, PaperSizes);
+
+        sut.TransformDocument(graphics);
+
+        using (new AssertionScope())
+        {
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse("<root />"));
+            sut.CursorX.Should().Be(0);
+            sut.CursorY.Should().Be(0);
+        }
+    }
+
+    [Fact]
+    public void TransformDocument_RequireSpaceFitsExactly_NoAction()
+    {
+        var sut = new XmlPrinter();
+        sut.LoadXml("<root><requireSpace height=\"10\" /></root>");
+        var graphics = Substitute.For<IGraphics>();
+        var document = new PrintDocument();
+        sut.SetupDocument(document, PaperSizes);
+        sut.CursorY = 287;
+
+        sut.TransformDocument(graphics);
+
+        using (new AssertionScope())
+        {
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse("<root />"));
+            sut.CursorX.Should().Be(0);
+            sut.CursorY.Should().Be(287);
+        }
+    }
+
+    [Fact]
+    public void TransformDocument_RequireSpaceNotEnoughSpace_NoAction()
+    {
+        var sut = new XmlPrinter();
+        sut.LoadXml("<root><requireSpace height=\"10\" /></root>");
+        var graphics = Substitute.For<IGraphics>();
+        var document = new PrintDocument();
+        sut.SetupDocument(document, PaperSizes);
+        sut.CursorY = 288;
+
+        sut.TransformDocument(graphics);
+
+        using (new AssertionScope())
+        {
+            XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(
+                XDocument.Parse("<root><newPage /></root>"));
+            sut.CursorX.Should().Be(0);
+            sut.CursorY.Should().Be(0);
+        }
     }
 }
