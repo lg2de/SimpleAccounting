@@ -170,7 +170,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, null!, clock, null!, null!), new FullJournalViewModel(projectData),
+                new MenuViewModel(projectData, busy, null!, clock, null!, null!, null!), new FullJournalViewModel(projectData),
                 new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate, null!, null!, null!,
                 new SystemClock());
         dialogs.ShowMessageBox(
@@ -482,7 +482,7 @@ public partial class ShellViewModelTests
             new ShellViewModel(
                 projectData,
                 busy,
-                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs, null!),
                 new FullJournalViewModel(projectData),
                 new AccountJournalViewModel(projectData), accountsViewModel, applicationUpdate, null!, null!, null!,
                 new SystemClock());
@@ -505,7 +505,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs, null!),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate, null!, null!, null!, null!);
         return sut;
@@ -526,7 +526,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs, null!),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate, null!, null!, null!, clock);
         return sut;
@@ -548,7 +548,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs, null!),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate, null!, null!, null!, new SystemClock());
         return sut;
@@ -570,7 +570,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs, null!),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate, null!, null!, null!, new SystemClock());
         return sut;
@@ -592,7 +592,7 @@ public partial class ShellViewModelTests
         var sut =
             new ShellViewModel(
                 projectData, busy,
-                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs),
+                new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs, null!),
                 new FullJournalViewModel(projectData), new AccountJournalViewModel(projectData),
                 accountsViewModel, applicationUpdate, null!, null!, null!, new SystemClock());
         return sut;

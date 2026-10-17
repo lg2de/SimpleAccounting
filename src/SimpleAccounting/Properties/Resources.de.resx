@@ -706,4 +706,37 @@ Fehlertext:</value>
   <data name="AccountsContextMenu_EditAccountGroups" xml:space="preserve">
     <value>Kontengruppen bearbeiten...</value>
   </data>
+  <data name="Menu_Project_Settings_Language" xml:space="preserve">
+    <value>Sprache</value>
+  </data>
+  <data name="Menu_Project_Settings_Theme" xml:space="preserve">
+    <value>Darstellung</value>
+  </data>
+  <data name="Menu_Project_Settings_ThemeLight" xml:space="preserve">
+    <value>Hell</value>
+  </data>
+  <data name="Menu_Project_Settings_ThemeDark" xml:space="preserve">
+    <value>Dunkel</value>
+  </data>
+  <data name="Menu_Project_Settings_ThemeSystem" xml:space="preserve">
+    <value>Systemeinstellung</value>
+  </data>
+  <data name="Word_Yes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="Word_No" xml:space="preserve">
+    <value>Nein</value>
+  </data>
+  <data name="Action_Print" xml:space="preserve">
+    <value>Drucken</value>
+  </data>
+  <data name="ReportPreview_FitWidth" xml:space="preserve">
+    <value>Seitenbreite</value>
+  </data>
+  <data name="ReportPreview_PageCountX" xml:space="preserve">
+    <value>{0} Seite(n)</value>
+  </data>
+  <data name="ReportPreview_FitPage" xml:space="preserve">
+    <value>Ganze Seite</value>
+  </data>
 </root>

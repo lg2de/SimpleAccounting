@@ -9,11 +9,16 @@
   mc:Ignorable="d"
   d:DesignWidth="400" d:DesignHeight="300"
   d:DataContext="{d:DesignInstance Type=local:BusyDesignControlModel, IsDesignTimeCreatable=True}">
-  <Grid Background="Gray" Opacity="0.5"
+  <Grid Background="{DynamicResource SmokeFillColorDefaultBrush}"
         Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-    <Rectangle Width="150" Height="50" Fill="White" />
-    <ProgressBar
-      Width="100" Height="20"
-      IsIndeterminate="True" />
+    <Border
+      Width="150" Height="50" CornerRadius="8"
+      Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+      BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+      <ProgressBar
+        Width="100"
+        VerticalAlignment="Center"
+        IsIndeterminate="True" />
+    </Border>
   </Grid>
 </UserControl>

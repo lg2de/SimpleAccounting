@@ -11,13 +11,13 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Forms;
 using System.Xml;
 using lg2de.SimpleAccounting.Abstractions;
 using lg2de.SimpleAccounting.Extensions;
+using lg2de.SimpleAccounting.Presentation;
 
 /// <summary>
-///     Implements the conversion of XML into print preview (Windows Forms).
+///     Implements the conversion of XML into print preview.
 /// </summary>
 internal class XmlPrinter : IXmlPrinter
 {
@@ -118,11 +118,7 @@ internal class XmlPrinter : IXmlPrinter
         var paperSizes = printDocument.PrinterSettings.PaperSizes;
         this.SetupDocument(printDocument, paperSizes.OfType<PaperSize>());
 
-        using var dialog = new PrintPreviewDialog
-        {
-            Document = printDocument, WindowState = FormWindowState.Maximized,
-        };
-        dialog.ShowDialog();
+        ReportPreviewWindow.Show(documentName, printDocument);
     }
 
     internal void LoadXml(string xml)
@@ -283,6 +279,9 @@ internal class XmlPrinter : IXmlPrinter
 
                     transformingNode.ParentNode!.RemoveChild(transformingNode);
                     break;
+                case "#comment":
+                    transformingNode.ParentNode!.RemoveChild(transformingNode);
+                    continue;
                 default:
                     // nothing to do
                     break;

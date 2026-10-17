@@ -10,12 +10,12 @@ using System.Windows;
 using System.Windows.Forms;
 using Caliburn.Micro;
 using JetBrains.Annotations;
+using lg2de.SimpleAccounting.Presentation;
 using Application = System.Windows.Application;
-using MessageBox = System.Windows.MessageBox;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 /// <summary>
-///     Default implementation of <see cref="IDialogs" /> using <see cref="System.Windows.MessageBox" />.
+///     Default implementation of <see cref="IDialogs" /> using <see cref="MessageDialog" />.
 /// </summary>
 [ExcludeFromCodeCoverage(
     Justification = "The abstraction is for unit testing only. This is the simple implementation.")]
@@ -38,14 +38,13 @@ internal class WindowsDialogs : IDialogs
             () =>
             {
                 Application.Current.MainWindow!.Activate();
-                result = MessageBox.Show(
+                result = MessageDialog.Show(
                     Application.Current.MainWindow,
                     messageBoxText,
                     caption,
                     button,
                     icon,
-                    defaultResult,
-                    options);
+                    defaultResult);
             });
         return result;
     }

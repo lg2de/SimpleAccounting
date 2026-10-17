@@ -718,4 +718,37 @@ Texte d'erreur:</value>
     <data name="AccountsContextMenu_EditAccountGroups" xml:space="preserve">
       <value>Modifier les groupes de comptes...</value>
     </data>
+  <data name="Menu_Project_Settings_Language" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="Menu_Project_Settings_Theme" xml:space="preserve">
+    <value>Apparence</value>
+  </data>
+  <data name="Menu_Project_Settings_ThemeLight" xml:space="preserve">
+    <value>Clair</value>
+  </data>
+  <data name="Menu_Project_Settings_ThemeDark" xml:space="preserve">
+    <value>Sombre</value>
+  </data>
+  <data name="Menu_Project_Settings_ThemeSystem" xml:space="preserve">
+    <value>Paramètre système</value>
+  </data>
+  <data name="Word_Yes" xml:space="preserve">
+    <value>Oui</value>
+  </data>
+  <data name="Word_No" xml:space="preserve">
+    <value>Non</value>
+  </data>
+  <data name="Action_Print" xml:space="preserve">
+    <value>Imprimer</value>
+  </data>
+  <data name="ReportPreview_FitWidth" xml:space="preserve">
+    <value>Largeur de page</value>
+  </data>
+  <data name="ReportPreview_PageCountX" xml:space="preserve">
+    <value>{0} page(s)</value>
+  </data>
+  <data name="ReportPreview_FitPage" xml:space="preserve">
+    <value>Page entière</value>
+  </data>
 </root>
