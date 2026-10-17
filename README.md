@@ -42,9 +42,10 @@ The software focuses on journal and balance sheet reporting.
 
 Some screenshots for the first impression:
 
-| Main view                                                        | Split booking                                                            | Totals and balances report                                                                       |
-|------------------------------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| <img src="./samples/MainView.png" alt="Main view" width="250" /> | <img src="./samples/SplitBooking.png" alt="Split booking" width="250" /> | <img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report" width="250" /> |
+| Main view                                                                         | Split booking                                                                             | Totals and balances report                                                                                     |
+|-----------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| <img src="./samples/MainView.png" alt="Main view - light theme" width="250" />    | <img src="./samples/SplitBooking.png" alt="Split booking - light theme" width="250" />    | <img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report - light theme" width="250" /> |
+| <img src="./samples/MainViewDark.png" alt="Main view - dark theme" width="250" /> | <img src="./samples/SplitBookingDark.png" alt="Split booking - dark theme" width="250" /> | <img src="./samples/AnnualBalanceReportDark.png" alt="Annual balance report - dark theme" width="250" />       |
 
 ## Getting started
 
