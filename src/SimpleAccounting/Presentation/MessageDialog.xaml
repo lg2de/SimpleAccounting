@@ -34,7 +34,7 @@
           Grid.Column="0"
           Margin="0 0 16 0"
           VerticalAlignment="Top"
-          FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+          FontFamily="{DynamicResource SymbolThemeFontFamily}"
           FontSize="32"
           Visibility="Collapsed" />
         <TextBlock
