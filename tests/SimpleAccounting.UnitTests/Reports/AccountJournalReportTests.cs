@@ -263,32 +263,32 @@ public class AccountJournalReportTests
             "text", // time range
             "move",
             "font", // default font
-            "spaceCheck",
+            "requireSpace",
             "font", // account header
             "move",
             "table", // account data
             pageBreakBetweenAccounts ? "newPage" : "move",
-            "spaceCheck",
+            "requireSpace",
             "font", // account header
             "move",
             "table", // account data
             pageBreakBetweenAccounts ? "newPage" : "move",
-            "spaceCheck",
+            "requireSpace",
             "font", // account header
             "move",
             "table", // account data
             pageBreakBetweenAccounts ? "newPage" : "move",
-            "spaceCheck",
+            "requireSpace",
             "font", // account header
             "move",
             "table", // account data
             pageBreakBetweenAccounts ? "newPage" : "move",
-            "spaceCheck",
+            "requireSpace",
             "font", // account header
             "move",
             "table", // account data
             pageBreakBetweenAccounts ? "newPage" : "move",
-            "spaceCheck",
+            "requireSpace",
             "font", // account header
             "move",
             "table", // account data

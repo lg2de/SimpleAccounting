@@ -913,16 +913,16 @@ public class XmlPrinterTests
                 + "<move relY=\"20\" />"
                 + "</root>"));
     }
-    
+
     [Fact]
-    public void TransformDocument_SpaceCheckNoHeight_NoAction()
+    public void TransformDocument_RequireSpaceNoHeight_NoAction()
     {
         var sut = new XmlPrinter();
-        sut.LoadXml("<root><spaceCheck /></root>");
+        sut.LoadXml("<root><requireSpace /></root>");
         var graphics = Substitute.For<IGraphics>();
         var document = new PrintDocument();
         sut.SetupDocument(document, PaperSizes);
-        
+
         sut.TransformDocument(graphics);
 
         using (new AssertionScope())
@@ -933,16 +933,16 @@ public class XmlPrinterTests
             sut.CursorY.Should().Be(0);
         }
     }
-    
+
     [Fact]
-    public void TransformDocument_SpaceCheckSpaceRemaining_NoAction()
+    public void TransformDocument_RequireSpaceSpaceRemaining_NoAction()
     {
         var sut = new XmlPrinter();
-        sut.LoadXml("<root><spaceCheck height=\"10\" /></root>");
+        sut.LoadXml("<root><requireSpace height=\"10\" /></root>");
         var graphics = Substitute.For<IGraphics>();
         var document = new PrintDocument();
         sut.SetupDocument(document, PaperSizes);
-        
+
         sut.TransformDocument(graphics);
 
         using (new AssertionScope())
@@ -953,17 +953,17 @@ public class XmlPrinterTests
             sut.CursorY.Should().Be(0);
         }
     }
-    
+
     [Fact]
-    public void TransformDocument_SpaceCheckFitsExactly_NoAction()
+    public void TransformDocument_RequireSpaceFitsExactly_NoAction()
     {
         var sut = new XmlPrinter();
-        sut.LoadXml("<root><spaceCheck height=\"10\" /></root>");
+        sut.LoadXml("<root><requireSpace height=\"10\" /></root>");
         var graphics = Substitute.For<IGraphics>();
         var document = new PrintDocument();
         sut.SetupDocument(document, PaperSizes);
         sut.CursorY = 287;
-        
+
         sut.TransformDocument(graphics);
 
         using (new AssertionScope())
@@ -974,17 +974,17 @@ public class XmlPrinterTests
             sut.CursorY.Should().Be(287);
         }
     }
-    
+
     [Fact]
-    public void TransformDocument_SpaceCheckNotEnoughSpace_NoAction()
+    public void TransformDocument_RequireSpaceNotEnoughSpace_NoAction()
     {
         var sut = new XmlPrinter();
-        sut.LoadXml("<root><spaceCheck height=\"10\" /></root>");
+        sut.LoadXml("<root><requireSpace height=\"10\" /></root>");
         var graphics = Substitute.For<IGraphics>();
         var document = new PrintDocument();
         sut.SetupDocument(document, PaperSizes);
         sut.CursorY = 288;
-        
+
         sut.TransformDocument(graphics);
 
         using (new AssertionScope())

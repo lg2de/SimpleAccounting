@@ -47,8 +47,8 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
         foreach (var account in this.accounts)
         {
             var accountEntries = this.YearData.Booking
-                .Where(
-                    x => x.Debit.Exists(a => a.Account == account.ID) || x.Credit.Exists(a => a.Account == account.ID))
+                .Where(x => x.Debit.Exists(a => a.Account == account.ID)
+                            || x.Credit.Exists(a => a.Account == account.ID))
                 .OrderBy(x => x.Date)
                 .ThenBy(x => x.ID)
                 .ToList();
@@ -65,17 +65,8 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
                 insertPoint!.ParentNode!.InsertBefore(separatorNode, insertPoint);
             }
 
-            XmlNode? dataNode = null;
-            foreach (XmlNode childNode in accountTemplate.ChildNodes)
-            {
-                var clone = childNode.CloneNode(deep: true);
-                insertPoint!.ParentNode!.InsertBefore(clone, insertPoint);
-                if (clone.Name == "table")
-                {
-                    dataNode = clone.SelectSingleNode("data");
-                }
-            }
-            
+            CloneAndInsertAccountTemplateNodes(accountTemplate, insertPoint, out XmlNode dataNode);
+
             this.UpdatePlaceholder("AccountName", account.FormatName());
 
             this.creditTotal = 0;
@@ -83,7 +74,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
 
             foreach (var entry in accountEntries)
             {
-                this.AddBookingEntries(entry, account.ID, dataNode!);
+                this.AddBookingEntries(entry, account.ID, dataNode);
             }
 
             // sum
@@ -91,7 +82,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             {
                 XmlNode totalLineNode = this.PrintDocument.CreateElement("tr");
                 totalLineNode.SetAttribute("topLine", true);
-                dataNode!.AppendChild(totalLineNode);
+                dataNode.AppendChild(totalLineNode);
                 totalLineNode.AddTableNode(Resources.Word_Total).SetAttribute("align", "right");
                 totalLineNode.AddTableNode(string.Empty); // id
                 totalLineNode.AddTableNode(string.Empty); // text
@@ -103,7 +94,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             // balance
             XmlNode balanceLineNode = this.PrintDocument.CreateElement("tr");
             balanceLineNode.SetAttribute("topLine", true);
-            dataNode!.AppendChild(balanceLineNode);
+            dataNode.AppendChild(balanceLineNode);
             balanceLineNode.AddTableNode(Resources.Word_Balance).SetAttribute("align", "right");
             balanceLineNode.AddTableNode(string.Empty); // id
             balanceLineNode.AddTableNode(string.Empty); // text
@@ -120,6 +111,26 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
 
             // empty remote account column
             balanceLineNode.AddTableNode(string.Empty);
+        }
+    }
+
+    private static void CloneAndInsertAccountTemplateNodes(
+        XmlNode accountTemplate, XmlNode? insertPoint, out XmlNode dataNode)
+    {
+        dataNode = null!;
+        foreach (XmlNode childNode in accountTemplate.ChildNodes)
+        {
+            var clone = childNode.CloneNode(deep: true);
+            insertPoint!.ParentNode!.InsertBefore(clone, insertPoint);
+            if (clone.Name == "table")
+            {
+                dataNode = clone.SelectSingleNode("descendant-or-self::data")!;
+            }
+        }
+
+        if (dataNode == null)
+        {
+            throw new InvalidOperationException("The account template must define a data node.");
         }
     }
 
@@ -142,7 +153,7 @@ internal class AccountJournalReport : ReportBase, IAccountJournalReport
             separatorNode = this.PrintDocument.CreateElement("move");
             separatorNode.SetAttribute("relY", "5");
         }
-        
+
         return separatorNode;
     }
 

@@ -49,7 +49,7 @@ internal class XmlPrinter : IXmlPrinter
     private const string TextNode = "text";
     private const string LineNode = "line";
     private const string FontNode = "font";
-    private const string SpaceCheckNode = "spaceCheck";
+    private const string RequireSpaceNode = "requireSpace";
 
     private const string RelativeXNode = "relX";
     private const string RelativeYNode = "relY";
@@ -274,13 +274,11 @@ internal class XmlPrinter : IXmlPrinter
                     this.ProcessFontNode(transformingNode, () => TransformNodes(transformingNode.FirstChild!));
                     InsertPageBreakIfRequired(nextNode);
                     continue;
-                case SpaceCheckNode:
-                    if (int.TryParse(transformingNode.Attributes?["height"]?.Value, out var height)
-                        && this.CursorY + height > this.DocumentHeight - this.DocumentBottomMargin)
+                case RequireSpaceNode:
+                    var height = transformingNode.GetAttribute("height", 0);
+                    if (this.CursorY + height > this.DocumentHeight - this.DocumentBottomMargin)
                     {
-                        XmlNode newPage = this.Document.CreateElement(NewPageNode);
-                        transformingNode.ParentNode!.InsertBefore(newPage, transformingNode);
-                        this.ProcessNewPage();
+                        this.CreateNewPage(transformingNode);
                     }
 
                     transformingNode.ParentNode!.RemoveChild(transformingNode);
@@ -303,10 +301,7 @@ internal class XmlPrinter : IXmlPrinter
                 return;
             }
 
-            XmlNode newPage = this.Document.CreateElement(NewPageNode);
-            nextNode.ParentNode!.InsertBefore(newPage, nextNode);
-
-            this.ProcessNewPage();
+            this.CreateNewPage(nextNode);
         }
     }
 
@@ -365,6 +360,18 @@ internal class XmlPrinter : IXmlPrinter
         }
     }
 
+    private void CreateNewPageNode(XmlNode tableNode)
+    {
+        XmlNode newPage = this.Document.CreateElement(NewPageNode);
+        tableNode.ParentNode!.InsertBefore(newPage, tableNode);
+    }
+    
+    private void CreateNewPage(XmlNode nextNode)
+    {
+        this.CreateNewPageNode(nextNode);
+        this.ProcessNewPage();
+    }
+
     private void TransformRectangle(XmlNode rectNode)
     {
         var x1 = rectNode.GetAttribute<float>(RelativeFromXNode);
@@ -414,11 +421,12 @@ internal class XmlPrinter : IXmlPrinter
             tableNode.SelectNodes("data/tr")
             ?? throw new InvalidOperationException("The table must define rows.");
 
-        // if table can not be started on page - create new one
+        // if table cannot be started on page - create new one
         if (this.CursorY + tableLineHeight * Two > this.DocumentHeight - this.DocumentBottomMargin)
         {
-            XmlNode newPage = this.Document.CreateElement(NewPageNode);
-            tableNode.ParentNode!.InsertBefore(newPage, tableNode);
+            this.CreateNewPageNode(tableNode);
+            
+            // We need to the cursor Y position but keep the X position.
             this.CursorY = this.DocumentTopMargin;
         }
 
@@ -564,10 +572,13 @@ internal class XmlPrinter : IXmlPrinter
 
         void StartNewPage()
         {
-            // start new page with table header
-            XmlNode newPage = this.Document.CreateElement(NewPageNode);
-            tableNode.ParentNode!.InsertBefore(newPage, tableNode);
+            // Start new page, ...
+            this.CreateNewPageNode(tableNode);
+
+            // ... set the cursor to the top margin (but keep the same x position), ...
             this.CursorY = this.DocumentTopMargin;
+            
+            // ... and restart with the table header.
             this.TransformTableHeader(tableNode);
         }
     }
