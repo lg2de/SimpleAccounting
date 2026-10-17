@@ -87,7 +87,7 @@ public partial class ReportPreviewWindow
         [
             new ZoomOption(AppResources.ReportPreview_FitPage, FitPageFactor),
             new ZoomOption(AppResources.ReportPreview_FitWidth, FitWidthFactor),
-            ..new[] { 50, 75, 100, 125, 150, 200 }.Select(
+            ..new[] { 50, 75, 100, 125, 150, 200, 300 }.Select(
                 x => new ZoomOption(string.Format(CultureInfo.CurrentUICulture, "{0} %", x), x / 100.0))
         ];
         this.ZoomSelection.ItemsSource = this.zoomOptions;
