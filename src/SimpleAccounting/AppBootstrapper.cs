@@ -37,7 +37,7 @@ public class AppBootstrapper : BootstrapperBase
             .Singleton<IFullJournalViewModel, FullJournalViewModel>()
             .Singleton<IAccountJournalViewModel, AccountJournalViewModel>()
             .Singleton<IAccountsViewModel, AccountsViewModel>();
-        this.container.Singleton<IWindowManager, WindowManager>();
+        this.container.Singleton<IWindowManager, DialogWindowManager>();
         this.container.Singleton<IReportFactory, ReportFactory>();
         this.container.Singleton<IApplicationUpdate, ApplicationUpdate>();
         this.container.Singleton<IDialogs, WindowsDialogs>()

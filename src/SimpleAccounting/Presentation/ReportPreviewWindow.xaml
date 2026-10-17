@@ -6,6 +6,7 @@
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   Width="1000" Height="800"
   WindowState="Maximized"
+  ShowInTaskbar="False"
   WindowStartupLocation="CenterOwner">
   <Window.InputBindings>
     <KeyBinding Key="Escape" Command="Close" />
@@ -29,7 +30,7 @@
           Command="Print"
           ToolTip="{x:Static properties:Resources.Action_Print}">
           <StackPanel Orientation="Horizontal">
-            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE749;"
+            <TextBlock FontFamily="{DynamicResource SymbolThemeFontFamily}" Text="&#xE749;"
                        VerticalAlignment="Center" Margin="0 0 8 0" />
             <TextBlock Text="{x:Static properties:Resources.Action_Print}" VerticalAlignment="Center" />
           </StackPanel>
@@ -39,7 +40,7 @@
           MinWidth="0" Margin="24 5 0 5"
           VerticalAlignment="Center"
           Command="DecreaseZoom"
-          FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Content="&#xE71F;" />
+          FontFamily="{DynamicResource SymbolThemeFontFamily}" Content="&#xE71F;" />
         <ComboBox
           x:Name="ZoomSelection"
           DockPanel.Dock="Left"
@@ -51,7 +52,7 @@
           MinWidth="0"
           VerticalAlignment="Center"
           Command="IncreaseZoom"
-          FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Content="&#xE8A3;" />
+          FontFamily="{DynamicResource SymbolThemeFontFamily}" Content="&#xE8A3;" />
         <TextBlock
           x:Name="PageCountText"
           DockPanel.Dock="Right"
