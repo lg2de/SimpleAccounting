@@ -279,6 +279,9 @@ internal class XmlPrinter : IXmlPrinter
 
                     transformingNode.ParentNode!.RemoveChild(transformingNode);
                     break;
+                case "#comment":
+                    transformingNode.ParentNode!.RemoveChild(transformingNode);
+                    continue;
                 default:
                     // nothing to do
                     break;
