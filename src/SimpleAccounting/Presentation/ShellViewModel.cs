@@ -32,7 +32,7 @@ internal class ShellViewModel : Screen
     private readonly IClock clock;
     private readonly string version;
 
-    private readonly bool helpSimulateUpdateVisible =
+    private readonly bool debugOptionsVisible =
 #if DEBUG
         true;
 #else
@@ -132,8 +132,11 @@ internal class ShellViewModel : Screen
     public IAsyncCommand HelpSimulateUpdate => new AsyncCommand(this.Busy, this.SimulateUpdateAsync);
 
     [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
+    public ICommand CrashSimulateUpdate => new RelayCommand(_ => throw new InvalidOperationException("Simulated crash."));
+
+    [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
     // ReSharper disable once ConvertToAutoProperty
-    public bool HelpSimulateUpdateVisible => this.helpSimulateUpdateVisible;
+    public bool DebugOptionsVisible => this.debugOptionsVisible;
 
     public ICommand NewAccountCommand => new AsyncCommand(this.Accounts.ShowNewAccountDialogAsync);
 

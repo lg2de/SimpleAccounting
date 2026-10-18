@@ -117,7 +117,10 @@
                     Command="{Binding HelpCheckForUpdateCommand}" />
           <MenuItem Header="TEST UPDATE"
                     Command="{Binding HelpSimulateUpdate}"
-                    Visibility="{Binding HelpSimulateUpdateVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    Visibility="{Binding DebugOptionsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
+          <MenuItem Header="TEST CRASH"
+                    Command="{Binding CrashSimulateUpdate}"
+                    Visibility="{Binding DebugOptionsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
         </MenuItem>
       </Menu>
       <Grid>
