@@ -130,6 +130,13 @@ internal class ApplicationUpdate : IApplicationUpdate
             {
                 var productInformation = new ProductHeaderValue(Defines.ProjectName);
                 var client = new GitHubClient(productInformation);
+
+                var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    client.Credentials = new Credentials(token);
+                }
+
                 return await client.Repository.Release.GetAll(Defines.OrganizationName, Defines.ProjectName);
             });
             return await queryTask;

@@ -13,81 +13,83 @@ jobs:
   build:
     name: build
     runs-on: windows-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-    - uses: actions/checkout@v7
-    - run: |
-        git fetch --prune --unshallow
-    - name: Print environment
-      run: 'gci env:'
-      shell: pwsh
+      - uses: actions/checkout@v7
+      - run: |
+          git fetch --prune --unshallow
+      - name: Print environment
+        run: 'gci env:'
+        shell: pwsh
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v6
-      with:
-        dotnet-version: 10.0.x
-    - name: Setup dotnet-cover
-      run: dotnet tool install --global dotnet-coverage
-    - name: Setup SonarScanner
-      run: dotnet tool install --global dotnet-sonarscanner
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Setup dotnet-cover
+        run: dotnet tool install --global dotnet-coverage
+      - name: Setup SonarScanner
+        run: dotnet tool install --global dotnet-sonarscanner
 
-    - name: Patch version info
-      run: .\PatchVersion.ps1
-      shell: pwsh
-      env:
-        GITHUB_PR_REF: ${{ github.head_ref }}
+      - name: Patch version info
+        run: .\PatchVersion.ps1
+        shell: pwsh
+        env:
+          GITHUB_PR_REF: ${{ github.head_ref }}
 
-    - name: Restore packages
-      run: dotnet restore --configfile nuget.config --verbosity normal
-    - name: Check generated model is up to date
-      # The generation is skipped in CI builds, so it is enforced here.
-      # The file is removed first, because all files have the same timestamp after checkout.
-      run: |
-        $generatedFile = "src\SimpleAccounting\Model\AccountingData.designer.cs"
-        Remove-Item $generatedFile
-        dotnet msbuild src\SimpleAccounting -t:GenerateModel -p:CI=false
-        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        git diff --exit-code -- $generatedFile
-        if ($LASTEXITCODE -ne 0) {
-          Write-Host "::error file=$generatedFile::The generated model is outdated. Build locally and commit the file."
-          exit 1
-        }
-      shell: pwsh
-    - name: Publish Small Release
-      run: dotnet publish --configuration Release
-      working-directory: src\SimpleAccounting
-    - name: Publish Large Release
-      run: dotnet publish --configuration Release -r win-x64 --self-contained
-      working-directory: src\SimpleAccounting
+      - name: Restore packages
+        run: dotnet restore --configfile nuget.config --verbosity normal
+      - name: Check generated model is up to date
+        # The generation is skipped in CI builds, so it is enforced here.
+        # The file is removed first, because all files have the same timestamp after checkout.
+        run: |
+          $generatedFile = "src\SimpleAccounting\Model\AccountingData.designer.cs"
+          Remove-Item $generatedFile
+          dotnet msbuild src\SimpleAccounting -t:GenerateModel -p:CI=false
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --exit-code -- $generatedFile
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error file=$generatedFile::The generated model is outdated. Build locally and commit the file."
+            exit 1
+          }
+        shell: pwsh
+      - name: Publish Small Release
+        run: dotnet publish --configuration Release
+        working-directory: src\SimpleAccounting
+      - name: Publish Large Release
+        run: dotnet publish --configuration Release -r win-x64 --self-contained
+        working-directory: src\SimpleAccounting
 
-    - name: Prepare SonarScanner
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        $prNo=${{ github.event.number }}
-        if ($prNo -gt 0) {
-          $branch="${{ github.HEAD_REF }}"
-          Write-Host analyzing Pull Request $prNo on branch $branch
-          $branchCommand="/d:sonar.pullrequest.key=$prNo"
-        } else {
-          $branch=$env:GITHUB_REF -replace "(\w+/)*",""
-          Write-Host analyzing branch $branch
-          $branchCommand="/d:sonar.branch.name=$branch"
-        }
-        Write-Host CMDs=$branchCommand
-        dotnet sonarscanner begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.token=$env:SONAR_TOKEN /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-      shell: pwsh
-    - name: Build Debug and Test
-      run: dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
-    - name: Complete SonarScanner
-      run: dotnet sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
+      - name: Prepare SonarScanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          $prNo=${{ github.event.number }}
+          if ($prNo -gt 0) {
+            $branch="${{ github.HEAD_REF }}"
+            Write-Host analyzing Pull Request $prNo on branch $branch
+            $branchCommand="/d:sonar.pullrequest.key=$prNo"
+          } else {
+            $branch=$env:GITHUB_REF -replace "(\w+/)*",""
+            Write-Host analyzing branch $branch
+            $branchCommand="/d:sonar.branch.name=$branch"
+          }
+          Write-Host CMDs=$branchCommand
+          dotnet sonarscanner begin /d:"sonar.host.url=https://sonarcloud.io" /o:lg2de /k:lg2de_SimpleAccounting $branchCommand /d:sonar.token=$env:SONAR_TOKEN /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+        shell: pwsh
+      - name: Build Debug and Test
+        run: dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
+      - name: Complete SonarScanner
+        run: dotnet sonarscanner end /d:sonar.token=${{ secrets.SONAR_TOKEN }}
 
-    - name: Upload small artifact
-      uses: actions/upload-artifact@v7
-      with:
-        name: SimpleAccounting
-        path: src\SimpleAccounting\bin\Release\net10.0-windows\publish
-    - name: Upload large artifact
-      uses: actions/upload-artifact@v7
-      with:
-        name: SimpleAccounting-self-contained
-        path: src\SimpleAccounting\bin\Release\net10.0-windows\win-x64\publish
+      - name: Upload small artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: SimpleAccounting
+          path: src\SimpleAccounting\bin\Release\net10.0-windows\publish
+      - name: Upload large artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: SimpleAccounting-self-contained
+          path: src\SimpleAccounting\bin\Release\net10.0-windows\win-x64\publish
