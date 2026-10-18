@@ -259,7 +259,7 @@ public partial class ReportPreviewWindow
         }
     }
 
-    private static void ShowPrinterError(Window? owner, InvalidPrinterException exception)
+    private static void ShowPrinterError(Window? owner, Exception exception)
     {
         MessageDialog.Show(
             owner, exception.Message, AppResources.Action_Print,

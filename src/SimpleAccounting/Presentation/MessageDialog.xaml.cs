@@ -104,6 +104,8 @@ public partial class MessageDialog
 
     protected override void OnClosing(CancelEventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(e);
+
         // prevents closing by Alt+F4
         e.Cancel = !this.isCloseAllowed;
         base.OnClosing(e);
@@ -117,11 +119,9 @@ public partial class MessageDialog
     /// </remarks>
     private static MessageBoxResult GetCloseResult(MessageBoxButton button)
     {
-        return button switch
-        {
-            MessageBoxButton.OKCancel or MessageBoxButton.YesNoCancel => MessageBoxResult.Cancel,
-            _ => MessageBoxResult.OK
-        };
+        return button is MessageBoxButton.OKCancel or MessageBoxButton.YesNoCancel
+            ? MessageBoxResult.Cancel
+            : MessageBoxResult.OK;
     }
 
     private static List<MessageBoxResult> GetResults(MessageBoxButton button)

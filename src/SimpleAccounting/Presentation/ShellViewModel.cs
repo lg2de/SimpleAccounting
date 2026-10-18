@@ -132,6 +132,7 @@ internal class ShellViewModel : Screen
     public IAsyncCommand HelpSimulateUpdate => new AsyncCommand(this.Busy, this.SimulateUpdateAsync);
 
     [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
+    [SuppressMessage("Performance", "CA1822:Make Member static", Justification = "It's for manual testing only.")]
     public ICommand CrashSimulateUpdate => new RelayCommand(_ => throw new InvalidOperationException("Simulated crash."));
 
     [ExcludeFromCodeCoverage(Justification = "It's for manual testing only.")]
