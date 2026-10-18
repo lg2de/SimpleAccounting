@@ -721,4 +721,40 @@ Error message:</value>
   <data name="AccountsContextMenu_EditAccountGroups" xml:space="preserve">
     <value>Edit account groups...</value>
   </data>
+  <data name="Menu_Project_Settings_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Menu_Project_Settings_Theme" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Menu_Project_Settings_ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Menu_Project_Settings_ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Menu_Project_Settings_ThemeSystem" xml:space="preserve">
+    <value>System setting</value>
+  </data>
+  <data name="Word_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Word_No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Action_Print" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="ReportPreview_FitWidth" xml:space="preserve">
+    <value>Page width</value>
+  </data>
+  <data name="ReportPreview_PageCountX" xml:space="preserve">
+    <value>{0} page(s)</value>
+  </data>
+  <data name="ReportPreview_FitPage" xml:space="preserve">
+    <value>Whole page</value>
+  </data>
+  <data name="ReportPreview_Paper" xml:space="preserve">
+    <value>Paper</value>
+  </data>
 </root>

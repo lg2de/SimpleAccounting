@@ -9,58 +9,59 @@
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
   d:DataContext="{d:DesignInstance Type=local:CloseYearDesignViewModel, IsDesignTimeCreatable=True}"
-  d:Background="Azure">
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    <Grid.Resources>
-      <Style TargetType="TextBlock">
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+  <DockPanel>
+    <DockPanel.Resources>
+      <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Margin" Value="5" />
       </Style>
-    </Grid.Resources>
-    <TextBlock
-      Grid.Row="0"
-      Padding="10" HorizontalAlignment="Center"
-      Text="{Binding InstructionText}" />
+    </DockPanel.Resources>
+    <Border Style="{StaticResource DialogFooterStyle}">
+      <StackPanel Style="{StaticResource DialogButtonPanelStyle}">
+        <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding CloseYearCommand}"
+                IsDefault="True" Style="{StaticResource PrimaryButtonStyle}" />
+        <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
+      </StackPanel>
+    </Border>
+    <Border Style="{StaticResource DialogContentStyle}">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" MinWidth="300" />
+        </Grid.ColumnDefinitions>
+        <TextBlock
+          Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0"
+          Margin="5 5 5 15"
+          TextWrapping="Wrap"
+          Text="{Binding InstructionText}" />
 
-    <StackPanel
-      Grid.Row="1"
-      Orientation="Horizontal">
-      <TextBlock Padding="5">
-        <Run Text="{x:Static properties:Resources.Word_CarriedForwardAccount}" />
-        <Run Text=":" />
-      </TextBlock>
-      <ComboBox
-        Width="200" HorizontalAlignment="Right"
-        ItemsSource="{Binding Accounts}"
-        SelectedItem="{Binding RemoteAccount, Mode=TwoWay}"
-        ItemTemplate="{StaticResource AccountSelectionTemplate}"
-        TextSearch.TextPath="Name" />
-    </StackPanel>
+        <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">
+          <Run Text="{x:Static properties:Resources.Word_CarriedForwardAccount}" />
+          <Run Text=":" />
+        </TextBlock>
+        <ComboBox
+          Grid.Column="1" Grid.Row="1"
+          ItemsSource="{Binding Accounts}"
+          SelectedItem="{Binding RemoteAccount, Mode=TwoWay}"
+          ItemTemplate="{StaticResource AccountSelectionTemplate}"
+          TextSearch.TextPath="Name" />
 
-    <DockPanel Grid.Row="2">
-      <TextBlock
-        Padding="5">
-        <Run Text="{x:Static properties:Resources.CloseYear_TextOptionDescription}" />
-        <Run Text=":" />
-      </TextBlock>
-      <ComboBox
-        ItemsSource="{Binding TextOptions}"
-        SelectedItem="{Binding TextOption, Mode=TwoWay}"
-        DisplayMemberPath="Name" />
-    </DockPanel>
-
-    <StackPanel
-      Grid.Row="3"
-      Grid.Column="0"
-      Margin="0 30 0 0"
-      Orientation="Horizontal" HorizontalAlignment="Right">
-      <Button Content="{x:Static properties:Resources.Word_Ok}" Command="{Binding CloseYearCommand}" />
-      <Button Content="{x:Static properties:Resources.Word_Cancel}" IsCancel="True" />
-    </StackPanel>
-  </Grid>
+        <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">
+          <Run Text="{x:Static properties:Resources.CloseYear_TextOptionDescription}" />
+          <Run Text=":" />
+        </TextBlock>
+        <ComboBox
+          Grid.Column="1" Grid.Row="2"
+          ItemsSource="{Binding TextOptions}"
+          SelectedItem="{Binding TextOption, Mode=TwoWay}"
+          DisplayMemberPath="Name" />
+      </Grid>
+    </Border>
+  </DockPanel>
 </UserControl>

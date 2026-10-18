@@ -94,7 +94,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("AccountsContextMenu_EditAccount", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Edit account groups....
         /// </summary>
@@ -227,6 +227,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Action_LoadData {
             get {
                 return ResourceManager.GetString("Action_LoadData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Print.
+        /// </summary>
+        public static string Action_Print {
+            get {
+                return ResourceManager.GetString("Action_Print", resourceCulture);
             }
         }
         
@@ -860,11 +869,56 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        public static string Menu_Project_Settings_Language {
+            get {
+                return ResourceManager.GetString("Menu_Project_Settings_Language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Project options.
         /// </summary>
         public static string Menu_Project_Settings_ProjectOptions {
             get {
                 return ResourceManager.GetString("Menu_Project_Settings_ProjectOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Appearance.
+        /// </summary>
+        public static string Menu_Project_Settings_Theme {
+            get {
+                return ResourceManager.GetString("Menu_Project_Settings_Theme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dark.
+        /// </summary>
+        public static string Menu_Project_Settings_ThemeDark {
+            get {
+                return ResourceManager.GetString("Menu_Project_Settings_ThemeDark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Light.
+        /// </summary>
+        public static string Menu_Project_Settings_ThemeLight {
+            get {
+                return ResourceManager.GetString("Menu_Project_Settings_ThemeLight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System setting.
+        /// </summary>
+        public static string Menu_Project_Settings_ThemeSystem {
+            get {
+                return ResourceManager.GetString("Menu_Project_Settings_ThemeSystem", resourceCulture);
             }
         }
         
@@ -921,7 +975,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("Menu_Reports_TotalsAndBalances", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The order defines the structure of the reports. New accounts are assigned to the first group..
         /// </summary>
@@ -930,7 +984,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_AccountGroupsHint", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Add account group.
         /// </summary>
@@ -948,7 +1002,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_GeneralHint", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The name is already used by another account group..
         /// </summary>
@@ -957,7 +1011,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_GroupNameDuplicated", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The name must not be empty..
         /// </summary>
@@ -1002,7 +1056,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_PageBreakBetweenAccounts", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Remove account group (only possible without accounts).
         /// </summary>
@@ -1011,7 +1065,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_RemoveAccountGroup", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Show currency with values.
         /// </summary>
@@ -1020,7 +1074,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_ShowCurrency", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Signatures.
         /// </summary>
@@ -1029,7 +1083,7 @@ namespace lg2de.SimpleAccounting.Properties {
                 return ResourceManager.GetString("ProjectOptions_Signatures", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Account groups.
         /// </summary>
@@ -1214,6 +1268,42 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Report_TotalsInTimeRange {
             get {
                 return ResourceManager.GetString("Report_TotalsInTimeRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Whole page.
+        /// </summary>
+        public static string ReportPreview_FitPage {
+            get {
+                return ResourceManager.GetString("ReportPreview_FitPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paper.
+        /// </summary>
+        public static string ReportPreview_Paper {
+            get {
+                return ResourceManager.GetString("ReportPreview_Paper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page width.
+        /// </summary>
+        public static string ReportPreview_FitWidth {
+            get {
+                return ResourceManager.GetString("ReportPreview_FitWidth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} page(s).
+        /// </summary>
+        public static string ReportPreview_PageCountX {
+            get {
+                return ResourceManager.GetString("ReportPreview_PageCountX", resourceCulture);
             }
         }
         
@@ -1641,6 +1731,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        public static string Word_No {
+            get {
+                return ResourceManager.GetString("Word_No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Number.
         /// </summary>
         public static string Word_Number {
@@ -1800,6 +1899,15 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string Word_Various {
             get {
                 return ResourceManager.GetString("Word_Various", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        public static string Word_Yes {
+            get {
+                return ResourceManager.GetString("Word_Yes", resourceCulture);
             }
         }
     }

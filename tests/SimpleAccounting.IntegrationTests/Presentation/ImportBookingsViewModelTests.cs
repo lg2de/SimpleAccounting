@@ -47,8 +47,7 @@ public class ImportBookingsViewModelTests
             Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(),
             Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(),
-            Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
         sut.LoadedData.Should().NotContain(x => x.Name == "Shopping Mall", "entry is already imported");
         sut.LoadedData.Should().BeEquivalentTo(
         [
@@ -255,8 +254,7 @@ public class ImportBookingsViewModelTests
             Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(),
             Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(),
-            Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
         sut.LoadedData.Should().NotContain(x => x.Name == "Shopping Mall", "entry is already imported");
         sut.LoadedData.Should().BeEquivalentTo(
         [

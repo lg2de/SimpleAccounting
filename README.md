@@ -34,7 +34,7 @@ The software focuses on journal and balance sheet reporting.
 
 * Data management for double-entry accounting, stored as XML (see [example](./samples/sample.acml)) and defined using [XSD](./docs/AccountingData.xsd)
 * User interface (English, German, and French) for the management of accounts, the creation and modification of entries,
-  the listing of account journals
+  the listing of account journals, with Light and Dark theme
 * Support for split booking entries, either on the credit or debit side
 * Import of booking entries from your bank account using CSV files incl. semi-automatic assignment of offsetting accounts
 * Printable reports for full journal, account journal, accounts and balances, and annual financial statements
@@ -42,9 +42,10 @@ The software focuses on journal and balance sheet reporting.
 
 Some screenshots for the first impression:
 
-| Main view                                                        | Split booking                                                            | Totals and balances report                                                                       |
-|------------------------------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| <img src="./samples/MainView.png" alt="Main view" width="250" /> | <img src="./samples/SplitBooking.png" alt="Split booking" width="250" /> | <img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report" width="250" /> |
+| Main view                                                                         | Split booking                                                                             | Reports                                                                                                        |
+|-----------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| <img src="./samples/MainView.png" alt="Main view - light theme" width="250" />    | <img src="./samples/SplitBooking.png" alt="Split booking - light theme" width="250" />    | <img src="./samples/TotalsAndBalancesReport.png" alt="Totals and balances report - light theme" width="250" /> |
+| <img src="./samples/MainViewDark.png" alt="Main view - dark theme" width="250" /> | <img src="./samples/SplitBookingDark.png" alt="Split booking - dark theme" width="250" /> | <img src="./samples/AnnualBalanceReportDark.png" alt="Annual balance report - dark theme" width="250" />       |
 
 ## Getting started
 
@@ -57,7 +58,7 @@ I'll update this package with security fixes if needed.
 There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.5.0/SimpleAccounting.zip)
 available that requires .NET runtime to be installed.
 Please download and install the Runtime in
-version [10.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.1-windows-x64-installer)
+version [10.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.13-windows-x64-installer)
 or above.
 
 Download one of the `SimpleAccounting` packages from

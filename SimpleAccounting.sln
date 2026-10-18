@@ -25,11 +25,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAccounting.Integratio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{3F74D64E-D629-4AC0-A60B-29ED0C265896}"
 	ProjectSection(SolutionItems) = preProject
+	    samples\AnnualBalanceReportDark.png = samples\AnnualBalanceReportDark.png
 		samples\MainView.png = samples\MainView.png
+		samples\MainViewDark.png = samples\MainViewDark.png
 		README.md = README.md
 		samples\sample.acml = samples\sample.acml
 		samples\sample.csv = samples\sample.csv
 		samples\SplitBooking.png = samples\SplitBooking.png
+		samples\SplitBookingDark.png = samples\SplitBookingDark.png
 		samples\TotalsAndBalancesReport.png = samples\TotalsAndBalancesReport.png
 	EndProjectSection
 EndProject

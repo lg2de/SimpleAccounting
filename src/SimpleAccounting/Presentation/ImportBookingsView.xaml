@@ -9,180 +9,172 @@
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
   d:DesignWidth="1000" d:DesignHeight="500"
-  d:Background="Azure"
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
   d:DataContext="{d:DesignInstance Type=local:ImportBookingsDesignViewModel, IsDesignTimeCreatable=True}">
   <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-      <Grid.Resources>
-        <Style TargetType="local:NumberTextBox">
-          <Setter Property="Margin" Value="5" />
-          <Setter Property="Height" Value="30" />
-          <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-        <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-      </Grid.Resources>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-      <TextBlock
-        Grid.Row="0"
-        Padding="5" Background="Yellow"
-        Visibility="{Binding IsImportBroken, Converter={StaticResource BooleanToVisibilityConverter}}"
-        Text="{x:Static properties:Resources.ImportData_MissingAccountWarning}" />
-      <StackPanel
-        Grid.Row="1"
-        Orientation="Horizontal">
-        <TextBlock Padding="5" Text="{x:Static properties:Resources.ImportData_Notes}" />
-        <local:NumberTextBox
-          Width="100"
-          IsEnabled="{Binding IsImportPossible}"
-          Text="{Binding SelectedAccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <ComboBox
-          Width="150"
-          IsEnabled="{Binding IsImportPossible}"
-          ItemsSource="{Binding ImportAccounts}"
-          SelectedValue="{Binding SelectedAccountNumber, Mode=TwoWay}"
-          SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
-          SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
-      </StackPanel>
-      <StackPanel
-        Grid.Row="2"
-        Orientation="Horizontal">
-        <CheckBox
-          VerticalAlignment="Center"
-          IsEnabled="{Binding IsImportPossible}"
-          IsChecked="{Binding IsForceEnglish}"
-          Content="{x:Static properties:Resources.ImportData_FileHasEnglishFormat}" />
-        <CheckBox
-          VerticalAlignment="Center"
-          IsEnabled="{Binding IsImportPossible}"
-          IsChecked="{Binding IsReverseOrder}"
-          Content="{x:Static properties:Resources.ImportData_UseReverseOrder}" />
-        <Button
-          Width="100"
-          Content="{x:Static properties:Resources.Action_LoadData}"
-          Command="{Binding LoadDataCommand}" />
+    <Border Style="{StaticResource DialogContentStyle}">
+      <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Grid.Resources>
+          <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <TextBlock
-          VerticalAlignment="Center" Margin="20,0,0,0"
-          Text="{x:Static properties:Resources.ImportData_StartImport}" />
-        <DatePicker
-          SelectedDate="{Binding StartDate}"
-          DisplayDateStart="{Binding RangeMin, Mode=OneWay}" DisplayDateEnd="{Binding RangeMax, Mode=OneWay}"
-          Height="30"
-          IsEnabled="{Binding IsImportPossible}"
-          IsTodayHighlighted="True" />
-      </StackPanel>
-      <StackPanel
-        Grid.Row="3"
-        Orientation="Horizontal">
-        <Button
-          Width="180"
-          Content="{x:Static properties:Resources.Action_SetRemoteAccounts}"
-          ToolTip="{x:Static properties:Resources.Tooltip_SetRemoteAccounts}"
-          Command="{Binding SetRemoteAccountsCommand}" />
-        <Rectangle Width="20" />
-        <Button
-          Width="100"
-          Content="{x:Static properties:Resources.Action_BookPartially}"
-          ToolTip="{x:Static properties:Resources.Tooltip_BookPartially}"
-          IsEnabled="{Binding IsImportPossible}"
-          Command="{Binding BookMappedCommand}" />
-        <Button
-          Width="100"
-          Content="{x:Static properties:Resources.Action_BookAll}"
-          IsEnabled="{Binding IsImportPossible}"
-          Command="{Binding BookAllCommand}" />
+          Grid.Row="0"
+          Margin="5" Padding="8" Background="{DynamicResource SystemFillColorCautionBackgroundBrush}"
+          Visibility="{Binding IsImportBroken, Converter={StaticResource BooleanToVisibilityConverter}}"
+          Text="{x:Static properties:Resources.ImportData_MissingAccountWarning}" />
+        <StackPanel
+          Grid.Row="1"
+          Orientation="Horizontal">
+          <TextBlock Padding="5" VerticalAlignment="Center" Text="{x:Static properties:Resources.ImportData_Notes}" />
+          <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <local:NumberTextBox
+              Width="100"
+              IsEnabled="{Binding IsImportPossible}"
+              Text="{Binding SelectedAccountNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ComboBox
+              MinWidth="300"
+              IsEnabled="{Binding IsImportPossible}"
+              ItemsSource="{Binding ImportAccounts}"
+              SelectedValue="{Binding SelectedAccountNumber, Mode=TwoWay}"
+              SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
+              SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}" />
+          </StackPanel>
+        </StackPanel>
+        <StackPanel
+          Grid.Row="2"
+          Orientation="Horizontal">
+          <CheckBox
+            VerticalAlignment="Center"
+            IsEnabled="{Binding IsImportPossible}"
+            IsChecked="{Binding IsForceEnglish}"
+            Content="{x:Static properties:Resources.ImportData_FileHasEnglishFormat}" />
+          <CheckBox
+            VerticalAlignment="Center"
+            IsEnabled="{Binding IsImportPossible}"
+            IsChecked="{Binding IsReverseOrder}"
+            Content="{x:Static properties:Resources.ImportData_UseReverseOrder}" />
+          <Button
+            MinWidth="100"
+            Content="{x:Static properties:Resources.Action_LoadData}"
+            Command="{Binding LoadDataCommand}" />
+          <TextBlock
+            VerticalAlignment="Center" Margin="20,0,0,0"
+            Text="{x:Static properties:Resources.ImportData_StartImport}" />
+          <DatePicker
+            SelectedDate="{Binding StartDate}"
+            DisplayDateStart="{Binding RangeMin, Mode=OneWay}" DisplayDateEnd="{Binding RangeMax, Mode=OneWay}"
+            IsEnabled="{Binding IsImportPossible}"
+            VerticalAlignment="Center"
+            IsTodayHighlighted="True" />
+        </StackPanel>
+        <StackPanel
+          Grid.Row="3"
+          Orientation="Horizontal">
+          <Button
+            MinWidth="180"
+            Content="{x:Static properties:Resources.Action_SetRemoteAccounts}"
+            ToolTip="{x:Static properties:Resources.Tooltip_SetRemoteAccounts}"
+            Command="{Binding SetRemoteAccountsCommand}" />
+          <Rectangle Width="20" />
+          <Button
+            MinWidth="100"
+            Content="{x:Static properties:Resources.Action_BookPartially}"
+            ToolTip="{x:Static properties:Resources.Tooltip_BookPartially}"
+            IsEnabled="{Binding IsImportPossible}"
+            Command="{Binding BookMappedCommand}" />
+          <Button
+            MinWidth="100"
+            Content="{x:Static properties:Resources.Action_BookAll}"
+            IsEnabled="{Binding IsImportPossible}"
+            Command="{Binding BookAllCommand}" />
 
-        <Button Content="CloseDummy" IsCancel="True" Width="0" Height="0" />
-      </StackPanel>
-      <DataGrid
-        Grid.Row="4"
-        ItemsSource="{Binding ImportDataFiltered}"
-        AutoGenerateColumns="False"
-        CanUserResizeColumns="True"
-        CanUserAddRows="False" CanUserDeleteRows="False">
-        <DataGrid.Columns>
-          <DataGridTextColumn
-            Header="{x:Static properties:Resources.Word_Date}"
-            Binding="{Binding Date, StringFormat=\{0:d\}}" IsReadOnly="True" />
-          <DataGridTextColumn
-            Header="{x:Static properties:Resources.Word_BookingNumber_Short}"
-            Binding="{Binding Identifier}" />
-          <DataGridTextColumn
-            Header="{x:Static properties:Resources.Word_Recipient}"
-            Binding="{Binding Name}"
-            Width="200" />
-          <DataGridTextColumn
-            Header="{x:Static properties:Resources.Word_BookingText}"
-            Binding="{Binding Text}"
-            Width="200" />
-          <DataGridTextColumn
-            Header="{x:Static properties:Resources.Word_Value}"
-            Binding="{Binding Value, StringFormat=\{0:0.00\}}"
-            ElementStyle="{StaticResource ValueGridStyle}" />
-          <DataGridCheckBoxColumn Header="{x:Static properties:Resources.Word_Skip}"
-                                  Binding="{Binding IsSkip, UpdateSourceTrigger=PropertyChanged}" />
-          <DataGridTemplateColumn
-            Header="{x:Static properties:Resources.Word_RemoteAccount}" MinWidth="150">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate DataType="{x:Type local:ImportEntryViewModel}">
-                <Grid>
-                  <ComboBox
-                    Margin="0"
-                    Visibility="{Binding IsCandidate, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    IsEnabled="{Binding IsSkip, Converter={StaticResource InverseBooleanConverter}}"
-                    ItemsSource="{Binding Accounts}"
-                    SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    ItemTemplate="{StaticResource AccountSelectionTemplate}"
-                    TextSearch.TextPath="Name" />
-                  <ContentControl
-                    Visibility="{Binding IsExisting, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    Content="{Binding RemoteAccount}"
-                    ContentTemplate="{StaticResource AccountSelectionTemplate}" />
-                </Grid>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <DataGridCheckBoxColumn
-            Header="{x:Static properties:Resources.Word_IsFollowup}"
-            Binding="{Binding IsFollowup}" />
-          <DataGridTemplateColumn>
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate DataType="{x:Type local:ImportEntryViewModel}">
-                <Button
-                  Width="30" Height="30" Padding="0" Margin="0"
-                  Content="X"
-                  ToolTip="{x:Static properties:Resources.Word_ResetAssignment}"
-                  Command="{Binding ResetRemoteAccountCommand}" />
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-        </DataGrid.Columns>
-        <DataGrid.CellStyle>
-          <Style TargetType="{x:Type DataGridCell}">
-            <Setter Property="Template">
-              <Setter.Value>
-                <ControlTemplate TargetType="{x:Type DataGridCell}">
-                  <Grid Background="{TemplateBinding Background}">
-                    <ContentPresenter VerticalAlignment="Center" Margin="2" />
+          <Button Content="CloseDummy" IsCancel="True"
+                  Width="0" Height="0" MinWidth="0" MinHeight="0" Margin="0" Padding="0" Opacity="0" />
+        </StackPanel>
+        <DataGrid
+          Grid.Row="4"
+          ItemsSource="{Binding ImportDataFiltered}"
+          AutoGenerateColumns="False"
+          CanUserResizeColumns="True"
+          CanUserAddRows="False" CanUserDeleteRows="False">
+          <DataGrid.Columns>
+            <DataGridTextColumn
+              Header="{x:Static properties:Resources.Word_Date}"
+              Binding="{Binding Date, StringFormat=\{0:d\}}" IsReadOnly="True" />
+            <DataGridTextColumn
+              Header="{x:Static properties:Resources.Word_BookingNumber_Short}"
+              Binding="{Binding Identifier}" />
+            <DataGridTextColumn
+              Header="{x:Static properties:Resources.Word_Recipient}"
+              Binding="{Binding Name}"
+              Width="200" />
+            <DataGridTextColumn
+              Header="{x:Static properties:Resources.Word_BookingText}"
+              Binding="{Binding Text}"
+              Width="200" />
+            <DataGridTextColumn
+              Header="{x:Static properties:Resources.Word_Value}"
+              Binding="{Binding Value, StringFormat=\{0:0.00\}}"
+              ElementStyle="{StaticResource ValueGridStyle}" />
+            <DataGridCheckBoxColumn Header="{x:Static properties:Resources.Word_Skip}"
+                                    Binding="{Binding IsSkip, UpdateSourceTrigger=PropertyChanged}" />
+            <DataGridTemplateColumn
+              Header="{x:Static properties:Resources.Word_RemoteAccount}" MinWidth="150">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate DataType="{x:Type local:ImportEntryViewModel}">
+                  <Grid>
+                    <ComboBox
+                      Margin="0"
+                      Visibility="{Binding IsCandidate, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      IsEnabled="{Binding IsSkip, Converter={StaticResource InverseBooleanConverter}}"
+                      ItemsSource="{Binding Accounts}"
+                      SelectedItem="{Binding RemoteAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemTemplate="{StaticResource AccountSelectionTemplate}"
+                      TextSearch.TextPath="Name" />
+                    <ContentControl
+                      Visibility="{Binding IsExisting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      Content="{Binding RemoteAccount}"
+                      ContentTemplate="{StaticResource AccountSelectionTemplate}" />
                   </Grid>
-                </ControlTemplate>
-              </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-              <DataTrigger Binding="{Binding IsExisting}" Value="True">
-                <Setter Property="Background" Value="LightGray" />
-                <Setter Property="IsEnabled" Value="False" />
-              </DataTrigger>
-            </Style.Triggers>
-          </Style>
-        </DataGrid.CellStyle>
-      </DataGrid>
-    </Grid>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridCheckBoxColumn
+              Header="{x:Static properties:Resources.Word_IsFollowup}"
+              Binding="{Binding IsFollowup}" />
+            <DataGridTemplateColumn>
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate DataType="{x:Type local:ImportEntryViewModel}">
+                  <Button
+                    Width="30" MinWidth="0" Padding="0" Margin="0"
+                    Content="X"
+                    ToolTip="{x:Static properties:Resources.Word_ResetAssignment}"
+                    Command="{Binding ResetRemoteAccountCommand}" />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+          <DataGrid.CellStyle>
+            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCellStyle}">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding IsExisting}" Value="True">
+                  <Setter Property="Background" Value="{DynamicResource SystemFillColorSolidNeutralBackgroundBrush}" />
+                  <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </DataGrid.CellStyle>
+        </DataGrid>
+      </Grid>
+    </Border>
     <local:BusyControl DataContext="{Binding Busy}" />
   </Grid>
 </UserControl>

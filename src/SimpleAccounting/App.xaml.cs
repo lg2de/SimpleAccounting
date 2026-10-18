@@ -12,6 +12,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Markup;
+using lg2de.SimpleAccounting.Abstractions;
+using lg2de.SimpleAccounting.Presentation;
 using lg2de.SimpleAccounting.Properties;
 
 [ExcludeFromCodeCoverage(Justification = "The application class cannot be tested.")]
@@ -58,5 +60,8 @@ public partial class App
         FrameworkElement.LanguageProperty.OverrideMetadata(
             typeof(FrameworkElement),
             new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
+
+        new WpfApplicationTheme().Apply(settings.Theme);
+        NeutralWindowBackground.Register();
     }
 }

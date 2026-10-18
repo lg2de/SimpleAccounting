@@ -22,7 +22,6 @@ using lg2de.SimpleAccounting.Properties;
 using lg2de.SimpleAccounting.Reports;
 using NSubstitute;
 using Xunit;
-using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 public class MenuViewModelTests
 {
@@ -35,7 +34,7 @@ public class MenuViewModelTests
         var projectData = new ProjectData(settings, null!, null!, fileSystem, clock, null!);
         var dialogs = Substitute.For<IDialogs>();
         var busy = new BusyControlModel();
-        var sut = new MenuViewModel(projectData, busy, null!, clock, null!, dialogs);
+        var sut = new MenuViewModel(projectData, busy, null!, clock, null!, dialogs, null!);
         long counter = 0;
         var tcs = new TaskCompletionSource<bool>();
         dialogs.ShowOpenFileDialog(Arg.Any<string>()).Returns((DialogResult.OK, "dummy"));
@@ -78,6 +77,29 @@ public class MenuViewModelTests
         sut.IsEnglishCulture.Should().BeFalse();
         sut.IsFrenchCulture.Should().BeFalse();
         sut.IsSystemCulture.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("Dark", false, true, false)]
+    [InlineData("Light", true, false, false)]
+    [InlineData("", false, false, true)]
+    public void SwitchThemeCommand_Theme_ThemeAppliedAndConfigurationUpdated(
+        string themeName, bool expectedLight, bool expectedDark, bool expectedSystem)
+    {
+        var sut = CreateSut(out IApplicationTheme applicationTheme);
+        sut.SwitchThemeCommand.Execute(ApplicationThemes.Dark);
+        applicationTheme.ClearReceivedCalls();
+        using var monitor = sut.Monitor();
+
+        sut.SwitchThemeCommand.Execute(themeName);
+
+        applicationTheme.Received(1).Apply(themeName);
+        sut.IsLightTheme.Should().Be(expectedLight);
+        sut.IsDarkTheme.Should().Be(expectedDark);
+        sut.IsSystemTheme.Should().Be(expectedSystem);
+        monitor.Should().RaisePropertyChangeFor(x => x.IsLightTheme);
+        monitor.Should().RaisePropertyChangeFor(x => x.IsDarkTheme);
+        monitor.Should().RaisePropertyChangeFor(x => x.IsSystemTheme);
     }
 
     [Fact]
@@ -128,7 +150,7 @@ public class MenuViewModelTests
     [Fact]
     public void CloseYearCommand_ActionAborted_YearsUnchanged()
     {
-        var sut = CreateSut(out ProjectData projectData, out IDialogs dialogs, out _);
+        var sut = CreateSut(out ProjectData projectData, out IDialogs dialogs, out _, out _);
         dialogs.ShowMessageBox(
             Arg.Any<string>(),
             Arg.Any<string>(),
@@ -147,10 +169,10 @@ public class MenuViewModelTests
     [Fact]
     public void CloseYearCommand_CurrentYearClosed_CannotExecute()
     {
-        var sut = CreateSut(out ProjectData projectData, out IDialogs dialogs, out _);
+        var sut = CreateSut(out ProjectData projectData, out IDialogs dialogs, out _, out _);
         dialogs.ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
+            Arg.Any<MessageBoxResult>()).Returns(MessageBoxResult.Yes);
         projectData.LoadData(Samples.SampleProject);
         sut.OnDataLoaded();
         sut.BookingYears[0].Command.Execute(null);
@@ -358,24 +380,31 @@ public class MenuViewModelTests
 
     private static MenuViewModel CreateSut(out ProjectData projectData)
     {
-        var sut = CreateSut(out projectData, out IDialogs _, out IReportFactory _);
+        var sut = CreateSut(out projectData, out IDialogs _, out IReportFactory _, out IApplicationTheme _);
         return sut;
     }
 
     private static MenuViewModel CreateSut(out IDialogs dialogs)
     {
-        var sut = CreateSut(out ProjectData _, out dialogs, out IReportFactory _);
+        var sut = CreateSut(out ProjectData _, out dialogs, out IReportFactory _, out IApplicationTheme _);
+        return sut;
+    }
+
+    private static MenuViewModel CreateSut(out IApplicationTheme applicationTheme)
+    {
+        var sut = CreateSut(out ProjectData _, out IDialogs _, out IReportFactory _, out applicationTheme);
         return sut;
     }
 
     private static MenuViewModel CreateSut(out ProjectData projectData, out IReportFactory reportFactory)
     {
-        var sut = CreateSut(out projectData, out IDialogs _, out reportFactory);
+        var sut = CreateSut(out projectData, out IDialogs _, out reportFactory, out IApplicationTheme _);
         return sut;
     }
 
     private static MenuViewModel CreateSut(
-        out ProjectData projectData, out IDialogs dialogs, out IReportFactory reportFactory)
+        out ProjectData projectData, out IDialogs dialogs, out IReportFactory reportFactory,
+        out IApplicationTheme applicationTheme)
     {
         var windowManager = Substitute.For<IWindowManager>();
         var fileSystem = Substitute.For<IFileSystem>();
@@ -384,9 +413,10 @@ public class MenuViewModelTests
         var busy = Substitute.For<IBusy>();
         reportFactory = Substitute.For<IReportFactory>();
         var clock = Substitute.For<IClock>();
+        applicationTheme = Substitute.For<IApplicationTheme>();
         var settings = new Settings();
         projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
-        var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs);
+        var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs, applicationTheme);
         return sut;
     }
 
@@ -401,7 +431,7 @@ public class MenuViewModelTests
         var clock = Substitute.For<IClock>();
         var settings = new Settings();
         var projectData = new ProjectData(settings, windowManager, dialogs, fileSystem, clock, processApi);
-        var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs);
+        var sut = new MenuViewModel(projectData, busy, reportFactory, clock, processApi, dialogs, null!);
         return sut;
     }
 }

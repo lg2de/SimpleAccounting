@@ -820,7 +820,7 @@ public partial class ShellViewModelTests
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.No);
         sut.ProjectData.IsModified = true;
         applicationUpdate.GetUpdatePackageAsync(userInvoked: true, Arg.Any<string>(), Arg.Any<CultureInfo>())

@@ -6,16 +6,16 @@ namespace lg2de.SimpleAccounting.Abstractions;
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using Caliburn.Micro;
 using JetBrains.Annotations;
+using lg2de.SimpleAccounting.Presentation;
 using Application = System.Windows.Application;
-using MessageBox = System.Windows.MessageBox;
-using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 /// <summary>
-///     Default implementation of <see cref="IDialogs" /> using <see cref="System.Windows.MessageBox" />.
+///     Default implementation of <see cref="IDialogs" /> using <see cref="MessageDialog" />.
 /// </summary>
 [ExcludeFromCodeCoverage(
     Justification = "The abstraction is for unit testing only. This is the simple implementation.")]
@@ -30,23 +30,25 @@ internal class WindowsDialogs : IDialogs
         string caption,
         MessageBoxButton button = MessageBoxButton.OK,
         MessageBoxImage icon = MessageBoxImage.None,
-        MessageBoxResult defaultResult = MessageBoxResult.None,
-        MessageBoxOptions options = MessageBoxOptions.None)
+        MessageBoxResult defaultResult = MessageBoxResult.None)
     {
         MessageBoxResult result = MessageBoxResult.None;
-        Execute.OnUIThread(
-            () =>
-            {
-                Application.Current.MainWindow!.Activate();
-                result = MessageBox.Show(
-                    Application.Current.MainWindow,
-                    messageBoxText,
-                    caption,
-                    button,
-                    icon,
-                    defaultResult,
-                    options);
-            });
+        Execute.OnUIThread(() =>
+        {
+            // the message belongs to the active window, e.g. an open dialog, instead of the main window
+            var owner =
+                Application.Current.Windows.OfType<Window>()
+                    .FirstOrDefault(x => x is { IsActive: true, IsVisible: true })
+                ?? Application.Current.MainWindow!;
+            owner.Activate();
+            result = MessageDialog.Show(
+                owner,
+                messageBoxText,
+                caption,
+                button,
+                icon,
+                defaultResult);
+        });
         return result;
     }
 
