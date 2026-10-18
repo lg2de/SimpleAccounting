@@ -53,6 +53,16 @@ public partial class ReportPreviewWindow
     private const double FitPageFactor = -1;
     private const double FitWidthFactor = 0;
 
+    // limits the zoom factor fitting the page into a tiny window
+    private const double MinimumFitFactor = 0.1;
+
+    // tolerance to compare the current zoom factor with the fixed ones
+    private const double ZoomTolerance = 0.001;
+
+    // fixed zoom factors offered in addition, in percent
+    private const double PercentPerFactor = 100;
+    private static readonly int[] ZoomPercentages = [50, 75, 100, 125, 150, 200, 300];
+
     private readonly PrintDocument document;
     private readonly List<PreviewPage> pages;
     private readonly List<ZoomOption> zoomOptions;
@@ -87,8 +97,9 @@ public partial class ReportPreviewWindow
         [
             new ZoomOption(AppResources.ReportPreview_FitPage, FitPageFactor),
             new ZoomOption(AppResources.ReportPreview_FitWidth, FitWidthFactor),
-            ..new[] { 50, 75, 100, 125, 150, 200, 300 }.Select(
-                x => new ZoomOption(string.Format(CultureInfo.CurrentUICulture, "{0} %", x), x / 100.0))
+            ..ZoomPercentages.Select(
+                x => new ZoomOption(
+                    string.Format(CultureInfo.CurrentUICulture, "{0} %", x), x / PercentPerFactor))
         ];
         this.ZoomSelection.ItemsSource = this.zoomOptions;
         this.ZoomSelection.SelectedIndex = 0; // whole page
@@ -150,7 +161,7 @@ public partial class ReportPreviewWindow
                 factor = Math.Min(factor, availableHeight / this.pages.Max(x => x.NaturalHeight));
             }
 
-            factor = Math.Max(0.1, factor);
+            factor = Math.Max(MinimumFitFactor, factor);
         }
 
         double deviceScale = VisualTreeHelper.GetDpi(this).DpiScaleX;
@@ -164,8 +175,8 @@ public partial class ReportPreviewWindow
         double current = this.pages.Count > 0 ? this.pages[0].Zoom : 1;
         var fixedOptions = this.zoomOptions.Where(x => x.Factor > 0).ToList();
         var next = direction > 0
-            ? fixedOptions.FirstOrDefault(x => x.Factor > current + 0.001) ?? fixedOptions[^1]
-            : fixedOptions.LastOrDefault(x => x.Factor < current - 0.001) ?? fixedOptions[0];
+            ? fixedOptions.Find(x => x.Factor > current + ZoomTolerance) ?? fixedOptions[^1]
+            : fixedOptions.FindLast(x => x.Factor < current - ZoomTolerance) ?? fixedOptions[0];
         this.ZoomSelection.SelectedItem = next;
     }
 

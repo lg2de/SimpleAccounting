@@ -37,10 +37,7 @@ public partial class MessageDialog
             defaultResult = results[0];
         }
 
-        // closing the window without button has the same meaning as the Win32 message box
-        this.result = results.Contains(MessageBoxResult.Cancel) ? MessageBoxResult.Cancel
-            : results.Contains(MessageBoxResult.No) ? MessageBoxResult.No
-            : MessageBoxResult.OK;
+        this.result = GetCloseResult(button);
 
         // ESC triggers "Cancel", or "OK" if this is the only button
         this.ButtonsPanel.ItemsSource = results
@@ -70,6 +67,19 @@ public partial class MessageDialog
         PlaySound(icon);
         dialog.ShowDialog();
         return dialog.result;
+    }
+
+    /// <summary>
+    ///     Gets the result of closing the window without button, which has the same meaning as the Win32 message box.
+    /// </summary>
+    private static MessageBoxResult GetCloseResult(MessageBoxButton button)
+    {
+        return button switch
+        {
+            MessageBoxButton.OKCancel or MessageBoxButton.YesNoCancel => MessageBoxResult.Cancel,
+            MessageBoxButton.YesNo => MessageBoxResult.No,
+            _ => MessageBoxResult.OK
+        };
     }
 
     private static List<MessageBoxResult> GetResults(MessageBoxButton button)
