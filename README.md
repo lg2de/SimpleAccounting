@@ -58,7 +58,7 @@ I'll update this package with security fixes if needed.
 There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.5.0/SimpleAccounting.zip)
 available that requires .NET runtime to be installed.
 Please download and install the Runtime in
-version [10.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.1-windows-x64-installer)
+version [10.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.13-windows-x64-installer)
 or above.
 
 Download one of the `SimpleAccounting` packages from
