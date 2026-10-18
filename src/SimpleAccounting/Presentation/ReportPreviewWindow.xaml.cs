@@ -64,20 +64,19 @@ public partial class ReportPreviewWindow
     private static readonly int[] ZoomPercentages = [50, 75, 100, 125, 150, 200, 300];
 
     private readonly PrintDocument document;
-    private readonly List<PreviewPage> pages;
     private readonly List<ZoomOption> zoomOptions;
 
     // delays rendering while the zoom or the window size is changing
     private readonly DispatcherTimer renderTimer;
 
+    private List<PreviewPage> pages = [];
+
+    // suppresses the handling of selection changes while the selection is updated by code
+    private bool isUpdatingPaperSelection;
+
     private ReportPreviewWindow(string documentName, PrintDocument document)
     {
         this.document = document;
-
-        var controller = new PreviewPrintController { UseAntiAlias = true };
-        document.PrintController = controller;
-        document.Print();
-        this.pages = controller.GetPreviewPageInfo().Select(x => new PreviewPage(x)).ToList();
 
         this.renderTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(150) };
         this.renderTimer.Tick += (_, _) =>
@@ -89,9 +88,8 @@ public partial class ReportPreviewWindow
         this.InitializeComponent();
 
         this.Title = documentName;
-        this.PagesView.ItemsSource = this.pages;
-        this.PageCountText.Text = string.Format(
-            CultureInfo.CurrentUICulture, AppResources.ReportPreview_PageCountX, this.pages.Count);
+        this.UpdatePaperSelection();
+        this.CreatePages();
 
         this.zoomOptions =
         [
@@ -104,8 +102,8 @@ public partial class ReportPreviewWindow
         this.ZoomSelection.ItemsSource = this.zoomOptions;
         this.ZoomSelection.SelectedIndex = 0; // whole page
 
-        // the display scaling is known after loading only
-        this.Loaded += (_, _) => this.ApplyZoom();
+        // The visible area and the display scaling are known after loading only.
+        this.Loaded += (_, _) => this.ApplyZoomAndRender();
     }
 
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
@@ -114,27 +112,39 @@ public partial class ReportPreviewWindow
         this.ApplyZoom();
     }
 
+    protected override void OnClosed(EventArgs e)
+    {
+        this.renderTimer.Stop();
+        this.pages.ForEach(x => x.Dispose());
+        base.OnClosed(e);
+    }
+
     /// <summary>
     ///     Shows the preview of the document modal to the main window.
     /// </summary>
     public static void Show(string documentName, PrintDocument document)
     {
+        var owner = Application.Current?.MainWindow is { IsVisible: true } mainWindow ? mainWindow : null;
+
         ReportPreviewWindow window;
         Mouse.OverrideCursor = Cursors.Wait;
         try
         {
             window = new ReportPreviewWindow(documentName, document);
         }
+        catch (InvalidPrinterException exception)
+        {
+            // the preview requires the (default) printer to be available
+            Mouse.OverrideCursor = null;
+            ShowPrinterError(owner, exception);
+            return;
+        }
         finally
         {
             Mouse.OverrideCursor = null;
         }
 
-        if (Application.Current?.MainWindow is { IsVisible: true } mainWindow)
-        {
-            window.Owner = mainWindow;
-        }
-
+        window.Owner = owner;
         window.ShowDialog();
     }
 
@@ -142,7 +152,8 @@ public partial class ReportPreviewWindow
 
     private void ApplyZoom()
     {
-        if (this.ZoomSelection.SelectedItem is not ZoomOption option || this.pages.Count == 0)
+        // before loading, the size of the visible area is unknown
+        if (!this.IsLoaded || this.ZoomSelection.SelectedItem is not ZoomOption option || this.pages.Count == 0)
         {
             return;
         }
@@ -168,6 +179,102 @@ public partial class ReportPreviewWindow
         this.pages.ForEach(x => x.SetZoom(factor, deviceScale));
         this.renderTimer.Stop();
         this.renderTimer.Start();
+    }
+
+    /// <summary>
+    ///     Applies the zoom and renders the visible pages without delay.
+    /// </summary>
+    private void ApplyZoomAndRender()
+    {
+        this.ApplyZoom();
+        this.renderTimer.Stop();
+        this.pages.ForEach(x => x.Refresh());
+    }
+
+    /// <summary>
+    ///     Creates the pages of the preview using the current printer and page settings.
+    /// </summary>
+    private void CreatePages()
+    {
+        var oldPages = this.pages;
+
+        var controller = new PreviewPrintController { UseAntiAlias = true };
+        this.document.PrintController = controller;
+        this.document.Print();
+        this.pages = controller.GetPreviewPageInfo().Select(x => new PreviewPage(x)).ToList();
+
+        this.PagesView.ItemsSource = this.pages;
+        this.PageCountText.Text = string.Format(
+            CultureInfo.CurrentUICulture, AppResources.ReportPreview_PageCountX, this.pages.Count);
+        oldPages.ForEach(x => x.Dispose());
+
+        if (this.IsLoaded)
+        {
+            this.ApplyZoomAndRender();
+        }
+    }
+
+    private void RecreatePages()
+    {
+        Mouse.OverrideCursor = Cursors.Wait;
+        try
+        {
+            this.CreatePages();
+        }
+        finally
+        {
+            Mouse.OverrideCursor = null;
+        }
+    }
+
+    /// <summary>
+    ///     Updates the selection of the paper according to the settings of the document.
+    /// </summary>
+    /// <remarks>
+    ///     The paper sizes are offered by the current printer (selected in the print dialog).
+    ///     The paper defined by the report is offered additionally if the printer does not support it.
+    /// </remarks>
+    private void UpdatePaperSelection()
+    {
+        this.isUpdatingPaperSelection = true;
+        try
+        {
+            var currentPaper = this.document.DefaultPageSettings.PaperSize;
+            var paperSizes = this.document.PrinterSettings.PaperSizes.Cast<PaperSize>().ToList();
+            var selectedPaper =
+                paperSizes.Find(x => x.PaperName == currentPaper.PaperName)
+                ?? paperSizes.Find(x => x.Width == currentPaper.Width && x.Height == currentPaper.Height);
+            if (selectedPaper == null)
+            {
+                selectedPaper = currentPaper;
+                paperSizes.Insert(0, currentPaper);
+            }
+
+            this.PaperSelection.ItemsSource = paperSizes;
+            this.PaperSelection.SelectedItem = selectedPaper;
+        }
+        finally
+        {
+            this.isUpdatingPaperSelection = false;
+        }
+    }
+
+    private static void ShowPrinterError(Window? owner, InvalidPrinterException exception)
+    {
+        MessageDialog.Show(
+            owner, exception.Message, AppResources.Action_Print,
+            MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.None);
+    }
+
+    private void OnPaperSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (this.isUpdatingPaperSelection || this.PaperSelection.SelectedItem is not PaperSize paperSize)
+        {
+            return;
+        }
+
+        this.document.DefaultPageSettings.PaperSize = paperSize;
+        this.RecreatePages();
     }
 
     private void ChangeZoom(int direction)
@@ -221,6 +328,10 @@ public partial class ReportPreviewWindow
 
     private void OnPrintExecuted(object sender, ExecutedRoutedEventArgs e)
     {
+        string printerName = this.document.PrinterSettings.PrinterName;
+        string paperName = this.document.DefaultPageSettings.PaperSize.PaperName;
+        bool landscape = this.document.DefaultPageSettings.Landscape;
+
         using var dialog = new System.Windows.Forms.PrintDialog();
         dialog.Document = this.document;
         dialog.UseEXDialog = true;
@@ -229,10 +340,26 @@ public partial class ReportPreviewWindow
             return;
         }
 
-        // restore the default controller (with status dialog) for real printing
-        this.document.PrintController =
-            new System.Windows.Forms.PrintControllerWithStatusDialog(new StandardPrintController());
-        this.document.Print();
+        try
+        {
+            // the printer or the paper may be changed in the dialog, the preview shows the printed result
+            if (printerName != this.document.PrinterSettings.PrinterName
+                || paperName != this.document.DefaultPageSettings.PaperSize.PaperName
+                || landscape != this.document.DefaultPageSettings.Landscape)
+            {
+                this.UpdatePaperSelection();
+                this.RecreatePages();
+            }
+
+            // restore the default controller (with status dialog) for real printing
+            this.document.PrintController =
+                new System.Windows.Forms.PrintControllerWithStatusDialog(new StandardPrintController());
+            this.document.Print();
+        }
+        catch (InvalidPrinterException exception)
+        {
+            ShowPrinterError(this, exception);
+        }
     }
 
     private sealed record ZoomOption(string Text, double Factor);
@@ -244,10 +371,13 @@ public partial class ReportPreviewWindow
     ///     The bitmap is not cached: it is rendered when the page becomes visible (virtualization)
     ///     and released when the page is scrolled out of view.
     /// </remarks>
-    private sealed class PreviewPage : INotifyPropertyChanged
+    private sealed class PreviewPage : INotifyPropertyChanged, IDisposable
     {
         private readonly PreviewPageInfo pageInfo;
         private double deviceScale = 1;
+
+        // the page is not rendered before the zoom fitting the visible area has been applied
+        private bool isZoomApplied;
 
         public PreviewPage(PreviewPageInfo pageInfo)
         {
@@ -266,12 +396,19 @@ public partial class ReportPreviewWindow
 
         public double DisplayHeight => this.NaturalHeight * this.Zoom;
 
-        public BitmapSource Image => this.Render();
+        public BitmapSource? Image => this.isZoomApplied ? this.Render() : null;
+
+        public void Dispose()
+        {
+            // the page is stored as metafile which holds a GDI handle
+            this.pageInfo.Image.Dispose();
+        }
 
         public void SetZoom(double zoom, double scale)
         {
             this.Zoom = zoom;
             this.deviceScale = scale;
+            this.isZoomApplied = true;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.DisplayWidth)));
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.DisplayHeight)));
         }

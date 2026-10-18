@@ -20,7 +20,6 @@ using lg2de.SimpleAccounting.Properties;
 using lg2de.SimpleAccounting.Reports;
 using NSubstitute;
 using Xunit;
-using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 public partial class ShellViewModelTests
 {
@@ -177,7 +176,7 @@ public partial class ShellViewModelTests
                 Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Yes);
         fileSystem.FileExists(Arg.Is("c:\\file1")).Returns(true);
         bool securedFileAvailable = false;
@@ -194,7 +193,7 @@ public partial class ShellViewModelTests
             Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
             Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 
     [CulturedFact(["en"])]
@@ -285,7 +284,7 @@ public partial class ShellViewModelTests
                 Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.No);
         await ((IActivate)sut).ActivateAsync(TestContext.Current.CancellationToken);
         sut.Menu.RecentProjects.Select(x => x.Header).Should().Equal("K:\\file1", "file2");
@@ -422,7 +421,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut(out IDialogs dialogs, out IFileSystem _);
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Cancel);
         sut.ProjectData.IsModified = true;
 
@@ -438,7 +437,7 @@ public partial class ShellViewModelTests
         var sut = CreateSut(out IDialogs dialogs, out IFileSystem _);
         dialogs.ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
+            Arg.Any<MessageBoxResult>()).Returns(MessageBoxResult.Yes);
         dialogs.ShowSaveFileDialog(Arg.Any<string>()).Returns((DialogResult.Cancel, string.Empty));
         sut.ProjectData.NewProject();
         sut.ProjectData.IsModified = true;

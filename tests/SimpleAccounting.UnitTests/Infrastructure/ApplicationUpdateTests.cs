@@ -86,7 +86,7 @@ public class ApplicationUpdateTests
             Arg.Any<string>(),
             Arg.Any<string>(),
             MessageBoxButton.OK, Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 
     [Fact]
@@ -108,12 +108,12 @@ public class ApplicationUpdateTests
             Arg.Any<string>(),
             Arg.Any<string>(),
             MessageBoxButton.OK, Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
         dialogs.DidNotReceive().ShowMessageBox(
             Arg.Any<string>(),
             Arg.Any<string>(),
             MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 
     [Fact]
@@ -135,12 +135,12 @@ public class ApplicationUpdateTests
             Arg.Any<string>(),
             Arg.Any<string>(),
             MessageBoxButton.OK, Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
         dialogs.DidNotReceive().ShowMessageBox(
             Arg.Any<string>(),
             Arg.Any<string>(),
             MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public class ApplicationUpdateTests
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.No);
 
         var result = await sut.Awaiting(
@@ -171,7 +171,7 @@ public class ApplicationUpdateTests
             Arg.Any<string>(),
             Arg.Any<string>(),
             MessageBoxButton.OK, Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class ApplicationUpdateTests
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Yes);
         var result = await sut.Awaiting(
                 x => x.AskForUpdateAsync(userInvoked: false, releases, "2.0", CultureInfo.InvariantCulture))

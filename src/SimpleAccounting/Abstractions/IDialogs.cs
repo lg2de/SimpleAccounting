@@ -7,7 +7,6 @@ namespace lg2de.SimpleAccounting.Abstractions;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Forms;
-using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 /// <summary>
 ///     Defines access to a message box.
@@ -23,8 +22,7 @@ public interface IDialogs
         string caption,
         MessageBoxButton button = MessageBoxButton.OK,
         MessageBoxImage icon = MessageBoxImage.None,
-        MessageBoxResult defaultResult = MessageBoxResult.None,
-        MessageBoxOptions options = MessageBoxOptions.None);
+        MessageBoxResult defaultResult = MessageBoxResult.None);
 
     (DialogResult Result, string FileName) ShowOpenFileDialog(string filter, string initialDirectory);
 

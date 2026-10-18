@@ -1281,6 +1281,15 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Paper.
+        /// </summary>
+        public static string ReportPreview_Paper {
+            get {
+                return ResourceManager.GetString("ReportPreview_Paper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Page width.
         /// </summary>
         public static string ReportPreview_FitWidth {

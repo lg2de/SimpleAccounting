@@ -47,7 +47,7 @@ public class ProjectFileLoaderTests
                 Arg.Is<string>(s => s.Contains("by a different user", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.No);
 
         var result = await sut.Awaiting(x => x.LoadAsync("the.fileName")).Should().CompleteWithinAsync(1.Seconds());
@@ -57,7 +57,7 @@ public class ProjectFileLoaderTests
             Arg.Is<string>(s => s.Contains("by a different user", StringComparison.Ordinal)),
             Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class ProjectFileLoaderTests
             Arg.Any<string>(),
             Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
         // Such file must be written finally similar to the file read initially.
         fileSystem.Received(1).WriteAllTextIntoFile(reservationFileName, reservationXml);
     }
@@ -102,7 +102,7 @@ public class ProjectFileLoaderTests
                 Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.No);
 
         var result = await sut.Awaiting(x => x.LoadAsync("K:\\the.fileName")).Should()
@@ -114,6 +114,6 @@ public class ProjectFileLoaderTests
             Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
             Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 }

@@ -754,4 +754,7 @@ Error message:</value>
   <data name="ReportPreview_FitPage" xml:space="preserve">
     <value>Whole page</value>
   </data>
+  <data name="ReportPreview_Paper" xml:space="preserve">
+    <value>Paper</value>
+  </data>
 </root>

@@ -7,24 +7,25 @@
   MinWidth="320" MaxWidth="640"
   ResizeMode="NoResize"
   ShowInTaskbar="False"
-  WindowStartupLocation="CenterOwner">
-  <!-- layout like the Windows 11 content dialog: brighter content area, darker button area -->
+  WindowStartupLocation="CenterOwner"
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+  <Window.CommandBindings>
+    <!-- Ctrl+C copies the whole message like the Win32 message box -->
+    <CommandBinding Command="Copy" Executed="OnCopyExecuted" />
+  </Window.CommandBindings>
   <DockPanel>
-    <Border
-      DockPanel.Dock="Bottom"
-      Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
-      BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" BorderThickness="0 1 0 0"
-      Padding="19 15">
-      <ItemsControl x:Name="ButtonsPanel" HorizontalAlignment="Right">
+    <Border Style="{StaticResource DialogFooterStyle}">
+      <ItemsControl x:Name="ButtonsPanel" Focusable="False">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
-            <StackPanel Orientation="Horizontal" />
+            <StackPanel Style="{StaticResource DialogButtonPanelStyle}" />
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
       </ItemsControl>
     </Border>
-    <Border Background="{DynamicResource SolidBackgroundFillColorTertiaryBrush}">
-      <Grid Margin="24 24 24 20">
+    <Border Style="{StaticResource DialogContentStyle}">
+      <Grid Margin="5">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
@@ -32,10 +33,7 @@
         <TextBlock
           x:Name="IconText"
           Grid.Column="0"
-          Margin="0 0 16 0"
-          VerticalAlignment="Top"
-          FontFamily="{DynamicResource SymbolThemeFontFamily}"
-          FontSize="32"
+          Style="{StaticResource DialogIconStyle}"
           Visibility="Collapsed" />
         <TextBlock
           x:Name="MessageText"

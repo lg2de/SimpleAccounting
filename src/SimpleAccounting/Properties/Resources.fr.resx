@@ -751,4 +751,7 @@ Texte d'erreur:</value>
   <data name="ReportPreview_FitPage" xml:space="preserve">
     <value>Page entière</value>
   </data>
+  <data name="ReportPreview_Paper" xml:space="preserve">
+    <value>Papier</value>
+  </data>
 </root>

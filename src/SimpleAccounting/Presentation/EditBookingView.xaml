@@ -16,198 +16,199 @@
   <UserControl.InputBindings>
     <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding DefaultCommand, Mode=OneWay}" />
   </UserControl.InputBindings>
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="Auto" />
-      <ColumnDefinition Width="*" />
-      <ColumnDefinition Width="Auto" MinWidth="100" />
-      <ColumnDefinition Width="Auto" />
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    <Grid.Resources>
+  <DockPanel>
+    <DockPanel.Resources>
       <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Margin" Value="5" />
       </Style>
-    </Grid.Resources>
-    <DatePicker
-      Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0"
-      SelectedDate="{Binding Date}"
-      DisplayDateStart="{Binding DateStart, Mode=OneWay}"
-      DisplayDateEnd="{Binding DateEnd, Mode=OneWay}" />
-    <TextBlock
-      Grid.Column="2" Grid.Row="0"
-      HorizontalAlignment="Right" VerticalAlignment="Center"
-      Text="{x:Static properties:Resources.Word_BookingNumber}" />
-    <local:NumberTextBox
-      Grid.Column="3" Grid.Row="0"
-      Width="100" HorizontalContentAlignment="Right"
-      Scale="0"
-      Text="{Binding BookingIdentifier}" />
+    </DockPanel.Resources>
+    <Border Style="{StaticResource DialogFooterStyle}">
+      <StackPanel Style="{StaticResource DialogButtonPanelStyle}">
+        <Button
+          Content="{x:Static properties:Resources.Action_Book}" Command="{Binding AddCommand}"
+          Style="{StaticResource PrimaryButtonStyle}"
+          Visibility="{Binding NewMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Button
+          Content="{x:Static properties:Resources.Action_Save}" Command="{Binding SaveCommand}"
+          Style="{StaticResource PrimaryButtonStyle}"
+          Visibility="{Binding EditMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Button Content="{x:Static properties:Resources.Action_Close}" IsCancel="True" />
+      </StackPanel>
+    </Border>
+    <Border Style="{StaticResource DialogContentStyle}">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" MinWidth="100" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <DatePicker
+          Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0"
+          SelectedDate="{Binding Date}"
+          DisplayDateStart="{Binding DateStart, Mode=OneWay}"
+          DisplayDateEnd="{Binding DateEnd, Mode=OneWay}" />
+        <TextBlock
+          Grid.Column="2" Grid.Row="0"
+          HorizontalAlignment="Right" VerticalAlignment="Center"
+          Text="{x:Static properties:Resources.Word_BookingNumber}" />
+        <local:NumberTextBox
+          Grid.Column="3" Grid.Row="0"
+          Width="100" HorizontalContentAlignment="Right"
+          Scale="0"
+          Text="{Binding BookingIdentifier}" />
 
-    <ComboBox
-      Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
-      MinWidth="200" IsEditable="True" IsTextSearchEnabled="False"
-      Text="{Binding BookingText}"
-      ItemsSource="{Binding BindingTemplates}"
-      SelectedItem="{Binding SelectedTemplate}"
-      DisplayMemberPath="Text" />
-    <TextBlock
-      Grid.Column="2" Grid.Row="1"
-      HorizontalAlignment="Right" VerticalAlignment="Center"
-      Text="{Binding ValueLabel}" />
-    <local:NumberTextBox
-      Grid.Column="3" Grid.Row="1"
-      Width="100"
-      HorizontalContentAlignment="Right"
-      Scale="2"
-      Text="{Binding BookingValue, StringFormat='#0.00', UpdateSourceTrigger=PropertyChanged}" />
+        <ComboBox
+          Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
+          MinWidth="200" IsEditable="True" IsTextSearchEnabled="False"
+          Text="{Binding BookingText}"
+          ItemsSource="{Binding BindingTemplates}"
+          SelectedItem="{Binding SelectedTemplate}"
+          DisplayMemberPath="Text" />
+        <TextBlock
+          Grid.Column="2" Grid.Row="1"
+          HorizontalAlignment="Right" VerticalAlignment="Center"
+          Text="{Binding ValueLabel}" />
+        <local:NumberTextBox
+          Grid.Column="3" Grid.Row="1"
+          Width="100"
+          HorizontalContentAlignment="Right"
+          Scale="2"
+          Text="{Binding BookingValue, StringFormat='#0.00', UpdateSourceTrigger=PropertyChanged}" />
 
-    <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" SelectedIndex="{Binding PageIndex}">
-      <TabItem>
-        <TabItem.Header>
-          <TextBlock Text="{x:Static properties:Resources.Header_DebitCredit}" Padding="2" />
-        </TabItem.Header>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="*" />
-              <ColumnDefinition Width="4*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" SelectedIndex="{Binding PageIndex}">
+          <TabItem>
+            <TabItem.Header>
+              <TextBlock Text="{x:Static properties:Resources.Header_DebitCredit}" Padding="2" />
+            </TabItem.Header>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="4*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <TextBlock
-              Grid.Column="0" Grid.Row="0"
-              VerticalAlignment="Center"
-              Text="{x:Static properties:Resources.Word_Debit}" />
-            <local:EditBookingAccountControl
-              Grid.Column="1" Grid.Row="0"
-              AccountIndex="{Binding DebitIndex, Mode=OneWayToSource}"
-              AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
-              BookingText="{Binding BookingText}"
-              BookingValue="{Binding BookingValue}"
-              Accounts="{Binding Accounts}"
-              SplitEntries="{Binding DebitSplitEntries}"
-              AllowSplitting="{Binding DebitSplitAllowed}" />
+                <TextBlock
+                  Grid.Column="0" Grid.Row="0"
+                  VerticalAlignment="Center"
+                  Text="{x:Static properties:Resources.Word_Debit}" />
+                <local:EditBookingAccountControl
+                  Grid.Column="1" Grid.Row="0"
+                  AccountIndex="{Binding DebitIndex, Mode=OneWayToSource}"
+                  AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
+                  BookingText="{Binding BookingText}"
+                  BookingValue="{Binding BookingValue}"
+                  Accounts="{Binding Accounts}"
+                  SplitEntries="{Binding DebitSplitEntries}"
+                  AllowSplitting="{Binding DebitSplitAllowed}" />
 
-            <TextBlock
-              Grid.Column="0" Grid.Row="1"
-              VerticalAlignment="Center"
-              Text="{x:Static properties:Resources.Word_Credit}" />
-            <local:EditBookingAccountControl
-              Grid.Column="1" Grid.Row="1"
-              AccountIndex="{Binding CreditIndex, Mode=OneWayToSource}"
-              AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
-              Accounts="{Binding Accounts}"
-              SplitEntries="{Binding CreditSplitEntries}"
-              AllowSplitting="{Binding CreditSplitAllowed}" />
-          </Grid>
-        </ScrollViewer>
-      </TabItem>
-      <TabItem IsEnabled="{Binding IsEasyBookingEnabled}">
-        <TabItem.Header>
-          <TextBlock Text="{x:Static properties:Resources.Word_Income}" Padding="2" />
-        </TabItem.Header>
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="4*" />
-          </Grid.ColumnDefinitions>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-          </Grid.RowDefinitions>
+                <TextBlock
+                  Grid.Column="0" Grid.Row="1"
+                  VerticalAlignment="Center"
+                  Text="{x:Static properties:Resources.Word_Credit}" />
+                <local:EditBookingAccountControl
+                  Grid.Column="1" Grid.Row="1"
+                  AccountIndex="{Binding CreditIndex, Mode=OneWayToSource}"
+                  AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
+                  Accounts="{Binding Accounts}"
+                  SplitEntries="{Binding CreditSplitEntries}"
+                  AllowSplitting="{Binding CreditSplitAllowed}" />
+              </Grid>
+            </ScrollViewer>
+          </TabItem>
+          <TabItem IsEnabled="{Binding IsEasyBookingEnabled}">
+            <TabItem.Header>
+              <TextBlock Text="{x:Static properties:Resources.Word_Income}" Padding="2" />
+            </TabItem.Header>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="4*" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
 
-          <TextBlock
-            Grid.Column="0" Grid.Row="0"
-            VerticalAlignment="Center"
-            Text="{x:Static properties:Resources.Word_IncomeType}" />
-          <local:EditBookingAccountControl
-            Grid.Column="1" Grid.Row="0"
-            AccountIndex="{Binding IncomeIndex, Mode=OneWayToSource}"
-            AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
-            Accounts="{Binding IncomeAccounts}" />
+              <TextBlock
+                Grid.Column="0" Grid.Row="0"
+                VerticalAlignment="Center"
+                Text="{x:Static properties:Resources.Word_IncomeType}" />
+              <local:EditBookingAccountControl
+                Grid.Column="1" Grid.Row="0"
+                AccountIndex="{Binding IncomeIndex, Mode=OneWayToSource}"
+                AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
+                Accounts="{Binding IncomeAccounts}" />
 
-          <TextBlock
-            Grid.Column="0" Grid.Row="1"
-            VerticalAlignment="Center"
-            Text="{x:Static properties:Resources.Label_SourceAndRemoteAccount}" />
-          <local:EditBookingAccountControl
-            Grid.Column="1" Grid.Row="1"
-            AccountIndex="{Binding IncomeRemoteIndex, Mode=OneWayToSource}"
-            AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
-            Accounts="{Binding IncomeRemoteAccounts}" />
-        </Grid>
-      </TabItem>
-      <TabItem IsEnabled="{Binding IsEasyBookingEnabled}">
-        <TabItem.Header>
-          <TextBlock Text="{x:Static properties:Resources.Word_Expense}" Padding="2" />
-        </TabItem.Header>
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="4*" />
-          </Grid.ColumnDefinitions>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-          </Grid.RowDefinitions>
+              <TextBlock
+                Grid.Column="0" Grid.Row="1"
+                VerticalAlignment="Center"
+                Text="{x:Static properties:Resources.Label_SourceAndRemoteAccount}" />
+              <local:EditBookingAccountControl
+                Grid.Column="1" Grid.Row="1"
+                AccountIndex="{Binding IncomeRemoteIndex, Mode=OneWayToSource}"
+                AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
+                Accounts="{Binding IncomeRemoteAccounts}" />
+            </Grid>
+          </TabItem>
+          <TabItem IsEnabled="{Binding IsEasyBookingEnabled}">
+            <TabItem.Header>
+              <TextBlock Text="{x:Static properties:Resources.Word_Expense}" Padding="2" />
+            </TabItem.Header>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="4*" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
 
-          <TextBlock
-            Grid.Column="0" Grid.Row="0"
-            VerticalAlignment="Center"
-            Text="{x:Static properties:Resources.Word_ExpenseType}" />
-          <local:EditBookingAccountControl
-            Grid.Column="1" Grid.Row="0"
-            AccountIndex="{Binding ExpenseIndex, Mode=OneWayToSource}"
-            AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
-            Accounts="{Binding ExpenseAccounts}" />
+              <TextBlock
+                Grid.Column="0" Grid.Row="0"
+                VerticalAlignment="Center"
+                Text="{x:Static properties:Resources.Word_ExpenseType}" />
+              <local:EditBookingAccountControl
+                Grid.Column="1" Grid.Row="0"
+                AccountIndex="{Binding ExpenseIndex, Mode=OneWayToSource}"
+                AccountNumber="{Binding DebitAccount, Mode=TwoWay}"
+                Accounts="{Binding ExpenseAccounts}" />
 
-          <TextBlock
-            Grid.Column="0" Grid.Row="1"
-            VerticalAlignment="Center"
-            Text="{x:Static properties:Resources.Label_DebitAccountRemoteAccount}" />
-          <local:EditBookingAccountControl
-            Grid.Column="1" Grid.Row="1"
-            AccountIndex="{Binding ExpenseRemoteIndex, Mode=OneWayToSource}"
-            AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
-            Accounts="{Binding ExpenseRemoteAccounts}" />
-        </Grid>
-      </TabItem>
-    </TabControl>
+              <TextBlock
+                Grid.Column="0" Grid.Row="1"
+                VerticalAlignment="Center"
+                Text="{x:Static properties:Resources.Label_DebitAccountRemoteAccount}" />
+              <local:EditBookingAccountControl
+                Grid.Column="1" Grid.Row="1"
+                AccountIndex="{Binding ExpenseRemoteIndex, Mode=OneWayToSource}"
+                AccountNumber="{Binding CreditAccount, Mode=TwoWay}"
+                Accounts="{Binding ExpenseRemoteAccounts}" />
+            </Grid>
+          </TabItem>
+        </TabControl>
 
-    <StackPanel
-      Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="3"
-      Orientation="Horizontal">
-      <CheckBox
-        Content="{x:Static properties:Resources.Word_OpeningBooking}"
-        IsChecked="{Binding IsOpening}" />
-      <CheckBox
-        Content="{x:Static properties:Resources.Word_FollowUp}"
-        IsChecked="{Binding IsFollowup}" />
-    </StackPanel>
-
-    <StackPanel
-      Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="4"
-      Margin="0 30 0 0"
-      Orientation="Horizontal" HorizontalAlignment="Right">
-      <Button
-        MinWidth="140" Content="{x:Static properties:Resources.Action_Book}" Command="{Binding AddCommand}"
-        Style="{StaticResource PrimaryButtonStyle}"
-        Visibility="{Binding NewMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
-      <Button
-        MinWidth="140" Content="{x:Static properties:Resources.Action_Save}" Command="{Binding SaveCommand}"
-        Style="{StaticResource PrimaryButtonStyle}"
-        Visibility="{Binding EditMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
-      <Button MinWidth="140" Content="{x:Static properties:Resources.Action_Close}" IsCancel="True" />
-    </StackPanel>
-  </Grid>
+        <StackPanel
+          Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="3"
+          Orientation="Horizontal">
+          <CheckBox
+            Content="{x:Static properties:Resources.Word_OpeningBooking}"
+            IsChecked="{Binding IsOpening}" />
+          <CheckBox
+            Content="{x:Static properties:Resources.Word_FollowUp}"
+            IsChecked="{Binding IsFollowup}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </DockPanel>
 </UserControl>

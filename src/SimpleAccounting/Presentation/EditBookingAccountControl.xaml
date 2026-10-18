@@ -9,17 +9,23 @@
   xmlns:properties="clr-namespace:lg2de.SimpleAccounting.Properties"
   mc:Ignorable="d"
   d:DesignWidth="400" d:DesignHeight="50">
+  <!--
+    Single row and split rows use the same columns, so that the controls are aligned:
+    account number (fixed), account selection (remaining space), buttons (auto).
+  -->
+  <UserControl.Resources>
+    <GridLength x:Key="AccountNumberWidth">120</GridLength>
+  </UserControl.Resources>
   <Grid>
     <Grid
       Visibility="{Binding SingleRowVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="{StaticResource AccountNumberWidth}" />
         <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="2*" />
-        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
       <local:NumberTextBox
         Grid.Column="0" Grid.Row="0"
-        MinWidth="100"
         Scale="0"
         Text="{Binding AccountNumber, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, UpdateSourceTrigger=PropertyChanged}" />
       <ComboBox
@@ -38,31 +44,30 @@
         Content="{x:Static properties:Resources.Word_Split}"
         Command="{Binding SplitCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
     </Grid>
-    <ListView
+    <!--
+      No list view: its items have padding, margin and hover/selection background of the Fluent theme,
+      which indents the split rows compared to the single row. Selection is not used anyway.
+    -->
+    <ItemsControl
       Visibility="{Binding SplitRowsVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
       ItemsSource="{Binding SplitEntries, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-      HorizontalContentAlignment="Stretch"
+      Focusable="False"
+      Margin="0 20"
       KeyboardNavigation.TabNavigation="Continue">
-      <ListView.ItemContainerStyle>
-        <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
-          <Setter Property="Focusable" Value="false" />
-        </Style>
-      </ListView.ItemContainerStyle>
-      <ListView.ItemTemplate>
+      <ItemsControl.ItemTemplate>
         <DataTemplate>
           <Grid>
             <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="{StaticResource AccountNumberWidth}" />
               <ColumnDefinition Width="*" />
-              <ColumnDefinition Width="2*" />
-              <ColumnDefinition Width="35" />
-              <ColumnDefinition Width="35" />
+              <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-              <RowDefinition Height="*" />
-              <RowDefinition Height="*" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid
-              Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0">
+              Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0">
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -94,19 +99,30 @@
               SelectedIndex="{Binding AccountIndex, Mode=OneWayToSource}"
               SelectedValuePath="ID" ItemTemplate="{StaticResource AccountSelectionTemplate}"
               TextSearch.TextPath="Name" />
-            <Button
-              Grid.Column="2" Grid.Row="1"
-              Content="+" Width="35" MinWidth="0" Padding="0" Margin="0" VerticalAlignment="Center"
-              Command="{Binding AddSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-              CommandParameter="{Binding .}" />
-            <Button
-              Grid.Column="3" Grid.Row="1"
-              Content="-" Width="35" MinWidth="0" Padding="0" Margin="0" VerticalAlignment="Center"
-              Command="{Binding RemoveSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-              CommandParameter="{Binding .}" />
+            <!-- icon buttons with the same height as the other controls of the row -->
+            <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal">
+              <StackPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                  <Setter Property="MinWidth" Value="0" />
+                  <Setter Property="Width" Value="36" />
+                  <Setter Property="Padding" Value="0" />
+                  <Setter Property="VerticalAlignment" Value="Stretch" />
+                  <Setter Property="FontFamily" Value="{DynamicResource SymbolThemeFontFamily}" />
+                  <Setter Property="FontSize" Value="12" />
+                </Style>
+              </StackPanel.Resources>
+              <Button
+                Content="&#xE710;"
+                Command="{Binding AddSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                CommandParameter="{Binding .}" />
+              <Button
+                Content="&#xE738;"
+                Command="{Binding RemoveSplitEntryCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                CommandParameter="{Binding .}" />
+            </StackPanel>
           </Grid>
         </DataTemplate>
-      </ListView.ItemTemplate>
-    </ListView>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
   </Grid>
 </UserControl>

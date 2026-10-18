@@ -7,7 +7,9 @@
   Width="1000" Height="800"
   WindowState="Maximized"
   ShowInTaskbar="False"
-  WindowStartupLocation="CenterOwner">
+  WindowStartupLocation="CenterOwner"
+  Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}">
   <Window.InputBindings>
     <KeyBinding Key="Escape" Command="Close" />
   </Window.InputBindings>
@@ -53,6 +55,21 @@
           VerticalAlignment="Center"
           Command="IncreaseZoom"
           FontFamily="{DynamicResource SymbolThemeFontFamily}" Content="&#xE8A3;" />
+        <!--
+          The preview shows the result on the selected paper, the layout of the report is not changed.
+          The printer is selected in the print dialog.
+        -->
+        <TextBlock
+          DockPanel.Dock="Left"
+          Margin="24 0 0 0"
+          VerticalAlignment="Center"
+          Text="{x:Static properties:Resources.ReportPreview_Paper}" />
+        <ComboBox
+          x:Name="PaperSelection"
+          DockPanel.Dock="Left"
+          MinWidth="160"
+          DisplayMemberPath="PaperName"
+          SelectionChanged="OnPaperSelectionChanged" />
         <TextBlock
           x:Name="PageCountText"
           DockPanel.Dock="Right"

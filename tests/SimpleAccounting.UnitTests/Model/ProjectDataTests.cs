@@ -22,7 +22,6 @@ using lg2de.SimpleAccounting.Properties;
 using lg2de.SimpleAccounting.UnitTests.Presentation;
 using NSubstitute;
 using Xunit;
-using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 public class ProjectDataTests
 {
@@ -41,7 +40,7 @@ public class ProjectDataTests
                     "automatically generated backup file for project", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, MessageBoxImage.Question,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Yes);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
         fileSystem.FileExists("the.fileName").Returns(true);
@@ -74,7 +73,7 @@ public class ProjectDataTests
                     "automatically generated backup file for project", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, MessageBoxImage.Question,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.No);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
         fileSystem.FileExists("the.fileName").Returns(true);
@@ -124,7 +123,7 @@ public class ProjectDataTests
             Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
             Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
         fileSystem.Received(1).ReadAllTextFromFile("K:\\the.fileName");
     }
 
@@ -145,7 +144,7 @@ public class ProjectDataTests
                 Arg.Is<string>(s => s.Contains("Project data has been changed.", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 MessageBoxButton.YesNo, MessageBoxImage.Question,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Cancel);
         fileSystem.ReadAllTextFromFile(Arg.Any<string>()).Returns(new AccountingData().Serialize());
         fileSystem.FileExists("new.fileName").Returns(true);
@@ -296,7 +295,7 @@ public class ProjectDataTests
                 Arg.Is<string>(s => s.Contains("Cryptomator", StringComparison.Ordinal)),
                 Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Yes);
         bool securedFileAvailable = false;
         fileSystem.FileExists(Arg.Is("K:\\the.fileName")).Returns(_ => securedFileAvailable);
@@ -344,7 +343,7 @@ public class ProjectDataTests
 
         dialogs.DidNotReceive().ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 
     [Fact]
@@ -354,7 +353,7 @@ public class ProjectDataTests
         var dialogs = Substitute.For<IDialogs>();
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), MessageBoxImage.Warning,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.No);
         var fileSystem = Substitute.For<IFileSystem>();
         Action<string> registeredCallback = null;
@@ -387,7 +386,7 @@ public class ProjectDataTests
         var dialogs = Substitute.For<IDialogs>();
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), MessageBoxImage.Warning,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Yes);
         var fileSystem = Substitute.For<IFileSystem>();
         Action<string> registeredCallback = null;
@@ -423,7 +422,7 @@ public class ProjectDataTests
         var dialogs = Substitute.For<IDialogs>();
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), MessageBoxImage.Warning,
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Yes);
         var fileSystem = Substitute.For<IFileSystem>();
         Action<string> registeredCallback = null;
@@ -448,7 +447,7 @@ public class ProjectDataTests
         await sut.ProjectChangedHandlerTask;
         dialogs.DidNotReceive().ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 
     [Fact]
@@ -466,7 +465,7 @@ public class ProjectDataTests
         dialogs.DidNotReceive().ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
     }
 
     [Fact]
@@ -481,7 +480,7 @@ public class ProjectDataTests
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Cancel);
         sut.LoadData(Samples.SampleProject);
         sut.IsModified = true;
@@ -491,7 +490,7 @@ public class ProjectDataTests
         dialogs.Received(1).ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
         fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -510,7 +509,7 @@ public class ProjectDataTests
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.No);
         sut.LoadData(Samples.SampleProject);
 
@@ -519,7 +518,7 @@ public class ProjectDataTests
         dialogs.Received(1).ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
         fileSystem.DidNotReceive().WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
     }
 
@@ -538,7 +537,7 @@ public class ProjectDataTests
         dialogs.ShowMessageBox(
                 Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-                Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>())
+                Arg.Any<MessageBoxResult>())
             .Returns(MessageBoxResult.Yes);
         sut.LoadData(Samples.SampleProject);
 
@@ -547,7 +546,7 @@ public class ProjectDataTests
         dialogs.Received(1).ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<MessageBoxButton>(), Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>());
+            Arg.Any<MessageBoxResult>());
         fileSystem.Received(1).WriteAllTextIntoFile(Arg.Any<string>(), Arg.Any<string>());
     }
 

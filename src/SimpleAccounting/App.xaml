@@ -39,14 +39,43 @@
               resolves to the classic system style instead of the Fluent style.
             -->
             <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                <Setter Property="MinWidth" Value="80" />
+                <Setter Property="MinWidth" Value="120" />
                 <Setter Property="Margin" Value="5" />
                 <Setter Property="VerticalAlignment" Value="Bottom" />
             </Style>
             <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
-                <Setter Property="MinWidth" Value="80" />
+                <Setter Property="MinWidth" Value="120" />
                 <Setter Property="Margin" Value="5" />
                 <Setter Property="VerticalAlignment" Value="Bottom" />
+            </Style>
+
+            <!--
+              Layout of all dialogs, similar to the Windows 11 content dialog:
+              brighter content area with spacing, darker button area separated by a line.
+              Together with the margin of the controls (5) the spacing to the window border is 24 (content)
+              and 20 (buttons, vertical).
+            -->
+            <Style x:Key="DialogContentStyle" TargetType="Border">
+                <Setter Property="Background" Value="{DynamicResource SolidBackgroundFillColorTertiaryBrush}" />
+                <Setter Property="Padding" Value="19" />
+            </Style>
+            <Style x:Key="DialogFooterStyle" TargetType="Border">
+                <Setter Property="DockPanel.Dock" Value="Bottom" />
+                <Setter Property="Background" Value="{DynamicResource SolidBackgroundFillColorBaseBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="0 1 0 0" />
+                <Setter Property="Padding" Value="19 15" />
+            </Style>
+            <Style x:Key="DialogButtonPanelStyle" TargetType="StackPanel">
+                <Setter Property="Orientation" Value="Horizontal" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+            </Style>
+            <!-- glyph of "Segoe Fluent Icons" like the message dialog, the color is set by the user -->
+            <Style x:Key="DialogIconStyle" TargetType="TextBlock">
+                <Setter Property="Margin" Value="0 0 16 0" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="FontFamily" Value="{DynamicResource SymbolThemeFontFamily}" />
+                <Setter Property="FontSize" Value="32" />
             </Style>
             <Style TargetType="CheckBox" BasedOn="{StaticResource DefaultCheckBoxStyle}">
                 <Setter Property="Margin" Value="5" />

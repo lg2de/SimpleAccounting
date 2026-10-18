@@ -188,7 +188,10 @@ internal class ApplicationUpdate : IApplicationUpdate
             x => x.FileName?.ToUpperInvariant() ?? "<unknown>",
             x => cultureInfo.Parent.TwoLetterISOLanguageName == "de" ? x.GermanDescription : x.EnglishDescription);
         var vm = new UpdateOptionsViewModel(
-            string.Format(cultureInfo, Resources.Question_UpdateToVersionX, this.newRelease.TagName));
+            string.Format(cultureInfo, Resources.Question_UpdateToVersionX, this.newRelease.TagName))
+        {
+            DisplayName = caption
+        };
         string selectedPackage = string.Empty;
         foreach (string assetName in this.newRelease.Assets.Select(x => x.Name))
         {

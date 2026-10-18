@@ -22,7 +22,6 @@ using lg2de.SimpleAccounting.Properties;
 using lg2de.SimpleAccounting.Reports;
 using NSubstitute;
 using Xunit;
-using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
 public class MenuViewModelTests
 {
@@ -173,7 +172,7 @@ public class MenuViewModelTests
         var sut = CreateSut(out ProjectData projectData, out IDialogs dialogs, out _, out _);
         dialogs.ShowMessageBox(
             Arg.Any<string>(), Arg.Any<string>(), MessageBoxButton.YesNo, Arg.Any<MessageBoxImage>(),
-            Arg.Any<MessageBoxResult>(), Arg.Any<MessageBoxOptions>()).Returns(MessageBoxResult.Yes);
+            Arg.Any<MessageBoxResult>()).Returns(MessageBoxResult.Yes);
         projectData.LoadData(Samples.SampleProject);
         sut.OnDataLoaded();
         sut.BookingYears[0].Command.Execute(null);
