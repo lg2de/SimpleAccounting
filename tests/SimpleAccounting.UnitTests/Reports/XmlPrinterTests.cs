@@ -995,4 +995,16 @@ public class XmlPrinterTests
             sut.CursorY.Should().Be(0);
         }
     }
+    
+    [Fact]
+    public void TransformDocument_CommentNode_CommentRemoved()
+    {
+        var sut = new XmlPrinter();
+        sut.LoadXml("<root><!-- comment --></root>");
+        var graphics = Substitute.For<IGraphics>();
+        
+        sut.TransformDocument(graphics);
+
+        XDocument.Parse(sut.Document.OuterXml).Should().BeEquivalentTo(XDocument.Parse("<root />"));
+    }
 }
