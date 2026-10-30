@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CsvHelper;
-using CsvHelper.Configuration;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
@@ -51,11 +50,18 @@ internal sealed partial class ImportFileLoader : IDisposable
         // note, the stream is disposed by the reader
         var stream = new MemoryStream(this.bytes);
         this.streamReader = new StreamReader(stream, encoding);
-        var configuration = new CsvConfiguration(this.cultureInfo);
-        return this.ImportBookings(this.streamReader, configuration);
+        var listSeparator = this.cultureInfo.TextInfo.ListSeparator;
+        var options = new CsvReaderOptions
+        {
+            FormatProvider = this.cultureInfo,
+
+            // keep the separator defined by the culture, detect it if the culture uses a multi-character separator
+            Separator = listSeparator.Length == 1 ? listSeparator[0] : null
+        };
+        return this.ImportBookings(this.streamReader, options);
     }
 
-    private IEnumerable<ImportEntryViewModel> ImportBookings(TextReader reader, IReaderConfiguration configuration)
+    private IEnumerable<ImportEntryViewModel> ImportBookings(TextReader reader, CsvReaderOptions options)
     {
         var dateField =
             this.importMapping.Columns
@@ -73,14 +79,15 @@ internal sealed partial class ImportFileLoader : IDisposable
                 .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Value)?.Source
             ?? "value";
 
-        using var csv = new CsvReader(reader, configuration);
-        if (!csv.Read())
+        using var csv = CsvReader.Create(reader, options);
+
+        // the header is read implicitly by the first access
+        if (csv.Headers.Count == 0)
         {
             throw new InvalidOperationException("Failed to read initial record.");
         }
 
-        csv.ReadHeader();
-        if (csv.HeaderRecord is not { Length: > 1 })
+        if (csv.Headers.Count < 2)
         {
             throw new InvalidOperationException("Missing or incomplete file header.");
         }
@@ -99,17 +106,16 @@ internal sealed partial class ImportFileLoader : IDisposable
         string valueField)
     {
         // date and value are required
-        csv.TryGetField(dateField, out DateTime date);
-        csv.TryGetField<double>(valueField, out var value);
+        TryParseField(dateField, out DateTime date);
+        TryParseField(valueField, out double value);
 
         // name and text may be empty
-        csv.TryGetField(nameField, out string? name);
+        var name = GetStringField(nameField);
 
-        string? text = string.Empty;
+        var text = string.Empty;
         if (textField != null)
         {
-            csv.TryGetField(textField.Source, out text);
-            text ??= string.Empty;
+            text = GetStringField(textField.Source);
             if (!string.IsNullOrEmpty(textField.IgnorePattern))
             {
                 text = Regex.Replace(
@@ -119,10 +125,7 @@ internal sealed partial class ImportFileLoader : IDisposable
             text = this.duplicateSpaceExpression.Replace(text, " ");
         }
 
-        var item = new ImportEntryViewModel(this.accounts)
-        {
-            Date = date, Name = name ?? string.Empty, Text = text, Value = value
-        };
+        var item = new ImportEntryViewModel(this.accounts) { Date = date, Name = name, Text = text, Value = value };
 
         var modelValue = value.ToModelValue();
         var patterns = this.importMapping.Patterns ?? Enumerable.Empty<AccountDefinitionImportMappingPatternsPattern>();
@@ -130,6 +133,22 @@ internal sealed partial class ImportFileLoader : IDisposable
         item.RemoteAccount = this.accounts.SingleOrDefault(a => a.ID == matchedPattern?.AccountID);
 
         return item;
+
+        void TryParseField<T>(string field, out T result)
+            where T : ISpanParsable<T>
+        {
+            if (csv.TryGetFieldIndex(field, out var index) && csv.TryParse(index, out result))
+            {
+                return;
+            }
+
+            result = default!;
+        }
+
+        string GetStringField(string field)
+        {
+            return csv.TryGetFieldIndex(field, out var index) ? csv.GetString(index) : string.Empty;
+        }
 
         bool PatternPredicate(AccountDefinitionImportMappingPatternsPattern pattern)
         {
