@@ -81,6 +81,74 @@ public class ImportFileLoaderTests
     }
 
     [Theory]
+    [InlineData("en-us", ";", ".")]
+    [InlineData("de-de", ",", ",")]
+    public void Load_SeparatorDifferentFromCulture_SeparatorDetected(
+        string cultureName, string separator, string decimalSeparator)
+    {
+        var project = Samples.SampleProject;
+        var accounts = project.AllAccounts.ToList();
+        var bankAccount = accounts.Single(x => x.Name == "Bank account");
+        var input = Encoding.UTF8.GetBytes(
+            $"""
+             Date{separator}Name{separator}Text{separator}Value
+             2000-01-15{separator}Shopping Mall{separator}Shoes{separator}"-50{decimalSeparator}25"
+             """);
+        var sut = new ImportFileLoader(input, new CultureInfo(cultureName), accounts, bankAccount.ImportMapping);
+
+        var result = sut.Load().ToList();
+
+        result.Should().BeEquivalentTo(
+        [
+            new { Date = new DateTime(2000, 1, 15), Name = "Shopping Mall", Text = "Shoes", Value = -50.25 }
+        ]);
+    }
+
+    [Theory]
+    [InlineData("de", "15.01.2000", "-1.234,5")]
+    [InlineData("de", "15/01/2000", "-1234,5")]
+    [InlineData("de", "01/15/2000", "-1,234.5")]
+    [InlineData("en", "15.01.2000", "-1.234,5")]
+    [InlineData("fr", "01/15/2000", "-1234.5")]
+    public void Load_FormatDifferentFromCulture_FormatDetected(string cultureName, string date, string value)
+    {
+        var project = Samples.SampleProject;
+        var accounts = project.AllAccounts.ToList();
+        var bankAccount = accounts.Single(x => x.Name == "Bank account");
+        var input = Encoding.UTF8.GetBytes(
+            $"""
+             Date;Name;Text;Value
+             {date};Shopping Mall;Shoes;{value}
+             """);
+        var sut = new ImportFileLoader(input, new CultureInfo(cultureName), accounts, bankAccount.ImportMapping);
+
+        var result = sut.Load().ToList();
+
+        result.Should().BeEquivalentTo([new { Date = new DateTime(2000, 1, 15), Value = -1234.5 }]);
+    }
+
+    [Fact]
+    public void Load_CultureConfigured_ConfiguredCultureUsed()
+    {
+        var project = Samples.SampleProject;
+        var accounts = project.AllAccounts.ToList();
+        var bankAccount = accounts.Single(x => x.Name == "Bank account");
+        bankAccount.ImportMapping.Culture = "en-US";
+
+        // the detection would choose a culture using comma as decimal separator
+        var input = Encoding.UTF8.GetBytes(
+            """
+            Date;Name;Text;Value
+            2000-01-15;Shopping Mall;Shoes;1,5
+            """);
+        var sut = new ImportFileLoader(input, new CultureInfo("de"), accounts, bankAccount.ImportMapping);
+
+        var result = sut.Load().ToList();
+
+        result.Should().BeEquivalentTo([new { Date = new DateTime(2000, 1, 15), Value = 15.0 }]);
+    }
+
+    [Theory]
     [InlineData("", "Failed to read initial record.")]
     [InlineData("foo", "Missing or incomplete file header.")]
     public void Load_InvalidData_Throws(string input, string expectedError)

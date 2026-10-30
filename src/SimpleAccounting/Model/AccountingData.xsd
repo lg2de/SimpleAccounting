@@ -175,6 +175,8 @@
               </xs:complexType>
             </xs:element>
           </xs:sequence>
+          <!-- culture name (e.g. de-DE) of the numbers and dates in the import file, detected automatically if missing -->
+          <xs:attribute name="Culture" type="xs:string" use="optional" />
         </xs:complexType>
       </xs:element>
     </xs:sequence>

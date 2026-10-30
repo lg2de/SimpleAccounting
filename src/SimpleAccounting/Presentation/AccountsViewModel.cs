@@ -111,6 +111,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
                 account.ImportMapping.Columns?.Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Value);
             accountModel.ImportValueSource = valueColumn?.Source;
             accountModel.ImportValueIgnorePattern = valueColumn?.IgnorePattern;
+            accountModel.ImportCulture = account.ImportMapping.Culture ?? string.Empty;
 
             if (account.ImportMapping.Patterns == null)
             {
@@ -215,6 +216,7 @@ internal class AccountsViewModel : Screen, IAccountsViewModel
         // save required items
         accountDefinition.ImportMapping = new AccountDefinitionImportMapping
         {
+            Culture = string.IsNullOrWhiteSpace(viewModel.ImportCulture) ? null : viewModel.ImportCulture,
             Columns =
             [
                 new AccountDefinitionImportMappingColumnsColumn

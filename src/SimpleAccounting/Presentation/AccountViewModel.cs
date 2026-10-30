@@ -7,6 +7,7 @@ namespace lg2de.SimpleAccounting.Presentation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -41,6 +42,21 @@ internal class AccountViewModel : Screen
 
     public string TypeName => Types[this.Type];
 
+    /// <summary>
+    ///     Gets the cultures selectable for import files, an empty name means automatic detection.
+    /// </summary>
+    public static IDictionary<string, string> ImportCultures =>
+        new[] { new KeyValuePair<string, string>(string.Empty, Resources.AccountConfiguration_FileFormatAutomatic) }
+            .Concat(
+                ImportFormatDetector.SupportedCultures.Select(name =>
+                {
+                    var culture = CultureInfo.GetCultureInfo(name);
+                    var example = string.Format(
+                        culture, "{0:N2} / {1:d}", 1234.56, new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local));
+                    return new KeyValuePair<string, string>(name, $"{culture.NativeName} ({example})");
+                }))
+            .ToDictionary();
+
     public bool IsActivated { get; set; } = true;
 
     public bool IsImportActive
@@ -74,6 +90,8 @@ internal class AccountViewModel : Screen
     public string? ImportValueSource { get; set; }
 
     public string? ImportValueIgnorePattern { get; set; }
+
+    public string ImportCulture { get; set; } = string.Empty;
 
     public IList<AccountDefinition> ImportRemoteAccounts { get; set; } = new List<AccountDefinition>();
 

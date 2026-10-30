@@ -39,6 +39,7 @@ internal class AccountDesignViewModel : AccountViewModel
         this.ImportTextIgnorePattern = "ignore text";
         this.ImportValueSource = "Value column";
         this.ImportValueIgnorePattern = "ignore value";
+        this.ImportCulture = "fr-FR";
 
         this.ImportRemoteAccounts = new List<AccountDefinition> { new() { ID = 100, Name = "Bank" } };
         this.ImportPatterns.Add(

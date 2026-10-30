@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using CsvHelper;
-using CsvHelper.Configuration;
 using lg2de.SimpleAccounting.Extensions;
 using lg2de.SimpleAccounting.Model;
 using lg2de.SimpleAccounting.Presentation;
@@ -24,9 +24,23 @@ internal sealed partial class ImportFileLoader : IDisposable
     private readonly byte[] bytes;
     private readonly AccountDefinitionImportMapping importMapping;
     private readonly Regex duplicateSpaceExpression = DuplicateSpaceRegex();
+    private readonly string dateField;
+    private readonly string nameField;
+    private readonly AccountDefinitionImportMappingColumnsColumn? textField;
+    private readonly string valueField;
 
     private StreamReader? streamReader;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ImportFileLoader" /> class.
+    /// </summary>
+    /// <param name="bytes">The content of the import file.</param>
+    /// <param name="cultureInfo">
+    ///     The culture of the application, used if the import mapping does not define a culture and
+    ///     the culture of the import file cannot be detected unambiguously.
+    /// </param>
+    /// <param name="accounts">The accounts available as remote accounts.</param>
+    /// <param name="importMapping">The import mapping of the account to import into.</param>
     public ImportFileLoader(
         byte[] bytes,
         CultureInfo cultureInfo,
@@ -37,6 +51,22 @@ internal sealed partial class ImportFileLoader : IDisposable
         this.cultureInfo = cultureInfo;
         this.accounts = accounts;
         this.importMapping = importMapping;
+
+        this.dateField =
+            importMapping.Columns
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Date)?.Source
+            ?? "date";
+        this.nameField =
+            importMapping.Columns
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Name)?.Source
+            ?? "name";
+        this.textField =
+            importMapping.Columns
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Text);
+        this.valueField =
+            importMapping.Columns
+                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Value)?.Source
+            ?? "value";
     }
 
     public void Dispose()
@@ -48,81 +78,84 @@ internal sealed partial class ImportFileLoader : IDisposable
     {
         var encoding = FileEncoding.GetAcceptableEncoding(this.bytes);
 
+        var fileCulture = string.IsNullOrWhiteSpace(this.importMapping.Culture)
+            ? this.DetectCulture(encoding) ?? this.cultureInfo
+            : CultureInfo.GetCultureInfo(this.importMapping.Culture);
+
         // note, the stream is disposed by the reader
         var stream = new MemoryStream(this.bytes);
         this.streamReader = new StreamReader(stream, encoding);
-        var configuration = new CsvConfiguration(this.cultureInfo);
-        return this.ImportBookings(this.streamReader, configuration);
+
+        // the culture is used to parse numbers and dates only, the separator is detected from the file
+        var options = new CsvReaderOptions { FormatProvider = fileCulture };
+        return this.ImportBookings(this.streamReader, options);
     }
 
-    private IEnumerable<ImportEntryViewModel> ImportBookings(TextReader reader, IReaderConfiguration configuration)
+    private CultureInfo? DetectCulture(Encoding encoding)
     {
-        var dateField =
-            this.importMapping.Columns
-                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Date)?.Source
-            ?? "date";
-        var nameField =
-            this.importMapping.Columns
-                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Name)?.Source
-            ?? "name";
-        var textField =
-            this.importMapping.Columns
-                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Text);
-        var valueField =
-            this.importMapping.Columns
-                .Find(x => x.Target == AccountDefinitionImportMappingColumnsColumnTarget.Value)?.Source
-            ?? "value";
+        using var csv = CsvReader.Create(new StreamReader(new MemoryStream(this.bytes), encoding));
+        if (!csv.TryGetFieldIndex(this.dateField, out var dateIndex)
+            || !csv.TryGetFieldIndex(this.valueField, out var valueIndex))
+        {
+            // missing columns are reported while importing
+            return null;
+        }
 
-        using var csv = new CsvReader(reader, configuration);
-        if (!csv.Read())
+        var dates = new List<string>();
+        var values = new List<string>();
+        while (csv.Read())
+        {
+            dates.Add(csv.GetString(dateIndex));
+            values.Add(csv.GetString(valueIndex));
+        }
+
+        return ImportFormatDetector.Detect(dates, values, this.cultureInfo);
+    }
+
+    private IEnumerable<ImportEntryViewModel> ImportBookings(TextReader reader, CsvReaderOptions options)
+    {
+        using var csv = CsvReader.Create(reader, options);
+
+        // the header is read implicitly by the first access
+        if (csv.Headers.Count == 0)
         {
             throw new InvalidOperationException("Failed to read initial record.");
         }
 
-        csv.ReadHeader();
-        if (csv.HeaderRecord is not { Length: > 1 })
+        if (csv.Headers.Count < 2)
         {
             throw new InvalidOperationException("Missing or incomplete file header.");
         }
 
         while (csv.Read())
         {
-            yield return this.ImportBooking(csv, dateField, nameField, textField, valueField);
+            yield return this.ImportBooking(csv);
         }
     }
 
-    private ImportEntryViewModel ImportBooking(
-        CsvReader csv,
-        string dateField,
-        string nameField,
-        AccountDefinitionImportMappingColumnsColumn? textField,
-        string valueField)
+    private ImportEntryViewModel ImportBooking(CsvReader csv)
     {
         // date and value are required
-        csv.TryGetField(dateField, out DateTime date);
-        csv.TryGetField<double>(valueField, out var value);
+        TryParseField(this.dateField, out DateTime date);
+        TryParseField(this.valueField, out double value);
 
         // name and text may be empty
-        csv.TryGetField(nameField, out string? name);
+        var name = GetStringField(this.nameField);
 
-        string? text = string.Empty;
-        if (textField != null)
+        var text = string.Empty;
+        if (this.textField != null)
         {
-            csv.TryGetField(textField.Source, out text);
-            text ??= string.Empty;
-            if (!string.IsNullOrEmpty(textField.IgnorePattern))
+            text = GetStringField(this.textField.Source);
+            if (!string.IsNullOrEmpty(this.textField.IgnorePattern))
             {
                 text = Regex.Replace(
-                    text, textField.IgnorePattern, string.Empty, RegexOptions.None, TimeSpan.FromSeconds(1));
+                    text, this.textField.IgnorePattern, string.Empty, RegexOptions.None, TimeSpan.FromSeconds(1));
             }
 
             text = this.duplicateSpaceExpression.Replace(text, " ");
         }
 
-        var item = new ImportEntryViewModel(this.accounts)
-        {
-            Date = date, Name = name ?? string.Empty, Text = text, Value = value
-        };
+        var item = new ImportEntryViewModel(this.accounts) { Date = date, Name = name, Text = text, Value = value };
 
         var modelValue = value.ToModelValue();
         var patterns = this.importMapping.Patterns ?? Enumerable.Empty<AccountDefinitionImportMappingPatternsPattern>();
@@ -130,6 +163,22 @@ internal sealed partial class ImportFileLoader : IDisposable
         item.RemoteAccount = this.accounts.SingleOrDefault(a => a.ID == matchedPattern?.AccountID);
 
         return item;
+
+        void TryParseField<T>(string field, out T result)
+            where T : ISpanParsable<T>
+        {
+            if (csv.TryGetFieldIndex(field, out var index) && csv.TryParse(index, out result))
+            {
+                return;
+            }
+
+            result = default!;
+        }
+
+        string GetStringField(string field)
+        {
+            return csv.TryGetFieldIndex(field, out var index) ? csv.GetString(index) : string.Empty;
+        }
 
         bool PatternPredicate(AccountDefinitionImportMappingPatternsPattern pattern)
         {

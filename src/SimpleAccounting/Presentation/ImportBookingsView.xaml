@@ -54,11 +54,6 @@
           <CheckBox
             VerticalAlignment="Center"
             IsEnabled="{Binding IsImportPossible}"
-            IsChecked="{Binding IsForceEnglish}"
-            Content="{x:Static properties:Resources.ImportData_FileHasEnglishFormat}" />
-          <CheckBox
-            VerticalAlignment="Center"
-            IsEnabled="{Binding IsImportPossible}"
             IsChecked="{Binding IsReverseOrder}"
             Content="{x:Static properties:Resources.ImportData_UseReverseOrder}" />
           <Button

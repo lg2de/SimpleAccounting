@@ -109,6 +109,9 @@ namespace lg2de.SimpleAccounting.Model
                             && (this.Patterns.Count != 0));
             }
         }
+        
+        [System.Xml.Serialization.XmlAttributeAttribute("Culture")]
+        public string Culture { get; set; }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("XmlSchemaClassGenerator", "3.0.1405.0")]
