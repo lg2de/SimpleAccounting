@@ -89,6 +89,11 @@ public sealed class StringExtensionsTests : IDisposable
     [InlineData("A", "AA", 1)]
     [InlineData("A", "B", 1)]
     [InlineData("A", "BB", 2)]
+    [InlineData("AB", "A", 1)]
+    [InlineData("kitten", "sitting", 3)]
+    [InlineData("sitting", "kitten", 3)]
+    [InlineData("flaw", "lawn", 2)]
+    [InlineData("Sunday", "Saturday", 3)]
     public void LevenshteinDistance_Samples_ResultValidated(string input, string other, int expected)
     {
         var result = input.LevenshteinDistance(other);

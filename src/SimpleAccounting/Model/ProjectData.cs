@@ -419,10 +419,7 @@ internal sealed class ProjectData : IProjectData, IDisposable
                     MessageBoxImage.Warning, MessageBoxResult.Yes);
                 if (result == MessageBoxResult.Yes)
                 {
-                    string newFileName =
-                        Path.GetFileNameWithoutExtension(this.FileName)
-                        + "_"
-                        + this.clock.Now().ToString("yyyyMMddHHmmss", CultureInfo.CurrentUICulture);
+                    string newFileName = $"{Path.GetFileNameWithoutExtension(this.FileName)}_{FormattedNow()}";
                     this.FileName = Path.Combine(Path.GetDirectoryName(this.FileName)!, newFileName + ".acml");
                     await this.SaveProjectAsync();
                     await this.LoadFromFileAsync(this.FileName);
@@ -433,6 +430,14 @@ internal sealed class ProjectData : IProjectData, IDisposable
                     this.NewProject();
                 }
             }, CancellationToken.None);
+
+        [SuppressMessage(
+            "ReSharper", "S6585: Don't hardcode the format when turning dates and times to strings",
+            Justification = "We want to have a fixed format for the file name")]
+        string FormattedNow()
+        {
+            return this.clock.Now().ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+        }
     }
 
     private async Task AutoSaveAsync(CancellationToken cancellationToken)

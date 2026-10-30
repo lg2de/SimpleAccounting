@@ -16,16 +16,18 @@ using Xunit;
 
 public class ImportFileLoaderTests
 {
-    public static TheoryData<Encoding> GetEncodings()
+    public static TheoryData<string> GetEncodings()
     {
-        return new TheoryData<Encoding>(Encoding.UTF8, Encoding.Latin1);
+        return new TheoryData<string>(Encoding.UTF8.WebName, Encoding.Latin1.WebName);
     }
 
     [Theory]
     [MemberData(nameof(GetEncodings))]
-    public void Load_SampleInput_DataImported([NotNull] Encoding encoding)
+    public void Load_SampleInput_DataImported([NotNull] string encodingName)
     {
-        ArgumentNullException.ThrowIfNull(encoding);
+        ArgumentException.ThrowIfNullOrEmpty(encodingName);
+
+        var encoding = Encoding.GetEncoding(encodingName);
 
         var project = Samples.SampleProject;
         var accounts = project.AllAccounts.ToList();

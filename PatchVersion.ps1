@@ -20,8 +20,8 @@ if ($env:GITHUB_REF -match "/tags/") {
 
 Write-Host version = $version
 
-$file = gi .\src\SimpleAccounting\SimpleAccounting.csproj
-$xml = [xml](gc $file)
+$file = Get-Item .\src\SimpleAccounting\SimpleAccounting.csproj
+$xml = [xml](Get-Content $file)
 $xml.Project.PropertyGroup.InformationalVersion = $version
 
 $utf8 = New-Object System.Text.UTF8Encoding($true)
