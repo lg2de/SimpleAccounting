@@ -24,6 +24,9 @@
     <None Update="App.ico">
       <SonarQubeExclude>true</SonarQubeExclude>
     </None>
+    <!-- the license texts must be shipped with the release -->
+    <None Include="..\..\LICENSE" Link="LICENSE.txt" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="THIRD-PARTY-NOTICES.txt" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
@@ -85,6 +88,24 @@
     <Copy
       SourceFiles="obj\xscgen\lg2de.SimpleAccounting.Model.cs"
       DestinationFiles="Model\AccountingData.designer.cs" />
+  </Target>
+
+  <!--
+    Every NuGet package copied to the output (including transitive ones) must be listed in the third party notices.
+    This detects packages added e.g. by Renovate without the required license information.
+  -->
+  <Target Name="CheckThirdPartyNotices" AfterTargets="ResolveReferences">
+    <PropertyGroup>
+      <_ThirdPartyNotices>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\THIRD-PARTY-NOTICES.txt'))</_ThirdPartyNotices>
+    </PropertyGroup>
+    <ItemGroup>
+      <_ShippedPackage Include="@(ReferenceCopyLocalPaths->'%(NuGetPackageId)'->Distinct())" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' != ''" />
+      <_ShippedPackage Remove="Microsoft.NETCore.App.Runtime.$(RuntimeIdentifier);Microsoft.WindowsDesktop.App.Runtime.$(RuntimeIdentifier)" />
+      <_MissingNotice Include="@(_ShippedPackage)" Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch($(_ThirdPartyNotices), '(?m)^NuGet package: %(Identity)\s*$'))" />
+    </ItemGroup>
+    <Error
+      Condition="'@(_MissingNotice)' != ''"
+      Text="Shipped NuGet packages are missing in THIRD-PARTY-NOTICES.txt: @(_MissingNotice, ', ')" />
   </Target>
 
   <!--
