@@ -29,6 +29,18 @@ public class AccountViewModelTests
     }
 
     [Fact]
+    public void ImportCultures_SupportedCultures_ExamplesFormattedByCulture()
+    {
+        var cultures = AccountViewModel.ImportCultures;
+
+        using var _ = new AssertionScope();
+        cultures.Keys.Should().Equal(string.Empty, "de-DE", "en-US", "fr-FR");
+        cultures["de-DE"].Should().EndWith("(1.234,56 / 31.12.2000)");
+        cultures["en-US"].Should().EndWith("(1,234.56 / 12/31/2000)");
+        cultures["fr-FR"].Should().EndWith(" / 31/12/2000)");
+    }
+
+    [Fact]
     public void SaveCommand_MissingName_CannotExecute()
     {
         var sut = new AccountViewModel { Name = string.Empty };
