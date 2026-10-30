@@ -106,30 +106,31 @@ internal static class StringExtensions
 
             var sourceLength = input.Length;
             var targetLength = target.Length;
-            var distance = new int[sourceLength + 1, targetLength + 1];
 
-            for (var i = 0; i <= sourceLength; i++)
-            {
-                distance[i, 0] = i;
-            }
+            // only the previous row is required to calculate the current row
+            var previous = new int[targetLength + 1];
+            var current = new int[targetLength + 1];
 
             for (var j = 0; j <= targetLength; j++)
             {
-                distance[0, j] = j;
+                previous[j] = j;
             }
 
             for (var i = 1; i <= sourceLength; i++)
             {
+                current[0] = i;
                 for (var j = 1; j <= targetLength; j++)
                 {
                     var cost = target[j - 1] == input[i - 1] ? 0 : 1;
-                    distance[i, j] = Math.Min(
-                        Math.Min(distance[i - 1, j] + 1, distance[i, j - 1] + 1),
-                        distance[i - 1, j - 1] + cost);
+                    current[j] = Math.Min(
+                        Math.Min(previous[j] + 1, current[j - 1] + 1),
+                        previous[j - 1] + cost);
                 }
+
+                (previous, current) = (current, previous);
             }
 
-            return distance[sourceLength, targetLength];
+            return previous[targetLength];
         }
     }
 }

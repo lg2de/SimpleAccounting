@@ -52,7 +52,7 @@ internal class AccountViewModel : Screen
                 {
                     var culture = CultureInfo.GetCultureInfo(name);
                     var example = string.Format(
-                        culture, "{0:N2} / {1:d}", 1234.56, new DateTime(2000, 12, 31, 0, 0, 0, DateTimeKind.Local));
+                        culture, "{0:N2} / {1:d}", 1234.56, new DateOnly(2000, 12, 31));
                     return new KeyValuePair<string, string>(name, $"{culture.NativeName} ({example})");
                 }))
             .ToDictionary();

@@ -17,7 +17,7 @@ internal static class DataGridExtensions
 {
     public static void ResetDataGridColumnSizes(this DependencyObject dependencyObject)
     {
-        var dataGrids = FindVisualChildren<DataGrid>(dependencyObject);
+        var dataGrids = FindVisualChildren(dependencyObject).OfType<DataGrid>();
         foreach (var dataGrid in dataGrids)
         {
             foreach (DataGridColumn column in dataGrid.Columns.Where(x => !x.Width.IsAuto))
@@ -27,8 +27,7 @@ internal static class DataGridExtensions
         }
     }
 
-    private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj)
-        where T : DependencyObject
+    private static IEnumerable<DependencyObject> FindVisualChildren(DependencyObject depObj)
     {
         if (depObj == null)
         {
@@ -38,12 +37,9 @@ internal static class DataGridExtensions
         for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
         {
             DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-            if (child is T childOfExpectedType)
-            {
-                yield return childOfExpectedType;
-            }
+            yield return child;
 
-            foreach (T childOfChild in FindVisualChildren<T>(child))
+            foreach (DependencyObject childOfChild in FindVisualChildren(child))
             {
                 yield return childOfChild;
             }

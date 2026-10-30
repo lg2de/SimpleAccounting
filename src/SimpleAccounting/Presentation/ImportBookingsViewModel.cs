@@ -335,7 +335,7 @@ internal class ImportBookingsViewModel : Screen
                 continue;
             }
 
-            entry.RemoteAccount = filteredAccounts.FirstOrDefault(x => x.Name.Contains(
+            entry.RemoteAccount = filteredAccounts.Find(x => x.Name.Contains(
                 entry.Name, StringComparison.CurrentCultureIgnoreCase));
             if (entry.RemoteAccount != null)
             {
