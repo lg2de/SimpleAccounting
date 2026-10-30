@@ -18,7 +18,7 @@
     <!-- license is BSD-3-Clause -->
     <PackageReference Include="NSubstitute" Version="6.2.0"/>
     <!-- license is apache 2.0 -->
-    <PackageReference Include="xunit.v3" Version="4.0.1" />
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
     <!-- license is MS.PL -->
     <PackageReference Include="Xunit.StaFact" Version="4.0.23" />
   </ItemGroup>
