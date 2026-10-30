@@ -74,6 +74,7 @@
     The generation runs for local builds if the schema (or this project file) has been changed.
     It is skipped in CI to build exactly the committed code.
     Relative paths are used because the command line is written into the generated file.
+    The generator version is not written (option gc-) to avoid changes of the generated file on tool updates.
   -->
   <Target
     Name="GenerateModel"
@@ -83,7 +84,7 @@
     Outputs="Model\AccountingData.designer.cs">
     <Exec Command="dotnet tool restore" WorkingDirectory="$(MSBuildProjectDirectory)" StandardOutputImportance="low" />
     <Exec
-      Command="dotnet xscgen -n lg2de.SimpleAccounting.Model -o obj\xscgen --ct System.Collections.Generic.List`1 --csm PublicWithoutConstructorInitialization --cc- --namingScheme=Direct Model\AccountingData.xsd"
+      Command="dotnet xscgen -n lg2de.SimpleAccounting.Model -o obj\xscgen --ct System.Collections.Generic.List`1 --csm PublicWithoutConstructorInitialization --cc- --namingScheme=Direct --gc- Model\AccountingData.xsd"
       WorkingDirectory="$(MSBuildProjectDirectory)" />
     <Copy
       SourceFiles="obj\xscgen\lg2de.SimpleAccounting.Model.cs"
