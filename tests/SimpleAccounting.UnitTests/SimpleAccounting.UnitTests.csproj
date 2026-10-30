@@ -23,7 +23,7 @@
     <!-- license is apache 2.0 -->
     <PackageReference Include="xunit.v3" Version="4.0.1"/>
     <!-- license is MS.PL -->
-    <PackageReference Include="Xunit.StaFact" Version="4.0.23" />
+    <PackageReference Include="Xunit.StaFact" Version="4.0.24" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="AwesomeAssertions"/>
