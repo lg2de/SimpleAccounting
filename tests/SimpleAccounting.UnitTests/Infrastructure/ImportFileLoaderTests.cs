@@ -81,6 +81,30 @@ public class ImportFileLoaderTests
     }
 
     [Theory]
+    [InlineData("en-us", ";", ".")]
+    [InlineData("de-de", ",", ",")]
+    public void Load_SeparatorDifferentFromCulture_SeparatorDetected(
+        string cultureName, string separator, string decimalSeparator)
+    {
+        var project = Samples.SampleProject;
+        var accounts = project.AllAccounts.ToList();
+        var bankAccount = accounts.Single(x => x.Name == "Bank account");
+        var input = Encoding.UTF8.GetBytes(
+            $"""
+             Date{separator}Name{separator}Text{separator}Value
+             2000-01-15{separator}Shopping Mall{separator}Shoes{separator}"-50{decimalSeparator}25"
+             """);
+        var sut = new ImportFileLoader(input, new CultureInfo(cultureName), accounts, bankAccount.ImportMapping);
+
+        var result = sut.Load().ToList();
+
+        result.Should().BeEquivalentTo(
+        [
+            new { Date = new DateTime(2000, 1, 15), Name = "Shopping Mall", Text = "Shoes", Value = -50.25 }
+        ]);
+    }
+
+    [Theory]
     [InlineData("", "Failed to read initial record.")]
     [InlineData("foo", "Missing or incomplete file header.")]
     public void Load_InvalidData_Throws(string input, string expectedError)

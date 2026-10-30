@@ -50,14 +50,9 @@ internal sealed partial class ImportFileLoader : IDisposable
         // note, the stream is disposed by the reader
         var stream = new MemoryStream(this.bytes);
         this.streamReader = new StreamReader(stream, encoding);
-        var listSeparator = this.cultureInfo.TextInfo.ListSeparator;
-        var options = new CsvReaderOptions
-        {
-            FormatProvider = this.cultureInfo,
 
-            // keep the separator defined by the culture, detect it if the culture uses a multi-character separator
-            Separator = listSeparator.Length == 1 ? listSeparator[0] : null
-        };
+        // the culture is used to parse numbers and dates only, the separator is detected from the file
+        var options = new CsvReaderOptions { FormatProvider = this.cultureInfo };
         return this.ImportBookings(this.streamReader, options);
     }
 
