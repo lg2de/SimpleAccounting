@@ -94,9 +94,10 @@ The roadmap is defined by issues and milestones.
 I do not like closed source reuse of my software.
 This is why I decided to license the software under GPLV3.
 
-The application uses several external packages licensed under [MIT](https://opensource.org/licenses/MIT).
-Additionally, the package [CsvHelper](https://github.com/JoshClose/CsvHelper) is licensed from Josh Close
-under [Apache 2.0](https://licenses.nuget.org/Apache-2.0) (dual licensed with MS-PL, Apache 2.0 is chosen for compatibility with GPLv3).
+The application uses several external packages licensed under [MIT](https://opensource.org/licenses/MIT)
+and [Apache 2.0](https://licenses.nuget.org/Apache-2.0).
+They are listed with their copyright and license texts in
+[THIRD-PARTY-NOTICES.txt](src/SimpleAccounting/THIRD-PARTY-NOTICES.txt), which is shipped with every release.
 
 For the unit tests additional packages are used licensed under
 [Apache 2.0](https://licenses.nuget.org/Apache-2.0),
