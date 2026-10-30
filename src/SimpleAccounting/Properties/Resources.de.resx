@@ -262,8 +262,14 @@ Wählen Sie das Konto aus, in welches Buchungen importiert werden sollen.
 (Es werden nur Konten angezeigt, welche eine Import-Konfiguration haben.)
 Die importierten Empfängernamen und Buchungstexte können korrigiert werden.</value>
   </data>
-  <data name="ImportData_FileHasEnglishFormat" xml:space="preserve">
-    <value>Datei im englischen Format</value>
+  <data name="AccountConfiguration_FileFormat" xml:space="preserve">
+    <value>Dateiformat</value>
+  </data>
+  <data name="AccountConfiguration_FileFormatAutomatic" xml:space="preserve">
+    <value>Automatische Erkennung</value>
+  </data>
+  <data name="AccountConfiguration_FileFormatDescription" xml:space="preserve">
+    <value>Format der Zahlen und Datumsangaben in der Importdatei</value>
   </data>
   <data name="Action_LoadData" xml:space="preserve">
     <value>Lade Daten</value>

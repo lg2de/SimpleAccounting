@@ -268,8 +268,14 @@ Select the account to which booking are to be imported.
 (Only accounts that have an import configuration are available for selection).
 The imported recipient names and transaction texts can be modified.</value>
   </data>
-  <data name="ImportData_FileHasEnglishFormat" xml:space="preserve">
-    <value>File is in English format</value>
+  <data name="AccountConfiguration_FileFormat" xml:space="preserve">
+    <value>File format</value>
+  </data>
+  <data name="AccountConfiguration_FileFormatAutomatic" xml:space="preserve">
+    <value>Automatic detection</value>
+  </data>
+  <data name="AccountConfiguration_FileFormatDescription" xml:space="preserve">
+    <value>Format of numbers and dates in the import file</value>
   </data>
   <data name="Action_LoadData" xml:space="preserve">
     <value>Load data</value>

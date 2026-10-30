@@ -277,6 +277,48 @@ public class AccountsViewModelTests
             .Select(x => x.AccountID).Should().Equal(5UL, 3UL);
     }
 
+    [Theory]
+    [InlineData("de-DE", "de-DE")]
+    [InlineData("", null)]
+    public async Task OnEditAccount_ImportCultureChanged_ImportMappingUpdated(string newCulture, string expectedCulture)
+    {
+        var windowManager = Substitute.For<IWindowManager>();
+        string loadedCulture = null;
+        windowManager.ShowDialogAsync(
+                Arg.Do<object>(o =>
+                {
+                    var viewModel = (AccountViewModel)o;
+                    loadedCulture = viewModel.ImportCulture;
+                    viewModel.ImportCulture = newCulture;
+                }))
+            .Returns(true);
+        var clock = Substitute.For<IClock>();
+        var projectData = new ProjectData(new Settings(), null!, null!, null!, clock, null!);
+        var sut = new AccountsViewModel(windowManager, projectData);
+        var importMapping = Samples.SimpleImportConfiguration;
+        importMapping.Culture = "fr-FR";
+        projectData.Storage.Accounts =
+        [
+            new AccountingDataAccountsAccountGroup
+            {
+                Name = "Group",
+                Account =
+                [
+                    new AccountDefinition
+                    {
+                        ID = 1, Name = "Bank", Type = AccountDefinitionType.Asset, ImportMapping = importMapping
+                    }
+                ]
+            }
+        ];
+        sut.OnDataLoaded();
+
+        await sut.OnEditAccountAsync(sut.AccountList.Single());
+
+        loadedCulture.Should().Be("fr-FR");
+        projectData.Storage.Accounts[0].Account[0].ImportMapping.Culture.Should().Be(expectedCulture);
+    }
+
     [Fact]
     public async Task OnEditAccount_IdChanged_LastCarryForwardUpdated()
     {

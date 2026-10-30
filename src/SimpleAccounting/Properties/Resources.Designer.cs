@@ -60,6 +60,33 @@ namespace lg2de.SimpleAccounting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File format.
+        /// </summary>
+        public static string AccountConfiguration_FileFormat {
+            get {
+                return ResourceManager.GetString("AccountConfiguration_FileFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatic detection.
+        /// </summary>
+        public static string AccountConfiguration_FileFormatAutomatic {
+            get {
+                return ResourceManager.GetString("AccountConfiguration_FileFormatAutomatic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Format of numbers and dates in the import file.
+        /// </summary>
+        public static string AccountConfiguration_FileFormatDescription {
+            get {
+                return ResourceManager.GetString("AccountConfiguration_FileFormatDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ignore Pattern.
         /// </summary>
         public static string AccountConfiguration_IgnorePattern {
@@ -570,15 +597,6 @@ namespace lg2de.SimpleAccounting.Properties {
         public static string ImportData_AlreadyBooked {
             get {
                 return ResourceManager.GetString("ImportData_AlreadyBooked", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File is in English format.
-        /// </summary>
-        public static string ImportData_FileHasEnglishFormat {
-            get {
-                return ResourceManager.GetString("ImportData_FileHasEnglishFormat", resourceCulture);
             }
         }
         

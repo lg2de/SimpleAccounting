@@ -264,8 +264,14 @@ Sélectionnez le compte vers lequel les journalisations doivent être importées
 (Seuls les comptes disposant d'une configuration d'importation peuvent être sélectionnés).
 Les noms de destinataires importés et les textes de transaction peuvent être modifiés.</value>
   </data>
-    <data name="ImportData_FileHasEnglishFormat" xml:space="preserve">
-    <value>Le fichier est au format anglais</value>
+    <data name="AccountConfiguration_FileFormat" xml:space="preserve">
+    <value>Format du fichier</value>
+  </data>
+    <data name="AccountConfiguration_FileFormatAutomatic" xml:space="preserve">
+    <value>Détection automatique</value>
+  </data>
+    <data name="AccountConfiguration_FileFormatDescription" xml:space="preserve">
+    <value>Format des nombres et des dates dans le fichier d'importation</value>
   </data>
     <data name="Action_LoadData" xml:space="preserve">
     <value>Charger les données</value>

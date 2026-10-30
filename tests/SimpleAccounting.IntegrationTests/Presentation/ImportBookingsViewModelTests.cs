@@ -32,7 +32,7 @@ public class ImportBookingsViewModelTests
         projectData.LoadData(project);
         var sut = new ImportBookingsViewModel(dialogs, null!, projectData)
         {
-            SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID, IsForceEnglish = true
+            SelectedAccount = bankAccount, SelectedAccountNumber = bankAccount.ID
         };
 
         var stream = this.GetType().Assembly.GetManifestResourceStream(
@@ -238,7 +238,6 @@ public class ImportBookingsViewModelTests
         {
             SelectedAccount = bankAccount,
             SelectedAccountNumber = bankAccount.ID,
-            IsForceEnglish = true,
             IsReverseOrder = true
         };
 

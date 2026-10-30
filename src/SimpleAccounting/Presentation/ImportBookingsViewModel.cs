@@ -130,8 +130,6 @@ internal class ImportBookingsViewModel : Screen
                 .Where(x => x.Date >= this.StartDate)
                 .OrderBy(x => x.Date));
 
-    public bool IsForceEnglish { get; set; }
-
     public bool IsReverseOrder { get; set; }
 
     public IBusy Busy { get; } = new BusyControlModel();
@@ -242,16 +240,10 @@ internal class ImportBookingsViewModel : Screen
         {
             this.LoadedData.Clear();
 
-            var cultureInfo = CultureInfo.CurrentUICulture;
-            if (this.IsForceEnglish)
-            {
-                cultureInfo = new CultureInfo("en-us");
-            }
-
             var filteredAccounts = this.accounts.Where(x =>
                 x.ID != this.selectedAccountNumber && x.Type != AccountDefinitionType.Carryforward).ToList();
             using var loader = new ImportFileLoader(
-                bytes, cultureInfo, filteredAccounts, this.SelectedAccount!.ImportMapping);
+                bytes, CultureInfo.CurrentUICulture, filteredAccounts, this.SelectedAccount!.ImportMapping);
 
             var loadedEntries = loader.Load();
             if (this.IsReverseOrder)
