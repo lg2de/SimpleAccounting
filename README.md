@@ -103,3 +103,13 @@ For the unit tests additional packages are used licensed under
 [Apache 2.0](https://licenses.nuget.org/Apache-2.0),
 [MS-PL](https://opensource.org/licenses/MS-PL),
 and [BSD-3-Clause](https://licenses.nuget.org/BSD-3-Clause).
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=lg2de%2FSimpleAccounting&type=date&releases=&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=lg2de/SimpleAccounting&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=lg2de/SimpleAccounting&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=lg2de/SimpleAccounting&type=date&legend=bottom-right" />
+ </picture>
+</a>
