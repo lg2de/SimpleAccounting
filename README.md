@@ -51,14 +51,14 @@ Some screenshots for the first impression:
 
 The application is based on [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).
 There is
-a [self-contained package](https://github.com/lg2de/SimpleAccounting/releases/download/2.5.0/SimpleAccounting-self-contained.zip)
+a [self-contained package](https://github.com/lg2de/SimpleAccounting/releases/download/3.0.0/SimpleAccounting-self-contained.zip)
 available.
 Using this package, you do not need to install the .NET 10 runtime.
 I'll update this package with security fixes if needed.
-There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/2.5.0/SimpleAccounting.zip)
+There is also a [small package](https://github.com/lg2de/SimpleAccounting/releases/download/3.0.0/SimpleAccounting.zip)
 available that requires .NET runtime to be installed.
 Please download and install the Runtime in
-version [10.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.13-windows-x64-installer)
+version [10.0](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.14-windows-x64-installer)
 or above.
 
 Download one of the `SimpleAccounting` packages from
